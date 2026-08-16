@@ -1,0 +1,1358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fantasy Front Office</title>
+  <style>
+:root {
+  color-scheme: dark;
+  --bg: #071019;
+  --panel: #0d1822;
+  --panel-2: #142230;
+  --border: #26394a;
+  --border-soft: rgba(148, 166, 183, .16);
+  --text: #f7f9fc;
+  --muted: #9aabbb;
+  --accent: #77c9ff;
+  --accent-strong: #32adff;
+  --accent-soft: rgba(50, 173, 255, .10);
+  --good: #6fd59a;
+  --warning: #f2c66d;
+  --danger: #f67b7b;
+  --shadow: 0 20px 55px rgba(0,0,0,.30);
+  --shadow-soft: 0 10px 28px rgba(0,0,0,.18);
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 8% -8%, rgba(50,173,255,.15), transparent 30%),
+    radial-gradient(circle at 95% 5%, rgba(50,173,255,.055), transparent 24%),
+    linear-gradient(180deg, #08131d 0%, var(--bg) 42%, #060d14 100%);
+  color: var(--text);
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+.hidden { display: none !important; }
+
+.app-shell { max-width: 1520px; margin: 0 auto; padding: 22px 24px 28px; }
+.topbar,
+.workspace-heading,
+.panel-header,
+.section-title-row,
+.drawer-header,
+.drawer-footer,
+.table-toolbar,
+.inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.topbar { margin-bottom: 20px; min-height: 58px; }
+.brand-lockup { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+  background: linear-gradient(145deg, rgba(50,173,255,.23), rgba(50,173,255,.08));
+  border: 1px solid rgba(119,201,255,.28);
+  color: #bfe6ff; font-weight: 900; letter-spacing: -.04em; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+.brand-copy h1 { font-size: 1.08rem; line-height: 1.1; letter-spacing: -.015em; }
+.brand-copy p { margin: 4px 0 0; font-size: .78rem; color: var(--muted); }
+h1,h2,h3,h4,p { margin-top: 0; }
+h1 { margin-bottom: 0; font-size: clamp(1.6rem, 3vw, 2.35rem); }
+h2 { margin-bottom: 4px; }
+h3,h4 { margin-bottom: 4px; }
+.eyebrow {
+  margin-bottom: 6px;
+  color: var(--accent);
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.muted, small { color: var(--muted); }
+
+.panel,
+.view-panel,
+.summary-card,
+.workspace-nav,
+.workspace-heading {
+  border: 1px solid var(--border);
+  background: rgba(16,26,35,.94);
+  box-shadow: var(--shadow);
+}
+.panel,
+.view-panel { border-radius: var(--radius); padding: 20px; }
+.onboarding-panel {
+  max-width: 1080px; margin: 24px auto 32px; padding: 0; overflow: hidden;
+  display: grid; grid-template-columns: minmax(280px,.78fr) minmax(440px,1.22fr);
+  background: linear-gradient(145deg, rgba(13,24,34,.98), rgba(9,18,27,.98));
+}
+.onboarding-intro {
+  padding: 34px 30px; border-right: 1px solid var(--border-soft);
+  background:
+    linear-gradient(160deg, rgba(50,173,255,.09), transparent 52%),
+    rgba(10,20,29,.60);
+  display: flex; flex-direction: column; justify-content: space-between; gap: 28px;
+}
+.onboarding-intro h2 { margin: 8px 0 12px; max-width: 420px; font-size: clamp(1.8rem, 3.6vw, 2.65rem); line-height: 1.04; letter-spacing: -.035em; }
+.onboarding-intro .lead { max-width: 430px; margin: 0; color: #a9b9c8; font-size: .96rem; line-height: 1.55; }
+.setup-badge {
+  display: inline-flex; width: fit-content; align-items: center; gap: 7px; padding: 6px 9px; border-radius: 999px;
+  border: 1px solid rgba(119,201,255,.24); background: rgba(50,173,255,.08); color: #a9dcff;
+  font-size: .68rem; font-weight: 850; letter-spacing: .10em; text-transform: uppercase;
+}
+.setup-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-strong); box-shadow: 0 0 0 4px rgba(50,173,255,.09); }
+.feature-list { display: grid; gap: 10px; }
+.feature-item { display: flex; gap: 10px; align-items: flex-start; color: #b4c2cf; font-size: .82rem; line-height: 1.35; }
+.feature-check {
+  flex: 0 0 auto; width: 19px; height: 19px; border-radius: 6px; display: grid; place-items: center;
+  background: rgba(50,173,255,.10); border: 1px solid rgba(119,201,255,.22); color: var(--accent); font-size: .7rem; font-weight: 900;
+}
+.onboarding-form-wrap { padding: 28px 30px 30px; }
+.onboarding-form-heading { margin-bottom: 18px; }
+.onboarding-form-heading h3 { margin: 0 0 5px; font-size: 1.18rem; letter-spacing: -.015em; }
+.onboarding-form-heading p { margin: 0; color: var(--muted); font-size: .82rem; }
+.form-section { padding: 0 0 18px; margin-bottom: 18px; border-bottom: 1px solid var(--border-soft); }
+.form-section:last-of-type { margin-bottom: 12px; }
+.form-section-title { margin: 0 0 10px; color: #c9d5df; font-size: .74rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.onboarding-panel .form-grid { gap: 11px 14px; margin-top: 0; }
+.onboarding-panel .form-grid label { gap: 5px; }
+.onboarding-panel input,
+.onboarding-panel select { padding: 9px 11px; min-height: 43px; }
+.onboarding-panel .form-actions { margin-top: 4px; }
+.onboarding-panel .btn-primary { min-width: 190px; min-height: 43px; box-shadow: 0 9px 24px rgba(43,167,255,.16); }
+.workspace-heading { border-radius: var(--radius); padding: 18px 20px; margin: 14px 0; }
+
+.workspace-nav {
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  display: flex;
+  gap: 6px;
+  padding: 7px;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+}
+.nav-tab {
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 14px;
+  font-weight: 700;
+}
+.nav-tab.active { background: var(--panel-2); color: var(--text); }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.summary-card { border-radius: 14px; padding: 16px; }
+.summary-card .label { color: var(--muted); font-size: .78rem; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; }
+.summary-card .value { margin-top: 6px; font-size: 1.38rem; font-weight: 850; }
+.summary-card .subvalue { margin-top: 4px; font-size: .82rem; color: var(--muted); }
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--panel-2);
+}
+.btn:hover { filter: brightness(1.08); }
+.btn-primary { background: linear-gradient(180deg, #3db3ff, #249eea); color: #03111c; border-color: rgba(255,255,255,.08); }
+.btn-secondary { border-color: var(--border); }
+.btn-ghost { background: transparent; border-color: var(--border); }
+.btn-danger { background: rgba(246,123,123,.12); border-color: rgba(246,123,123,.4); color: #ffb0b0; }
+.btn-small { padding: 7px 10px; font-size: .82rem; }
+.icon-btn { border: 0; background: transparent; color: var(--muted); font-size: 1.7rem; line-height: 1; }
+
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+.form-grid.compact { gap: 12px; }
+.form-grid label { display: grid; gap: 7px; color: var(--muted); font-size: .84rem; font-weight: 700; }
+.full-width { grid-column: 1 / -1; }
+.form-actions { display: flex; justify-content: flex-end; }
+input, select, textarea {
+  width: 100%;
+  border: 1px solid #2a4052;
+  background: rgba(7,17,26,.78);
+  color: var(--text);
+  border-radius: 11px;
+  padding: 10px 11px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+  outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent-strong); box-shadow: 0 0 0 3px rgba(43,167,255,.12); }
+textarea { resize: vertical; }
+
+.season-picker { display: grid; gap: 5px; color: var(--muted); font-size: .8rem; }
+.season-picker select { min-width: 130px; }
+
+.view-panel { min-height: 240px; }
+.section-grid { display: grid; grid-template-columns: 1.45fr .75fr; gap: 14px; }
+.stack { display: grid; gap: 14px; }
+.subpanel { border: 1px solid var(--border); border-radius: 14px; background: #0d171f; padding: 16px; }
+.subpanel h3 { margin-bottom: 12px; }
+
+.status-pill,
+.issue-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: .73rem;
+  font-weight: 800;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+}
+.issue-pill { color: var(--warning); border-color: rgba(242,198,109,.35); background: rgba(242,198,109,.08); }
+.good { color: var(--good); }
+.warning { color: var(--warning); }
+.danger { color: var(--danger); }
+
+.table-toolbar { margin-bottom: 12px; flex-wrap: wrap; }
+.table-toolbar .toolbar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.search-input { min-width: 250px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 860px; }
+th, td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+th { background: #101b25; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .045em; position: sticky; top: 0; z-index: 2; }
+tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: rgba(255,255,255,.025); }
+.money { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.player-button { padding: 0; border: 0; background: transparent; color: var(--text); font-weight: 800; text-align: left; }
+.player-button:hover { color: var(--accent); }
+.cell-input { min-width: 120px; padding: 7px 8px; }
+.empty-cell { color: var(--warning); }
+.total-row td { font-weight: 850; background: rgba(43,167,255,.045); }
+
+.issue-list, .activity-list { display: grid; gap: 10px; }
+.issue-item, .activity-item { border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; background: #0b141d; }
+.activity-item p, .issue-item p { margin-bottom: 2px; }
+
+.progress-track { height: 10px; border-radius: 999px; background: #0a1219; overflow: hidden; border: 1px solid var(--border); }
+.progress-fill { height: 100%; background: var(--accent-strong); }
+
+.drawer-dialog,
+.modal-dialog {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+}
+.drawer-dialog { margin: 0 0 0 auto; width: min(680px, 100vw); max-width: none; height: 100vh; }
+.drawer-dialog::backdrop,
+.modal-dialog::backdrop { background: rgba(0,0,0,.62); backdrop-filter: blur(4px); }
+.drawer-card { width: 100%; min-height: 100vh; display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--border); }
+.drawer-header, .drawer-footer { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.drawer-footer { border-bottom: 0; border-top: 1px solid var(--border); margin-top: auto; }
+.drawer-footer-right { display: flex; gap: 8px; margin-left: auto; }
+.drawer-body { padding: 18px; overflow-y: auto; }
+.editor-section { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+.contract-grid { display: grid; gap: 8px; margin-top: 12px; }
+.contract-row { display: grid; grid-template-columns: 100px 1fr 1fr; gap: 8px; align-items: end; }
+.contract-row .season-label { padding-bottom: 11px; font-weight: 800; }
+.warning-box { margin-top: 14px; border: 1px solid rgba(242,198,109,.4); background: rgba(242,198,109,.08); color: #f8d995; border-radius: 10px; padding: 12px; }
+
+.modal-dialog { width: min(760px, calc(100vw - 24px)); }
+.modal-card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+.modal-body { padding: 18px; }
+.file-drop { display: grid; place-items: center; gap: 10px; min-height: 120px; border: 1px dashed #456078; border-radius: 12px; color: var(--muted); background: #0b141d; }
+.file-drop input { width: auto; border: 0; background: transparent; }
+.import-preview { margin-top: 16px; }
+.import-preview .table-wrap { max-height: 330px; overflow: auto; }
+
+.settings-list { display: grid; gap: 10px; }
+.status-setting { display: grid; grid-template-columns: 1fr 140px auto; gap: 10px; align-items: center; }
+.season-setting { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; }
+
+@media (max-width: 980px) {
+  .summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .section-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .app-shell { padding: 13px 14px 22px; }
+  .topbar, .workspace-heading { align-items: flex-start; }
+  .topbar { margin-bottom: 12px; min-height: 48px; }
+  .brand-mark { width: 38px; height: 38px; border-radius: 10px; }
+  .brand-copy h1 { font-size: 1rem; }
+  .brand-copy p { font-size: .72rem; }
+  .topbar-actions { width: auto; }
+  .onboarding-panel { margin: 12px auto 22px; grid-template-columns: 1fr; border-radius: 16px; }
+  .onboarding-intro { padding: 22px 20px 18px; border-right: 0; border-bottom: 1px solid var(--border-soft); gap: 16px; }
+  .onboarding-intro h2 { margin: 7px 0 8px; font-size: 1.75rem; line-height: 1.05; }
+  .onboarding-intro .lead { font-size: .88rem; line-height: 1.48; }
+  .feature-list { grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+  .feature-item { font-size: .75rem; }
+  .feature-item:last-child { display: none; }
+  .onboarding-form-wrap { padding: 18px 20px 20px; }
+  .onboarding-form-heading { margin-bottom: 14px; }
+  .onboarding-form-heading h3 { font-size: 1.05rem; }
+  .form-section { padding-bottom: 14px; margin-bottom: 14px; }
+  .onboarding-panel .form-grid { gap: 9px; }
+  .onboarding-panel .form-grid label { gap: 4px; font-size: .79rem; }
+  .onboarding-panel input,
+  .onboarding-panel select { padding: 8px 10px; min-height: 41px; }
+  .onboarding-panel .form-actions { margin-top: 2px; }
+  .onboarding-panel .btn-primary { width: 100%; min-height: 43px; }
+  .workspace-nav { overflow-x: auto; }
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .full-width { grid-column: auto; }
+  .contract-row { grid-template-columns: 1fr; border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+  .contract-row .season-label { padding-bottom: 0; }
+  .drawer-dialog { width: 100vw; }
+  .status-setting, .season-setting { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 390px) {
+  .feature-list { grid-template-columns: 1fr; }
+  .feature-item:last-child { display: flex; }
+  .onboarding-intro { padding: 20px 18px 16px; }
+  .onboarding-form-wrap { padding: 17px 18px 19px; }
+}
+</style>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">FO</div>
+        <div class="brand-copy">
+          <h1>Fantasy Front Office</h1>
+          <p>Personal cap &amp; contract manager</p>
+        </div>
+      </div>
+      <div id="topbarActions" class="topbar-actions">
+        <button id="resetBtn" class="btn btn-ghost" type="button">Reset Demo</button>
+        <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="onboarding" class="panel onboarding-panel hidden" aria-labelledby="onboardingTitle">
+        <div class="onboarding-intro">
+          <div>
+            <span class="setup-badge">New workspace</span>
+            <h2 id="onboardingTitle">Run your fantasy team like a front office.</h2>
+            <p class="lead">Keep salaries, contracts, cap space and roster decisions organized in one private workspace.</p>
+          </div>
+          <div class="feature-list" aria-label="Front office features">
+            <div class="feature-item"><span class="feature-check">✓</span><span>Multi-year salary tracking</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Automatic cap calculations</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Flexible roster statuses</span></div>
+          </div>
+        </div>
+
+        <div class="onboarding-form-wrap">
+          <div class="onboarding-form-heading">
+            <h3>Set up your Front Office</h3>
+            <p>Start with the essentials. You can change these later.</p>
+          </div>
+
+          <form id="frontOfficeForm">
+            <section class="form-section">
+              <p class="form-section-title">Team</p>
+              <div class="form-grid">
+                <label>
+                  Team name
+                  <input id="teamName" name="teamName" required placeholder="Red Deer Wolves" />
+                </label>
+                <label>
+                  League name
+                  <input id="leagueName" name="leagueName" required placeholder="Ice Throne Dynasty" />
+                </label>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <p class="form-section-title">League setup</p>
+              <div class="form-grid">
+                <label>
+                  Sport
+                  <select id="sport" name="sport">
+                    <option value="NHL">NHL</option>
+                  </select>
+                </label>
+                <label>
+                  Current season
+                  <input id="currentSeason" name="currentSeason" required value="2026-27" pattern="\d{4}-\d{2}" />
+                </label>
+                <label>
+                  Salary cap
+                  <input id="salaryCap" name="salaryCap" type="text" inputmode="numeric" autocomplete="off" value="$119,600,000" aria-label="Salary cap" />
+                </label>
+                <label>
+                  Roster limit
+                  <input id="rosterLimit" name="rosterLimit" type="number" min="0" step="1" value="30" />
+                </label>
+                <label>
+                  Currency
+                  <select id="currency" name="currency">
+                    <option value="USD">USD</option>
+                    <option value="CAD">CAD</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">Create Front Office</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="workspace" class="hidden">
+        <nav class="workspace-nav" aria-label="Front office navigation">
+          <button class="nav-tab active" data-view="overview" type="button">Overview</button>
+          <button class="nav-tab" data-view="roster" type="button">Roster</button>
+          <button class="nav-tab" data-view="cap" type="button">Cap</button>
+          <button class="nav-tab" data-view="settings" type="button">Settings</button>
+        </nav>
+
+        <section class="workspace-heading">
+          <div>
+            <p id="leagueLabel" class="eyebrow"></p>
+            <h2 id="teamLabel"></h2>
+          </div>
+          <label class="season-picker">
+            Season
+            <select id="seasonSelect"></select>
+          </label>
+        </section>
+
+        <section id="summaryCards" class="summary-grid" aria-label="Front office summary"></section>
+
+        <section id="overviewView" class="view-panel"></section>
+        <section id="rosterView" class="view-panel hidden"></section>
+        <section id="capView" class="view-panel hidden"></section>
+        <section id="settingsView" class="view-panel hidden"></section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="playerDialog" class="drawer-dialog">
+    <form id="playerForm" method="dialog" class="drawer-card">
+      <header class="drawer-header">
+        <div>
+          <p class="eyebrow">Player editor</p>
+          <h3 id="playerDialogTitle">Add Player</h3>
+        </div>
+        <button id="closePlayerDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+
+      <div class="drawer-body">
+        <div class="form-grid compact">
+          <label>
+            Player name
+            <input id="playerName" required />
+          </label>
+          <label>
+            Position
+            <select id="playerPosition">
+              <option value="C">C</option>
+              <option value="LW">LW</option>
+              <option value="RW">RW</option>
+              <option value="F">F</option>
+              <option value="D">D</option>
+              <option value="G">G</option>
+            </select>
+          </label>
+          <label>
+            Real team
+            <input id="realTeam" maxlength="8" placeholder="EDM" />
+          </label>
+          <label>
+            Roster status
+            <select id="rosterStatus"></select>
+          </label>
+        </div>
+
+        <section class="editor-section">
+          <div class="section-title-row">
+            <div>
+              <p class="eyebrow">Contract</p>
+              <h4>Season salary and cap charge</h4>
+            </div>
+            <button id="fillContractBtn" class="btn btn-ghost btn-small" type="button">Fill flat contract</button>
+          </div>
+          <div id="contractGrid" class="contract-grid"></div>
+        </section>
+
+        <section class="editor-section">
+          <div class="form-grid compact">
+            <label>
+              Contract through
+              <select id="contractEnd"></select>
+            </label>
+            <label class="full-width">
+              Notes
+              <textarea id="playerNotes" rows="3" placeholder="Optional personal notes"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section id="playerWarnings" class="warning-box hidden" aria-live="polite"></section>
+      </div>
+
+      <footer class="drawer-footer">
+        <button id="deletePlayerBtn" class="btn btn-danger hidden" type="button">Remove Player</button>
+        <div class="drawer-footer-right">
+          <button id="cancelPlayerBtn" class="btn btn-ghost" type="button">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save Player</button>
+        </div>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="importDialog" class="modal-dialog">
+    <form method="dialog" class="modal-card">
+      <header class="drawer-header">
+        <div>
+          <p class="eyebrow">Roster import</p>
+          <h3>Import CSV</h3>
+        </div>
+        <button id="closeImportDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="modal-body">
+        <p class="muted">Supported V1 columns: Player or Name, Pos or Position, Team, Status, and season salary columns such as 2026-27 or Salary 2026-27.</p>
+        <label class="file-drop">
+          <span>Select CSV file</span>
+          <input id="csvFile" type="file" accept=".csv,text/csv" />
+        </label>
+        <div id="importPreview" class="import-preview hidden"></div>
+      </div>
+      <footer class="drawer-footer">
+        <button id="cancelImportBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="applyImportBtn" class="btn btn-primary" type="button" disabled>Apply Import</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="adjustmentDialog" class="modal-dialog">
+    <form id="adjustmentForm" method="dialog" class="modal-card">
+      <header class="drawer-header">
+        <div>
+          <p class="eyebrow">Financial adjustment</p>
+          <h3>Add adjustment</h3>
+        </div>
+        <button id="closeAdjustmentDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="modal-body form-grid compact">
+        <label>
+          Type
+          <select id="adjustmentType">
+            <option value="Dead Cap">Dead Cap</option>
+            <option value="Retained Salary">Retained Salary</option>
+            <option value="Bonus/Penalty">Bonus/Penalty</option>
+            <option value="Cap Credit">Cap Credit</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <label>
+          Season
+          <select id="adjustmentSeason"></select>
+        </label>
+        <label class="full-width">
+          Description
+          <input id="adjustmentDescription" required placeholder="Player release penalty" />
+        </label>
+        <label>
+          Amount
+          <input id="adjustmentAmount" required type="number" step="1" />
+          <small>Positive consumes cap. Negative creates cap space.</small>
+        </label>
+      </div>
+      <footer class="drawer-footer">
+        <button id="cancelAdjustmentBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save Adjustment</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'fantasyFrontOfficeV1';
+  const DEFAULT_STATUSES = [
+    { id: uid(), name: 'Active', countsTowardCap: true },
+    { id: uid(), name: 'Reserve', countsTowardCap: true },
+    { id: uid(), name: 'IR', countsTowardCap: true },
+    { id: uid(), name: 'Prospect', countsTowardCap: false },
+    { id: uid(), name: 'Other', countsTowardCap: true }
+  ];
+
+  let state = loadState();
+  let editingPlayerId = null;
+  let pendingImport = [];
+
+  const el = (id) => document.getElementById(id);
+  const onboarding = el('onboarding');
+  const workspace = el('workspace');
+  const playerDialog = el('playerDialog');
+  const importDialog = el('importDialog');
+  const adjustmentDialog = el('adjustmentDialog');
+
+  init();
+
+  function init() {
+    bindEvents();
+    render();
+  }
+
+  function emptyState() {
+    return {
+      frontOffice: null,
+      seasons: [],
+      statuses: structuredClone(DEFAULT_STATUSES),
+      players: [],
+      adjustments: [],
+      activity: []
+    };
+  }
+
+  function bindEvents() {
+    el('frontOfficeForm').addEventListener('submit', handleCreateFrontOffice);
+    el('salaryCap').addEventListener('input', (event) => formatWholeDollarInput(event.target));
+    el('salaryCap').addEventListener('blur', (event) => formatWholeDollarInput(event.target));
+    el('resetBtn').addEventListener('click', resetApp);
+    el('exportBtn').addEventListener('click', exportRosterCsv);
+    el('seasonSelect').addEventListener('change', () => {
+      state.frontOffice.currentSeasonId = el('seasonSelect').value;
+      saveState();
+      render();
+    });
+
+    document.querySelectorAll('.nav-tab').forEach((button) => {
+      button.addEventListener('click', () => switchView(button.dataset.view));
+    });
+
+    el('closePlayerDialog').addEventListener('click', () => playerDialog.close());
+    el('cancelPlayerBtn').addEventListener('click', () => playerDialog.close());
+    el('playerForm').addEventListener('submit', savePlayerFromDialog);
+    el('deletePlayerBtn').addEventListener('click', removeEditingPlayer);
+    el('fillContractBtn').addEventListener('click', fillFlatContract);
+
+    el('closeImportDialog').addEventListener('click', () => importDialog.close());
+    el('cancelImportBtn').addEventListener('click', () => importDialog.close());
+    el('csvFile').addEventListener('change', handleCsvFile);
+    el('applyImportBtn').addEventListener('click', applyImport);
+
+    el('closeAdjustmentDialog').addEventListener('click', () => adjustmentDialog.close());
+    el('cancelAdjustmentBtn').addEventListener('click', () => adjustmentDialog.close());
+    el('adjustmentForm').addEventListener('submit', saveAdjustment);
+  }
+
+  function handleCreateFrontOffice(event) {
+    event.preventDefault();
+    const currentSeason = el('currentSeason').value.trim();
+    const startYear = parseSeasonStart(currentSeason);
+    if (!startYear) {
+      alert('Use a season in the format 2026-27.');
+      return;
+    }
+
+    const seasons = [];
+    for (let i = 0; i < 4; i += 1) {
+      const year = startYear + i;
+      seasons.push({
+        id: uid(),
+        startYear: year,
+        salaryCap: i === 0 ? nullableNumber(el('salaryCap').value) : null
+      });
+    }
+
+    state = emptyState();
+    state.seasons = seasons;
+    state.frontOffice = {
+      id: uid(),
+      teamName: el('teamName').value.trim(),
+      leagueName: el('leagueName').value.trim(),
+      sport: el('sport').value,
+      currency: el('currency').value,
+      rosterLimit: nullableNumber(el('rosterLimit').value),
+      currentSeasonId: seasons[0].id,
+      createdAt: new Date().toISOString()
+    };
+    state.activity.unshift(activity('Front Office created'));
+    saveState();
+    render();
+  }
+
+  function render() {
+    const hasOffice = Boolean(state.frontOffice);
+    onboarding.classList.toggle('hidden', hasOffice);
+    workspace.classList.toggle('hidden', !hasOffice);
+    el('exportBtn').disabled = !hasOffice;
+    el('topbarActions').classList.toggle('hidden', !hasOffice);
+    if (!hasOffice) return;
+
+    el('teamLabel').textContent = state.frontOffice.teamName;
+    el('leagueLabel').textContent = `${state.frontOffice.leagueName} · ${state.frontOffice.sport}`;
+    renderSeasonSelect();
+    renderSummaryCards();
+    renderOverview();
+    renderRoster();
+    renderCap();
+    renderSettings();
+  }
+
+  function renderSeasonSelect() {
+    const select = el('seasonSelect');
+    select.innerHTML = state.seasons
+      .sort((a, b) => a.startYear - b.startYear)
+      .map((season) => `<option value="${season.id}" ${season.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${seasonLabel(season.startYear)}</option>`)
+      .join('');
+  }
+
+  function renderSummaryCards() {
+    const season = currentSeason();
+    const calc = calculateSeason(season.id);
+    const rosterLimit = state.frontOffice.rosterLimit;
+    const expiring = state.players.filter((p) => p.contractEndSeasonId === season.id).length;
+    const deadCap = state.adjustments
+      .filter((a) => a.type === 'Dead Cap' && a.seasonId === season.id)
+      .reduce((sum, a) => sum + a.amount, 0);
+
+    const capSpaceValue = calc.complete && calc.salaryCap !== null ? formatMoney(calc.capSpace) : 'Incomplete';
+    const capSpaceSub = calc.missingPlayerIds.length ? `${calc.missingPlayerIds.length} missing salary` : 'Current cap result';
+
+    el('summaryCards').innerHTML = [
+      summaryCard('Cap Used', calc.complete ? formatMoney(calc.capUsed) : `${formatMoney(calc.knownCapUsed)} known`, calc.complete ? 'Complete' : 'Incomplete'),
+      summaryCard('Cap Space', capSpaceValue, capSpaceSub),
+      summaryCard('Players', `${state.players.length}${rosterLimit ? ` / ${rosterLimit}` : ''}`, 'Current roster'),
+      summaryCard('Expiring', String(expiring), seasonLabel(season.startYear)),
+      summaryCard('Dead Cap', formatMoney(deadCap), seasonLabel(season.startYear))
+    ].join('');
+  }
+
+  function summaryCard(label, value, subvalue) {
+    return `<article class="summary-card"><div class="label">${escapeHtml(label)}</div><div class="value">${escapeHtml(value)}</div><div class="subvalue">${escapeHtml(subvalue)}</div></article>`;
+  }
+
+  function renderOverview() {
+    const season = currentSeason();
+    const calc = calculateSeason(season.id);
+    const missingPlayers = calc.missingPlayerIds.map((id) => state.players.find((p) => p.id === id)).filter(Boolean);
+    const futureRows = state.seasons.map((s) => {
+      const c = calculateSeason(s.id);
+      const space = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
+      return `<tr><td>${seasonLabel(s.startYear)}</td><td class="money">${formatMoney(c.knownRosterCap)}</td><td class="money">${formatMoney(c.adjustmentsTotal)}</td><td class="money">${formatMoney(c.knownCapUsed)}</td><td class="money">${space}</td></tr>`;
+    }).join('');
+
+    const issues = [];
+    missingPlayers.forEach((p) => issues.push(`<div class="issue-item"><p><strong>${escapeHtml(p.name)}</strong></p><span class="warning">Missing ${seasonLabel(season.startYear)} salary</span></div>`));
+    if (!issues.length) issues.push('<div class="issue-item"><p class="good"><strong>No current-season salary issues.</strong></p></div>');
+
+    const activities = state.activity.slice(0, 6).map((a) => `<div class="activity-item"><p><strong>${escapeHtml(a.label)}</strong></p><small>${formatDateTime(a.at)}</small></div>`).join('') || '<div class="activity-item"><p class="muted">No activity yet.</p></div>';
+
+    el('overviewView').innerHTML = `
+      <div class="section-grid">
+        <div class="stack">
+          <div class="subpanel">
+            <div class="section-title-row"><div><p class="eyebrow">Future commitments</p><h3>Cap by season</h3></div></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Season</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Cap Space</th></tr></thead>
+                <tbody>${futureRows}</tbody>
+              </table>
+            </div>
+          </div>
+          <div class="subpanel">
+            <p class="eyebrow">Recent activity</p>
+            <h3>Changes</h3>
+            <div class="activity-list">${activities}</div>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="subpanel">
+            <p class="eyebrow">Data quality</p>
+            <h3>Issues</h3>
+            <div class="issue-list">${issues.join('')}</div>
+          </div>
+          <div class="subpanel">
+            <p class="eyebrow">Setup</p>
+            <h3>${calc.complete ? '<span class="good">Front Office Ready</span>' : '<span class="warning">Financial Setup Incomplete</span>'}</h3>
+            <p class="muted">Current cap remains incomplete until every cap-counting player has a current-season salary.</p>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderRoster() {
+    const seasons = visibleSeasons();
+    const rows = state.players.map((player) => {
+      const status = statusById(player.statusId);
+      const seasonCells = seasons.map((season) => {
+        const salary = player.salaries[season.id];
+        const value = salary?.salary ?? null;
+        return `<td class="money ${value === null ? 'empty-cell' : ''}">${value === null ? '—' : formatMoney(value)}</td>`;
+      }).join('');
+      return `<tr>
+        <td><button class="player-button" data-edit-player="${player.id}" type="button">${escapeHtml(player.name)}</button></td>
+        <td>${escapeHtml(player.position)}</td>
+        <td>${escapeHtml(player.realTeam || '—')}</td>
+        <td><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>
+        ${seasonCells}
+        <td>${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td>
+        <td>${escapeHtml(player.notes || '')}</td>
+      </tr>`;
+    }).join('');
+
+    const totalCells = seasons.map((s) => `<td class="money">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
+
+    el('rosterView').innerHTML = `
+      <div class="table-toolbar">
+        <div class="toolbar-group">
+          <input id="rosterSearch" class="search-input" placeholder="Search players..." />
+          <select id="statusFilter"><option value="">All statuses</option>${state.statuses.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+        </div>
+        <div class="toolbar-group">
+          <button id="importRosterBtn" class="btn btn-secondary" type="button">Import CSV</button>
+          <button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button>
+          <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="rosterTable">
+          <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Status</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Ends</th><th>Notes</th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="${7 + seasons.length}"><span class="muted">No players yet. Add a player or import a CSV.</span></td></tr>`}</tbody>
+          <tfoot><tr class="total-row"><td colspan="4">Roster Total</td>${totalCells}<td colspan="2"></td></tr></tfoot>
+        </table>
+      </div>
+      ${renderAdjustmentTable()}`;
+
+    el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());
+    el('importRosterBtn').addEventListener('click', openImportDialog);
+    el('addAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
+    document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
+    el('rosterSearch').addEventListener('input', applyRosterFilters);
+    el('statusFilter').addEventListener('change', applyRosterFilters);
+    document.querySelectorAll('[data-delete-adjustment]').forEach((button) => button.addEventListener('click', () => deleteAdjustment(button.dataset.deleteAdjustment)));
+  }
+
+  function renderAdjustmentTable() {
+    const seasons = visibleSeasons();
+    const rows = state.adjustments.map((a) => {
+      const cells = seasons.map((s) => `<td class="money">${a.seasonId === s.id ? formatMoney(a.amount) : '—'}</td>`).join('');
+      return `<tr><td>${escapeHtml(a.description)}</td><td>${escapeHtml(a.type)}</td>${cells}<td><button class="btn btn-ghost btn-small" data-delete-adjustment="${a.id}" type="button">Remove</button></td></tr>`;
+    }).join('');
+    return `
+      <div class="subpanel" style="margin-top:14px">
+        <div class="section-title-row"><div><p class="eyebrow">Financial adjustments</p><h3>Separate from roster players</h3></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th></th></tr></thead><tbody>${rows || `<tr><td colspan="${3 + seasons.length}"><span class="muted">No financial adjustments.</span></td></tr>`}</tbody></table></div>
+      </div>`;
+  }
+
+  function applyRosterFilters() {
+    const q = el('rosterSearch').value.trim().toLowerCase();
+    const statusId = el('statusFilter').value;
+    document.querySelectorAll('#rosterTable tbody tr').forEach((row) => {
+      const playerButton = row.querySelector('[data-edit-player]');
+      if (!playerButton) return;
+      const player = state.players.find((p) => p.id === playerButton.dataset.editPlayer);
+      const haystack = `${player.name} ${player.position} ${player.realTeam}`.toLowerCase();
+      row.hidden = Boolean((q && !haystack.includes(q)) || (statusId && player.statusId !== statusId));
+    });
+  }
+
+  function renderCap() {
+    const rows = state.seasons.map((s) => {
+      const c = calculateSeason(s.id);
+      return `<tr>
+        <td>${seasonLabel(s.startYear)}</td>
+        <td class="money">${c.salaryCap === null ? '—' : formatMoney(c.salaryCap)}</td>
+        <td class="money">${formatMoney(c.knownRosterCap)}</td>
+        <td class="money">${formatMoney(c.adjustmentsTotal)}</td>
+        <td class="money">${formatMoney(c.knownCapUsed)}</td>
+        <td class="money">${c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : 'Incomplete'}</td>
+      </tr>`;
+    }).join('');
+
+    el('capView').innerHTML = `
+      <div class="subpanel">
+        <p class="eyebrow">Cap table</p>
+        <h3>Multi-year financial view</h3>
+        <div class="table-wrap"><table><thead><tr><th>Season</th><th>Cap</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div>`;
+  }
+
+  function renderSettings() {
+    const seasonSettings = state.seasons.map((s) => `<div class="season-setting" data-season-setting="${s.id}">
+      <label>Season<input value="${seasonLabel(s.startYear)}" disabled /></label>
+      <label>Salary cap<input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Unknown" /></label>
+      <button class="btn btn-ghost btn-small" data-remove-season="${s.id}" type="button" ${state.seasons.length <= 1 ? 'disabled' : ''}>Remove</button>
+    </div>`).join('');
+
+    const statusSettings = state.statuses.map((s) => `<div class="status-setting" data-status-setting="${s.id}">
+      <input data-status-name="${s.id}" value="${escapeAttr(s.name)}" />
+      <label><select data-status-cap="${s.id}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select></label>
+      <button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">Remove</button>
+    </div>`).join('');
+
+    el('settingsView').innerHTML = `
+      <div class="section-grid">
+        <div class="subpanel">
+          <div class="section-title-row"><div><p class="eyebrow">Seasons</p><h3>Salary caps</h3></div><button id="addSeasonBtn" class="btn btn-secondary btn-small" type="button">+ Add Season</button></div>
+          <div class="settings-list">${seasonSettings}</div>
+        </div>
+        <div class="subpanel">
+          <div class="section-title-row"><div><p class="eyebrow">Roster</p><h3>Status rules</h3></div><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div>
+          <div class="settings-list">${statusSettings}</div>
+        </div>
+      </div>`;
+
+    document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', () => {
+      seasonById(input.dataset.seasonCap).salaryCap = nullableNumber(input.value);
+      state.activity.unshift(activity(`Updated ${seasonLabel(seasonById(input.dataset.seasonCap).startYear)} salary cap`));
+      saveState(); render();
+    }));
+    document.querySelectorAll('[data-remove-season]').forEach((button) => button.addEventListener('click', () => removeSeason(button.dataset.removeSeason)));
+    document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', () => {
+      statusById(input.dataset.statusName).name = input.value.trim() || 'Status';
+      saveState(); render();
+    }));
+    document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', () => {
+      statusById(select.dataset.statusCap).countsTowardCap = select.value === 'true';
+      state.activity.unshift(activity('Updated roster cap-counting rule'));
+      saveState(); render();
+    }));
+    document.querySelectorAll('[data-remove-status]').forEach((button) => button.addEventListener('click', () => removeStatus(button.dataset.removeStatus)));
+    el('addSeasonBtn').addEventListener('click', addSeason);
+    el('addStatusBtn').addEventListener('click', addStatus);
+  }
+
+  function switchView(view) {
+    document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
+    ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
+  }
+
+  function openPlayerDialog(playerId = null) {
+    editingPlayerId = playerId;
+    const player = playerId ? state.players.find((p) => p.id === playerId) : null;
+    el('playerDialogTitle').textContent = player ? player.name : 'Add Player';
+    el('playerName').value = player?.name || '';
+    el('playerPosition').value = player?.position || 'C';
+    el('realTeam').value = player?.realTeam || '';
+    renderStatusOptions(player?.statusId);
+    renderContractEditor(player);
+    el('playerNotes').value = player?.notes || '';
+    el('deletePlayerBtn').classList.toggle('hidden', !player);
+    validatePlayerDialog();
+    playerDialog.showModal();
+  }
+
+  function renderStatusOptions(selectedId) {
+    el('rosterStatus').innerHTML = state.statuses.map((s) => `<option value="${s.id}" ${s.id === selectedId ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('');
+  }
+
+  function renderContractEditor(player) {
+    const sorted = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
+    el('contractGrid').innerHTML = sorted.map((season) => {
+      const data = player?.salaries?.[season.id] || { salary: null, capOverride: null };
+      return `<div class="contract-row">
+        <div class="season-label">${seasonLabel(season.startYear)}</div>
+        <label>Salary<input data-contract-salary="${season.id}" type="number" min="0" step="1" value="${data.salary ?? ''}" placeholder="Not entered" /></label>
+        <label>Cap override<input data-contract-override="${season.id}" type="number" min="0" step="1" value="${data.capOverride ?? ''}" placeholder="Same as salary" /></label>
+      </div>`;
+    }).join('');
+    el('contractEnd').innerHTML = `<option value="">Not set</option>${sorted.map((s) => `<option value="${s.id}" ${player?.contractEndSeasonId === s.id ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('')}`;
+    document.querySelectorAll('[data-contract-salary], [data-contract-override]').forEach((input) => input.addEventListener('input', validatePlayerDialog));
+    el('contractEnd').addEventListener('change', validatePlayerDialog, { once: true });
+  }
+
+  function fillFlatContract() {
+    const amountRaw = prompt('Salary amount for each season:');
+    if (amountRaw === null) return;
+    const amount = nullableNumber(amountRaw.replace(/[$,]/g,''));
+    if (amount === null || amount < 0) {
+      alert('Enter a valid salary amount.');
+      return;
+    }
+    const through = el('contractEnd').value || currentSeason().id;
+    const throughSeason = seasonById(through);
+    document.querySelectorAll('[data-contract-salary]').forEach((input) => {
+      const s = seasonById(input.dataset.contractSalary);
+      if (s.startYear <= throughSeason.startYear) input.value = amount;
+    });
+    validatePlayerDialog();
+  }
+
+  function savePlayerFromDialog(event) {
+    event.preventDefault();
+    const name = el('playerName').value.trim();
+    if (!name) return;
+    const salaries = {};
+    state.seasons.forEach((season) => {
+      const salaryInput = document.querySelector(`[data-contract-salary="${season.id}"]`);
+      const overrideInput = document.querySelector(`[data-contract-override="${season.id}"]`);
+      salaries[season.id] = {
+        salary: nullableNumber(salaryInput.value),
+        capOverride: nullableNumber(overrideInput.value)
+      };
+    });
+
+    if (editingPlayerId) {
+      const player = state.players.find((p) => p.id === editingPlayerId);
+      player.name = name;
+      player.position = el('playerPosition').value;
+      player.realTeam = el('realTeam').value.trim().toUpperCase();
+      player.statusId = el('rosterStatus').value;
+      player.contractEndSeasonId = el('contractEnd').value || null;
+      player.notes = el('playerNotes').value.trim();
+      player.salaries = salaries;
+      player.updatedAt = new Date().toISOString();
+      state.activity.unshift(activity(`Updated ${player.name}`));
+    } else {
+      const player = {
+        id: uid(),
+        name,
+        position: el('playerPosition').value,
+        realTeam: el('realTeam').value.trim().toUpperCase(),
+        statusId: el('rosterStatus').value,
+        contractEndSeasonId: el('contractEnd').value || null,
+        notes: el('playerNotes').value.trim(),
+        salaries,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      state.players.push(player);
+      state.activity.unshift(activity(`Added ${player.name}`));
+    }
+    saveState();
+    playerDialog.close();
+    render();
+  }
+
+  function validatePlayerDialog() {
+    const endId = el('contractEnd').value;
+    const warnings = [];
+    if (endId) {
+      const end = seasonById(endId);
+      document.querySelectorAll('[data-contract-salary]').forEach((input) => {
+        const s = seasonById(input.dataset.contractSalary);
+        if (s.startYear <= end.startYear && nullableNumber(input.value) === null) warnings.push(`Missing salary for ${seasonLabel(s.startYear)}.`);
+        if (s.startYear > end.startYear && nullableNumber(input.value) !== null) warnings.push(`Salary exists after contract end in ${seasonLabel(s.startYear)}.`);
+      });
+    }
+    const box = el('playerWarnings');
+    box.classList.toggle('hidden', warnings.length === 0);
+    box.innerHTML = warnings.length ? `<strong>Review:</strong><br>${warnings.map(escapeHtml).join('<br>')}` : '';
+  }
+
+  function removeEditingPlayer() {
+    const player = state.players.find((p) => p.id === editingPlayerId);
+    if (!player) return;
+    if (!confirm(`Remove ${player.name} from this Front Office? Contract history in this prototype will also be removed.`)) return;
+    state.players = state.players.filter((p) => p.id !== editingPlayerId);
+    state.activity.unshift(activity(`Removed ${player.name}`));
+    saveState();
+    playerDialog.close();
+    render();
+  }
+
+  function openAdjustmentDialog() {
+    el('adjustmentSeason').innerHTML = state.seasons.map((s) => `<option value="${s.id}" ${s.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('');
+    el('adjustmentDescription').value = '';
+    el('adjustmentAmount').value = '';
+    adjustmentDialog.showModal();
+  }
+
+  function saveAdjustment(event) {
+    event.preventDefault();
+    const amount = nullableNumber(el('adjustmentAmount').value);
+    if (amount === null) return;
+    state.adjustments.push({
+      id: uid(),
+      type: el('adjustmentType').value,
+      seasonId: el('adjustmentSeason').value,
+      description: el('adjustmentDescription').value.trim(),
+      amount,
+      createdAt: new Date().toISOString()
+    });
+    state.activity.unshift(activity(`Added ${el('adjustmentType').value} adjustment`));
+    saveState();
+    adjustmentDialog.close();
+    render();
+  }
+
+  function deleteAdjustment(id) {
+    const a = state.adjustments.find((x) => x.id === id);
+    if (!a || !confirm(`Remove adjustment “${a.description}”?`)) return;
+    state.adjustments = state.adjustments.filter((x) => x.id !== id);
+    state.activity.unshift(activity(`Removed adjustment: ${a.description}`));
+    saveState(); render();
+  }
+
+  function openImportDialog() {
+    pendingImport = [];
+    el('csvFile').value = '';
+    el('importPreview').classList.add('hidden');
+    el('importPreview').innerHTML = '';
+    el('applyImportBtn').disabled = true;
+    importDialog.showModal();
+  }
+
+  async function handleCsvFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const rows = parseCsv(text);
+    if (rows.length < 2) {
+      alert('No data rows found.');
+      return;
+    }
+    const headers = rows[0].map((h) => h.trim());
+    pendingImport = rows.slice(1).filter((r) => r.some((v) => String(v).trim() !== '')).map((row, index) => mapImportRow(headers, row, index + 2));
+    renderImportPreview();
+  }
+
+  function mapImportRow(headers, row, sourceRow) {
+    const record = {};
+    headers.forEach((h, i) => { record[h] = row[i] ?? ''; });
+    const findColumn = (...patterns) => {
+      const h = headers.find((header) => patterns.some((p) => p.test(header.trim())));
+      return h ? record[h] : '';
+    };
+
+    const name = findColumn(/^player$/i, /^name$/i, /player name/i).trim();
+    const position = findColumn(/^pos$/i, /^position$/i).trim().toUpperCase() || 'F';
+    const realTeam = findColumn(/^team$/i, /nhl team/i, /real team/i).trim().toUpperCase();
+    const statusText = findColumn(/^status$/i, /roster status/i).trim();
+    const status = state.statuses.find((s) => s.name.toLowerCase() === statusText.toLowerCase()) || state.statuses[0];
+    const salaries = {};
+    state.seasons.forEach((season) => {
+      const label = seasonLabel(season.startYear);
+      const salaryHeader = headers.find((h) => normalizeHeader(h).includes(normalizeHeader(label)) && /salary|cap|\d{4}/i.test(h));
+      salaries[season.id] = salaryHeader ? nullableNumber(String(record[salaryHeader]).replace(/[$,]/g, '')) : null;
+    });
+    return { sourceRow, name, position, realTeam, statusId: status.id, salaries, valid: Boolean(name) };
+  }
+
+  function renderImportPreview() {
+    const valid = pendingImport.filter((r) => r.valid);
+    const invalid = pendingImport.length - valid.length;
+    const current = currentSeason();
+    const rows = pendingImport.slice(0, 25).map((r) => `<tr><td>${r.sourceRow}</td><td>${escapeHtml(r.name || 'Missing name')}</td><td>${escapeHtml(r.position)}</td><td>${escapeHtml(r.realTeam || '—')}</td><td>${r.salaries[current.id] === null ? '—' : formatMoney(r.salaries[current.id])}</td><td>${r.valid ? '<span class="good">Ready</span>' : '<span class="danger">Needs review</span>'}</td></tr>`).join('');
+    const preview = el('importPreview');
+    preview.classList.remove('hidden');
+    preview.innerHTML = `<p><strong>${valid.length} rows ready</strong>${invalid ? ` · <span class="danger">${invalid} rows skipped because player name is missing</span>` : ''}</p><div class="table-wrap"><table><thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Team</th><th>${seasonLabel(current.startYear)}</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    el('applyImportBtn').disabled = valid.length === 0;
+  }
+
+  function applyImport() {
+    const rows = pendingImport.filter((r) => r.valid);
+    let added = 0;
+    let updated = 0;
+    rows.forEach((r) => {
+      let player = state.players.find((p) => p.name.toLowerCase() === r.name.toLowerCase() && (!r.realTeam || !p.realTeam || p.realTeam === r.realTeam));
+      if (!player) {
+        player = {
+          id: uid(), name: r.name, position: r.position, realTeam: r.realTeam,
+          statusId: r.statusId, contractEndSeasonId: null, notes: '', salaries: {},
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+        };
+        state.players.push(player);
+        added += 1;
+      } else {
+        player.position = r.position || player.position;
+        player.realTeam = r.realTeam || player.realTeam;
+        player.statusId = r.statusId || player.statusId;
+        updated += 1;
+      }
+      state.seasons.forEach((season) => {
+        const incoming = r.salaries[season.id];
+        const existing = player.salaries[season.id] || { salary: null, capOverride: null };
+        player.salaries[season.id] = {
+          salary: incoming === null ? existing.salary : incoming,
+          capOverride: existing.capOverride ?? null
+        };
+      });
+      player.updatedAt = new Date().toISOString();
+    });
+    state.activity.unshift(activity(`CSV import applied: ${added} added, ${updated} updated`));
+    saveState();
+    importDialog.close();
+    pendingImport = [];
+    render();
+  }
+
+  function calculateSeason(seasonId) {
+    const season = seasonById(seasonId);
+    let knownRosterCap = 0;
+    const missingPlayerIds = [];
+    state.players.forEach((player) => {
+      const status = statusById(player.statusId);
+      if (!status?.countsTowardCap) return;
+      const salaryData = player.salaries?.[seasonId];
+      const effective = salaryData?.capOverride ?? salaryData?.salary ?? null;
+      if (effective === null) missingPlayerIds.push(player.id);
+      else knownRosterCap += effective;
+    });
+    const adjustmentsTotal = state.adjustments.filter((a) => a.seasonId === seasonId).reduce((sum, a) => sum + a.amount, 0);
+    const knownCapUsed = knownRosterCap + adjustmentsTotal;
+    const complete = missingPlayerIds.length === 0;
+    const salaryCap = season?.salaryCap ?? null;
+    const capUsed = complete ? knownCapUsed : null;
+    const capSpace = complete && salaryCap !== null ? salaryCap - knownCapUsed : null;
+    return { knownRosterCap, adjustmentsTotal, knownCapUsed, capUsed, salaryCap, capSpace, complete, missingPlayerIds };
+  }
+
+  function addSeason() {
+    const maxYear = Math.max(...state.seasons.map((s) => s.startYear));
+    state.seasons.push({ id: uid(), startYear: maxYear + 1, salaryCap: null });
+    state.players.forEach((p) => { p.salaries[state.seasons[state.seasons.length - 1].id] = { salary: null, capOverride: null }; });
+    state.activity.unshift(activity(`Added ${seasonLabel(maxYear + 1)} season`));
+    saveState(); render();
+  }
+
+  function removeSeason(id) {
+    if (state.seasons.length <= 1) return;
+    const season = seasonById(id);
+    if (!confirm(`Remove ${seasonLabel(season.startYear)} and its salary/adjustment values?`)) return;
+    state.seasons = state.seasons.filter((s) => s.id !== id);
+    state.players.forEach((p) => { delete p.salaries[id]; if (p.contractEndSeasonId === id) p.contractEndSeasonId = null; });
+    state.adjustments = state.adjustments.filter((a) => a.seasonId !== id);
+    if (state.frontOffice.currentSeasonId === id) state.frontOffice.currentSeasonId = state.seasons[0].id;
+    state.activity.unshift(activity(`Removed ${seasonLabel(season.startYear)} season`));
+    saveState(); render();
+  }
+
+  function addStatus() {
+    state.statuses.push({ id: uid(), name: 'New Status', countsTowardCap: true });
+    saveState(); render();
+  }
+
+  function removeStatus(id) {
+    const status = statusById(id);
+    if (!status) return;
+    if (state.statuses.length <= 1) {
+      alert('Keep at least one roster status.');
+      return;
+    }
+    if (state.players.some((p) => p.statusId === id)) {
+      alert('This status is currently assigned to one or more players. Reassign them before removing it.');
+      return;
+    }
+    state.statuses = state.statuses.filter((s) => s.id !== id);
+    saveState(); render();
+  }
+
+  function visibleSeasons() {
+    const sorted = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
+    const current = currentSeason();
+    const index = sorted.findIndex((s) => s.id === current.id);
+    return sorted.slice(Math.max(0, index), Math.max(0, index) + 4);
+  }
+
+  function currentSeason() { return seasonById(state.frontOffice.currentSeasonId) || state.seasons[0]; }
+  function seasonById(id) { return state.seasons.find((s) => s.id === id); }
+  function statusById(id) { return state.statuses.find((s) => s.id === id); }
+
+  function resetApp() {
+    if (!confirm('Reset this local prototype and delete its saved Front Office data?')) return;
+    state = emptyState();
+    localStorage.removeItem(STORAGE_KEY);
+    render();
+  }
+
+  function exportRosterCsv() {
+    if (!state.frontOffice) return;
+    const sortedSeasons = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
+    const headers = ['Player','Position','Real Team','Status', ...sortedSeasons.map((s) => `${seasonLabel(s.startYear)} Salary`), 'Contract End','Notes'];
+    const rows = state.players.map((p) => [
+      p.name, p.position, p.realTeam, statusById(p.statusId)?.name || '',
+      ...sortedSeasons.map((s) => p.salaries?.[s.id]?.salary ?? ''),
+      p.contractEndSeasonId ? seasonLabel(seasonById(p.contractEndSeasonId)?.startYear) : '', p.notes || ''
+    ]);
+    const csv = [headers, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n');
+    downloadText(`${safeFileName(state.frontOffice.teamName)}-front-office.csv`, csv, 'text/csv');
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.warn('Local persistence is unavailable in this browser context.', error);
+    }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return emptyState();
+      const parsed = JSON.parse(raw);
+      if (!parsed.statuses?.length) parsed.statuses = structuredClone(DEFAULT_STATUSES);
+      return parsed;
+    } catch {
+      return emptyState();
+    }
+  }
+
+  function activity(label) { return { id: uid(), label, at: new Date().toISOString() }; }
+  function uid() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+  function seasonLabel(startYear) { if (!startYear) return '—'; return `${startYear}-${String((startYear + 1) % 100).padStart(2,'0')}`; }
+  function parseSeasonStart(value) { const match = /^(\d{4})-(\d{2})$/.exec(value); if (!match) return null; const start = Number(match[1]); const end = Number(match[2]); return ((start + 1) % 100) === end ? start : null; }
+  function nullableNumber(value) {
+    if (value === null || value === undefined || String(value).trim() === '') return null;
+    const cleaned = String(value).replace(/[$,\s]/g, '');
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : null;
+  }
+  function formatWholeDollarInput(input) {
+    const digits = String(input.value || '').replace(/[^0-9]/g, '');
+    input.value = digits ? `$${Number(digits).toLocaleString('en-US')}` : '';
+  }
+  function formatMoney(value) {
+    if (value === null || value === undefined || Number.isNaN(value)) return '—';
+    const abs = Math.abs(value);
+    const sign = value < 0 ? '-' : '';
+    if (abs >= 1_000_000) return `${sign}$${(abs / 1_000_000).toFixed(abs % 1_000_000 === 0 ? 1 : 2)}M`;
+    if (abs >= 1_000) return `${sign}$${(abs / 1_000).toFixed(abs % 1_000 === 0 ? 0 : 1)}K`;
+    return `${sign}$${abs.toLocaleString(undefined,{maximumFractionDigits:0})}`;
+  }
+  function formatDateTime(value) { try { return new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}).format(new Date(value)); } catch { return value; } }
+  function normalizeHeader(value) { return String(value).toLowerCase().replace(/[^a-z0-9]/g,''); }
+  function escapeHtml(value) { return String(value ?? '').replace(/[&<>'"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c])); }
+  function escapeAttr(value) { return escapeHtml(value).replace(/`/g,'&#096;'); }
+  function csvEscape(value) { const s = String(value ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
+  function safeFileName(value) { return String(value || 'front-office').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  function downloadText(filename, text, type) { const blob = new Blob([text], { type }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
+
+  function parseCsv(text) {
+    const rows = [];
+    let row = [];
+    let cell = '';
+    let quoted = false;
+    for (let i = 0; i < text.length; i += 1) {
+      const ch = text[i];
+      if (quoted) {
+        if (ch === '"' && text[i + 1] === '"') { cell += '"'; i += 1; }
+        else if (ch === '"') quoted = false;
+        else cell += ch;
+      } else if (ch === '"') quoted = true;
+      else if (ch === ',') { row.push(cell); cell = ''; }
+      else if (ch === '\n') { row.push(cell.replace(/\r$/, '')); rows.push(row); row = []; cell = ''; }
+      else cell += ch;
+    }
+    if (cell.length || row.length) { row.push(cell.replace(/\r$/, '')); rows.push(row); }
+    return rows;
+  }
+})();
+
+</script>
+</body>
+</html>
