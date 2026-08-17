@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v1.5" />
+  <meta name="application-name" content="Fantasy Front Office v1.6" />
   <style>
 :root {
   color-scheme: dark;
@@ -545,6 +545,93 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .table-toolbar .toolbar-group:last-child #addPlayerBtn { grid-column:1 / -1; }
   .activity-panel .activity-list { grid-template-columns:1fr; }
   .activity-panel .activity-item:nth-child(n+2) { display:none; }
+}
+
+
+/* V1.6 high-density workspace chrome
+   Direction: fewer oversized cards, tighter aligned controls, compact metric tiles. */
+@media (max-width: 900px) {
+  .app-shell { padding: 7px 10px 14px; }
+
+  /* App bar: one compact utility row */
+  .topbar { min-height: 32px; margin-bottom: 5px; align-items: center; gap: 7px; }
+  .brand-lockup { gap: 6px; min-width: 0; }
+  .brand-mark { width: 28px; height: 28px; border-radius: 8px; font-size: .72rem; }
+  .brand-copy h1 { max-width: 118px; font-size: .79rem; line-height: 1.04; letter-spacing: -.01em; }
+  .brand-copy p { display: none !important; }
+  .topbar-actions { margin-left: auto; display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0; }
+  .topbar-actions .auth-meta { width: auto; flex: 0 0 auto; order: 0; }
+  .user-email { display: none; }
+  .cloud-pill { padding: 3px 6px; gap: 4px; font-size: .56rem; border-radius: 999px; white-space: nowrap; }
+  .cloud-pill::before { width: 5px; height: 5px; }
+  #exportBtn, #signOutBtn { min-height: 27px; padding: 4px 7px; border-radius: 7px; font-size: .61rem; white-space: nowrap; box-shadow: none; }
+
+  /* Navigation: compact segmented control */
+  .workspace-nav { margin: 0 0 5px; padding: 3px; gap: 2px; border-radius: 10px; box-shadow: none; background: rgba(12, 23, 32, .90); }
+  .nav-tab { min-height: 30px; padding: 5px 4px; border-radius: 7px; font-size: .70rem; line-height: 1; }
+
+  /* Team context: deliberately not another large card */
+  .workspace-heading {
+    grid-template-columns: minmax(0,1fr) 92px;
+    gap: 7px; align-items: center; padding: 5px 2px 6px; margin: 0 0 4px;
+    border: 0; border-bottom: 1px solid var(--border-soft); border-radius: 0;
+    background: transparent; box-shadow: none;
+  }
+  .workspace-heading .eyebrow { margin: 0 0 2px; font-size: .52rem; letter-spacing: .095em; line-height: 1.15; }
+  .workspace-heading h2 { margin: 0; font-size: .95rem; line-height: 1.05; letter-spacing: -.015em; }
+  .season-picker { gap: 2px; font-size: .54rem; line-height: 1; }
+  .season-picker select { width: 92px; min-height: 30px; padding: 4px 7px; border-radius: 8px; font-size: .69rem; }
+
+  /* KPI tiles: small finance-dashboard style blocks, 3 + 2 on most phones */
+  .summary-grid {
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 5px; margin: 0 0 6px;
+  }
+  .summary-card,
+  .summary-card:nth-child(4),
+  .summary-card:nth-child(5) {
+    grid-column: auto; min-height: 54px; padding: 7px 8px; border-radius: 9px;
+    background: rgba(15, 27, 37, .82); box-shadow: none;
+  }
+  .summary-card .label { font-size: .53rem; letter-spacing: .045em; line-height: 1.05; white-space: nowrap; }
+  .summary-card .value { margin-top: 3px; font-size: .91rem; line-height: 1; }
+  .summary-card .subvalue { display: none; }
+
+  /* Main panels should read as content, not giant floating cards */
+  .view-panel { padding: 7px; border-radius: 11px; box-shadow: none; }
+  .subpanel { padding: 8px; border-radius: 10px; box-shadow: none; }
+  .section-title-row { margin-bottom: 4px; }
+  .subpanel .eyebrow { font-size: .56rem; }
+  .subpanel h3 { font-size: .90rem; margin-bottom: 5px; }
+
+  .overview-stack { gap: 6px; }
+  .overview-status-grid { gap: 5px; }
+  .compact-status-panel { padding: 7px; }
+  .compact-status-panel h3 { font-size: .82rem; }
+  .compact-copy { font-size: .64rem; line-height: 1.25; }
+  .compact-list .issue-item, .compact-list .activity-item { padding: 6px 7px; }
+
+  /* Roster controls: denser and aligned */
+  .table-toolbar { gap: 5px; margin-bottom: 6px; }
+  .table-toolbar .toolbar-group { gap: 5px; }
+  .table-toolbar input, .table-toolbar select { min-height: 34px; padding: 6px 8px; border-radius: 8px; font-size: .72rem; }
+  .table-toolbar .btn { min-height: 34px; padding: 6px 6px; border-radius: 8px; font-size: .64rem; }
+
+  .commitments-panel { padding: 7px; }
+  .commitments-table th, .commitments-table td { padding: 7px 8px; }
+}
+
+@media (max-width: 410px) {
+  .brand-copy h1 { max-width: 105px; font-size: .75rem; }
+  .cloud-pill { font-size: 0; width: 20px; height: 20px; padding: 0; justify-content: center; }
+  .cloud-pill::before { width: 6px; height: 6px; }
+  #exportBtn, #signOutBtn { font-size: .58rem; padding-left: 6px; padding-right: 6px; }
+  .workspace-heading { grid-template-columns: minmax(0,1fr) 86px; }
+  .season-picker select { width: 86px; }
+  .summary-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .summary-card { min-height: 51px; padding: 7px; }
+  .summary-card .label { font-size: .49rem; }
+  .summary-card .value { font-size: .86rem; }
 }
 
 </style>
@@ -1243,6 +1330,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
+    // Settings is configuration-first; the global KPI strip is intentionally hidden there.
+    el('summaryCards').classList.toggle('hidden', view === 'settings');
   }
 
   function openPlayerDialog(playerId = null) {
