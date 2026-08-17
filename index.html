@@ -1786,6 +1786,183 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .depth-slot-name { font-size: .63rem; }
 }
 
+
+/* V2.10 information-rich depth chart + single-primary-CTA empty states */
+.depth-panel { overflow: hidden; }
+.depth-section-card { overflow: hidden; }
+.depth-rows-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(119,201,255,.34) transparent;
+  padding-bottom: 2px;
+}
+.depth-rows-scroll::-webkit-scrollbar { height: 5px; }
+.depth-rows-scroll::-webkit-scrollbar-thumb { background: rgba(119,201,255,.30); border-radius: 999px; }
+.depth-defense-lines,
+.depth-goalie-lines { display: grid; gap: 7px; }
+.depth-slot {
+  height: 100px;
+  min-height: 100px;
+  padding: 8px 9px;
+  align-content: start;
+  grid-template-rows: auto minmax(2.15em, auto) auto auto;
+  gap: 3px;
+}
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label {
+  height: 100px;
+  min-height: 100px;
+}
+.depth-slot-header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+.depth-slot-position {
+  flex: 0 0 auto;
+  font-size: .54rem;
+  line-height: 1;
+}
+.depth-slot-status {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #a9bac8;
+  font-size: .50rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.depth-slot-name {
+  min-height: 2.15em;
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: .76rem;
+  line-height: 1.08;
+  font-weight: 875;
+}
+.depth-slot-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: .55rem;
+  line-height: 1.15;
+}
+.depth-slot-finance {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: auto;
+  padding-top: 3px;
+  border-top: 1px solid rgba(148,166,183,.10);
+  font-variant-numeric: tabular-nums;
+}
+.depth-slot-finance strong {
+  flex: 0 0 auto;
+  color: #eaf7ff;
+  font-size: .60rem;
+  line-height: 1;
+}
+.depth-slot-finance span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: .48rem;
+  line-height: 1;
+  text-align: right;
+}
+.depth-slot.empty {
+  grid-template-rows: auto auto auto;
+  align-content: center;
+}
+.depth-slot.empty .depth-slot-meta { color: #667989; }
+.depth-goalie-pair,
+.depth-extra-goalies { align-items: stretch; }
+.depth-goalie-unit { min-width: 0; }
+.depth-position-row .depth-slot { height: 100px; min-height: 100px; }
+.depth-position-row .depth-role-label { height: 100px; min-height: 100px; }
+
+@media (max-width: 720px) {
+  .depth-section-card { padding: 8px 7px 8px; }
+  .depth-section-head { padding: 0 2px; }
+  .depth-section-head::after {
+    content: 'swipe →';
+    margin-left: auto;
+    color: #6f8394;
+    font-size: .49rem;
+    font-weight: 750;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .depth-section-head > span { margin-left: 4px; }
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-lines,
+  .depth-rows-scroll .depth-goalie-lines { min-width: 470px; }
+  .depth-rows-scroll .depth-forward-line {
+    grid-template-columns: 40px repeat(3, 136px);
+    gap: 5px;
+  }
+  .depth-rows-scroll .depth-pair-grid {
+    grid-template-columns: 40px repeat(2, 210px);
+    gap: 5px;
+  }
+  .depth-goalie-pair,
+  .depth-extra-goalies {
+    grid-template-columns: repeat(2, 230px);
+    gap: 6px;
+  }
+  .depth-goalie-unit {
+    grid-template-columns: 54px 170px;
+    gap: 6px;
+  }
+  .depth-extra-row { grid-template-columns: 40px 425px; gap: 5px; }
+  .depth-slot,
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-position-row .depth-slot,
+  .depth-position-row .depth-role-label {
+    height: 100px;
+    min-height: 100px;
+  }
+  .depth-slot { padding: 7px 7px 6px; gap: 3px; }
+  .depth-slot-name { min-height:2.15em; font-size: .68rem; }
+  .depth-slot-meta { font-size: .51rem; }
+  .depth-slot-position { font-size: .50rem; }
+  .depth-slot-status { font-size: .47rem; }
+  .depth-slot-finance strong { font-size: .56rem; }
+  .depth-slot-finance span { font-size: .45rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-lines,
+  .depth-rows-scroll .depth-goalie-lines { min-width: 466px; }
+  .depth-rows-scroll .depth-forward-line { grid-template-columns: 38px repeat(3, 136px); gap: 4px; }
+  .depth-rows-scroll .depth-pair-grid { grid-template-columns: 38px repeat(2, 210px); gap: 4px; }
+  .depth-goalie-pair,
+  .depth-extra-goalies { grid-template-columns: repeat(2, 228px); gap: 5px; }
+  .depth-goalie-unit { grid-template-columns: 52px 171px; gap: 5px; }
+  .depth-slot-name { font-size: .66rem; }
+}
+
 </style>
 </head>
 <body>
@@ -2521,10 +2698,17 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   }
 
   function depthSlot(player, positionLabel, current) {
-    if (!player) return `<div class="depth-slot empty"><span class="depth-slot-position">${escapeHtml(positionLabel)}</span><span class="depth-slot-name">Open slot</span></div>`;
+    if (!player) return `<div class="depth-slot empty"><span class="depth-slot-header"><span class="depth-slot-position">${escapeHtml(positionLabel)}</span></span><span class="depth-slot-name">Open slot</span><span class="depth-slot-meta">Available</span></div>`;
     const status = statusById(player.statusId);
     const charge = effectivePlayerCharge(player, current.id);
-    return `<button class="depth-slot" data-depth-open="${player.id}" type="button"><span class="depth-slot-position">${escapeHtml(positionLabel)}</span><span class="depth-slot-name">${escapeHtml(player.name)}</span><span class="depth-slot-meta">${escapeHtml(player.realTeam || '—')} · ${escapeHtml(status?.name || 'Other')} · ${charge === null ? '—' : formatMoney(charge)}</span></button>`;
+    const age = player.ageSnapshot !== null && player.ageSnapshot !== undefined ? `Age ${player.ageSnapshot}` : 'Age —';
+    const end = player.contractEndSeasonId ? `Ends ${seasonLabel(seasonById(player.contractEndSeasonId)?.startYear)}` : 'No end set';
+    return `<button class="depth-slot" data-depth-open="${player.id}" type="button">
+      <span class="depth-slot-header"><span class="depth-slot-position">${escapeHtml(positionLabel)}</span><span class="depth-slot-status">${escapeHtml(status?.name || 'Other')}</span></span>
+      <span class="depth-slot-name">${escapeHtml(player.name)}</span>
+      <span class="depth-slot-meta">${escapeHtml(player.realTeam || '—')} · ${escapeHtml(age)}</span>
+      <span class="depth-slot-finance"><strong>${charge === null ? '—' : formatMoney(charge)}</strong><span>${escapeHtml(end)}</span></span>
+    </button>`;
   }
 
   function depthPositionRoleLabel(position, index) {
@@ -2546,9 +2730,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const extraDefense = defense.slice(6).map((player, offset) => `<div class="depth-extra-row"><div class="depth-role-label">D${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
     const extraGoalies = goalies.slice(2).map((player, offset) => `<div class="depth-goalie-unit"><div class="depth-role-label">G${offset + 3}</div>${depthSlot(player, 'G', current)}</div>`).join('');
     return `<div class="depth-lineup-shell depth-lineup-all">
-      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Forward lines</h4><span>${lw.length + centers.length + rw.length} forwards</span></div><div class="depth-forward-lines">${forwardLines}${extraForwards}</div></section>
-      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Defense pairs</h4><span>${defense.length} defensemen</span></div>${defensePairs}${extraDefense ? `<div class="depth-extra-list">${extraDefense}</div>` : ''}</section>
-      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Goalies</h4><span>${goalies.length} goalies</span></div><div class="depth-goalie-pair">${goalieUnits}</div>${extraGoalies ? `<div class="depth-extra-goalies">${extraGoalies}</div>` : ''}</section>
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Forward lines</h4><span>${lw.length + centers.length + rw.length} forwards</span></div><div class="depth-rows-scroll" role="region" aria-label="Forward lines. Swipe horizontally if needed." tabindex="0"><div class="depth-forward-lines">${forwardLines}${extraForwards}</div></div></section>
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Defense pairs</h4><span>${defense.length} defensemen</span></div><div class="depth-rows-scroll" role="region" aria-label="Defense pairs. Swipe horizontally if needed." tabindex="0"><div class="depth-defense-lines">${defensePairs}${extraDefense ? `<div class="depth-extra-list">${extraDefense}</div>` : ''}</div></div></section>
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Goalies</h4><span>${goalies.length} goalies</span></div><div class="depth-rows-scroll" role="region" aria-label="Goalie depth. Swipe horizontally if needed." tabindex="0"><div class="depth-goalie-lines"><div class="depth-goalie-pair">${goalieUnits}</div>${extraGoalies ? `<div class="depth-extra-goalies">${extraGoalies}</div>` : ''}</div></div></section>
     </div>`;
   }
 
@@ -2677,7 +2861,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         </div>
         <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
 
-        ${activePlayers.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
+        ${activePlayers.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Use Add Player above or import a Fantrax roster from Import / Tools.</p></div>`}
 
         ${activePlayers.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}">${depthChartHtml}</div>` : ''}
 
@@ -2699,8 +2883,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     if (el('cancelDepthOrderBtn')) el('cancelDepthOrderBtn').addEventListener('click', () => { depthEditMode = false; depthDraftOrder = []; renderRoster(); });
     if (el('saveDepthOrderBtn')) el('saveDepthOrderBtn').addEventListener('click', saveDepthOrder);
     document.querySelectorAll('[data-depth-move-index]').forEach((button) => button.addEventListener('click', () => moveDepthDraft(Number(button.dataset.depthMoveIndex), Number(button.dataset.depthMoveDirection))));
-    if (el('emptyAddPlayerBtn')) el('emptyAddPlayerBtn').addEventListener('click', () => openPlayerDialog());
-    if (el('emptyImportRosterBtn')) el('emptyImportRosterBtn').addEventListener('click', openImportDialog);
 
     const refreshFilters = () => applyRosterFilters();
     el('rosterSearch').addEventListener('input', refreshFilters);
@@ -2776,11 +2958,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     }).join('');
     const activeProspectRows = activeProspects.map((player) => `<button class="farm-active-prospect" data-farm-edit="${player.id}" type="button"><strong>${escapeHtml(player.name)}</strong><span>${escapeHtml(player.position)} · Active roster</span></button>`).join('');
 
-    el('farmView').innerHTML = `<div class="farm-page"><div class="page-heading-row"><div><p class="eyebrow">Development</p><h3>Minors</h3><p class="page-copy">Prospects assigned to Minors stay separate from your active lineup. Fantrax rows marked as minors are routed here automatically on import.</p></div><div class="inline-actions"><button id="importMinorsBtn" class="btn btn-secondary" type="button">Import Fantrax</button><button id="addFarmProspectBtn" class="btn btn-primary" type="button">+ Add Player</button></div></div><div class="farm-summary"><span><strong>${prospects.length}</strong> in minors</span><span><strong>${activeProspects.length}</strong> prospects on active roster</span></div>${prospects.length ? `<div class="farm-player-list">${rows}</div>` : `<div class="empty-state"><h4>No players in Minors</h4><p>Add a player here or import Fantrax. Players placed in Minors are automatically labelled Prospect.</p><div class="empty-state-actions"><button id="emptyAddFarmProspectBtn" class="btn btn-primary" type="button">+ Add Player</button><button id="emptyImportMinorsBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}${activeProspects.length ? `<div class="subpanel farm-active-section"><p class="eyebrow">Prospects currently called up</p><div class="farm-active-grid">${activeProspectRows}</div></div>` : ''}</div>`;
+    el('farmView').innerHTML = `<div class="farm-page"><div class="page-heading-row"><div><p class="eyebrow">Development</p><h3>Minors</h3><p class="page-copy">Prospects assigned to Minors stay separate from your active lineup. Fantrax rows marked as minors are routed here automatically on import.</p></div><div class="inline-actions"><button id="importMinorsBtn" class="btn btn-secondary" type="button">Import Fantrax</button><button id="addFarmProspectBtn" class="btn btn-primary" type="button">+ Add Player</button></div></div><div class="farm-summary"><span><strong>${prospects.length}</strong> in minors</span><span><strong>${activeProspects.length}</strong> prospects on active roster</span></div>${prospects.length ? `<div class="farm-player-list">${rows}</div>` : `<div class="empty-state"><h4>No players in Minors</h4><p>Use Add Player or Import Fantrax above. Players placed in Minors are automatically labelled Prospect.</p></div>`}${activeProspects.length ? `<div class="subpanel farm-active-section"><p class="eyebrow">Prospects currently called up</p><div class="farm-active-grid">${activeProspectRows}</div></div>` : ''}</div>`;
     el('addFarmProspectBtn').addEventListener('click', openFarmProspectDialog);
     el('importMinorsBtn').addEventListener('click', openImportDialog);
-    if (el('emptyAddFarmProspectBtn')) el('emptyAddFarmProspectBtn').addEventListener('click', openFarmProspectDialog);
-    if (el('emptyImportMinorsBtn')) el('emptyImportMinorsBtn').addEventListener('click', openImportDialog);
     document.querySelectorAll('[data-farm-edit]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.farmEdit)));
     document.querySelectorAll('[data-call-up]').forEach((button) => button.addEventListener('click', () => quickCallUp(button.dataset.callUp)));
   }
@@ -2803,9 +2983,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       ].filter(Boolean).join('');
       return `<article class="transaction-card"><div class="transaction-card-head"><div><span class="transaction-type">${escapeHtml(tx.type)}</span><h4>${escapeHtml(tx.summary)}</h4></div><time>${escapeHtml(tx.date)}</time></div>${tx.counterparty ? `<p class="transaction-counterparty">With ${escapeHtml(tx.counterparty)}</p>` : ''}${chips ? `<div class="transaction-chips">${chips}</div>` : ''}${incoming.length ? `<div class="transaction-flow in"><strong>IN</strong><span>${incoming.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${outgoing.length ? `<div class="transaction-flow out"><strong>OUT</strong><span>${outgoing.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${playerItems.length ? `<div class="transaction-flow"><strong>PLAYER</strong><span>${playerItems.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${financial.length ? `<div class="transaction-flow financial"><strong>CAP</strong><span>${financial.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${tx.notes ? `<p class="transaction-notes">${escapeHtml(tx.notes)}</p>` : ''}</article>`;
     }).join('');
-    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades, waivers, buyouts, signings, call-ups and other front-office moves are recorded here. Cap consequences flow through to the Cap page.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Record your first trade, signing, waiver move or buyout.</p><div class="empty-state-actions"><button id="emptyRecordTransactionBtn" class="btn btn-primary" type="button">+ Record first transaction</button></div></div>`}</div>`;
+    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades, waivers, buyouts, signings, call-ups and other front-office moves are recorded here. Cap consequences flow through to the Cap page.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Use Record Transaction above to add your first trade, signing, waiver move or buyout.</p></div>`}</div>`;
     el('recordTransactionBtn').addEventListener('click', openTransactionDialog);
-    if (el('emptyRecordTransactionBtn')) el('emptyRecordTransactionBtn').addEventListener('click', openTransactionDialog);
   }
 
   function openTransactionDialog(options = {}) {
