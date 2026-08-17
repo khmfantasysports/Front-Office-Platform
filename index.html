@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
+  <meta name="application-name" content="Fantasy Front Office v1.4" />
   <style>
 :root {
   color-scheme: dark;
@@ -366,6 +367,84 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
   #backToOfficesBtn { display:none; }
 }
 
+
+/* V1.4 mobile layout + streamlined player editor */
+html, body { max-width: 100%; overflow-x: hidden; }
+.app-shell, main, #workspace, .view-panel, .section-grid, .stack, .subpanel { min-width: 0; }
+.view-panel, .subpanel { max-width: 100%; }
+.table-wrap { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.player-intro { margin: 0 0 14px; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+.player-basics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.player-basics .player-name-field, .player-basics .status-field { grid-column: 1 / -1; }
+.quick-contract {
+  margin-top: 18px; padding: 14px; border: 1px solid var(--border); border-radius: 14px;
+  background: linear-gradient(145deg, rgba(50,173,255,.055), rgba(11,20,29,.75));
+}
+.quick-contract-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.quick-contract-head h4 { margin:0; }
+.quick-contract-head p { margin:3px 0 0; color:var(--muted); font-size:.78rem; }
+.quick-contract-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; align-items:end; }
+.quick-contract-grid label { display:grid; gap:6px; color:var(--muted); font-size:.82rem; font-weight:700; }
+.quick-contract-action { grid-column: 1 / -1; }
+.quick-contract-action .btn { width:100%; }
+.advanced-contract { margin-top: 12px; border-top: 1px solid var(--border-soft); padding-top: 10px; }
+.advanced-contract summary { cursor:pointer; color:#c8d7e4; font-size:.82rem; font-weight:800; list-style:none; }
+.advanced-contract summary::-webkit-details-marker { display:none; }
+.advanced-contract summary::after { content:'+'; float:right; color:var(--accent); font-size:1rem; }
+.advanced-contract[open] summary::after { content:'−'; }
+.advanced-contract-copy { margin:5px 0 10px; color:var(--muted); font-size:.74rem; line-height:1.4; }
+.contract-row { grid-template-columns: 92px 1fr 1fr; }
+.contract-row input { font-variant-numeric: tabular-nums; }
+.player-notes-section { margin-top: 16px; }
+.drawer-header-copy { min-width:0; }
+.drawer-header .eyebrow { margin-bottom:4px; }
+.drawer-footer { position: sticky; bottom: 0; z-index: 2; background: rgba(13,24,34,.98); backdrop-filter: blur(10px); }
+
+@media (max-width: 720px) {
+  .app-shell { width:100%; max-width:100%; padding: 12px 12px 20px; }
+  .topbar { gap:10px; }
+  .brand-lockup { gap:9px; min-width:0; }
+  .brand-copy { min-width:0; }
+  .brand-copy h1 { max-width:145px; }
+  .topbar-actions { width:auto; max-width:190px; display:grid; grid-template-columns:auto auto; gap:6px; align-items:start; }
+  .topbar-actions .auth-meta { grid-column:1 / -1; justify-content:flex-end; }
+  #exportBtn, #signOutBtn { padding:8px 10px; font-size:.78rem; }
+  #exportBtn:disabled { display:none; }
+  .workspace-nav { position:static; top:auto; width:100%; scrollbar-width:none; }
+  .workspace-nav::-webkit-scrollbar { display:none; }
+  .workspace-heading { gap:10px; padding:14px; }
+  .workspace-heading h2 { font-size:1.35rem; }
+  .summary-grid { gap:10px; }
+  .summary-card { padding:13px; box-shadow:var(--shadow-soft); }
+  .summary-card .value { font-size:1.18rem; }
+  .view-panel { padding:12px; min-height:0; box-shadow:var(--shadow-soft); }
+  .subpanel { padding:13px; }
+  .section-grid, .stack { width:100%; max-width:100%; }
+  table { min-width: 700px; }
+  .table-wrap { border-radius:10px; }
+  .drawer-card { min-height:100dvh; }
+  .drawer-header { padding:14px 15px; }
+  .drawer-body { padding:14px 14px 96px; }
+  .drawer-footer { padding:12px 14px; }
+  .player-basics { grid-template-columns: 1fr 1fr; gap:10px; }
+  .player-basics label { gap:5px; }
+  .player-basics input, .player-basics select { min-height:43px; }
+  .quick-contract { padding:12px; }
+  .quick-contract-grid { grid-template-columns:1fr 1fr; }
+  .contract-grid { gap:8px; }
+  .contract-row { grid-template-columns:1fr; padding:10px; }
+  .contract-row .season-label { display:flex; align-items:center; justify-content:space-between; font-size:.9rem; }
+  .editor-section { margin-top:16px; padding-top:14px; }
+}
+
+@media (max-width: 390px) {
+  .player-basics, .quick-contract-grid { grid-template-columns:1fr; }
+  .player-basics .player-name-field, .player-basics .status-field, .quick-contract-action { grid-column:auto; }
+  .brand-copy h1 { max-width:128px; font-size:.94rem; }
+  .topbar-actions { max-width:170px; }
+}
+
 </style>
 </head>
 <body>
@@ -517,18 +596,20 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
   <dialog id="playerDialog" class="drawer-dialog">
     <form id="playerForm" method="dialog" class="drawer-card">
       <header class="drawer-header">
-        <div>
-          <p class="eyebrow">Player editor</p>
+        <div class="drawer-header-copy">
+          <p class="eyebrow">Roster player</p>
           <h3 id="playerDialogTitle">Add Player</h3>
         </div>
         <button id="closePlayerDialog" class="icon-btn" type="button" aria-label="Close">×</button>
       </header>
 
       <div class="drawer-body">
-        <div class="form-grid compact">
-          <label>
+        <p id="playerDialogIntro" class="player-intro">Add the player first, then use the quick contract fields for the common salary setup. Advanced year-by-year overrides are optional.</p>
+
+        <div class="player-basics">
+          <label class="player-name-field">
             Player name
-            <input id="playerName" required />
+            <input id="playerName" autocomplete="off" required />
           </label>
           <label>
             Position
@@ -542,44 +623,56 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
             </select>
           </label>
           <label>
-            Real team
-            <input id="realTeam" maxlength="8" placeholder="EDM" />
+            NHL team
+            <input id="realTeam" maxlength="8" placeholder="EDM" autocomplete="off" />
           </label>
-          <label>
+          <label class="status-field">
             Roster status
             <select id="rosterStatus"></select>
           </label>
         </div>
 
-        <section class="editor-section">
-          <div class="section-title-row">
+        <section class="quick-contract" aria-labelledby="quickContractTitle">
+          <div class="quick-contract-head">
             <div>
               <p class="eyebrow">Contract</p>
-              <h4>Season salary and cap charge</h4>
+              <h4 id="quickContractTitle">Quick contract</h4>
+              <p>Best for flat fantasy salaries. You can customize individual years below.</p>
             </div>
-            <button id="fillContractBtn" class="btn btn-ghost btn-small" type="button">Fill flat contract</button>
           </div>
-          <div id="contractGrid" class="contract-grid"></div>
-        </section>
-
-        <section class="editor-section">
-          <div class="form-grid compact">
+          <div class="quick-contract-grid">
+            <label>
+              Salary per season
+              <input id="quickSalary" type="text" inputmode="numeric" placeholder="$6,000,000" />
+            </label>
             <label>
               Contract through
               <select id="contractEnd"></select>
             </label>
-            <label class="full-width">
-              Notes
-              <textarea id="playerNotes" rows="3" placeholder="Optional personal notes"></textarea>
-            </label>
+            <div class="quick-contract-action">
+              <button id="applyQuickContractBtn" class="btn btn-secondary" type="button">Apply salary through contract end</button>
+            </div>
           </div>
+
+          <details id="advancedContract" class="advanced-contract">
+            <summary>Advanced yearly salaries &amp; cap overrides</summary>
+            <p class="advanced-contract-copy">Use this only when salary changes by season or the cap charge differs from salary.</p>
+            <div id="contractGrid" class="contract-grid"></div>
+          </details>
+        </section>
+
+        <section class="player-notes-section">
+          <label>
+            Notes
+            <textarea id="playerNotes" rows="3" placeholder="Optional personal notes"></textarea>
+          </label>
         </section>
 
         <section id="playerWarnings" class="warning-box hidden" aria-live="polite"></section>
       </div>
 
       <footer class="drawer-footer">
-        <button id="deletePlayerBtn" class="btn btn-danger hidden" type="button">Remove Player</button>
+        <button id="deletePlayerBtn" class="btn btn-danger hidden" type="button">Remove</button>
         <div class="drawer-footer-right">
           <button id="cancelPlayerBtn" class="btn btn-ghost" type="button">Cancel</button>
           <button class="btn btn-primary" type="submit">Save Player</button>
@@ -738,7 +831,8 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     el('cancelPlayerBtn').addEventListener('click', () => playerDialog.close());
     el('playerForm').addEventListener('submit', savePlayerFromDialog);
     el('deletePlayerBtn').addEventListener('click', removeEditingPlayer);
-    el('fillContractBtn').addEventListener('click', fillFlatContract);
+    el('applyQuickContractBtn').addEventListener('click', applyQuickContract);
+    el('quickSalary').addEventListener('blur', (event) => formatWholeDollarInput(event.target));
 
     el('closeImportDialog').addEventListener('click', () => importDialog.close());
     el('cancelImportBtn').addEventListener('click', () => importDialog.close());
@@ -794,6 +888,7 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     onboarding.classList.add('hidden');
     workspace.classList.remove('hidden');
     el('exportBtn').disabled = false;
+    el('exportBtn').classList.remove('hidden');
 
     el('teamLabel').textContent = state.frontOffice.teamName;
     el('leagueLabel').textContent = `${state.frontOffice.leagueName} · ${state.frontOffice.sport}`;
@@ -1056,9 +1151,14 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     editingPlayerId = playerId;
     const player = playerId ? state.players.find((p) => p.id === playerId) : null;
     el('playerDialogTitle').textContent = player ? player.name : 'Add Player';
+    el('playerDialogIntro').textContent = player
+      ? 'Update roster details or contract information. Advanced yearly fields are only needed for exceptions.'
+      : 'Add the player first, then use the quick contract fields for the common salary setup. Advanced year-by-year overrides are optional.';
     el('playerName').value = player?.name || '';
     el('playerPosition').value = player?.position || 'C';
     el('realTeam').value = player?.realTeam || '';
+    el('quickSalary').value = '';
+    el('advancedContract').open = false;
     renderStatusOptions(player?.statusId);
     renderContractEditor(player);
     el('playerNotes').value = player?.notes || '';
@@ -1077,29 +1177,36 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
       const data = player?.salaries?.[season.id] || { salary: null, capOverride: null };
       return `<div class="contract-row">
         <div class="season-label">${seasonLabel(season.startYear)}</div>
-        <label>Salary<input data-contract-salary="${season.id}" type="number" min="0" step="1" value="${data.salary ?? ''}" placeholder="Not entered" /></label>
-        <label>Cap override<input data-contract-override="${season.id}" type="number" min="0" step="1" value="${data.capOverride ?? ''}" placeholder="Same as salary" /></label>
+        <label>Salary<input data-contract-salary="${season.id}" type="text" inputmode="numeric" value="${data.salary === null ? '' : escapeAttr(formatWholeDollarValue(data.salary))}" placeholder="Not entered" /></label>
+        <label>Cap override<input data-contract-override="${season.id}" type="text" inputmode="numeric" value="${data.capOverride === null ? '' : escapeAttr(formatWholeDollarValue(data.capOverride))}" placeholder="Same as salary" /></label>
       </div>`;
     }).join('');
     el('contractEnd').innerHTML = `<option value="">Not set</option>${sorted.map((s) => `<option value="${s.id}" ${player?.contractEndSeasonId === s.id ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('')}`;
-    document.querySelectorAll('[data-contract-salary], [data-contract-override]').forEach((input) => input.addEventListener('input', validatePlayerDialog));
-    el('contractEnd').addEventListener('change', validatePlayerDialog, { once: true });
+    document.querySelectorAll('[data-contract-salary], [data-contract-override]').forEach((input) => {
+      input.addEventListener('input', validatePlayerDialog);
+      input.addEventListener('blur', (event) => formatWholeDollarInput(event.target));
+    });
+    el('contractEnd').addEventListener('change', validatePlayerDialog);
   }
 
-  function fillFlatContract() {
-    const amountRaw = prompt('Salary amount for each season:');
-    if (amountRaw === null) return;
-    const amount = nullableNumber(amountRaw.replace(/[$,]/g,''));
+  function applyQuickContract() {
+    const amount = nullableNumber(el('quickSalary').value);
     if (amount === null || amount < 0) {
-      alert('Enter a valid salary amount.');
+      alert('Enter a valid salary amount first.');
       return;
     }
-    const through = el('contractEnd').value || currentSeason().id;
+    const through = el('contractEnd').value || currentSeason()?.id;
     const throughSeason = seasonById(through);
+    if (!throughSeason) {
+      alert('Choose a contract end season.');
+      return;
+    }
+    el('contractEnd').value = throughSeason.id;
     document.querySelectorAll('[data-contract-salary]').forEach((input) => {
-      const s = seasonById(input.dataset.contractSalary);
-      if (s.startYear <= throughSeason.startYear) input.value = amount;
+      const season = seasonById(input.dataset.contractSalary);
+      input.value = season && season.startYear <= throughSeason.startYear ? formatWholeDollarValue(amount) : '';
     });
+    el('quickSalary').value = formatWholeDollarValue(amount);
     validatePlayerDialog();
   }
 
@@ -1117,9 +1224,15 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
       };
     });
 
+    const frontOfficeId = state.frontOffice?.id;
+    if (!frontOfficeId) {
+      alert('This Front Office is no longer loaded. Reopen it and try again.');
+      return;
+    }
+
     await runCloudAction(async () => {
       const { error } = await db.rpc('save_front_office_player_v1', {
-        p_front_office_id: state.frontOffice.id,
+        p_front_office_id: frontOfficeId,
         p_front_office_player_id: editingPlayerId || null,
         p_player_name: name,
         p_position: el('playerPosition').value,
@@ -1131,7 +1244,7 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
       });
       if (error) throw error;
       playerDialog.close();
-      await loadOffice(state.frontOffice.id, false);
+      await loadOffice(frontOfficeId, false);
     });
   }
   function validatePlayerDialog() {
@@ -1460,6 +1573,7 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     authGate.classList.add('hidden');
     onboarding.classList.add('hidden');
     workspace.classList.add('hidden');
+    el('exportBtn').classList.add('hidden');
     officePicker.classList.remove('hidden');
     el('topbarActions').classList.remove('hidden');
     el('userEmail').textContent = session.user.email || 'Signed in';
@@ -1471,6 +1585,7 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     state = emptyState();
     officePicker.classList.add('hidden');
     workspace.classList.add('hidden');
+    el('exportBtn').classList.add('hidden');
     onboarding.classList.remove('hidden');
     el('teamName').value = '';
     el('leagueName').value = '';
@@ -1626,9 +1741,12 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     const n = Number(cleaned);
     return Number.isFinite(n) ? n : null;
   }
+  function formatWholeDollarValue(value) {
+    const number = nullableNumber(value);
+    return number === null ? '' : `$${Math.round(number).toLocaleString('en-US')}`;
+  }
   function formatWholeDollarInput(input) {
-    const digits = String(input.value || '').replace(/[^0-9]/g, '');
-    input.value = digits ? `$${Number(digits).toLocaleString('en-US')}` : '';
+    input.value = formatWholeDollarValue(input.value);
   }
   function formatMoney(value) {
     if (value === null || value === undefined || Number.isNaN(value)) return '—';
