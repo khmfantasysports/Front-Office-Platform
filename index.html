@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.0" />
+  <meta name="application-name" content="Fantasy Front Office v2.1" />
   <style>
 :root {
   color-scheme: dark;
@@ -1008,6 +1008,19 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .status-setting-compact { grid-template-columns:minmax(0,1fr) 106px auto; gap:5px; }
 }
 
+
+
+/* V2.1 safety + past-season reference */
+.btn:disabled { opacity: .55; cursor: not-allowed; filter: none; }
+.season-history-panel { margin-top: 10px; }
+.season-history-panel table { min-width: 420px; }
+.season-history-copy { margin: 4px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.4; }
+.season-history-empty { margin: 0; color: var(--muted); font-size: .78rem; }
+@media (max-width:720px) {
+  .season-history-panel { padding: 9px; }
+  .season-history-panel th, .season-history-panel td { padding: 8px 9px; }
+}
+
 </style>
 </head>
 <body>
@@ -1266,7 +1279,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         <button id="deletePlayerBtn" class="btn btn-danger hidden" type="button">Remove</button>
         <div class="drawer-footer-right">
           <button id="cancelPlayerBtn" class="btn btn-ghost" type="button">Cancel</button>
-          <button class="btn btn-primary" type="submit">Save Player</button>
+          <button id="savePlayerBtn" class="btn btn-primary" type="submit">Save Player</button>
         </div>
       </footer>
     </form>
@@ -1682,11 +1695,26 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </tr>`;
     }).join('');
 
+    const activeSeason = currentSeason();
+    const historicalSeasons = [...state.seasons]
+      .filter((season) => activeSeason && season.startYear < activeSeason.startYear)
+      .sort((a, b) => b.startYear - a.startYear);
+    const historyRows = historicalSeasons.map((season) => `<tr>
+      <td>${seasonLabel(season.startYear)}</td>
+      <td class="money">${season.salaryCap === null ? '—' : formatMoney(season.salaryCap)}</td>
+    </tr>`).join('');
+
     el('capView').innerHTML = `
       <div class="subpanel">
         <p class="eyebrow">Cap table</p>
         <h3>Multi-year financial view</h3>
         <div class="table-wrap"><table><thead><tr><th>Season</th><th>Cap</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </div>
+      <div class="subpanel season-history-panel">
+        <div class="section-title-row"><div><p class="eyebrow">History</p><h3>Past seasons</h3><p class="season-history-copy">When the active season moves forward, prior season settings stay available here for reference.</p></div></div>
+        ${historyRows
+          ? `<div class="table-wrap"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div>`
+          : '<p class="season-history-empty">No past seasons yet. The first historical row will appear after you advance the active season.</p>'}
       </div>`;
   }
 
@@ -1948,6 +1976,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
   async function savePlayerFromDialog(event) {
     event.preventDefault();
+    const saveButton = el('savePlayerBtn');
+    if (saveButton?.disabled) return;
+
     const name = el('playerName').value.trim();
     if (!name) return;
     const existingPlayer = editingPlayerId ? state.players.find((player) => player.id === editingPlayerId) : null;
@@ -1968,29 +1999,44 @@ html, body { max-width: 100%; overflow-x: hidden; }
       return;
     }
 
-    await runCloudAction(async () => {
-      const { error } = await db.rpc('save_front_office_player_v2', {
-        p_front_office_id: frontOfficeId,
-        p_front_office_player_id: editingPlayerId || null,
-        p_player_name: name,
-        p_position: el('playerPosition').value,
-        p_eligible_positions: normalizeEligibility(el('playerEligible').value) || el('playerPosition').value,
-        p_real_team: normalizeNhlTeam(el('realTeam').value),
-        p_age_snapshot: nullableInteger(el('playerAge').value),
-        p_age_as_of: nullableInteger(el('playerAge').value) === null ? null : todayIsoDate(),
-        p_roster_status_id: el('rosterStatus').value,
-        p_contract_end_season_id: el('contractEnd').value || null,
-        p_notes: el('playerNotes').value.trim() || null,
-        p_salary_rows: salaryRows,
-        p_source_system: null,
-        p_source_player_id: null,
-        p_source_player_name: null
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.dataset.originalLabel = saveButton.textContent;
+      saveButton.textContent = 'Saving…';
+    }
+
+    try {
+      const saved = await runCloudAction(async () => {
+        const { error } = await db.rpc('save_front_office_player_v2', {
+          p_front_office_id: frontOfficeId,
+          p_front_office_player_id: editingPlayerId || null,
+          p_player_name: name,
+          p_position: el('playerPosition').value,
+          p_eligible_positions: normalizeEligibility(el('playerEligible').value) || el('playerPosition').value,
+          p_real_team: normalizeNhlTeam(el('realTeam').value),
+          p_age_snapshot: nullableInteger(el('playerAge').value),
+          p_age_as_of: nullableInteger(el('playerAge').value) === null ? null : todayIsoDate(),
+          p_roster_status_id: el('rosterStatus').value,
+          p_contract_end_season_id: el('contractEnd').value || null,
+          p_notes: el('playerNotes').value.trim() || null,
+          p_salary_rows: salaryRows,
+          p_source_system: null,
+          p_source_player_id: null,
+          p_source_player_name: null
+        });
+        if (error) throw error;
+        await loadOffice(frontOfficeId, false);
       });
-      if (error) throw error;
-      playerDialog.close();
-      await loadOffice(frontOfficeId, false);
-    });
+      if (saved) playerDialog.close();
+    } finally {
+      if (saveButton) {
+        saveButton.disabled = false;
+        saveButton.textContent = saveButton.dataset.originalLabel || 'Save Player';
+        delete saveButton.dataset.originalLabel;
+      }
+    }
   }
+
   function validatePlayerDialog() {
     const endId = el('contractEnd').value;
     const warnings = [];
