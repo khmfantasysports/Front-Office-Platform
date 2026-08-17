@@ -1602,6 +1602,190 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .transaction-dialog { width:min(760px,calc(100vw - 12px)); }
 }
 
+
+
+/* V2.9 depth-first roster + normalized hockey lineup */
+.view-switch.v29 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(390px, 100%);
+}
+.view-switch.v29 button { min-width: 0; white-space: nowrap; }
+.depth-panel {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(13,24,34,.78);
+}
+.depth-panel .depth-lineup-shell { gap: 12px; }
+.depth-panel .depth-position-tabs {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+  overflow: visible;
+}
+.depth-panel .depth-position-tab {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 6px;
+}
+.depth-chart-toolbar {
+  min-height: 48px;
+  padding: 2px 2px 0;
+}
+.depth-chart-toolbar-copy h4 { font-size: 1.05rem; letter-spacing: -.015em; }
+.depth-chart-toolbar-copy p { max-width: 620px; font-size: .73rem; }
+.depth-section-card {
+  gap: 10px;
+  padding: 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: rgba(7,17,26,.38);
+}
+.depth-section-head {
+  min-height: 25px;
+  padding: 0 1px;
+}
+.depth-section-head h4 { font-size: .76rem; letter-spacing: .075em; }
+.depth-section-head span { font-size: .65rem; }
+.depth-forward-lines { gap: 7px; }
+.depth-forward-line,
+.depth-pair-grid {
+  grid-template-columns: 56px repeat(3, minmax(0,1fr));
+  gap: 7px;
+}
+.depth-pair-grid { grid-template-columns: 56px repeat(2, minmax(0,1fr)); }
+.depth-pair-grid + .depth-pair-grid { margin-top: 0; }
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label,
+.depth-slot {
+  height: 72px;
+  min-height: 72px;
+  border-radius: 11px;
+}
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label {
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 4px;
+  line-height: 1.05;
+}
+.depth-line-label span,
+.depth-pair-label span {
+  color: var(--muted);
+  font-size: .58rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.depth-line-label strong,
+.depth-pair-label strong {
+  color: #d8e6f1;
+  font-size: .85rem;
+  font-weight: 900;
+}
+.depth-slot {
+  align-content: center;
+  gap: 3px;
+  padding: 8px 10px;
+  overflow: hidden;
+}
+.depth-slot-position { font-size: .56rem; }
+.depth-slot-name {
+  display: -webkit-box;
+  min-height: 2.15em;
+  overflow: hidden;
+  white-space: normal;
+  text-overflow: clip;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: .79rem;
+  line-height: 1.08;
+}
+.depth-slot-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .60rem;
+}
+.depth-slot.empty .depth-slot-name { min-height: auto; }
+.depth-goalie-pair,
+.depth-extra-goalies {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 7px;
+}
+.depth-goalie-unit {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 72px minmax(0,1fr);
+  gap: 7px;
+  align-items: stretch;
+}
+.depth-extra-goalies { margin-top: 7px; }
+.depth-extra-row { grid-template-columns: 56px minmax(0,1fr); gap: 7px; }
+.depth-position-row { grid-template-columns: 72px minmax(0,1fr); }
+.depth-position-row .depth-slot { min-height:72px; height:72px; }
+.depth-order-row { min-height: 58px; }
+
+@media (max-width: 720px) {
+  .roster-page > .page-heading-row:first-child {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .view-switch.v29 { width: 100%; }
+  .view-switch.v29 button { min-height: 34px; font-size: .69rem; }
+  .depth-panel { padding: 8px; border-radius: 12px; }
+  .depth-panel .depth-lineup-shell { gap: 9px; }
+  .depth-panel .depth-position-tabs { gap: 2px; padding: 2px; }
+  .depth-panel .depth-position-tab { min-height: 32px; padding: 5px 2px; font-size: .66rem; }
+  .depth-chart-toolbar { min-height: 44px; }
+  .depth-chart-toolbar-copy h4 { font-size: .96rem; }
+  .depth-chart-toolbar-copy p { font-size: .67rem; }
+  .depth-section-card { gap: 8px; padding: 8px; border-radius: 10px; }
+  .depth-forward-lines { gap: 6px; }
+  .depth-forward-line { grid-template-columns: 42px repeat(3,minmax(0,1fr)); gap: 5px; }
+  .depth-pair-grid { grid-template-columns: 42px repeat(2,minmax(0,1fr)); gap: 5px; }
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-slot,
+  .depth-position-row .depth-slot {
+    height: 66px;
+    min-height: 66px;
+  }
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label { padding: 5px 2px; font-size: .54rem; }
+  .depth-line-label span,
+  .depth-pair-label span { font-size: .48rem; }
+  .depth-line-label strong,
+  .depth-pair-label strong { font-size: .72rem; }
+  .depth-slot { padding: 6px 6px; gap: 2px; }
+  .depth-slot-position { font-size: .49rem; }
+  .depth-slot-name { min-height: 2.1em; font-size: .66rem; line-height: 1.05; }
+  .depth-slot-meta { font-size: .50rem; }
+  .depth-goalie-pair,
+  .depth-extra-goalies { gap: 5px; }
+  .depth-goalie-unit { grid-template-columns: 58px minmax(0,1fr); gap: 5px; }
+  .depth-extra-row { grid-template-columns: 42px minmax(0,1fr); gap: 5px; }
+  .depth-position-row { grid-template-columns: 62px minmax(0,1fr); gap: 5px; }
+}
+
+@media (max-width: 390px) {
+  .depth-forward-line { grid-template-columns: 38px repeat(3,minmax(0,1fr)); gap: 4px; }
+  .depth-pair-grid { grid-template-columns: 38px repeat(2,minmax(0,1fr)); gap: 4px; }
+  .depth-goalie-pair,
+  .depth-extra-goalies { grid-template-columns: 1fr; }
+  .depth-goalie-unit { grid-template-columns: 58px minmax(0,1fr); }
+  .depth-slot-name { font-size: .63rem; }
+}
+
 </style>
 </head>
 <body>
@@ -1968,7 +2152,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   let pendingImport = [];
   let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0, minors: 0 };
   let frontOfficeList = [];
-  let rosterMode = 'list';
+  let rosterMode = 'depth';
   let rosterFilters = { status: '', position: '', team: '', expiring: '', missingSalary: false, fantrax: false };
   let depthPosition = 'ALL';
   let depthEditMode = false;
@@ -2355,16 +2539,16 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const rw = resolvedDepthPlayers('RW');
     const defense = resolvedDepthPlayers('D');
     const goalies = resolvedDepthPlayers('G');
-    const forwardLines = Array.from({ length: 4 }, (_, index) => `<div class="depth-forward-line"><div class="depth-line-label">Line ${index + 1}</div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`).join('');
-    const defensePairs = Array.from({ length: 3 }, (_, index) => `<div class="depth-pair-grid"><div class="depth-pair-label">Pair ${index + 1}</div>${depthSlot(defense[index * 2], `D${index * 2 + 1}`, current)}${depthSlot(defense[index * 2 + 1], `D${index * 2 + 2}`, current)}</div>`).join('');
-    const goalieRows = [0,1].map((index) => `<div class="depth-goalie-grid"><div class="depth-role-label">${index === 0 ? 'Starter' : 'Backup'}</div>${depthSlot(goalies[index], 'G', current)}</div>`).join('');
-    const extraForwards = Math.max(lw.length, centers.length, rw.length) > 4 ? `<div class="depth-extra-list">${Array.from({ length: Math.max(lw.length, centers.length, rw.length) - 4 }, (_, offset) => { const index = offset + 4; return `<div class="depth-forward-line"><div class="depth-line-label">Depth ${index + 1}</div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`; }).join('')}</div>` : '';
-    const extraDefense = defense.slice(6).map((player, offset) => `<div class="depth-extra-row"><div class="depth-role-label">Depth ${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
-    const extraGoalies = goalies.slice(2).map((player, offset) => `<div class="depth-goalie-grid"><div class="depth-role-label">Depth ${offset + 3}</div>${depthSlot(player, 'G', current)}</div>`).join('');
-    return `<div class="depth-lineup-shell">
-      <section class="depth-section"><div class="depth-section-head"><h4>Forward lines</h4><span>LW · C · RW</span></div><div class="depth-forward-lines">${forwardLines}${extraForwards}</div></section>
-      <section class="depth-section"><div class="depth-section-head"><h4>Defense pairs</h4><span>${defense.length} defensemen</span></div>${defensePairs}${extraDefense ? `<div class="depth-extra-list">${extraDefense}</div>` : ''}</section>
-      <section class="depth-section"><div class="depth-section-head"><h4>Goalies</h4><span>${goalies.length} goalies</span></div>${goalieRows}${extraGoalies ? `<div class="depth-extra-list">${extraGoalies}</div>` : ''}</section>
+    const forwardLines = Array.from({ length: 4 }, (_, index) => `<div class="depth-forward-line"><div class="depth-line-label"><span>Line</span><strong>${index + 1}</strong></div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`).join('');
+    const defensePairs = Array.from({ length: 3 }, (_, index) => `<div class="depth-pair-grid"><div class="depth-pair-label"><span>Pair</span><strong>${index + 1}</strong></div>${depthSlot(defense[index * 2], 'D', current)}${depthSlot(defense[index * 2 + 1], 'D', current)}</div>`).join('');
+    const goalieUnits = [0,1].map((index) => `<div class="depth-goalie-unit"><div class="depth-role-label">${index === 0 ? 'Starter' : 'Backup'}</div>${depthSlot(goalies[index], 'G', current)}</div>`).join('');
+    const extraForwards = Math.max(lw.length, centers.length, rw.length) > 4 ? `<div class="depth-extra-list">${Array.from({ length: Math.max(lw.length, centers.length, rw.length) - 4 }, (_, offset) => { const index = offset + 4; return `<div class="depth-forward-line"><div class="depth-line-label"><span>Depth</span><strong>${index + 1}</strong></div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`; }).join('')}</div>` : '';
+    const extraDefense = defense.slice(6).map((player, offset) => `<div class="depth-extra-row"><div class="depth-role-label">D${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
+    const extraGoalies = goalies.slice(2).map((player, offset) => `<div class="depth-goalie-unit"><div class="depth-role-label">G${offset + 3}</div>${depthSlot(player, 'G', current)}</div>`).join('');
+    return `<div class="depth-lineup-shell depth-lineup-all">
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Forward lines</h4><span>${lw.length + centers.length + rw.length} forwards</span></div><div class="depth-forward-lines">${forwardLines}${extraForwards}</div></section>
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Defense pairs</h4><span>${defense.length} defensemen</span></div>${defensePairs}${extraDefense ? `<div class="depth-extra-list">${extraDefense}</div>` : ''}</section>
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Goalies</h4><span>${goalies.length} goalies</span></div><div class="depth-goalie-pair">${goalieUnits}</div>${extraGoalies ? `<div class="depth-extra-goalies">${extraGoalies}</div>` : ''}</section>
     </div>`;
   }
 
@@ -2394,8 +2578,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function renderDepthChart(current) {
     const tabs = ['ALL', ...DEPTH_POSITIONS].map((position) => `<button class="depth-position-tab ${depthPosition === position ? 'active' : ''}" data-depth-position="${position}" type="button">${position === 'ALL' ? 'All' : position}</button>`).join('');
     const canEdit = depthPosition !== 'ALL' && resolvedDepthPlayerIds(depthPosition).length > 0;
-    const title = depthPosition === 'ALL' ? 'Hockey lineup' : `${depthPosition} depth`;
-    const copy = depthPosition === 'ALL' ? 'Your preferred forward lines, defense pairs and goalie order.' : `Set your preferred ${depthPosition} order. Select Edit order to move players up or down.`;
+    const title = depthPosition === 'ALL' ? 'Depth chart' : `${depthPosition} depth`;
+    const copy = depthPosition === 'ALL' ? 'Your preferred lines, defense pairs and goalie order.' : `Set your preferred ${depthPosition} order. Select Edit order to move players up or down.`;
     const actions = depthPosition === 'ALL' ? '' : depthEditMode ? `<button id="cancelDepthOrderBtn" class="btn btn-ghost btn-small" type="button" ${depthSaving ? 'disabled' : ''}>Cancel</button><button id="saveDepthOrderBtn" class="btn btn-primary btn-small" type="button" ${depthSaving ? 'disabled' : ''}>${depthSaving ? 'Saving…' : 'Save order'}</button>` : `<button id="editDepthOrderBtn" class="btn btn-secondary btn-small" type="button" ${canEdit ? '' : 'disabled'}>Edit order</button>`;
     return `<div class="depth-lineup-shell"><div class="depth-position-tabs" aria-label="Depth chart position">${tabs}</div><div class="depth-chart-toolbar"><div class="depth-chart-toolbar-copy"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(copy)}</p></div><div class="depth-chart-actions">${actions}</div></div>${depthEditMode ? '<p class="depth-edit-note">Ordering is saved to this Front Office and will follow you across devices.</p>' : ''}${depthPosition === 'ALL' ? renderAllDepthChart(current) : renderSinglePositionDepth(depthPosition, current)}</div>`;
   }
@@ -2476,7 +2660,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       <div class="roster-page">
         <div class="page-heading-row">
           <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length} minors</h3></div>
-          <div class="view-switch v25" aria-label="Roster view"><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
+          <div class="view-switch v25 v29" aria-label="Roster view"><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
         </div>
         <div class="roster-commandbar">
           <input id="rosterSearch" class="search-input" placeholder="Search players..." />
