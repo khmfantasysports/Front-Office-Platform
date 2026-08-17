@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.7" />
+  <meta name="application-name" content="Fantasy Front Office v2.8" />
   <style>
 :root {
   color-scheme: dark;
@@ -1547,7 +1547,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
 
 
-/* V2.7 Farm System + transaction ledger */
+/* V2.8 Minors terminology + Fantrax minors routing */
 .app-menu-bar .workspace-nav { overflow-x:auto; scrollbar-width:none; }
 .app-menu-bar .workspace-nav::-webkit-scrollbar { display:none; }
 .app-menu-bar .nav-tab { flex:0 0 auto; min-width:max-content; }
@@ -1618,7 +1618,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       <nav id="workspaceNav" class="workspace-nav hidden" aria-label="Front office navigation">
         <button class="nav-tab active" data-view="overview" type="button">Overview</button>
         <button class="nav-tab" data-view="roster" type="button">Roster</button>
-        <button class="nav-tab" data-view="farm" type="button">Farm</button>
+        <button class="nav-tab" data-view="farm" type="button">Minors</button>
         <button class="nav-tab" data-view="cap" type="button">Cap</button>
         <button class="nav-tab" data-view="transactions" type="button">Transactions</button>
         <button class="nav-tab" data-view="settings" type="button">Settings</button>
@@ -1811,7 +1811,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
             Roster location
             <select id="playerRosterGroup">
               <option value="ACTIVE">Active roster</option>
-              <option value="FARM">Farm system</option>
+              <option value="FARM">Minors</option>
             </select>
           </label>
         </div>
@@ -1893,7 +1893,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         <button id="closeImportDialog" class="icon-btn" type="button" aria-label="Close">×</button>
       </header>
       <div class="modal-body">
-        <p class="muted">Fantrax Team Roster exports are detected automatically, including separate Skaters and Goalies sections. Generic CSV import remains supported.</p>
+        <p class="muted">Fantrax Team Roster exports are detected automatically, including separate Skaters and Goalies sections. Rows marked Min, Minor or Minors are routed to Minors automatically. Generic CSV import remains supported.</p>
         <label class="file-drop">
           <span>Select CSV file</span>
           <input id="csvFile" type="file" accept=".csv,text/csv" />
@@ -1924,7 +1924,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           <label class="full-width">Counterparty / team<input id="transactionCounterparty" placeholder="Optional" /></label>
           <label class="full-width">Summary<input id="transactionSummary" required placeholder="Acquired Player A for 2028 1st" /></label>
           <label>Linked player<select id="transactionPlayer"><option value="">None</option></select></label>
-          <label>Roster action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to farm</option><option value="REMOVE">Remove from roster</option></select></label>
+          <label>Roster action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to minors</option><option value="REMOVE">Remove from roster</option></select></label>
           <label>Roster status after move<select id="transactionRosterStatus"><option value="">Keep current status</option></select></label>
           <label class="full-width">Incoming items<textarea id="transactionIncoming" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
           <label class="full-width">Outgoing items<textarea id="transactionOutgoing" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
@@ -1966,7 +1966,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   let editingPlayerId = null;
   let playerFormDirty = false;
   let pendingImport = [];
-  let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
+  let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0, minors: 0 };
   let frontOfficeList = [];
   let rosterMode = 'list';
   let rosterFilters = { status: '', position: '', team: '', expiring: '', missingSalary: false, fantrax: false };
@@ -2160,7 +2160,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('summaryCards').innerHTML = [
       summaryCard('Cap Used', calc.complete ? formatMoney(calc.capUsed) : `${formatMoney(calc.knownCapUsed)} known`, calc.complete ? 'Complete' : 'Incomplete', capState),
       summaryCard('Cap Space', capSpaceValue, capSpaceSub, capState),
-      summaryCard('Players', `${activeCount}${rosterLimit ? ` / ${rosterLimit}` : ''}`, `${farmSystemPlayers().length} farm`, rosterState),
+      summaryCard('Players', `${activeCount}${rosterLimit ? ` / ${rosterLimit}` : ''}`, `${farmSystemPlayers().length} minors`, rosterState),
       summaryCard('Expiring', String(expiring), seasonLabel(season.startYear), expiring > 0 ? 'warning' : 'neutral'),
       summaryCard('Dead Cap', formatMoney(deadCap), seasonLabel(season.startYear), deadCap > 0 ? 'warning' : 'neutral')
     ].join('');
@@ -2475,7 +2475,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('rosterView').innerHTML = `
       <div class="roster-page">
         <div class="page-heading-row">
-          <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length} farm</h3></div>
+          <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length} minors</h3></div>
           <div class="view-switch v25" aria-label="Roster view"><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
         </div>
         <div class="roster-commandbar">
@@ -2491,7 +2491,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           </div></details>
           <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
         </div>
-        <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="openTransactionsToolBtn" class="btn btn-secondary" type="button">Transactions</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
+        <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
 
         ${activePlayers.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
 
@@ -2506,7 +2506,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('rosterGridModeBtn').addEventListener('click', () => rerenderMode('grid'));
     el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());
     el('importRosterBtn').addEventListener('click', () => { closeRosterMenus(); openImportDialog(); });
-    el('openTransactionsToolBtn').addEventListener('click', () => { closeRosterMenus(); switchView('transactions'); });
     el('rosterExportBtn').addEventListener('click', () => { closeRosterMenus(); exportRosterCsv(); });
     document.querySelectorAll('[data-roster-list-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.rosterListPlayer)));
     document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
@@ -2593,9 +2592,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     }).join('');
     const activeProspectRows = activeProspects.map((player) => `<button class="farm-active-prospect" data-farm-edit="${player.id}" type="button"><strong>${escapeHtml(player.name)}</strong><span>${escapeHtml(player.position)} · Active roster</span></button>`).join('');
 
-    el('farmView').innerHTML = `<div class="farm-page"><div class="page-heading-row"><div><p class="eyebrow">Development</p><h3>Farm System</h3><p class="page-copy">Prospects assigned here stay separate from your active lineup. Their cap treatment still follows the roster status rules you set.</p></div><button id="addFarmProspectBtn" class="btn btn-primary" type="button">+ Add Prospect</button></div><div class="farm-summary"><span><strong>${prospects.length}</strong> in farm</span><span><strong>${activeProspects.length}</strong> prospects on active roster</span></div>${prospects.length ? `<div class="farm-player-list">${rows}</div>` : `<div class="empty-state"><h4>No prospects in the Farm system</h4><p>Label a player as Prospect and assign them to Farm, or add a new prospect here.</p><div class="empty-state-actions"><button id="emptyAddFarmProspectBtn" class="btn btn-primary" type="button">+ Add first prospect</button></div></div>`}${activeProspects.length ? `<div class="subpanel farm-active-section"><p class="eyebrow">Prospects currently called up</p><div class="farm-active-grid">${activeProspectRows}</div></div>` : ''}</div>`;
+    el('farmView').innerHTML = `<div class="farm-page"><div class="page-heading-row"><div><p class="eyebrow">Development</p><h3>Minors</h3><p class="page-copy">Prospects assigned to Minors stay separate from your active lineup. Fantrax rows marked as minors are routed here automatically on import.</p></div><div class="inline-actions"><button id="importMinorsBtn" class="btn btn-secondary" type="button">Import Fantrax</button><button id="addFarmProspectBtn" class="btn btn-primary" type="button">+ Add Player</button></div></div><div class="farm-summary"><span><strong>${prospects.length}</strong> in minors</span><span><strong>${activeProspects.length}</strong> prospects on active roster</span></div>${prospects.length ? `<div class="farm-player-list">${rows}</div>` : `<div class="empty-state"><h4>No players in Minors</h4><p>Add a player here or import Fantrax. Players placed in Minors are automatically labelled Prospect.</p><div class="empty-state-actions"><button id="emptyAddFarmProspectBtn" class="btn btn-primary" type="button">+ Add Player</button><button id="emptyImportMinorsBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}${activeProspects.length ? `<div class="subpanel farm-active-section"><p class="eyebrow">Prospects currently called up</p><div class="farm-active-grid">${activeProspectRows}</div></div>` : ''}</div>`;
     el('addFarmProspectBtn').addEventListener('click', openFarmProspectDialog);
+    el('importMinorsBtn').addEventListener('click', openImportDialog);
     if (el('emptyAddFarmProspectBtn')) el('emptyAddFarmProspectBtn').addEventListener('click', openFarmProspectDialog);
+    if (el('emptyImportMinorsBtn')) el('emptyImportMinorsBtn').addEventListener('click', openImportDialog);
     document.querySelectorAll('[data-farm-edit]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.farmEdit)));
     document.querySelectorAll('[data-call-up]').forEach((button) => button.addEventListener('click', () => quickCallUp(button.dataset.callUp)));
   }
@@ -2936,7 +2937,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         const previousGroup = existingPlayer?.rosterGroup || 'ACTIVE';
         const desiredGroup = el('playerRosterGroup').value || 'ACTIVE';
         const desiredProspect = el('playerIsProspect').checked;
-        if (desiredGroup === 'FARM' && !desiredProspect) throw new Error('Only players labelled Prospect can be assigned to the Farm system.');
+        if (desiredGroup === 'FARM' && !desiredProspect) throw new Error('Only players labelled Prospect can be assigned to Minors.');
         const { data: savedPlayerId, error } = await db.rpc('save_front_office_player_v2', {
           p_front_office_id: frontOfficeId,
           p_front_office_player_id: editingPlayerId || null,
@@ -2990,7 +2991,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
             p_transaction_type: 'Send Down',
             p_transaction_date: todayIsoDate(),
             p_counterparty: null,
-            p_summary: `${name} assigned to the Farm system`,
+            p_summary: `${name} assigned to Minors`,
             p_notes: null,
             p_in_items: [], p_out_items: [],
             p_front_office_player_id: playerId,
@@ -3053,7 +3054,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   }
   function openImportDialog() {
     pendingImport = [];
-    pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
+    pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0, minors: 0 };
     el('csvFile').value = '';
     el('importSalaryToggle').checked = true;
     el('importPreview').classList.add('hidden');
@@ -3074,10 +3075,10 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
     const fantrax = parseFantraxTeamRoster(rows);
     if (fantrax.detected) {
-      pendingImportMeta = { type: 'fantrax', skaters: fantrax.skaters, goalies: fantrax.goalies };
+      pendingImportMeta = { type: 'fantrax', skaters: fantrax.skaters, goalies: fantrax.goalies, minors: fantrax.minors };
       pendingImport = fantrax.rows;
     } else {
-      pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
+      pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0, minors: 0 };
       const headers = rows[0].map((h) => h.trim());
       pendingImport = rows.slice(1)
         .filter((r) => r.some((v) => String(v).trim() !== ''))
@@ -3091,6 +3092,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     let detected = false;
     let skaters = 0;
     let goalies = 0;
+    let minors = 0;
     let section = '';
     let headers = null;
 
@@ -3116,7 +3118,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       const name = String(record.Player || '').trim();
       if (!sourceId && !name) continue;
 
-      const statusResult = mapFantraxStatus(String(record.Status || '').trim());
       const salary = nullableNumber(String(record.Salary || '').replace(/[$,]/g, ''));
       const sourceRow = i + 1;
       const realTeam = normalizeNhlTeam(record.Team);
@@ -3124,6 +3125,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       const eligiblePositions = normalizeEligibility(record.Eligible) || position;
       const ageSnapshot = nullableInteger(record.Age);
       const existing = findExistingImportPlayer(sourceId, name, realTeam);
+      const statusRaw = String(record.Status || '').trim();
+      const isMinors = isFantraxMinorsStatus(statusRaw);
+      const statusResult = mapFantraxStatus(statusRaw, existing?.statusId || null);
 
       output.push({
         sourceRow,
@@ -3135,7 +3139,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         realTeam,
         ageSnapshot,
         statusId: statusResult.statusId,
-        statusRaw: String(record.Status || '').trim(),
+        statusRaw,
+        isMinors,
         salary,
         salaries: {},
         section,
@@ -3146,12 +3151,22 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       });
       if (section === 'Skaters') skaters += 1;
       if (section === 'Goalies') goalies += 1;
+      if (isMinors) minors += 1;
     }
-    return { detected: detected && output.length > 0, rows: output, skaters, goalies };
+    return { detected: detected && output.length > 0, rows: output, skaters, goalies, minors };
   }
 
-  function mapFantraxStatus(value) {
+  function isFantraxMinorsStatus(value) {
+    const normalized = String(value || '').trim().toLowerCase().replace(/[^a-z]/g, '');
+    return normalized === 'min' || normalized === 'minor' || normalized === 'minors' || normalized.startsWith('minor');
+  }
+
+  function mapFantraxStatus(value, fallbackStatusId = null) {
     const raw = String(value || '').trim();
+    if (isFantraxMinorsStatus(raw)) {
+      const fallback = statusById(fallbackStatusId) || state.statuses.find((s) => s.name.toLowerCase() === 'active') || state.statuses[0];
+      return { statusId: fallback?.id || null, warning: fallback ? '' : 'No roster status is available for this Minors player.' };
+    }
     const codeMap = { act: 'Active', res: 'Reserve' };
     const desired = codeMap[raw.toLowerCase()] || raw;
     const status = state.statuses.find((s) => s.name.toLowerCase() === desired.toLowerCase());
@@ -3192,7 +3207,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const existing = findExistingImportPlayer(sourceId, name, realTeam);
     return {
       sourceRow, sourceType: sourceId ? 'FANTRAX' : null, sourceId, name, position, eligiblePositions, realTeam,
-      ageSnapshot, statusId: status?.id || null, salary: null, salaries, section: '',
+      ageSnapshot, statusId: status?.id || null, salary: null, salaries, section: '', isMinors: false,
       existingPlayerId: existing?.id || null, action: existing ? 'Update' : 'Add', valid: Boolean(name && status?.id), warning: ''
     };
   }
@@ -3212,6 +3227,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         <td>${escapeHtml(r.realTeam || '—')}</td>
         <td>${r.ageSnapshot ?? '—'}</td>
         <td>${escapeHtml(statusById(r.statusId)?.name || r.statusRaw || 'Unmapped')}</td>
+        <td>${r.isMinors ? '<span class="status-pill">Minors</span>' : 'Active roster'}</td>
         <td>${currentSalary === null ? '—' : formatMoney(currentSalary)}</td>
         <td>${escapeHtml(r.action || 'Add')}</td>
         <td>${r.valid ? '<span class="good">Ready</span>' : `<span class="danger">${escapeHtml(r.warning || 'Needs review')}</span>`}</td>
@@ -3220,9 +3236,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const preview = el('importPreview');
     preview.classList.remove('hidden');
     const detector = fantrax
-      ? `<div class="import-detect"><span class="import-chip">Fantrax Team Roster detected</span><span class="import-chip">${pendingImportMeta.skaters} skaters</span><span class="import-chip">${pendingImportMeta.goalies} goalies</span><span class="import-chip">${valid.length} ready</span></div>`
+      ? `<div class="import-detect"><span class="import-chip">Fantrax Team Roster detected</span><span class="import-chip">${pendingImportMeta.skaters} skaters</span><span class="import-chip">${pendingImportMeta.goalies} goalies</span>${pendingImportMeta.minors ? `<span class="import-chip">${pendingImportMeta.minors} minors</span>` : ''}<span class="import-chip">${valid.length} ready</span></div>`
       : `<div class="import-detect"><span class="import-chip">Generic CSV</span><span class="import-chip">${valid.length} ready</span></div>`;
-    preview.innerHTML = `${detector}${invalid ? `<p class="danger">${invalid} row${invalid === 1 ? '' : 's'} require review and will not be imported.</p>` : ''}<div class="table-wrap"><table><thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Eligible</th><th>NHL Team</th><th>Age</th><th>Status</th><th>${seasonLabel(current.startYear)}</th><th>Action</th><th>Check</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    preview.innerHTML = `${detector}${invalid ? `<p class="danger">${invalid} row${invalid === 1 ? '' : 's'} require review and will not be imported.</p>` : ''}<div class="table-wrap"><table><thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Eligible</th><th>NHL Team</th><th>Age</th><th>Status</th><th>Location</th><th>${seasonLabel(current.startYear)}</th><th>Action</th><th>Check</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     el('applyImportBtn').disabled = valid.length === 0;
   }
 
@@ -3249,7 +3265,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           };
         });
 
-        const { error } = await db.rpc('save_front_office_player_v2', {
+        const { data: savedPlayerId, error } = await db.rpc('save_front_office_player_v2', {
           p_front_office_id: frontOfficeId,
           p_front_office_player_id: existing?.id || null,
           p_player_name: r.name,
@@ -3267,10 +3283,20 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           p_source_player_name: r.sourceId ? r.name : null
         });
         if (error) throw error;
+        const importedPlayerId = savedPlayerId || existing?.id || null;
+        if (pendingImportMeta.type === 'fantrax' && r.isMinors) {
+          if (!importedPlayerId) throw new Error(`Could not resolve the saved player ID for ${r.name}.`);
+          const { error: minorsError } = await db.rpc('sync_front_office_player_minors_v1', {
+            p_front_office_id: frontOfficeId,
+            p_front_office_player_id: importedPlayerId,
+            p_to_minors: true
+          });
+          if (minorsError) throw minorsError;
+        }
       }
       importDialog.close();
       pendingImport = [];
-      pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
+      pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0, minors: 0 };
       await loadOffice(frontOfficeId, false);
     });
   }
