@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.3" />
+  <meta name="application-name" content="Fantasy Front Office v2.7" />
   <style>
 :root {
   color-scheme: dark;
@@ -1545,6 +1545,63 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .depth-slot-meta { font-size:.50rem; }
 }
 
+
+
+/* V2.7 Farm System + transaction ledger */
+.app-menu-bar .workspace-nav { overflow-x:auto; scrollbar-width:none; }
+.app-menu-bar .workspace-nav::-webkit-scrollbar { display:none; }
+.app-menu-bar .nav-tab { flex:0 0 auto; min-width:max-content; }
+.prospect-check-field { align-content:end; }
+.prospect-check { min-height:43px; display:flex; align-items:center; gap:8px; padding:9px 11px; border:1px solid #2a4052; border-radius:11px; background:rgba(7,17,26,.78); color:var(--text); }
+.prospect-check input { width:auto; margin:0; }
+.page-copy { max-width:620px; margin:4px 0 0; color:var(--muted); font-size:.78rem; line-height:1.4; }
+.farm-page,.transactions-page { display:grid; gap:12px; }
+.farm-summary { display:flex; gap:8px; flex-wrap:wrap; }
+.farm-summary span { padding:7px 10px; border:1px solid var(--border); border-radius:999px; background:#0b151e; color:var(--muted); font-size:.72rem; }
+.farm-summary strong { color:var(--text); }
+.farm-player-list { display:grid; gap:7px; }
+.farm-player-card { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; border:1px solid var(--border); border-radius:12px; padding:8px; background:#0b151e; }
+.farm-player-main { min-width:0; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px; border:0; background:transparent; color:var(--text); text-align:left; }
+.farm-player-main span:first-child { min-width:0; }
+.farm-player-main strong,.farm-player-main small { display:block; }
+.farm-player-main strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.farm-player-main small { margin-top:3px; color:var(--muted); font-size:.68rem; }
+.farm-player-cap { text-align:right; white-space:nowrap; }
+.farm-active-section { margin-top:2px; }
+.farm-active-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:8px; }
+.farm-active-prospect { padding:9px 10px; border:1px solid var(--border); border-radius:10px; background:#0b141d; color:var(--text); text-align:left; }
+.farm-active-prospect strong,.farm-active-prospect span { display:block; }
+.farm-active-prospect span { margin-top:2px; color:var(--muted); font-size:.66rem; }
+.transaction-list { display:grid; gap:8px; }
+.transaction-card { border:1px solid var(--border); border-radius:12px; padding:11px 12px; background:#0b151e; }
+.transaction-card-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.transaction-card-head h4 { margin:3px 0 0; font-size:.9rem; }
+.transaction-card-head time { color:var(--muted); font-size:.68rem; white-space:nowrap; }
+.transaction-type { color:var(--accent); font-size:.62rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.transaction-counterparty,.transaction-notes { margin:6px 0 0; color:var(--muted); font-size:.7rem; }
+.transaction-chips { display:flex; gap:5px; margin-top:8px; }
+.tx-chip { padding:3px 6px; border-radius:999px; border:1px solid var(--border); font-size:.58rem; font-weight:900; }
+.tx-chip.in { color:var(--good); }.tx-chip.out { color:var(--danger); }.tx-chip.financial { color:var(--warning); }
+.transaction-flow { display:grid; grid-template-columns:42px minmax(0,1fr); gap:7px; margin-top:7px; font-size:.7rem; }
+.transaction-flow strong { color:var(--muted); font-size:.61rem; letter-spacing:.06em; }
+.transaction-flow.in strong { color:var(--good); }.transaction-flow.out strong { color:var(--danger); }.transaction-flow.financial strong { color:var(--warning); }
+.transaction-form-body { display:grid; gap:16px; max-height:70vh; overflow-y:auto; }
+.transaction-financial-section { border-top:1px solid var(--border); padding-top:14px; }
+.transaction-financial-section h4 { margin:0; }
+.transaction-financial-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+.transaction-financial-grid label { display:grid; grid-template-columns:80px minmax(0,1fr); align-items:center; gap:8px; color:var(--muted); font-size:.72rem; }
+.transaction-financial-grid input { min-height:38px; }
+.transaction-cap-card .section-title-row { margin-bottom:8px; }
+@media(max-width:720px){
+  .app-menu-bar .workspace-nav { justify-content:flex-start; }
+  .app-menu-bar .nav-tab { padding-left:8px; padding-right:8px; }
+  .farm-active-grid { grid-template-columns:1fr; }
+  .farm-player-card { grid-template-columns:minmax(0,1fr) auto; }
+  .farm-player-main { gap:7px; }
+  .transaction-financial-grid { grid-template-columns:1fr; }
+  .transaction-dialog { width:min(760px,calc(100vw - 12px)); }
+}
+
 </style>
 </head>
 <body>
@@ -1561,7 +1618,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       <nav id="workspaceNav" class="workspace-nav hidden" aria-label="Front office navigation">
         <button class="nav-tab active" data-view="overview" type="button">Overview</button>
         <button class="nav-tab" data-view="roster" type="button">Roster</button>
+        <button class="nav-tab" data-view="farm" type="button">Farm</button>
         <button class="nav-tab" data-view="cap" type="button">Cap</button>
+        <button class="nav-tab" data-view="transactions" type="button">Transactions</button>
         <button class="nav-tab" data-view="settings" type="button">Settings</button>
       </nav>
 
@@ -1691,7 +1750,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
         <section id="overviewView" class="view-panel"></section>
         <section id="rosterView" class="view-panel hidden"></section>
+        <section id="farmView" class="view-panel hidden"></section>
         <section id="capView" class="view-panel hidden"></section>
+        <section id="transactionsView" class="view-panel hidden"></section>
         <section id="settingsView" class="view-panel hidden"></section>
       </section>
     </main>
@@ -1741,6 +1802,17 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           <label class="status-field">
             Roster status
             <select id="rosterStatus"></select>
+          </label>
+          <label class="prospect-check-field">
+            <span>Player type</span>
+            <span class="prospect-check"><input id="playerIsProspect" type="checkbox" /> Prospect</span>
+          </label>
+          <label>
+            Roster location
+            <select id="playerRosterGroup">
+              <option value="ACTIVE">Active roster</option>
+              <option value="FARM">Farm system</option>
+            </select>
           </label>
         </div>
 
@@ -1839,46 +1911,41 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     </form>
   </dialog>
 
-  <dialog id="adjustmentDialog" class="modal-dialog">
-    <form id="adjustmentForm" method="dialog" class="modal-card">
+  <dialog id="transactionDialog" class="modal-dialog transaction-dialog">
+    <form id="transactionForm" method="dialog" class="modal-card">
       <header class="drawer-header">
-        <div>
-          <p class="eyebrow">Financial adjustment</p>
-          <h3>Add adjustment</h3>
-        </div>
-        <button id="closeAdjustmentDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+        <div><p class="eyebrow">Front office ledger</p><h3>Record transaction</h3></div>
+        <button id="closeTransactionDialog" class="icon-btn" type="button" aria-label="Close">×</button>
       </header>
-      <div class="modal-body form-grid compact">
-        <label>
-          Type
-          <select id="adjustmentType">
-            <option value="Dead Cap">Dead Cap</option>
-            <option value="Retained Salary">Retained Salary</option>
-            <option value="Bonus/Penalty">Bonus/Penalty</option>
-            <option value="Cap Credit">Cap Credit</option>
-            <option value="Other">Other</option>
-          </select>
-        </label>
-        <label>
-          Season
-          <select id="adjustmentSeason"></select>
-        </label>
-        <label class="full-width">
-          Description
-          <input id="adjustmentDescription" required placeholder="Player release penalty" />
-        </label>
-        <label>
-          Amount
-          <input id="adjustmentAmount" required type="number" step="1" />
-          <small>Positive consumes cap. Negative creates cap space.</small>
-        </label>
+      <div class="modal-body transaction-form-body">
+        <div class="form-grid compact">
+          <label>Type<select id="transactionType"><option>Trade</option><option>Signing</option><option>Extension</option><option>Call Up</option><option>Send Down</option><option>Waiver</option><option>Buyout</option><option>Release</option><option>Add</option><option>Drop</option><option>Other</option></select></label>
+          <label>Date<input id="transactionDate" type="date" /></label>
+          <label class="full-width">Counterparty / team<input id="transactionCounterparty" placeholder="Optional" /></label>
+          <label class="full-width">Summary<input id="transactionSummary" required placeholder="Acquired Player A for 2028 1st" /></label>
+          <label>Linked player<select id="transactionPlayer"><option value="">None</option></select></label>
+          <label>Roster action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to farm</option><option value="REMOVE">Remove from roster</option></select></label>
+          <label>Roster status after move<select id="transactionRosterStatus"><option value="">Keep current status</option></select></label>
+          <label class="full-width">Incoming items<textarea id="transactionIncoming" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
+          <label class="full-width">Outgoing items<textarea id="transactionOutgoing" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
+          <label class="full-width">Notes<textarea id="transactionNotes" rows="2" placeholder="Optional transaction notes"></textarea></label>
+        </div>
+        <section class="transaction-financial-section">
+          <div><p class="eyebrow">Cap consequence</p><h4>Optional financial impact</h4><p class="muted">Use this for buyout penalties, retained salary, cap credits or other transaction-generated adjustments.</p></div>
+          <div class="form-grid compact">
+            <label>Adjustment type<select id="transactionAdjustmentType"><option value="Dead Cap">Dead Cap</option><option value="Retained Salary">Retained Salary</option><option value="Bonus/Penalty">Bonus/Penalty</option><option value="Cap Credit">Cap Credit</option><option value="Other">Other</option></select></label>
+            <label>Description<input id="transactionAdjustmentDescription" placeholder="e.g. Buyout penalty" /></label>
+          </div>
+          <div id="transactionFinancialGrid" class="transaction-financial-grid"></div>
+        </section>
       </div>
       <footer class="drawer-footer">
-        <button id="cancelAdjustmentBtn" class="btn btn-ghost" type="button">Cancel</button>
-        <button class="btn btn-primary" type="submit">Save Adjustment</button>
+        <button id="cancelTransactionBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="saveTransactionBtn" class="btn btn-primary" type="submit">Save Transaction</button>
       </footer>
     </form>
   </dialog>
+
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -1892,7 +1959,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  const APP_VERSION = '2.6';
+  const APP_VERSION = '2.7';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
@@ -1915,7 +1982,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   const workspace = el('workspace');
   const playerDialog = el('playerDialog');
   const importDialog = el('importDialog');
-  const adjustmentDialog = el('adjustmentDialog');
+  const transactionDialog = el('transactionDialog');
 
   init();
 
@@ -1942,6 +2009,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       players: [],
       adjustments: [],
       depthCharts: {},
+      transactions: [],
+      transactionItems: [],
       activity: []
     };
   }
@@ -1989,9 +2058,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('csvFile').addEventListener('change', handleCsvFile);
     el('applyImportBtn').addEventListener('click', applyImport);
 
-    el('closeAdjustmentDialog').addEventListener('click', () => adjustmentDialog.close());
-    el('cancelAdjustmentBtn').addEventListener('click', () => adjustmentDialog.close());
-    el('adjustmentForm').addEventListener('submit', saveAdjustment);
+    el('closeTransactionDialog').addEventListener('click', () => transactionDialog.close());
+    el('cancelTransactionBtn').addEventListener('click', () => transactionDialog.close());
+    el('transactionForm').addEventListener('submit', saveTransactionFromDialog);
+    el('playerIsProspect').addEventListener('change', syncProspectLocationControls);
+    el('playerRosterGroup').addEventListener('change', syncProspectLocationControls);
   }
   async function handleCreateFrontOffice(event) {
     event.preventDefault();
@@ -2051,7 +2122,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('summaryCards').classList.add('hidden');
     renderOverview();
     renderRoster();
+    renderFarm();
     renderCap();
+    renderTransactions();
     renderSettings();
   }
   function renderSeasonSelect() {
@@ -2081,12 +2154,13 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const capSpaceValue = calc.complete && calc.salaryCap !== null ? formatMoney(calc.capSpace) : 'Incomplete';
     const capSpaceSub = calc.missingPlayerIds.length ? `${calc.missingPlayerIds.length} missing salary` : 'Current cap result';
     const capState = capTone(calc);
-    const rosterState = rosterLimit && state.players.length > rosterLimit ? 'danger' : 'neutral';
+    const activeCount = activeRosterPlayers().length;
+    const rosterState = rosterLimit && activeCount > rosterLimit ? 'danger' : 'neutral';
 
     el('summaryCards').innerHTML = [
       summaryCard('Cap Used', calc.complete ? formatMoney(calc.capUsed) : `${formatMoney(calc.knownCapUsed)} known`, calc.complete ? 'Complete' : 'Incomplete', capState),
       summaryCard('Cap Space', capSpaceValue, capSpaceSub, capState),
-      summaryCard('Players', `${state.players.length}${rosterLimit ? ` / ${rosterLimit}` : ''}`, 'Current roster', rosterState),
+      summaryCard('Players', `${activeCount}${rosterLimit ? ` / ${rosterLimit}` : ''}`, `${farmSystemPlayers().length} farm`, rosterState),
       summaryCard('Expiring', String(expiring), seasonLabel(season.startYear), expiring > 0 ? 'warning' : 'neutral'),
       summaryCard('Dead Cap', formatMoney(deadCap), seasonLabel(season.startYear), deadCap > 0 ? 'warning' : 'neutral')
     ].join('');
@@ -2187,6 +2261,18 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     return row.capOverride !== null && row.capOverride !== undefined ? row.capOverride : row.salary;
   }
 
+  function activeRosterPlayers() {
+    return state.players.filter((player) => (player.rosterGroup || 'ACTIVE') === 'ACTIVE');
+  }
+
+  function farmSystemPlayers() {
+    return state.players.filter((player) => player.isProspect && (player.rosterGroup || 'ACTIVE') === 'FARM');
+  }
+
+  function defaultActiveStatusId() {
+    return state.statuses.find((status) => String(status.name || '').trim().toLowerCase() === 'active')?.id || state.statuses[0]?.id || null;
+  }
+
   function activeRosterFilterCount() {
     return [rosterFilters.status, rosterFilters.position, rosterFilters.team, rosterFilters.expiring].filter(Boolean).length
       + (rosterFilters.missingSalary ? 1 : 0) + (rosterFilters.fantrax ? 1 : 0);
@@ -2195,7 +2281,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function filteredRosterPlayers(query = '') {
     const q = String(query || '').trim().toLowerCase();
     const season = currentSeason();
-    return state.players.filter((player) => {
+    return activeRosterPlayers().filter((player) => {
       const status = statusById(player.statusId);
       const haystack = `${player.name} ${player.position} ${player.eligiblePositions || ''} ${player.realTeam || ''} ${player.ageSnapshot ?? ''} ${status?.name || ''}`.toLowerCase();
       if (q && !haystack.includes(q)) return false;
@@ -2230,7 +2316,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
   function defaultDepthMembers(position) {
     const current = currentSeason();
-    return state.players.filter((player) => playerDepthChartPosition(player) === position).sort((a,b) => {
+    return activeRosterPlayers().filter((player) => playerDepthChartPosition(player) === position).sort((a,b) => {
       const aCharge = effectivePlayerCharge(a, current.id) ?? -1;
       const bCharge = effectivePlayerCharge(b, current.id) ?? -1;
       if (aCharge !== bCharge) return bCharge - aCharge;
@@ -2350,13 +2436,14 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function renderRoster() {
     const seasons = contractHorizonSeasons();
     const current = currentSeason();
-    const positions = [...new Set(state.players.map((p) => p.position).filter(Boolean))].sort();
-    const teams = [...new Set(state.players.map((p) => p.realTeam).filter(Boolean))].sort();
+    const activePlayers = activeRosterPlayers();
+    const positions = [...new Set(activePlayers.map((p) => p.position).filter(Boolean))].sort();
+    const teams = [...new Set(activePlayers.map((p) => p.realTeam).filter(Boolean))].sort();
     const query = '';
     const players = filteredRosterPlayers(query);
     const filterCount = activeRosterFilterCount();
 
-    const listRows = state.players.map((player) => {
+    const listRows = activePlayers.map((player) => {
       const status = statusById(player.statusId);
       const charge = effectivePlayerCharge(player, current.id);
       const salary = player.salaries?.[current.id]?.salary ?? null;
@@ -2373,7 +2460,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       </button>`;
     }).join('');
 
-    const gridRows = state.players.map((player) => {
+    const gridRows = activePlayers.map((player) => {
       const status = statusById(player.statusId);
       const seasonCells = seasons.map((season) => {
         const value = player.salaries?.[season.id]?.salary ?? null;
@@ -2381,14 +2468,14 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       }).join('');
       return `<tr data-player-grid-row="${player.id}" data-player-id="${player.id}"><td class="col-player"><button class="player-button" data-edit-player="${player.id}" type="button"><span class="roster-player-name">${escapeHtml(player.name)}</span>${player.fantraxId ? '<span class="source-badge">FX</span>' : ''}</button></td><td class="col-pos">${escapeHtml(player.position)}</td><td class="eligible-cell col-eligible">${escapeHtml(player.eligiblePositions || player.position || '—')}</td><td class="col-team">${escapeHtml(player.realTeam || '—')}</td><td class="age-cell col-age">${player.ageSnapshot ?? '—'}</td><td class="col-status"><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>${seasonCells}<td class="col-end">${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td></tr>`;
     }).join('');
-    const totalCells = seasons.map((s) => `<td class="money col-salary">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
+    const totalCells = seasons.map((s) => { const total = activePlayers.reduce((sum, player) => { const charge = effectivePlayerCharge(player, s.id); const status = statusById(player.statusId); return sum + (status?.countsTowardCap && charge !== null ? charge : 0); }, 0); return `<td class="money col-salary">${formatMoney(total)}</td>`; }).join('');
 
     const depthChartHtml = renderDepthChart(current);
 
     el('rosterView').innerHTML = `
       <div class="roster-page">
         <div class="page-heading-row">
-          <div><p class="eyebrow">Roster</p><h3>${state.players.length} / ${state.frontOffice.rosterLimit ?? '—'} players</h3></div>
+          <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length} farm</h3></div>
           <div class="view-switch v25" aria-label="Roster view"><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
         </div>
         <div class="roster-commandbar">
@@ -2404,14 +2491,13 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           </div></details>
           <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
         </div>
-        <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
+        <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="openTransactionsToolBtn" class="btn btn-secondary" type="button">Transactions</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
 
-        ${state.players.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
+        ${activePlayers.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
 
-        ${state.players.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}">${depthChartHtml}</div>` : ''}
+        ${activePlayers.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}">${depthChartHtml}</div>` : ''}
 
-        ${state.players.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-horizon-note"><span><strong>Seven-season contract horizon</strong> · current season + six future years</span><span>${seasonLabel(seasons[0]?.startYear)} → ${seasonLabel(seasons[seasons.length - 1]?.startYear)}</span></div><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view all seven contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact roster-table-seven"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
-        ${renderAdjustmentTable()}
+        ${activePlayers.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-horizon-note"><span><strong>Seven-season contract horizon</strong> · current season + six future years</span><span>${seasonLabel(seasons[0]?.startYear)} → ${seasonLabel(seasons[seasons.length - 1]?.startYear)}</span></div><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view all seven contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact roster-table-seven"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
       </div>`;
 
     const rerenderMode = (mode) => { if (mode !== 'depth') { depthEditMode = false; depthDraftOrder = []; } rosterMode = mode; renderRoster(); };
@@ -2420,7 +2506,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('rosterGridModeBtn').addEventListener('click', () => rerenderMode('grid'));
     el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());
     el('importRosterBtn').addEventListener('click', () => { closeRosterMenus(); openImportDialog(); });
-    el('addAdjustmentBtn').addEventListener('click', () => { closeRosterMenus(); openAdjustmentDialog(); });
+    el('openTransactionsToolBtn').addEventListener('click', () => { closeRosterMenus(); switchView('transactions'); });
     el('rosterExportBtn').addEventListener('click', () => { closeRosterMenus(); exportRosterCsv(); });
     document.querySelectorAll('[data-roster-list-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.rosterListPlayer)));
     document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
@@ -2432,8 +2518,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     document.querySelectorAll('[data-depth-move-index]').forEach((button) => button.addEventListener('click', () => moveDepthDraft(Number(button.dataset.depthMoveIndex), Number(button.dataset.depthMoveDirection))));
     if (el('emptyAddPlayerBtn')) el('emptyAddPlayerBtn').addEventListener('click', () => openPlayerDialog());
     if (el('emptyImportRosterBtn')) el('emptyImportRosterBtn').addEventListener('click', openImportDialog);
-    if (el('emptyAddAdjustmentBtn')) el('emptyAddAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
-    document.querySelectorAll('[data-delete-adjustment]').forEach((button) => button.addEventListener('click', () => deleteAdjustment(button.dataset.deleteAdjustment)));
 
     const refreshFilters = () => applyRosterFilters();
     el('rosterSearch').addEventListener('input', refreshFilters);
@@ -2445,19 +2529,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('rosterFantraxFilter').addEventListener('change', (e) => { rosterFilters.fantrax = e.target.checked; renderRoster(); });
     el('clearRosterFiltersBtn').addEventListener('click', () => { rosterFilters = { status:'', position:'', team:'', expiring:'', missingSalary:false, fantrax:false }; renderRoster(); });
     applyRosterFilters();
-  }
-
-  function renderAdjustmentTable() {
-    const seasons = contractHorizonSeasons();
-    const rows = state.adjustments.map((a) => {
-      const cells = seasons.map((s) => `<td class="money">${a.seasonId === s.id ? formatMoney(a.amount) : '—'}</td>`).join('');
-      return `<tr><td>${escapeHtml(a.description)}</td><td>${escapeHtml(a.type)}</td>${cells}<td><button class="btn btn-ghost btn-small" data-delete-adjustment="${a.id}" type="button">Remove</button></td></tr>`;
-    }).join('');
-    return `
-      <div class="adjustments-panel">
-        <div class="section-title-row"><div><p class="eyebrow">Financial adjustments</p><h3>Dead cap, retention & credits</h3></div></div>
-        ${rows ? `<div class="table-wrap"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th></th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty-state compact"><h4>No financial adjustments</h4><p>Add dead cap, retained salary, penalties or cap credits only when your league requires them.</p><div class="empty-state-actions"><button id="emptyAddAdjustmentBtn" class="btn btn-secondary btn-small" type="button">+ Add adjustment</button></div></div>`}
-      </div>`;
   }
 
 
@@ -2477,6 +2548,148 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   }
 
 
+  function openFarmProspectDialog() {
+    openPlayerDialog();
+    el('playerIsProspect').checked = true;
+    el('playerRosterGroup').value = 'FARM';
+    syncProspectLocationControls();
+    markPlayerDirty();
+  }
+
+  async function quickCallUp(playerId) {
+    const player = state.players.find((p) => p.id === playerId);
+    if (!player) return;
+    const success = await runCloudAction(async () => {
+      const { error } = await db.rpc('record_front_office_transaction_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_transaction_type: 'Call Up',
+        p_transaction_date: todayIsoDate(),
+        p_counterparty: null,
+        p_summary: `${player.name} called up to the active roster`,
+        p_notes: null,
+        p_in_items: [], p_out_items: [],
+        p_front_office_player_id: player.id,
+        p_roster_action: 'CALL_UP',
+        p_roster_status_id: defaultActiveStatusId(),
+        p_adjustment_type: null,
+        p_adjustment_description: null,
+        p_adjustment_rows: []
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
+    if (success) switchView('roster');
+  }
+
+  function renderFarm() {
+    const prospects = farmSystemPlayers();
+    const activeProspects = activeRosterPlayers().filter((player) => player.isProspect);
+    const current = currentSeason();
+    const rows = prospects.map((player) => {
+      const status = statusById(player.statusId);
+      const charge = effectivePlayerCharge(player, current.id);
+      const end = player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—';
+      return `<article class="farm-player-card"><button class="farm-player-main" data-farm-edit="${player.id}" type="button"><span><strong>${escapeHtml(player.name)}</strong><small>${escapeHtml(player.position)} · ${escapeHtml(player.realTeam || 'No NHL team')} · ${escapeHtml(status?.name || 'Other')}</small></span><span class="farm-player-cap"><strong>${charge === null ? '—' : formatMoney(charge)}</strong><small>Ends ${escapeHtml(end)}</small></span></button><button class="btn btn-primary btn-small" data-call-up="${player.id}" type="button">Call Up</button></article>`;
+    }).join('');
+    const activeProspectRows = activeProspects.map((player) => `<button class="farm-active-prospect" data-farm-edit="${player.id}" type="button"><strong>${escapeHtml(player.name)}</strong><span>${escapeHtml(player.position)} · Active roster</span></button>`).join('');
+
+    el('farmView').innerHTML = `<div class="farm-page"><div class="page-heading-row"><div><p class="eyebrow">Development</p><h3>Farm System</h3><p class="page-copy">Prospects assigned here stay separate from your active lineup. Their cap treatment still follows the roster status rules you set.</p></div><button id="addFarmProspectBtn" class="btn btn-primary" type="button">+ Add Prospect</button></div><div class="farm-summary"><span><strong>${prospects.length}</strong> in farm</span><span><strong>${activeProspects.length}</strong> prospects on active roster</span></div>${prospects.length ? `<div class="farm-player-list">${rows}</div>` : `<div class="empty-state"><h4>No prospects in the Farm system</h4><p>Label a player as Prospect and assign them to Farm, or add a new prospect here.</p><div class="empty-state-actions"><button id="emptyAddFarmProspectBtn" class="btn btn-primary" type="button">+ Add first prospect</button></div></div>`}${activeProspects.length ? `<div class="subpanel farm-active-section"><p class="eyebrow">Prospects currently called up</p><div class="farm-active-grid">${activeProspectRows}</div></div>` : ''}</div>`;
+    el('addFarmProspectBtn').addEventListener('click', openFarmProspectDialog);
+    if (el('emptyAddFarmProspectBtn')) el('emptyAddFarmProspectBtn').addEventListener('click', openFarmProspectDialog);
+    document.querySelectorAll('[data-farm-edit]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.farmEdit)));
+    document.querySelectorAll('[data-call-up]').forEach((button) => button.addEventListener('click', () => quickCallUp(button.dataset.callUp)));
+  }
+
+  function transactionItemsFor(transactionId, direction = null) {
+    return state.transactionItems.filter((item) => item.transactionId === transactionId && (!direction || item.direction === direction));
+  }
+
+  function renderTransactions() {
+    const txRows = [...state.transactions].sort((a,b) => `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`)).map((tx) => {
+      const incoming = transactionItemsFor(tx.id, 'IN');
+      const outgoing = transactionItemsFor(tx.id, 'OUT');
+      const neutral = transactionItemsFor(tx.id, 'NONE');
+      const financial = neutral.filter((item) => item.kind === 'FINANCIAL');
+      const playerItems = neutral.filter((item) => item.kind === 'PLAYER');
+      const chips = [
+        incoming.length ? `<span class="tx-chip in">IN ${incoming.length}</span>` : '',
+        outgoing.length ? `<span class="tx-chip out">OUT ${outgoing.length}</span>` : '',
+        financial.length ? `<span class="tx-chip financial">CAP</span>` : ''
+      ].filter(Boolean).join('');
+      return `<article class="transaction-card"><div class="transaction-card-head"><div><span class="transaction-type">${escapeHtml(tx.type)}</span><h4>${escapeHtml(tx.summary)}</h4></div><time>${escapeHtml(tx.date)}</time></div>${tx.counterparty ? `<p class="transaction-counterparty">With ${escapeHtml(tx.counterparty)}</p>` : ''}${chips ? `<div class="transaction-chips">${chips}</div>` : ''}${incoming.length ? `<div class="transaction-flow in"><strong>IN</strong><span>${incoming.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${outgoing.length ? `<div class="transaction-flow out"><strong>OUT</strong><span>${outgoing.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${playerItems.length ? `<div class="transaction-flow"><strong>PLAYER</strong><span>${playerItems.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${financial.length ? `<div class="transaction-flow financial"><strong>CAP</strong><span>${financial.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${tx.notes ? `<p class="transaction-notes">${escapeHtml(tx.notes)}</p>` : ''}</article>`;
+    }).join('');
+    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades, waivers, buyouts, signings, call-ups and other front-office moves are recorded here. Cap consequences flow through to the Cap page.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Record your first trade, signing, waiver move or buyout.</p><div class="empty-state-actions"><button id="emptyRecordTransactionBtn" class="btn btn-primary" type="button">+ Record first transaction</button></div></div>`}</div>`;
+    el('recordTransactionBtn').addEventListener('click', openTransactionDialog);
+    if (el('emptyRecordTransactionBtn')) el('emptyRecordTransactionBtn').addEventListener('click', openTransactionDialog);
+  }
+
+  function openTransactionDialog(options = {}) {
+    el('transactionType').value = options.type || 'Trade';
+    el('transactionDate').value = options.date || todayIsoDate();
+    el('transactionCounterparty').value = options.counterparty || '';
+    el('transactionSummary').value = options.summary || '';
+    el('transactionIncoming').value = options.incoming || '';
+    el('transactionOutgoing').value = options.outgoing || '';
+    el('transactionNotes').value = options.notes || '';
+    el('transactionRosterAction').value = options.rosterAction || 'NONE';
+    el('transactionAdjustmentType').value = options.adjustmentType || 'Dead Cap';
+    el('transactionAdjustmentDescription').value = options.adjustmentDescription || '';
+    el('transactionPlayer').innerHTML = `<option value="">None</option>${state.players.map((player) => `<option value="${player.id}" ${options.playerId === player.id ? 'selected' : ''}>${escapeHtml(player.name)}${player.isProspect ? ' · Prospect' : ''}</option>`).join('')}`;
+    el('transactionRosterStatus').innerHTML = `<option value="">Keep current status</option>${state.statuses.map((status) => `<option value="${status.id}">${escapeHtml(status.name)}</option>`).join('')}`;
+    el('transactionFinancialGrid').innerHTML = contractHorizonSeasons().map((season) => `<label><span>${seasonLabel(season.startYear)}</span><input data-transaction-adjustment-season="${season.id}" type="number" step="1" placeholder="0" /></label>`).join('');
+    transactionDialog.showModal();
+  }
+
+  async function saveTransactionFromDialog(event) {
+    event.preventDefault();
+    const button = el('saveTransactionBtn');
+    if (button.disabled) return;
+    const summary = el('transactionSummary').value.trim();
+    if (!summary) return;
+    const rows = [...document.querySelectorAll('[data-transaction-adjustment-season]')].map((input) => ({ season_id: input.dataset.transactionAdjustmentSeason, amount: nullableNumber(input.value) })).filter((row) => row.amount !== null);
+    button.disabled = true;
+    button.textContent = 'Saving…';
+    try {
+      const incoming = el('transactionIncoming').value.split(/\n+/).map((value) => value.trim()).filter(Boolean);
+      const outgoing = el('transactionOutgoing').value.split(/\n+/).map((value) => value.trim()).filter(Boolean);
+      const success = await runCloudAction(async () => {
+        const { error } = await db.rpc('record_front_office_transaction_v1', {
+          p_front_office_id: state.frontOffice.id,
+          p_transaction_type: el('transactionType').value,
+          p_transaction_date: el('transactionDate').value || todayIsoDate(),
+          p_counterparty: el('transactionCounterparty').value.trim() || null,
+          p_summary: summary,
+          p_notes: el('transactionNotes').value.trim() || null,
+          p_in_items: incoming,
+          p_out_items: outgoing,
+          p_front_office_player_id: el('transactionPlayer').value || null,
+          p_roster_action: el('transactionRosterAction').value,
+          p_roster_status_id: el('transactionRosterStatus').value || null,
+          p_adjustment_type: rows.length ? el('transactionAdjustmentType').value : null,
+          p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${el('transactionType').value} cap adjustment`) : null,
+          p_adjustment_rows: rows
+        });
+        if (error) throw error;
+        await loadOffice(state.frontOffice.id, false);
+      });
+      if (success) transactionDialog.close();
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Save Transaction';
+    }
+  }
+
+  function renderCapAdjustments() {
+    const seasons = contractHorizonSeasons();
+    const grouped = new Map();
+    state.adjustments.forEach((a) => {
+      if (!grouped.has(a.id)) grouped.set(a.id, { id:a.id, type:a.type, description:a.description, sourceTransactionId:a.sourceTransactionId || null, seasons:{} });
+      grouped.get(a.id).seasons[a.seasonId] = a.amount;
+    });
+    const rows = [...grouped.values()].map((a) => `<tr><td>${escapeHtml(a.description)}</td><td>${escapeHtml(a.type)}</td>${seasons.map((s) => `<td class="money">${a.seasons[s.id] === undefined ? '—' : formatMoney(a.seasons[s.id])}</td>`).join('')}<td>${a.sourceTransactionId ? 'Transaction' : 'Legacy'}</td></tr>`).join('');
+    return `<div class="cap-detail-card transaction-cap-card"><div class="section-title-row"><div><p class="eyebrow">Transaction impacts</p><h3>Dead cap, retention & credits</h3></div><button id="capRecordTransactionBtn" class="btn btn-secondary btn-small" type="button">+ Transaction</button></div>${rows ? `<div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Source</th></tr></thead><tbody>${rows}</tbody></table></div></div>` : `<div class="empty-state compact"><h4>No transaction cap impacts</h4><p>Buyout penalties, retained salary and other financial consequences will appear here when recorded through Transactions.</p></div>`}</div>`;
+  }
+
   function renderCap() {
     const rows = contractHorizonSeasons().map((s) => {
       const c = calculateSeason(s.id);
@@ -2491,8 +2704,10 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       <div class="page-heading-row"><div><p class="eyebrow">Financials</p><h3>${seasonLabel(activeSeason.startYear)} cap position</h3></div></div>
       ${renderCapVisuals()}
       <div class="cap-detail-card"><p class="eyebrow">Details</p><h3>Seven-season cap table</h3><div class="cap-scroll-hint" aria-hidden="true">Swipe for full financial detail <span class="scroll-arrow">→</span></div><div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll" role="region" aria-label="Seven-season cap table. Swipe horizontally to view all financial columns." tabindex="0"><table class="cap-detail-table cap-detail-table-v25"><thead><tr><th>Season</th><th>Cap</th><th>Players</th><th>Adjustments</th><th>Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>
+      ${renderCapAdjustments()}
       <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="cap-history-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
     </div>`;
+    if (el('capRecordTransactionBtn')) el('capRecordTransactionBtn').addEventListener('click', () => openTransactionDialog());
   }
 
 
@@ -2526,7 +2741,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
-    ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
+    ['overview', 'roster', 'farm', 'cap', 'transactions', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
     // KPI strip is an Overview-only snapshot; operational pages stay focused on their own content.
     el('summaryCards').classList.add('hidden');
   }
@@ -2556,6 +2771,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('playerEligible').value = player?.eligiblePositions || player?.position || '';
     el('realTeam').value = player?.realTeam || '';
     el('playerAge').value = player?.ageSnapshot ?? '';
+    el('playerIsProspect').checked = Boolean(player?.isProspect);
+    el('playerRosterGroup').value = player?.rosterGroup || 'ACTIVE';
+    syncProspectLocationControls();
     el('quickSalary').value = '';
     el('contractYearsRemaining').value = '';
     el('salaryChangeMode').value = 'same';
@@ -2571,6 +2789,15 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     playerFormDirty = false;
     setPlayerSaveStatus(player ? 'Saved' : 'New player', player ? 'saved' : '');
     playerDialog.showModal();
+  }
+
+  function syncProspectLocationControls() {
+    const prospect = Boolean(el('playerIsProspect')?.checked);
+    const location = el('playerRosterGroup');
+    if (!location) return;
+    const farmOption = [...location.options].find((option) => option.value === 'FARM');
+    if (farmOption) farmOption.disabled = !prospect;
+    if (!prospect && location.value === 'FARM') location.value = 'ACTIVE';
   }
 
   function renderStatusOptions(selectedId) {
@@ -2706,7 +2933,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
     try {
       const saved = await runCloudAction(async () => {
-        const { error } = await db.rpc('save_front_office_player_v2', {
+        const previousGroup = existingPlayer?.rosterGroup || 'ACTIVE';
+        const desiredGroup = el('playerRosterGroup').value || 'ACTIVE';
+        const desiredProspect = el('playerIsProspect').checked;
+        if (desiredGroup === 'FARM' && !desiredProspect) throw new Error('Only players labelled Prospect can be assigned to the Farm system.');
+        const { data: savedPlayerId, error } = await db.rpc('save_front_office_player_v2', {
           p_front_office_id: frontOfficeId,
           p_front_office_player_id: editingPlayerId || null,
           p_player_name: name,
@@ -2724,6 +2955,54 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           p_source_player_name: null
         });
         if (error) throw error;
+        const playerId = savedPlayerId || editingPlayerId;
+        if (!playerId) throw new Error('Player save did not return a player ID.');
+
+        if (previousGroup === 'FARM' && desiredGroup === 'ACTIVE') {
+          const { error: moveError } = await db.rpc('record_front_office_transaction_v1', {
+            p_front_office_id: frontOfficeId,
+            p_transaction_type: 'Call Up',
+            p_transaction_date: todayIsoDate(),
+            p_counterparty: null,
+            p_summary: `${name} called up to the active roster`,
+            p_notes: null,
+            p_in_items: [], p_out_items: [],
+            p_front_office_player_id: playerId,
+            p_roster_action: 'CALL_UP',
+            p_roster_status_id: el('rosterStatus').value || null,
+            p_adjustment_type: null,
+            p_adjustment_description: null,
+            p_adjustment_rows: []
+          });
+          if (moveError) throw moveError;
+        }
+
+        const { error: prospectError } = await db.rpc('set_front_office_player_prospect_v1', {
+          p_front_office_id: frontOfficeId,
+          p_front_office_player_id: playerId,
+          p_is_prospect: desiredProspect
+        });
+        if (prospectError) throw prospectError;
+
+        if (desiredGroup === 'FARM' && previousGroup !== 'FARM') {
+          const { error: moveError } = await db.rpc('record_front_office_transaction_v1', {
+            p_front_office_id: frontOfficeId,
+            p_transaction_type: 'Send Down',
+            p_transaction_date: todayIsoDate(),
+            p_counterparty: null,
+            p_summary: `${name} assigned to the Farm system`,
+            p_notes: null,
+            p_in_items: [], p_out_items: [],
+            p_front_office_player_id: playerId,
+            p_roster_action: 'SEND_TO_FARM',
+            p_roster_status_id: el('rosterStatus').value || null,
+            p_adjustment_type: null,
+            p_adjustment_description: null,
+            p_adjustment_rows: []
+          });
+          if (moveError) throw moveError;
+        }
+
         await loadOffice(frontOfficeId, false);
       });
       if (saved) {
@@ -2769,44 +3048,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       });
       if (error) throw error;
       playerDialog.close();
-      await loadOffice(state.frontOffice.id, false);
-    });
-  }
-  function openAdjustmentDialog() {
-    el('adjustmentSeason').innerHTML = contractHorizonSeasons().map((s) => `<option value="${s.id}" ${s.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('');
-    el('adjustmentDescription').value = '';
-    el('adjustmentAmount').value = '';
-    adjustmentDialog.showModal();
-  }
-
-  async function saveAdjustment(event) {
-    event.preventDefault();
-    const amount = nullableNumber(el('adjustmentAmount').value);
-    if (amount === null) return;
-    await runCloudAction(async () => {
-      const { error } = await db.rpc('save_financial_adjustment_v1', {
-        p_front_office_id: state.frontOffice.id,
-        p_adjustment_type: el('adjustmentType').value,
-        p_description: el('adjustmentDescription').value.trim(),
-        p_front_office_season_id: el('adjustmentSeason').value,
-        p_amount: amount,
-        p_front_office_player_id: null,
-        p_notes: null
-      });
-      if (error) throw error;
-      adjustmentDialog.close();
-      await loadOffice(state.frontOffice.id, false);
-    });
-  }
-  async function deleteAdjustment(id) {
-    const a = state.adjustments.find((x) => x.id === id);
-    if (!a || !confirm(`Remove adjustment “${a.description}”?`)) return;
-    await runCloudAction(async () => {
-      const { error } = await db.rpc('delete_financial_adjustment_v1', {
-        p_front_office_id: state.frontOffice.id,
-        p_financial_adjustment_id: id
-      });
-      if (error) throw error;
       await loadOffice(state.frontOffice.id, false);
     });
   }
@@ -3142,9 +3383,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function exportRosterCsv() {
     if (!state.frontOffice) return;
     const sortedSeasons = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
-    const headers = ['Fantrax ID','Player','Pos','Eligible','NHL Team','Age','Status', ...sortedSeasons.map((s) => `${seasonLabel(s.startYear)} Salary`), 'Contract End','Notes'];
+    const headers = ['Fantrax ID','Player','Pos','Eligible','NHL Team','Age','Status','Prospect','Roster Location', ...sortedSeasons.map((s) => `${seasonLabel(s.startYear)} Salary`), 'Contract End','Notes'];
     const rows = state.players.map((p) => [
-      p.fantraxId || '', p.name, p.position, p.eligiblePositions || p.position || '', p.realTeam, p.ageSnapshot ?? '', statusById(p.statusId)?.name || '',
+      p.fantraxId || '', p.name, p.position, p.eligiblePositions || p.position || '', p.realTeam, p.ageSnapshot ?? '', statusById(p.statusId)?.name || '', p.isProspect ? 'Yes' : 'No', p.rosterGroup || 'ACTIVE',
       ...sortedSeasons.map((s) => p.salaries?.[s.id]?.salary ?? ''),
       p.contractEndSeasonId ? seasonLabel(seasonById(p.contractEndSeasonId)?.startYear) : '', p.notes || ''
     ]);
@@ -3268,7 +3509,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       db.from('contract_seasons').select('*').eq('front_office_id', frontOfficeId),
       db.from('financial_adjustments').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).is('archived_at', null),
       db.from('financial_adjustment_seasons').select('*').eq('front_office_id', frontOfficeId),
-      db.from('front_office_depth_chart_entries').select('*').eq('front_office_id', frontOfficeId).order('position_code').order('depth_order')
+      db.from('front_office_depth_chart_entries').select('*').eq('front_office_id', frontOfficeId).order('position_code').order('depth_order'),
+      db.from('front_office_transactions').select('*').eq('front_office_id', frontOfficeId).order('transaction_date', { ascending:false }).order('created_at', { ascending:false }),
+      db.from('front_office_transaction_items').select('*').eq('front_office_id', frontOfficeId).order('created_at')
     ]);
     const errorResult = queries.find((q) => q.error);
     if (errorResult?.error) {
@@ -3277,7 +3520,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       return;
     }
 
-    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ,depthQ] = queries;
+    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ,depthQ,transactionsQ,transactionItemsQ] = queries;
     const office = officeQ.data;
     const seasons = seasonsQ.data || [];
     const statuses = statusesQ.data || [];
@@ -3315,6 +3558,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         ageAsOf: p.age_as_of || null,
         fantraxId: (sourceLinksByPlayer.get(p.front_office_player_id) || []).find((link) => link.source_system === 'FANTRAX')?.source_player_id || null,
         statusId: roster.roster_status_id,
+        isProspect: Boolean(p.is_prospect),
+        rosterGroup: roster.roster_group || 'ACTIVE',
         contractEndSeasonId: contract?.end_season_id || null,
         notes: contract?.notes || '',
         salaries,
@@ -3332,6 +3577,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         description: header.description,
         seasonId: row.front_office_season_id,
         amount: Number(row.amount),
+        sourceTransactionId: header.source_transaction_id || null,
         createdAt: header.created_at
       };
     });
@@ -3342,6 +3588,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       if (!depthCharts[position]) depthCharts[position] = [];
       depthCharts[position].push(row.front_office_player_id);
     });
+
+    const transactions = (transactionsQ.data || []).map((row) => ({ id:row.transaction_id, date:row.transaction_date, type:row.transaction_type, counterparty:row.counterparty || '', summary:row.summary, notes:row.notes || '', createdAt:row.created_at }));
+    const transactionItems = (transactionItemsQ.data || []).map((row) => ({ id:row.transaction_item_id, transactionId:row.transaction_id, kind:row.item_kind, direction:row.direction, playerId:row.front_office_player_id || null, label:row.item_label, metadata:row.metadata || {}, createdAt:row.created_at }));
 
     state = {
       frontOffice: {
@@ -3359,6 +3608,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       players,
       adjustments,
       depthCharts,
+      transactions,
+      transactionItems,
       activity: [activity('Cloud data loaded')]
     };
     setCloudStatus('Synced', '');
