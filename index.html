@@ -1449,6 +1449,102 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .roster-horizon-note { font-size:.61rem; }
 }
 
+
+
+/* V2.6 hockey depth chart */
+.depth-lineup-shell { display:grid; gap:12px; }
+.depth-position-tabs {
+  display:flex; align-items:center; gap:5px; overflow-x:auto; scrollbar-width:none;
+  padding:3px; border:1px solid var(--border); border-radius:11px; background:rgba(9,20,29,.78);
+}
+.depth-position-tabs::-webkit-scrollbar { display:none; }
+.depth-position-tab {
+  flex:1 0 auto; min-width:54px; min-height:34px; padding:7px 12px; border:0; border-radius:8px;
+  background:transparent; color:var(--muted); font-weight:850; font-size:.75rem;
+}
+.depth-position-tab.active { background:rgba(50,173,255,.12); color:var(--text); }
+.depth-chart-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.depth-chart-toolbar-copy h4 { margin:0; font-size:1rem; }
+.depth-chart-toolbar-copy p { margin:3px 0 0; color:var(--muted); font-size:.72rem; }
+.depth-chart-actions { display:flex; align-items:center; gap:7px; }
+.depth-chart-actions .btn { min-height:34px; padding:7px 10px; }
+.depth-section { display:grid; gap:8px; }
+.depth-section-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.depth-section-head h4 { margin:0; font-size:.78rem; color:#cdd9e3; letter-spacing:.06em; text-transform:uppercase; }
+.depth-section-head span { color:var(--muted); font-size:.66rem; }
+.depth-forward-lines { display:grid; gap:8px; }
+.depth-forward-line {
+  display:grid; grid-template-columns:58px repeat(3,minmax(0,1fr)); gap:7px; align-items:stretch;
+}
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label {
+  display:flex; align-items:center; justify-content:center; min-height:58px; padding:7px;
+  border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.018);
+  color:var(--muted); font-size:.66rem; font-weight:850; text-align:center;
+}
+.depth-slot {
+  min-width:0; display:grid; align-content:center; gap:2px; min-height:58px; padding:8px 9px;
+  border:1px solid var(--border); border-radius:10px; background:#0b151e; color:var(--text); text-align:left;
+}
+button.depth-slot { cursor:pointer; }
+button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24; }
+.depth-slot-position { color:var(--accent); font-size:.56rem; font-weight:900; letter-spacing:.08em; }
+.depth-slot-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.78rem; font-weight:850; }
+.depth-slot-meta { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:.61rem; }
+.depth-slot.empty { border-style:dashed; color:#667989; background:rgba(255,255,255,.01); }
+.depth-pair-grid { display:grid; grid-template-columns:58px repeat(2,minmax(0,1fr)); gap:7px; }
+.depth-pair-grid + .depth-pair-grid { margin-top:7px; }
+.depth-goalie-grid { display:grid; grid-template-columns:90px minmax(0,1fr); gap:7px; }
+.depth-goalie-grid + .depth-goalie-grid { margin-top:7px; }
+.depth-extra-list { display:grid; gap:6px; }
+.depth-extra-row { display:grid; grid-template-columns:70px minmax(0,1fr); gap:7px; }
+.depth-order-list { display:grid; gap:6px; }
+.depth-order-row {
+  display:grid; grid-template-columns:42px minmax(0,1fr) auto; gap:8px; align-items:center;
+  min-height:54px; padding:7px 8px; border:1px solid var(--border); border-radius:10px; background:#0b151e;
+}
+.depth-order-rank { color:var(--accent); font-weight:900; font-size:.73rem; text-align:center; }
+.depth-order-player { min-width:0; }
+.depth-order-player strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.8rem; }
+.depth-order-player span { display:block; margin-top:2px; color:var(--muted); font-size:.62rem; }
+.depth-order-controls { display:flex; gap:5px; }
+.depth-move-btn {
+  width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--border); border-radius:8px;
+  background:var(--panel-2); color:var(--text); font-weight:900;
+}
+.depth-move-btn:disabled { opacity:.28; cursor:default; }
+.depth-position-layout { display:grid; gap:8px; }
+.depth-position-row {
+  display:grid; grid-template-columns:84px minmax(0,1fr); gap:8px; align-items:stretch;
+}
+.depth-position-row .depth-slot { min-height:54px; }
+.depth-edit-note { margin:0; color:var(--muted); font-size:.68rem; line-height:1.35; }
+.depth-saving { color:var(--warning); font-size:.68rem; font-weight:800; }
+
+@media (max-width:720px) {
+  .depth-lineup-shell { gap:9px; }
+  .depth-position-tabs { gap:3px; }
+  .depth-position-tab { min-width:48px; min-height:31px; padding:6px 9px; font-size:.68rem; }
+  .depth-forward-line { grid-template-columns:44px repeat(3,minmax(0,1fr)); gap:5px; }
+  .depth-pair-grid { grid-template-columns:52px repeat(2,minmax(0,1fr)); gap:5px; }
+  .depth-goalie-grid { grid-template-columns:70px minmax(0,1fr); gap:5px; }
+  .depth-line-label, .depth-pair-label, .depth-role-label { min-height:54px; padding:5px; font-size:.58rem; }
+  .depth-slot { min-height:54px; padding:7px 6px; }
+  .depth-slot-position { font-size:.50rem; }
+  .depth-slot-name { font-size:.69rem; }
+  .depth-slot-meta { font-size:.54rem; }
+  .depth-position-row { grid-template-columns:68px minmax(0,1fr); gap:6px; }
+  .depth-chart-toolbar { align-items:flex-start; }
+  .depth-chart-actions { margin-left:auto; }
+}
+@media (max-width:390px) {
+  .depth-forward-line { grid-template-columns:38px repeat(3,minmax(0,1fr)); gap:4px; }
+  .depth-line-label { font-size:.52rem; }
+  .depth-slot-name { font-size:.64rem; }
+  .depth-slot-meta { font-size:.50rem; }
+}
+
 </style>
 </head>
 <body>
@@ -1796,7 +1892,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  const APP_VERSION = '2.4';
+  const APP_VERSION = '2.6';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
@@ -1807,6 +1903,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
   let frontOfficeList = [];
   let rosterMode = 'list';
   let rosterFilters = { status: '', position: '', team: '', expiring: '', missingSalary: false, fantrax: false };
+  let depthPosition = 'ALL';
+  let depthEditMode = false;
+  let depthDraftOrder = [];
+  let depthSaving = false;
 
   const el = (id) => document.getElementById(id);
   const authGate = el('authGate');
@@ -1841,6 +1941,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       statuses: [],
       players: [],
       adjustments: [],
+      depthCharts: {},
       activity: []
     };
   }
@@ -2117,6 +2218,135 @@ html, body { max-width: 100%; overflow-x: hidden; }
   }
 
 
+
+  const DEPTH_POSITIONS = ['LW','C','RW','D','G'];
+
+  function playerDepthChartPosition(player) {
+    const primary = String(player?.position || '').trim().toUpperCase();
+    if (DEPTH_POSITIONS.includes(primary)) return primary;
+    const eligible = String(player?.eligiblePositions || '').split(',').map((value) => value.trim().toUpperCase()).filter(Boolean);
+    return DEPTH_POSITIONS.find((position) => eligible.includes(position)) || null;
+  }
+
+  function defaultDepthMembers(position) {
+    const current = currentSeason();
+    return state.players.filter((player) => playerDepthChartPosition(player) === position).sort((a,b) => {
+      const aCharge = effectivePlayerCharge(a, current.id) ?? -1;
+      const bCharge = effectivePlayerCharge(b, current.id) ?? -1;
+      if (aCharge !== bCharge) return bCharge - aCharge;
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  function resolvedDepthPlayerIds(position) {
+    const members = defaultDepthMembers(position);
+    const memberIds = new Set(members.map((player) => player.id));
+    const saved = (state.depthCharts?.[position] || []).filter((playerId) => memberIds.has(playerId));
+    const savedSet = new Set(saved);
+    return [...saved, ...members.map((player) => player.id).filter((playerId) => !savedSet.has(playerId))];
+  }
+
+  function resolvedDepthPlayers(position) {
+    return resolvedDepthPlayerIds(position).map((playerId) => state.players.find((player) => player.id === playerId)).filter(Boolean);
+  }
+
+  function depthSlot(player, positionLabel, current) {
+    if (!player) return `<div class="depth-slot empty"><span class="depth-slot-position">${escapeHtml(positionLabel)}</span><span class="depth-slot-name">Open slot</span></div>`;
+    const status = statusById(player.statusId);
+    const charge = effectivePlayerCharge(player, current.id);
+    return `<button class="depth-slot" data-depth-open="${player.id}" type="button"><span class="depth-slot-position">${escapeHtml(positionLabel)}</span><span class="depth-slot-name">${escapeHtml(player.name)}</span><span class="depth-slot-meta">${escapeHtml(player.realTeam || '—')} · ${escapeHtml(status?.name || 'Other')} · ${charge === null ? '—' : formatMoney(charge)}</span></button>`;
+  }
+
+  function depthPositionRoleLabel(position, index) {
+    if (position === 'D') return index < 6 ? `Pair ${Math.floor(index / 2) + 1}` : `Depth ${index + 1}`;
+    if (position === 'G') return index === 0 ? 'Starter' : index === 1 ? 'Backup' : `Depth ${index + 1}`;
+    return index < 4 ? `Line ${index + 1}` : `Depth ${index + 1}`;
+  }
+
+  function renderAllDepthChart(current) {
+    const lw = resolvedDepthPlayers('LW');
+    const centers = resolvedDepthPlayers('C');
+    const rw = resolvedDepthPlayers('RW');
+    const defense = resolvedDepthPlayers('D');
+    const goalies = resolvedDepthPlayers('G');
+    const forwardLines = Array.from({ length: 4 }, (_, index) => `<div class="depth-forward-line"><div class="depth-line-label">Line ${index + 1}</div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`).join('');
+    const defensePairs = Array.from({ length: 3 }, (_, index) => `<div class="depth-pair-grid"><div class="depth-pair-label">Pair ${index + 1}</div>${depthSlot(defense[index * 2], `D${index * 2 + 1}`, current)}${depthSlot(defense[index * 2 + 1], `D${index * 2 + 2}`, current)}</div>`).join('');
+    const goalieRows = [0,1].map((index) => `<div class="depth-goalie-grid"><div class="depth-role-label">${index === 0 ? 'Starter' : 'Backup'}</div>${depthSlot(goalies[index], 'G', current)}</div>`).join('');
+    const extraForwards = Math.max(lw.length, centers.length, rw.length) > 4 ? `<div class="depth-extra-list">${Array.from({ length: Math.max(lw.length, centers.length, rw.length) - 4 }, (_, offset) => { const index = offset + 4; return `<div class="depth-forward-line"><div class="depth-line-label">Depth ${index + 1}</div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`; }).join('')}</div>` : '';
+    const extraDefense = defense.slice(6).map((player, offset) => `<div class="depth-extra-row"><div class="depth-role-label">Depth ${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
+    const extraGoalies = goalies.slice(2).map((player, offset) => `<div class="depth-goalie-grid"><div class="depth-role-label">Depth ${offset + 3}</div>${depthSlot(player, 'G', current)}</div>`).join('');
+    return `<div class="depth-lineup-shell">
+      <section class="depth-section"><div class="depth-section-head"><h4>Forward lines</h4><span>LW · C · RW</span></div><div class="depth-forward-lines">${forwardLines}${extraForwards}</div></section>
+      <section class="depth-section"><div class="depth-section-head"><h4>Defense pairs</h4><span>${defense.length} defensemen</span></div>${defensePairs}${extraDefense ? `<div class="depth-extra-list">${extraDefense}</div>` : ''}</section>
+      <section class="depth-section"><div class="depth-section-head"><h4>Goalies</h4><span>${goalies.length} goalies</span></div>${goalieRows}${extraGoalies ? `<div class="depth-extra-list">${extraGoalies}</div>` : ''}</section>
+    </div>`;
+  }
+
+  function renderSinglePositionDepth(position, current) {
+    const orderedIds = depthEditMode && depthPosition === position ? depthDraftOrder : resolvedDepthPlayerIds(position);
+    const players = orderedIds.map((playerId) => state.players.find((player) => player.id === playerId)).filter(Boolean);
+    if (!players.length) return `<div class="empty-state compact"><h4>No ${escapeHtml(position)} players</h4><p>Players appear here based on their primary roster position.</p></div>`;
+    if (depthEditMode && depthPosition === position) {
+      const rows = players.map((player, index) => {
+        const status = statusById(player.statusId);
+        return `<div class="depth-order-row"><span class="depth-order-rank">${index + 1}</span><span class="depth-order-player"><strong>${escapeHtml(player.name)}</strong><span>${escapeHtml(player.realTeam || '—')} · ${escapeHtml(status?.name || 'Other')} · ${escapeHtml(depthPositionRoleLabel(position, index))}</span></span><span class="depth-order-controls"><button class="depth-move-btn" data-depth-move-index="${index}" data-depth-move-direction="-1" type="button" ${index === 0 ? 'disabled' : ''} aria-label="Move ${escapeAttr(player.name)} up">↑</button><button class="depth-move-btn" data-depth-move-index="${index}" data-depth-move-direction="1" type="button" ${index === players.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeAttr(player.name)} down">↓</button></span></div>`;
+      }).join('');
+      return `<div class="depth-order-list">${rows}</div>`;
+    }
+    if (position === 'D') {
+      const pairs = [];
+      for (let index = 0; index < Math.max(6, Math.min(players.length, 6)); index += 2) pairs.push(`<div class="depth-pair-grid"><div class="depth-pair-label">Pair ${Math.floor(index / 2) + 1}</div>${depthSlot(players[index], `D${index + 1}`, current)}${depthSlot(players[index + 1], `D${index + 2}`, current)}</div>`);
+      const extras = players.slice(6).map((player, offset) => `<div class="depth-position-row"><div class="depth-role-label">Depth ${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
+      return `<div class="depth-position-layout">${pairs.join('')}${extras}</div>`;
+    }
+    if (position === 'G') {
+      return `<div class="depth-position-layout">${players.map((player, index) => `<div class="depth-position-row"><div class="depth-role-label">${escapeHtml(depthPositionRoleLabel(position, index))}</div>${depthSlot(player, 'G', current)}</div>`).join('')}</div>`;
+    }
+    return `<div class="depth-position-layout">${players.map((player, index) => `<div class="depth-position-row"><div class="depth-role-label">${escapeHtml(depthPositionRoleLabel(position, index))}</div>${depthSlot(player, position, current)}</div>`).join('')}</div>`;
+  }
+
+  function renderDepthChart(current) {
+    const tabs = ['ALL', ...DEPTH_POSITIONS].map((position) => `<button class="depth-position-tab ${depthPosition === position ? 'active' : ''}" data-depth-position="${position}" type="button">${position === 'ALL' ? 'All' : position}</button>`).join('');
+    const canEdit = depthPosition !== 'ALL' && resolvedDepthPlayerIds(depthPosition).length > 0;
+    const title = depthPosition === 'ALL' ? 'Hockey lineup' : `${depthPosition} depth`;
+    const copy = depthPosition === 'ALL' ? 'Your preferred forward lines, defense pairs and goalie order.' : `Set your preferred ${depthPosition} order. Select Edit order to move players up or down.`;
+    const actions = depthPosition === 'ALL' ? '' : depthEditMode ? `<button id="cancelDepthOrderBtn" class="btn btn-ghost btn-small" type="button" ${depthSaving ? 'disabled' : ''}>Cancel</button><button id="saveDepthOrderBtn" class="btn btn-primary btn-small" type="button" ${depthSaving ? 'disabled' : ''}>${depthSaving ? 'Saving…' : 'Save order'}</button>` : `<button id="editDepthOrderBtn" class="btn btn-secondary btn-small" type="button" ${canEdit ? '' : 'disabled'}>Edit order</button>`;
+    return `<div class="depth-lineup-shell"><div class="depth-position-tabs" aria-label="Depth chart position">${tabs}</div><div class="depth-chart-toolbar"><div class="depth-chart-toolbar-copy"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(copy)}</p></div><div class="depth-chart-actions">${actions}</div></div>${depthEditMode ? '<p class="depth-edit-note">Ordering is saved to this Front Office and will follow you across devices.</p>' : ''}${depthPosition === 'ALL' ? renderAllDepthChart(current) : renderSinglePositionDepth(depthPosition, current)}</div>`;
+  }
+
+  function moveDepthDraft(index, direction) {
+    const target = index + direction;
+    if (index < 0 || target < 0 || index >= depthDraftOrder.length || target >= depthDraftOrder.length) return;
+    const next = [...depthDraftOrder];
+    [next[index], next[target]] = [next[target], next[index]];
+    depthDraftOrder = next;
+    renderRoster();
+  }
+
+  async function saveDepthOrder() {
+    if (depthPosition === 'ALL' || depthSaving) return;
+    depthSaving = true;
+    renderRoster();
+    const orderedIds = [...depthDraftOrder];
+    const position = depthPosition;
+    const success = await runCloudAction(async () => {
+      const { error } = await db.rpc('save_depth_chart_order_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_position_code: position,
+        p_player_ids: orderedIds
+      });
+      if (error) throw error;
+      state.depthCharts[position] = orderedIds;
+      state.activity.unshift(activity(`Updated ${position} depth chart`));
+    });
+    depthSaving = false;
+    if (success) {
+      depthEditMode = false;
+      depthDraftOrder = [];
+    }
+    renderRoster();
+  }
+
   function renderRoster() {
     const seasons = contractHorizonSeasons();
     const current = currentSeason();
@@ -2153,35 +2383,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     }).join('');
     const totalCells = seasons.map((s) => `<td class="money col-salary">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
 
-    const depthOrder = ['C','LW','RW','F','D','G'];
-    const playerDepthTokens = (player) => {
-      const raw = `${player.eligiblePositions || ''},${player.position || ''}`.split(',').map((v) => v.trim().toUpperCase()).filter(Boolean);
-      return [...new Set(raw)];
-    };
-    const discoveredDepth = [...new Set(state.players.flatMap(playerDepthTokens))];
-    const depthPositions = [...depthOrder.filter((p) => discoveredDepth.includes(p)), ...discoveredDepth.filter((p) => !depthOrder.includes(p)).sort()];
-    const depthSummary = depthPositions.map((position) => {
-      const count = state.players.filter((player) => playerDepthTokens(player).includes(position)).length;
-      return `<span class="depth-summary-pill"><strong>${escapeHtml(position)}</strong> ${count}</span>`;
-    }).join('');
-    const depthCards = depthPositions.map((position) => {
-      const members = state.players.filter((player) => playerDepthTokens(player).includes(position)).sort((a,b) => {
-        const aPrimary = String(a.position || '').toUpperCase() === position ? 0 : 1;
-        const bPrimary = String(b.position || '').toUpperCase() === position ? 0 : 1;
-        if (aPrimary !== bPrimary) return aPrimary - bPrimary;
-        const aCharge = effectivePlayerCharge(a, current.id) ?? -1;
-        const bCharge = effectivePlayerCharge(b, current.id) ?? -1;
-        if (aCharge !== bCharge) return bCharge - aCharge;
-        return a.name.localeCompare(b.name);
-      });
-      const memberRows = members.map((player) => {
-        const status = statusById(player.statusId);
-        const charge = effectivePlayerCharge(player, current.id);
-        const isPrimary = String(player.position || '').toUpperCase() === position;
-        return `<button class="depth-player-row" data-depth-player="${player.id}" type="button"><span class="depth-player-main"><span class="depth-player-name">${escapeHtml(player.name)}</span><span class="depth-player-meta">${escapeHtml(player.realTeam || 'No NHL team')} · ${escapeHtml(status?.name || 'Other')}${isPrimary ? ' · Primary' : ' · Eligible'}</span></span><span class="depth-player-finance"><strong>${charge === null ? '—' : formatMoney(charge)}</strong><span>${seasonLabel(current.startYear)}</span></span></button>`;
-      }).join('');
-      return `<section class="depth-card" data-depth-card="${escapeAttr(position)}"><div class="depth-card-head"><strong>${escapeHtml(position)}</strong><span class="depth-card-count">${members.length} eligible</span></div><div class="depth-player-list">${memberRows || '<div class="depth-empty">No players</div>'}</div></section>`;
-    }).join('');
+    const depthChartHtml = renderDepthChart(current);
 
     el('rosterView').innerHTML = `
       <div class="roster-page">
@@ -2206,13 +2408,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
         ${state.players.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
 
-        ${state.players.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}"><div class="depth-summary-strip"><span class="muted">Eligible positional depth</span>${depthSummary}</div><div id="depthGrid" class="depth-grid">${depthCards}</div><div id="depthNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
+        ${state.players.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}">${depthChartHtml}</div>` : ''}
 
         ${state.players.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-horizon-note"><span><strong>Seven-season contract horizon</strong> · current season + six future years</span><span>${seasonLabel(seasons[0]?.startYear)} → ${seasonLabel(seasons[seasons.length - 1]?.startYear)}</span></div><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view all seven contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact roster-table-seven"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
         ${renderAdjustmentTable()}
       </div>`;
 
-    const rerenderMode = (mode) => { rosterMode = mode; renderRoster(); };
+    const rerenderMode = (mode) => { if (mode !== 'depth') { depthEditMode = false; depthDraftOrder = []; } rosterMode = mode; renderRoster(); };
     el('rosterListModeBtn').addEventListener('click', () => rerenderMode('list'));
     el('rosterDepthModeBtn').addEventListener('click', () => rerenderMode('depth'));
     el('rosterGridModeBtn').addEventListener('click', () => rerenderMode('grid'));
@@ -2222,7 +2424,12 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('rosterExportBtn').addEventListener('click', () => { closeRosterMenus(); exportRosterCsv(); });
     document.querySelectorAll('[data-roster-list-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.rosterListPlayer)));
     document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
-    document.querySelectorAll('[data-depth-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.depthPlayer)));
+    document.querySelectorAll('[data-depth-open]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.depthOpen)));
+    document.querySelectorAll('[data-depth-position]').forEach((button) => button.addEventListener('click', () => { depthPosition = button.dataset.depthPosition; depthEditMode = false; depthDraftOrder = []; renderRoster(); }));
+    if (el('editDepthOrderBtn')) el('editDepthOrderBtn').addEventListener('click', () => { depthDraftOrder = resolvedDepthPlayerIds(depthPosition); depthEditMode = true; renderRoster(); });
+    if (el('cancelDepthOrderBtn')) el('cancelDepthOrderBtn').addEventListener('click', () => { depthEditMode = false; depthDraftOrder = []; renderRoster(); });
+    if (el('saveDepthOrderBtn')) el('saveDepthOrderBtn').addEventListener('click', saveDepthOrder);
+    document.querySelectorAll('[data-depth-move-index]').forEach((button) => button.addEventListener('click', () => moveDepthDraft(Number(button.dataset.depthMoveIndex), Number(button.dataset.depthMoveDirection))));
     if (el('emptyAddPlayerBtn')) el('emptyAddPlayerBtn').addEventListener('click', () => openPlayerDialog());
     if (el('emptyImportRosterBtn')) el('emptyImportRosterBtn').addEventListener('click', openImportDialog);
     if (el('emptyAddAdjustmentBtn')) el('emptyAddAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
@@ -2259,16 +2466,14 @@ html, body { max-width: 100%; overflow-x: hidden; }
     const allowed = new Set(filteredRosterPlayers(search).map((p) => p.id));
     document.querySelectorAll('[data-roster-list-player]').forEach((row) => { row.hidden = !allowed.has(row.dataset.rosterListPlayer); });
     document.querySelectorAll('[data-player-grid-row]').forEach((row) => { row.hidden = !allowed.has(row.dataset.playerGridRow); });
-    document.querySelectorAll('[data-depth-player]').forEach((row) => { row.hidden = !allowed.has(row.dataset.depthPlayer); });
-    document.querySelectorAll('[data-depth-card]').forEach((card) => {
-      const visibleRows = [...card.querySelectorAll('[data-depth-player]')].filter((row) => !row.hidden);
-      card.hidden = visibleRows.length === 0;
-    });
+    if (!depthEditMode) {
+      document.querySelectorAll('[data-depth-open]').forEach((row) => { row.hidden = !allowed.has(row.dataset.depthOpen); });
+    }
     const shown = allowed.size;
     if (el('rosterResultCount')) el('rosterResultCount').textContent = `${shown} shown`;
     if (el('rosterNoMatches')) el('rosterNoMatches').classList.toggle('hidden', shown !== 0);
     if (el('gridNoMatches')) el('gridNoMatches').classList.toggle('hidden', shown !== 0);
-    if (el('depthNoMatches')) el('depthNoMatches').classList.toggle('hidden', shown !== 0);
+
   }
 
 
@@ -3062,7 +3267,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
       db.from('contracts').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).is('archived_at', null),
       db.from('contract_seasons').select('*').eq('front_office_id', frontOfficeId),
       db.from('financial_adjustments').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).is('archived_at', null),
-      db.from('financial_adjustment_seasons').select('*').eq('front_office_id', frontOfficeId)
+      db.from('financial_adjustment_seasons').select('*').eq('front_office_id', frontOfficeId),
+      db.from('front_office_depth_chart_entries').select('*').eq('front_office_id', frontOfficeId).order('position_code').order('depth_order')
     ]);
     const errorResult = queries.find((q) => q.error);
     if (errorResult?.error) {
@@ -3071,7 +3277,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       return;
     }
 
-    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ] = queries;
+    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ,depthQ] = queries;
     const office = officeQ.data;
     const seasons = seasonsQ.data || [];
     const statuses = statusesQ.data || [];
@@ -3130,6 +3336,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
       };
     });
 
+    const depthCharts = {};
+    (depthQ.data || []).forEach((row) => {
+      const position = String(row.position_code || '').toUpperCase();
+      if (!depthCharts[position]) depthCharts[position] = [];
+      depthCharts[position].push(row.front_office_player_id);
+    });
+
     state = {
       frontOffice: {
         id: office.front_office_id,
@@ -3145,6 +3358,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       statuses: statuses.map((s) => ({ id: s.roster_status_id, name: s.status_name, countsTowardCap: s.counts_toward_cap })),
       players,
       adjustments,
+      depthCharts,
       activity: [activity('Cloud data loaded')]
     };
     setCloudStatus('Synced', '');
