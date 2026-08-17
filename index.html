@@ -828,6 +828,44 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .summary-card .value { font-size: .62rem; }
 }
 
+
+/* V1.8 NHL identity + native Fantrax roster import */
+.player-basics-v18 { display:grid; grid-template-columns:1.4fr .65fr .9fr .65fr; gap:10px; }
+.player-basics-v18 .player-name-field { grid-column:1 / -1; }
+.player-basics-v18 .status-field { grid-column:span 2; }
+.import-detect { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0; }
+.import-chip { display:inline-flex; align-items:center; min-height:28px; padding:4px 9px; border:1px solid var(--border); border-radius:999px; background:rgba(96,190,255,.06); color:var(--text); font-size:.76rem; font-weight:800; }
+.import-options { display:flex; gap:10px; align-items:flex-start; margin:12px 0 4px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:rgba(255,255,255,.015); }
+.import-options input { width:auto; min-height:0; margin-top:3px; }
+.import-options span { display:block; font-size:.82rem; line-height:1.35; }
+.import-options small { display:block; margin-top:2px; color:var(--muted); }
+.roster-table-v18 th:nth-child(1), .roster-table-v18 td:nth-child(1) { min-width:150px; }
+.roster-table-v18 th:nth-child(3), .roster-table-v18 td:nth-child(3) { min-width:94px; }
+.roster-table-v18 th:nth-child(4), .roster-table-v18 td:nth-child(4) { min-width:78px; }
+.roster-table-v18 th:nth-child(6), .roster-table-v18 td:nth-child(6) { min-width:96px; }
+.age-cell { text-align:center; font-variant-numeric:tabular-nums; }
+.eligible-cell { color:var(--muted); font-size:.86rem; }
+.source-note { color:var(--muted); font-size:.74rem; }
+@media (max-width: 720px) {
+  .player-basics-v18 { grid-template-columns:1fr 1fr; }
+  .player-basics-v18 .status-field { grid-column:auto; }
+}
+
+/* V1.9 rolling seven-season horizon + generated contracts */
+.quick-contract-grid-v19 { grid-template-columns:repeat(4, minmax(0,1fr)); }
+.quick-contract-grid-v19 .contract-through-field { grid-column:span 2; }
+.quick-contract-grid-v19 .quick-contract-action { grid-column:span 2; display:grid; gap:5px; }
+.quick-contract-grid-v19 .quick-contract-action small { color:var(--muted); font-size:.7rem; line-height:1.3; }
+.muted-control { opacity:.58; }
+@media (max-width:720px) {
+  .quick-contract-grid-v19 { grid-template-columns:1fr 1fr; }
+  .quick-contract-grid-v19 .contract-through-field,
+  .quick-contract-grid-v19 .quick-contract-action { grid-column:1 / -1; }
+}
+@media (max-width:460px) {
+  .quick-contract-grid-v19 { grid-template-columns:1fr 1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -992,7 +1030,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <div class="drawer-body">
         <p id="playerDialogIntro" class="player-intro">Add the player first, then use the quick contract fields for the common salary setup. Advanced year-by-year overrides are optional.</p>
 
-        <div class="player-basics">
+        <div class="player-basics-v18">
           <label class="player-name-field">
             Player name
             <input id="playerName" autocomplete="off" required />
@@ -1009,8 +1047,16 @@ html, body { max-width: 100%; overflow-x: hidden; }
             </select>
           </label>
           <label>
+            Eligible
+            <input id="playerEligible" maxlength="40" placeholder="C,LW" autocomplete="off" />
+          </label>
+          <label>
             NHL team
             <input id="realTeam" maxlength="8" placeholder="EDM" autocomplete="off" />
+          </label>
+          <label>
+            Age
+            <input id="playerAge" type="number" inputmode="numeric" min="0" max="100" step="1" placeholder="26" />
           </label>
           <label class="status-field">
             Roster status
@@ -1026,17 +1072,34 @@ html, body { max-width: 100%; overflow-x: hidden; }
               <p>Best for flat fantasy salaries. You can customize individual years below.</p>
             </div>
           </div>
-          <div class="quick-contract-grid">
+          <div class="quick-contract-grid quick-contract-grid-v19">
             <label>
-              Salary per season
+              Starting salary
               <input id="quickSalary" type="text" inputmode="numeric" placeholder="$6,000,000" />
             </label>
             <label>
+              Years remaining
+              <input id="contractYearsRemaining" type="number" inputmode="numeric" min="1" step="1" placeholder="3" />
+            </label>
+            <label>
+              Annual salary change
+              <select id="salaryChangeMode">
+                <option value="same">Same salary</option>
+                <option value="increase">Increase each year</option>
+                <option value="decrease">Decrease each year</option>
+              </select>
+            </label>
+            <label id="salaryChangePctLabel">
+              Change %
+              <input id="salaryChangePct" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="0" />
+            </label>
+            <label class="contract-through-field">
               Contract through
               <select id="contractEnd"></select>
             </label>
             <div class="quick-contract-action">
-              <button id="applyQuickContractBtn" class="btn btn-secondary" type="button">Apply salary through contract end</button>
+              <button id="applyQuickContractBtn" class="btn btn-secondary" type="button">Generate contract years</button>
+              <small>Years remaining includes the current season. Percentage changes compound from the starting salary.</small>
             </div>
           </div>
 
@@ -1077,10 +1140,14 @@ html, body { max-width: 100%; overflow-x: hidden; }
         <button id="closeImportDialog" class="icon-btn" type="button" aria-label="Close">×</button>
       </header>
       <div class="modal-body">
-        <p class="muted">Supported V1 columns: Player or Name, Pos or Position, Team, Status, and season salary columns such as 2026-27 or Salary 2026-27.</p>
+        <p class="muted">Fantrax Team Roster exports are detected automatically, including separate Skaters and Goalies sections. Generic CSV import remains supported.</p>
         <label class="file-drop">
           <span>Select CSV file</span>
           <input id="csvFile" type="file" accept=".csv,text/csv" />
+        </label>
+        <label class="import-options">
+          <input id="importSalaryToggle" type="checkbox" checked />
+          <span>Update current-season salary from the import<small>Future salaries, cap overrides, contract end, notes and adjustments are never overwritten by a Fantrax roster import.</small></span>
         </label>
         <div id="importPreview" class="import-preview hidden"></div>
       </div>
@@ -1144,11 +1211,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
+  const APP_VERSION = '1.9';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
   let editingPlayerId = null;
   let pendingImport = [];
+  let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
   let frontOfficeList = [];
 
   const el = (id) => document.getElementById(id);
@@ -1199,12 +1268,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('seasonSelect').addEventListener('change', async () => {
       const seasonId = el('seasonSelect').value;
       await runCloudAction(async () => {
-        const { error } = await db.rpc('set_current_front_office_season_v1', {
-          p_front_office_id: state.frontOffice.id,
+        const frontOfficeId = state.frontOffice.id;
+        const { error } = await db.rpc('set_current_front_office_season_v2', {
+          p_front_office_id: frontOfficeId,
           p_front_office_season_id: seasonId
         });
         if (error) throw error;
-        state.frontOffice.currentSeasonId = seasonId;
+        await loadOffice(frontOfficeId, false);
       });
       render();
     });
@@ -1219,6 +1289,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('deletePlayerBtn').addEventListener('click', removeEditingPlayer);
     el('applyQuickContractBtn').addEventListener('click', applyQuickContract);
     el('quickSalary').addEventListener('blur', (event) => formatWholeDollarInput(event.target));
+    el('salaryChangeMode').addEventListener('change', updateQuickContractControls);
+    el('contractYearsRemaining').addEventListener('input', syncContractEndFromYears);
 
     el('closeImportDialog').addEventListener('click', () => importDialog.close());
     el('cancelImportBtn').addEventListener('click', () => importDialog.close());
@@ -1248,7 +1320,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
         p_roster_limit: nullableNumber(el('rosterLimit').value),
         p_current_season_start_year: startYear,
         p_current_salary_cap: nullableNumber(el('salaryCap').value),
-        p_season_count: 4
+        p_season_count: 7
       });
       if (error) throw error;
       await loadOffice(data);
@@ -1324,7 +1396,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     const season = currentSeason();
     const calc = calculateSeason(season.id);
     const missingPlayers = calc.missingPlayerIds.map((id) => state.players.find((p) => p.id === id)).filter(Boolean);
-    const futureRows = state.seasons.map((s) => {
+    const futureRows = contractHorizonSeasons().map((s) => {
       const c = calculateSeason(s.id);
       const space = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
       return `<tr><td>${seasonLabel(s.startYear)}</td><td class="money">${formatMoney(c.knownRosterCap)}</td><td class="money">${formatMoney(c.adjustmentsTotal)}</td><td class="money">${formatMoney(c.knownCapUsed)}</td><td class="money">${space}</td></tr>`;
@@ -1375,13 +1447,14 @@ html, body { max-width: 100%; overflow-x: hidden; }
         return `<td class="money ${value === null ? 'empty-cell' : ''}">${value === null ? '—' : formatMoney(value)}</td>`;
       }).join('');
       return `<tr>
-        <td><button class="player-button" data-edit-player="${player.id}" type="button">${escapeHtml(player.name)}</button></td>
+        <td><button class="player-button" data-edit-player="${player.id}" type="button">${escapeHtml(player.name)}</button>${player.fantraxId ? `<div class="source-note">Fantrax linked</div>` : ''}</td>
         <td>${escapeHtml(player.position)}</td>
+        <td class="eligible-cell">${escapeHtml(player.eligiblePositions || player.position || '—')}</td>
         <td>${escapeHtml(player.realTeam || '—')}</td>
+        <td class="age-cell">${player.ageSnapshot ?? '—'}</td>
         <td><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>
         ${seasonCells}
         <td>${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td>
-        <td>${escapeHtml(player.notes || '')}</td>
       </tr>`;
     }).join('');
 
@@ -1394,16 +1467,16 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <select id="statusFilter"><option value="">All statuses</option>${state.statuses.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
         </div>
         <div class="toolbar-group">
-          <button id="importRosterBtn" class="btn btn-secondary" type="button">Import CSV</button>
+          <button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button>
           <button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button>
           <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
         </div>
       </div>
       <div class="table-wrap">
-        <table id="rosterTable">
-          <thead><tr><th>Player</th><th>Pos</th><th>Team</th><th>Status</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Ends</th><th>Notes</th></tr></thead>
-          <tbody>${rows || `<tr><td colspan="${7 + seasons.length}"><span class="muted">No players yet. Add a player or import a CSV.</span></td></tr>`}</tbody>
-          <tfoot><tr class="total-row"><td colspan="4">Roster Total</td>${totalCells}<td colspan="2"></td></tr></tfoot>
+        <table id="rosterTable" class="roster-table-v18">
+          <thead><tr><th>Player</th><th>Pos</th><th>Eligible</th><th>NHL Team</th><th>Age</th><th>Status</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Ends</th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="${7 + seasons.length}"><span class="muted">No players yet. Add a player or import a Fantrax roster.</span></td></tr>`}</tbody>
+          <tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot>
         </table>
       </div>
       ${renderAdjustmentTable()}`;
@@ -1437,13 +1510,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
       const playerButton = row.querySelector('[data-edit-player]');
       if (!playerButton) return;
       const player = state.players.find((p) => p.id === playerButton.dataset.editPlayer);
-      const haystack = `${player.name} ${player.position} ${player.realTeam}`.toLowerCase();
+      const haystack = `${player.name} ${player.position} ${player.eligiblePositions || ''} ${player.realTeam} ${player.ageSnapshot ?? ''}`.toLowerCase();
       row.hidden = Boolean((q && !haystack.includes(q)) || (statusId && player.statusId !== statusId));
     });
   }
 
   function renderCap() {
-    const rows = state.seasons.map((s) => {
+    const rows = contractHorizonSeasons().map((s) => {
       const c = calculateSeason(s.id);
       return `<tr>
         <td>${seasonLabel(s.startYear)}</td>
@@ -1467,7 +1540,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     const seasonSettings = state.seasons.map((s) => `<div class="season-setting" data-season-setting="${s.id}">
       <label>Season<input value="${seasonLabel(s.startYear)}" disabled /></label>
       <label>Salary cap<input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Unknown" /></label>
-      <button class="btn btn-ghost btn-small" data-remove-season="${s.id}" type="button" ${state.seasons.length <= 1 ? 'disabled' : ''}>Remove</button>
+      <button class="btn btn-ghost btn-small" data-remove-season="${s.id}" type="button" ${contractHorizonSeasons().some((h) => h.id === s.id) ? 'disabled title="Seven-season rolling horizon"' : ''}>Remove</button>
     </div>`).join('');
 
     const statusSettings = state.statuses.map((s) => `<div class="status-setting" data-status-setting="${s.id}">
@@ -1542,11 +1615,18 @@ html, body { max-width: 100%; overflow-x: hidden; }
       : 'Add the player first, then use the quick contract fields for the common salary setup. Advanced year-by-year overrides are optional.';
     el('playerName').value = player?.name || '';
     el('playerPosition').value = player?.position || 'C';
+    el('playerEligible').value = player?.eligiblePositions || player?.position || '';
     el('realTeam').value = player?.realTeam || '';
+    el('playerAge').value = player?.ageSnapshot ?? '';
     el('quickSalary').value = '';
+    el('contractYearsRemaining').value = '';
+    el('salaryChangeMode').value = 'same';
+    el('salaryChangePct').value = '0';
     el('advancedContract').open = false;
     renderStatusOptions(player?.statusId);
     renderContractEditor(player);
+    prefillQuickContract(player);
+    updateQuickContractControls();
     el('playerNotes').value = player?.notes || '';
     el('deletePlayerBtn').classList.toggle('hidden', !player);
     validatePlayerDialog();
@@ -1558,7 +1638,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
   }
 
   function renderContractEditor(player) {
-    const sorted = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
+    const sorted = contractHorizonSeasons();
     el('contractGrid').innerHTML = sorted.map((season) => {
       const data = player?.salaries?.[season.id] || { salary: null, capOverride: null };
       return `<div class="contract-row">
@@ -1575,22 +1655,77 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('contractEnd').addEventListener('change', validatePlayerDialog);
   }
 
+  function prefillQuickContract(player) {
+    if (!player) return;
+    const current = currentSeason();
+    const currentSalary = player.salaries?.[current?.id]?.salary ?? null;
+    if (currentSalary !== null) el('quickSalary').value = formatWholeDollarValue(currentSalary);
+    const end = seasonById(player.contractEndSeasonId);
+    if (current && end && end.startYear >= current.startYear) {
+      el('contractYearsRemaining').value = Math.min(end.startYear - current.startYear + 1, contractHorizonSeasons().length);
+    }
+  }
+
+  function updateQuickContractControls() {
+    const same = el('salaryChangeMode').value === 'same';
+    el('salaryChangePct').disabled = same;
+    el('salaryChangePctLabel').classList.toggle('muted-control', same);
+    if (same) el('salaryChangePct').value = '0';
+  }
+
+  function syncContractEndFromYears() {
+    const seasons = contractHorizonSeasons();
+    const years = nullableInteger(el('contractYearsRemaining').value);
+    if (!years || years < 1 || !seasons.length) return;
+    const boundedYears = Math.min(years, seasons.length);
+    el('contractYearsRemaining').value = String(boundedYears);
+    el('contractEnd').value = seasons[boundedYears - 1].id;
+  }
+
   function applyQuickContract() {
     const amount = nullableNumber(el('quickSalary').value);
     if (amount === null || amount < 0) {
-      alert('Enter a valid salary amount first.');
+      alert('Enter a valid starting salary first.');
       return;
     }
-    const through = el('contractEnd').value || currentSeason()?.id;
-    const throughSeason = seasonById(through);
-    if (!throughSeason) {
-      alert('Choose a contract end season.');
+    const seasons = contractHorizonSeasons();
+    if (!seasons.length) {
+      alert('No contract seasons are available.');
       return;
     }
-    el('contractEnd').value = throughSeason.id;
+    const requestedYears = nullableInteger(el('contractYearsRemaining').value);
+    let years = requestedYears;
+    if (!years) {
+      const selectedEnd = seasonById(el('contractEnd').value);
+      years = selectedEnd ? selectedEnd.startYear - seasons[0].startYear + 1 : 1;
+    }
+    if (years < 1) {
+      alert('Years remaining must be at least 1.');
+      return;
+    }
+    years = Math.min(years, seasons.length);
+    el('contractYearsRemaining').value = String(years);
+
+    const mode = el('salaryChangeMode').value;
+    const pct = mode === 'same' ? 0 : (nullableNumber(el('salaryChangePct').value) ?? 0);
+    if (pct < 0 || pct > 100) {
+      alert('Annual salary change must be between 0% and 100%.');
+      return;
+    }
+    const direction = mode === 'decrease' ? -1 : mode === 'increase' ? 1 : 0;
+    const factor = 1 + (direction * pct / 100);
+    const endSeason = seasons[years - 1];
+    el('contractEnd').value = endSeason.id;
+
     document.querySelectorAll('[data-contract-salary]').forEach((input) => {
       const season = seasonById(input.dataset.contractSalary);
-      input.value = season && season.startYear <= throughSeason.startYear ? formatWholeDollarValue(amount) : '';
+      const index = seasons.findIndex((item) => item.id === season?.id);
+      if (index >= 0 && index < years) {
+        const generated = Math.round(amount * Math.pow(factor, index));
+        input.value = formatWholeDollarValue(Math.max(0, generated));
+      } else if (index >= years) {
+        input.value = '';
+      }
     });
     el('quickSalary').value = formatWholeDollarValue(amount);
     validatePlayerDialog();
@@ -1600,13 +1735,15 @@ html, body { max-width: 100%; overflow-x: hidden; }
     event.preventDefault();
     const name = el('playerName').value.trim();
     if (!name) return;
+    const existingPlayer = editingPlayerId ? state.players.find((player) => player.id === editingPlayerId) : null;
     const salaryRows = state.seasons.map((season) => {
       const salaryInput = document.querySelector(`[data-contract-salary="${season.id}"]`);
       const overrideInput = document.querySelector(`[data-contract-override="${season.id}"]`);
+      const existingSalary = existingPlayer?.salaries?.[season.id] || { salary: null, capOverride: null };
       return {
         season_id: season.id,
-        salary: nullableNumber(salaryInput.value),
-        cap_override: nullableNumber(overrideInput.value)
+        salary: salaryInput ? nullableNumber(salaryInput.value) : existingSalary.salary,
+        cap_override: overrideInput ? nullableNumber(overrideInput.value) : existingSalary.capOverride
       };
     });
 
@@ -1617,16 +1754,22 @@ html, body { max-width: 100%; overflow-x: hidden; }
     }
 
     await runCloudAction(async () => {
-      const { error } = await db.rpc('save_front_office_player_v1', {
+      const { error } = await db.rpc('save_front_office_player_v2', {
         p_front_office_id: frontOfficeId,
         p_front_office_player_id: editingPlayerId || null,
         p_player_name: name,
         p_position: el('playerPosition').value,
-        p_real_team: el('realTeam').value.trim().toUpperCase() || null,
+        p_eligible_positions: normalizeEligibility(el('playerEligible').value) || el('playerPosition').value,
+        p_real_team: normalizeNhlTeam(el('realTeam').value),
+        p_age_snapshot: nullableInteger(el('playerAge').value),
+        p_age_as_of: nullableInteger(el('playerAge').value) === null ? null : todayIsoDate(),
         p_roster_status_id: el('rosterStatus').value,
         p_contract_end_season_id: el('contractEnd').value || null,
         p_notes: el('playerNotes').value.trim() || null,
-        p_salary_rows: salaryRows
+        p_salary_rows: salaryRows,
+        p_source_system: null,
+        p_source_player_id: null,
+        p_source_player_name: null
       });
       if (error) throw error;
       playerDialog.close();
@@ -1664,7 +1807,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     });
   }
   function openAdjustmentDialog() {
-    el('adjustmentSeason').innerHTML = state.seasons.map((s) => `<option value="${s.id}" ${s.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('');
+    el('adjustmentSeason').innerHTML = contractHorizonSeasons().map((s) => `<option value="${s.id}" ${s.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('');
     el('adjustmentDescription').value = '';
     el('adjustmentAmount').value = '';
     adjustmentDialog.showModal();
@@ -1703,7 +1846,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
   }
   function openImportDialog() {
     pendingImport = [];
+    pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
     el('csvFile').value = '';
+    el('importSalaryToggle').checked = true;
     el('importPreview').classList.add('hidden');
     el('importPreview').innerHTML = '';
     el('applyImportBtn').disabled = true;
@@ -1719,9 +1864,100 @@ html, body { max-width: 100%; overflow-x: hidden; }
       alert('No data rows found.');
       return;
     }
-    const headers = rows[0].map((h) => h.trim());
-    pendingImport = rows.slice(1).filter((r) => r.some((v) => String(v).trim() !== '')).map((row, index) => mapImportRow(headers, row, index + 2));
+
+    const fantrax = parseFantraxTeamRoster(rows);
+    if (fantrax.detected) {
+      pendingImportMeta = { type: 'fantrax', skaters: fantrax.skaters, goalies: fantrax.goalies };
+      pendingImport = fantrax.rows;
+    } else {
+      pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
+      const headers = rows[0].map((h) => h.trim());
+      pendingImport = rows.slice(1)
+        .filter((r) => r.some((v) => String(v).trim() !== ''))
+        .map((row, index) => mapImportRow(headers, row, index + 2));
+    }
     renderImportPreview();
+  }
+
+  function parseFantraxTeamRoster(rows) {
+    const output = [];
+    let detected = false;
+    let skaters = 0;
+    let goalies = 0;
+    let section = '';
+    let headers = null;
+
+    for (let i = 0; i < rows.length; i += 1) {
+      const row = rows[i].map((value) => String(value ?? '').trim());
+      const marker = (row[1] || '').toLowerCase();
+      if (!row[0] && (marker === 'skaters' || marker === 'goalies')) {
+        section = marker === 'skaters' ? 'Skaters' : 'Goalies';
+        headers = null;
+        detected = true;
+        continue;
+      }
+      if (!section) continue;
+      if (row[0].toLowerCase() === 'id' && row.some((value) => value.toLowerCase() === 'player')) {
+        headers = row;
+        continue;
+      }
+      if (!headers || !row.some(Boolean)) continue;
+
+      const record = {};
+      headers.forEach((header, index) => { record[header] = row[index] ?? ''; });
+      const sourceId = String(record.ID || '').trim();
+      const name = String(record.Player || '').trim();
+      if (!sourceId && !name) continue;
+
+      const statusResult = mapFantraxStatus(String(record.Status || '').trim());
+      const salary = nullableNumber(String(record.Salary || '').replace(/[$,]/g, ''));
+      const sourceRow = i + 1;
+      const realTeam = normalizeNhlTeam(record.Team);
+      const position = String(record.Pos || '').trim().toUpperCase() || 'F';
+      const eligiblePositions = normalizeEligibility(record.Eligible) || position;
+      const ageSnapshot = nullableInteger(record.Age);
+      const existing = findExistingImportPlayer(sourceId, name, realTeam);
+
+      output.push({
+        sourceRow,
+        sourceType: 'FANTRAX',
+        sourceId,
+        name,
+        position,
+        eligiblePositions,
+        realTeam,
+        ageSnapshot,
+        statusId: statusResult.statusId,
+        statusRaw: String(record.Status || '').trim(),
+        salary,
+        salaries: {},
+        section,
+        existingPlayerId: existing?.id || null,
+        action: existing ? 'Update' : 'Add',
+        valid: Boolean(name && sourceId && statusResult.statusId),
+        warning: statusResult.warning
+      });
+      if (section === 'Skaters') skaters += 1;
+      if (section === 'Goalies') goalies += 1;
+    }
+    return { detected: detected && output.length > 0, rows: output, skaters, goalies };
+  }
+
+  function mapFantraxStatus(value) {
+    const raw = String(value || '').trim();
+    const codeMap = { act: 'Active', res: 'Reserve' };
+    const desired = codeMap[raw.toLowerCase()] || raw;
+    const status = state.statuses.find((s) => s.name.toLowerCase() === desired.toLowerCase());
+    return { statusId: status?.id || null, warning: status ? '' : `Unmapped Fantrax status: ${raw || 'blank'}` };
+  }
+
+  function findExistingImportPlayer(sourceId, name, realTeam) {
+    if (sourceId) {
+      const linked = state.players.find((p) => p.fantraxId === sourceId);
+      if (linked) return linked;
+    }
+    const normalizedName = String(name || '').trim().toLowerCase();
+    return state.players.find((p) => p.name.toLowerCase() === normalizedName && (!realTeam || !p.realTeam || p.realTeam === realTeam)) || null;
   }
 
   function mapImportRow(headers, row, sourceRow) {
@@ -1734,7 +1970,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
     const name = findColumn(/^player$/i, /^name$/i, /player name/i).trim();
     const position = findColumn(/^pos$/i, /^position$/i).trim().toUpperCase() || 'F';
-    const realTeam = findColumn(/^team$/i, /nhl team/i, /real team/i).trim().toUpperCase();
+    const eligiblePositions = normalizeEligibility(findColumn(/^eligible$/i, /eligib/i)) || position;
+    const realTeam = normalizeNhlTeam(findColumn(/^team$/i, /nhl team/i, /real team/i));
+    const ageSnapshot = nullableInteger(findColumn(/^age$/i));
+    const sourceId = findColumn(/^id$/i, /fantrax.*id/i).trim();
     const statusText = findColumn(/^status$/i, /roster status/i).trim();
     const status = state.statuses.find((s) => s.name.toLowerCase() === statusText.toLowerCase()) || state.statuses[0];
     const salaries = {};
@@ -1743,53 +1982,92 @@ html, body { max-width: 100%; overflow-x: hidden; }
       const salaryHeader = headers.find((h) => normalizeHeader(h).includes(normalizeHeader(label)) && /salary|cap|\d{4}/i.test(h));
       salaries[season.id] = salaryHeader ? nullableNumber(String(record[salaryHeader]).replace(/[$,]/g, '')) : null;
     });
-    return { sourceRow, name, position, realTeam, statusId: status.id, salaries, valid: Boolean(name) };
+    const existing = findExistingImportPlayer(sourceId, name, realTeam);
+    return {
+      sourceRow, sourceType: sourceId ? 'FANTRAX' : null, sourceId, name, position, eligiblePositions, realTeam,
+      ageSnapshot, statusId: status?.id || null, salary: null, salaries, section: '',
+      existingPlayerId: existing?.id || null, action: existing ? 'Update' : 'Add', valid: Boolean(name && status?.id), warning: ''
+    };
   }
 
   function renderImportPreview() {
     const valid = pendingImport.filter((r) => r.valid);
     const invalid = pendingImport.length - valid.length;
     const current = currentSeason();
-    const rows = pendingImport.slice(0, 25).map((r) => `<tr><td>${r.sourceRow}</td><td>${escapeHtml(r.name || 'Missing name')}</td><td>${escapeHtml(r.position)}</td><td>${escapeHtml(r.realTeam || '—')}</td><td>${r.salaries[current.id] === null ? '—' : formatMoney(r.salaries[current.id])}</td><td>${r.valid ? '<span class="good">Ready</span>' : '<span class="danger">Needs review</span>'}</td></tr>`).join('');
+    const fantrax = pendingImportMeta.type === 'fantrax';
+    const rows = pendingImport.slice(0, 30).map((r) => {
+      const currentSalary = fantrax ? r.salary : r.salaries[current.id];
+      return `<tr>
+        <td>${r.sourceRow}</td>
+        <td>${escapeHtml(r.name || 'Missing name')}</td>
+        <td>${escapeHtml(r.position)}</td>
+        <td>${escapeHtml(r.eligiblePositions || '—')}</td>
+        <td>${escapeHtml(r.realTeam || '—')}</td>
+        <td>${r.ageSnapshot ?? '—'}</td>
+        <td>${escapeHtml(statusById(r.statusId)?.name || r.statusRaw || 'Unmapped')}</td>
+        <td>${currentSalary === null ? '—' : formatMoney(currentSalary)}</td>
+        <td>${escapeHtml(r.action || 'Add')}</td>
+        <td>${r.valid ? '<span class="good">Ready</span>' : `<span class="danger">${escapeHtml(r.warning || 'Needs review')}</span>`}</td>
+      </tr>`;
+    }).join('');
     const preview = el('importPreview');
     preview.classList.remove('hidden');
-    preview.innerHTML = `<p><strong>${valid.length} rows ready</strong>${invalid ? ` · <span class="danger">${invalid} rows skipped because player name is missing</span>` : ''}</p><div class="table-wrap"><table><thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Team</th><th>${seasonLabel(current.startYear)}</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const detector = fantrax
+      ? `<div class="import-detect"><span class="import-chip">Fantrax Team Roster detected</span><span class="import-chip">${pendingImportMeta.skaters} skaters</span><span class="import-chip">${pendingImportMeta.goalies} goalies</span><span class="import-chip">${valid.length} ready</span></div>`
+      : `<div class="import-detect"><span class="import-chip">Generic CSV</span><span class="import-chip">${valid.length} ready</span></div>`;
+    preview.innerHTML = `${detector}${invalid ? `<p class="danger">${invalid} row${invalid === 1 ? '' : 's'} require review and will not be imported.</p>` : ''}<div class="table-wrap"><table><thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Eligible</th><th>NHL Team</th><th>Age</th><th>Status</th><th>${seasonLabel(current.startYear)}</th><th>Action</th><th>Check</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     el('applyImportBtn').disabled = valid.length === 0;
   }
 
   async function applyImport() {
     const rows = pendingImport.filter((r) => r.valid);
     if (!rows.length) return;
+    const updateSalary = el('importSalaryToggle').checked;
+    const frontOfficeId = state.frontOffice?.id;
+    if (!frontOfficeId) return alert('Reopen this Front Office before importing.');
+
     await runCloudAction(async () => {
       for (const r of rows) {
-        const existing = state.players.find((p) => p.name.toLowerCase() === r.name.toLowerCase() && (!r.realTeam || !p.realTeam || p.realTeam === r.realTeam));
+        const existing = state.players.find((p) => p.id === r.existingPlayerId) || findExistingImportPlayer(r.sourceId, r.name, r.realTeam);
         const salaryRows = state.seasons.map((season) => {
-          const current = existing?.salaries?.[season.id] || { salary: null, capOverride: null };
-          const incoming = r.salaries[season.id];
+          const currentData = existing?.salaries?.[season.id] || { salary: null, capOverride: null };
+          let incoming = r.salaries?.[season.id] ?? null;
+          if (pendingImportMeta.type === 'fantrax' && season.id === currentSeason()?.id && updateSalary) incoming = r.salary;
+          if (pendingImportMeta.type === 'fantrax' && season.id !== currentSeason()?.id) incoming = null;
+          if (pendingImportMeta.type === 'fantrax' && !updateSalary) incoming = null;
           return {
             season_id: season.id,
-            salary: incoming === null ? current.salary : incoming,
-            cap_override: current.capOverride ?? null
+            salary: incoming === null ? currentData.salary : incoming,
+            cap_override: currentData.capOverride ?? null
           };
         });
-        const { error } = await db.rpc('save_front_office_player_v1', {
-          p_front_office_id: state.frontOffice.id,
+
+        const { error } = await db.rpc('save_front_office_player_v2', {
+          p_front_office_id: frontOfficeId,
           p_front_office_player_id: existing?.id || null,
           p_player_name: r.name,
           p_position: r.position || existing?.position || 'F',
+          p_eligible_positions: r.eligiblePositions || existing?.eligiblePositions || r.position || 'F',
           p_real_team: r.realTeam || existing?.realTeam || null,
+          p_age_snapshot: r.ageSnapshot ?? existing?.ageSnapshot ?? null,
+          p_age_as_of: (r.ageSnapshot ?? existing?.ageSnapshot) === null || (r.ageSnapshot ?? existing?.ageSnapshot) === undefined ? null : todayIsoDate(),
           p_roster_status_id: r.statusId || existing?.statusId || state.statuses[0]?.id,
           p_contract_end_season_id: existing?.contractEndSeasonId || null,
           p_notes: existing?.notes || null,
-          p_salary_rows: salaryRows
+          p_salary_rows: salaryRows,
+          p_source_system: r.sourceId ? 'FANTRAX' : null,
+          p_source_player_id: r.sourceId || null,
+          p_source_player_name: r.sourceId ? r.name : null
         });
         if (error) throw error;
       }
       importDialog.close();
       pendingImport = [];
-      await loadOffice(state.frontOffice.id, false);
+      pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
+      await loadOffice(frontOfficeId, false);
     });
   }
+
   function calculateSeason(seasonId) {
     const season = seasonById(seasonId);
     let knownRosterCap = 0;
@@ -1826,7 +2104,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
     });
   }
   async function removeSeason(id) {
-    if (state.seasons.length <= 1) return;
+    if (contractHorizonSeasons().some((season) => season.id === id)) {
+      alert('The current season and next six seasons are maintained automatically.');
+      return;
+    }
     const season = seasonById(id);
     if (!confirm(`Remove ${seasonLabel(season.startYear)} and its salary/adjustment values?`)) return;
     await runCloudAction(async () => {
@@ -1871,6 +2152,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
       await loadOffice(state.frontOffice.id, false);
     });
   }
+  function contractHorizonSeasons() {
+    const sorted = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
+    const current = currentSeason();
+    if (!current) return sorted.slice(0, 7);
+    return sorted.filter((season) => season.startYear >= current.startYear && season.startYear <= current.startYear + 6);
+  }
+
   function visibleSeasons() {
     const sorted = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
     const current = currentSeason();
@@ -1888,9 +2176,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
   function exportRosterCsv() {
     if (!state.frontOffice) return;
     const sortedSeasons = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
-    const headers = ['Player','Position','Real Team','Status', ...sortedSeasons.map((s) => `${seasonLabel(s.startYear)} Salary`), 'Contract End','Notes'];
+    const headers = ['Fantrax ID','Player','Pos','Eligible','NHL Team','Age','Status', ...sortedSeasons.map((s) => `${seasonLabel(s.startYear)} Salary`), 'Contract End','Notes'];
     const rows = state.players.map((p) => [
-      p.name, p.position, p.realTeam, statusById(p.statusId)?.name || '',
+      p.fantraxId || '', p.name, p.position, p.eligiblePositions || p.position || '', p.realTeam, p.ageSnapshot ?? '', statusById(p.statusId)?.name || '',
       ...sortedSeasons.map((s) => p.salaries?.[s.id]?.salary ?? ''),
       p.contractEndSeasonId ? seasonLabel(seasonById(p.contractEndSeasonId)?.startYear) : '', p.notes || ''
     ]);
@@ -2006,6 +2294,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       db.from('front_office_seasons').select('*').eq('front_office_id', frontOfficeId).order('season_start_year'),
       db.from('front_office_roster_statuses').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).order('sort_order'),
       db.from('front_office_players').select('*').eq('front_office_id', frontOfficeId).is('archived_at', null),
+      db.from('front_office_player_source_links').select('*').eq('front_office_id', frontOfficeId),
       db.from('roster_entries').select('*').eq('front_office_id', frontOfficeId).is('removed_at', null),
       db.from('contracts').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).is('archived_at', null),
       db.from('contract_seasons').select('*').eq('front_office_id', frontOfficeId),
@@ -2019,11 +2308,16 @@ html, body { max-width: 100%; overflow-x: hidden; }
       return;
     }
 
-    const [officeQ,seasonsQ,statusesQ,playersQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ] = queries;
+    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ] = queries;
     const office = officeQ.data;
     const seasons = seasonsQ.data || [];
     const statuses = statusesQ.data || [];
     const rosterByPlayer = new Map((rosterQ.data || []).map((r) => [r.front_office_player_id, r]));
+    const sourceLinksByPlayer = new Map();
+    (sourceLinksQ.data || []).forEach((link) => {
+      if (!sourceLinksByPlayer.has(link.front_office_player_id)) sourceLinksByPlayer.set(link.front_office_player_id, []);
+      sourceLinksByPlayer.get(link.front_office_player_id).push(link);
+    });
     const contractsByPlayer = new Map((contractsQ.data || []).map((c) => [c.front_office_player_id, c]));
     const contractSeasonGroups = new Map();
     (contractSeasonsQ.data || []).forEach((cs) => {
@@ -2046,7 +2340,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
         id: p.front_office_player_id,
         name: p.player_name,
         position: p.position || 'F',
+        eligiblePositions: p.eligible_positions || p.position || 'F',
         realTeam: p.real_team || '',
+        ageSnapshot: p.age_snapshot === null || p.age_snapshot === undefined ? null : Number(p.age_snapshot),
+        ageAsOf: p.age_as_of || null,
+        fantraxId: (sourceLinksByPlayer.get(p.front_office_player_id) || []).find((link) => link.source_system === 'FANTRAX')?.source_player_id || null,
         statusId: roster.roster_status_id,
         contractEndSeasonId: contract?.end_season_id || null,
         notes: contract?.notes || '',
@@ -2129,6 +2427,18 @@ html, body { max-width: 100%; overflow-x: hidden; }
     const n = Number(cleaned);
     return Number.isFinite(n) ? n : null;
   }
+  function nullableInteger(value) {
+    const n = nullableNumber(value);
+    return n === null || !Number.isInteger(n) ? null : n;
+  }
+  function normalizeEligibility(value) {
+    return String(value || '').toUpperCase().replace(/\s+/g, '').replace(/^,+|,+$/g, '');
+  }
+  function normalizeNhlTeam(value) {
+    const team = String(value || '').trim().toUpperCase();
+    return !team || ['(N/A)','N/A','NA'].includes(team) ? null : team;
+  }
+  function todayIsoDate() { return new Date().toISOString().slice(0, 10); }
   function formatWholeDollarValue(value) {
     const number = nullableNumber(value);
     return number === null ? '' : `$${Math.round(number).toLocaleString('en-US')}`;
