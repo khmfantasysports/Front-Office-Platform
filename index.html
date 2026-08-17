@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v1.4" />
+  <meta name="application-name" content="Fantasy Front Office v1.5" />
   <style>
 :root {
   color-scheme: dark;
@@ -445,6 +445,108 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .topbar-actions { max-width:170px; }
 }
 
+
+
+/* V1.5 compact workspace refinements */
+.overview-stack { display:grid; gap:12px; }
+.overview-status-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.compact-status-panel { min-height:0; }
+.compact-status-panel h3 { margin:0 0 5px; font-size:1rem; }
+.compact-copy { margin:0; font-size:.78rem; line-height:1.4; }
+.compact-list { gap:6px; }
+.compact-list .issue-item,
+.compact-list .activity-item { padding:8px 9px; }
+.compact-list .issue-item p,
+.compact-list .activity-item p { margin:0; }
+.compact-list small { font-size:.7rem; }
+.commitments-table { min-width:620px; }
+
+@media (max-width: 720px) {
+  .app-shell { padding:9px 10px 16px; }
+
+  .topbar { min-height:38px; margin-bottom:8px; align-items:center; gap:8px; }
+  .brand-lockup { gap:7px; }
+  .brand-mark { width:32px; height:32px; border-radius:9px; font-size:.82rem; }
+  .brand-copy h1 { max-width:132px; font-size:.88rem; line-height:1.02; }
+  .brand-copy p { display:none; }
+  .topbar-actions { max-width:none; display:flex; align-items:center; justify-content:flex-end; gap:5px; }
+  .topbar-actions .auth-meta { width:auto; order:3; }
+  .cloud-pill { padding:4px 6px; font-size:.61rem; }
+  #exportBtn, #signOutBtn { padding:6px 8px; min-height:32px; font-size:.69rem; border-radius:8px; }
+
+  .workspace-nav { gap:3px; padding:4px; border-radius:12px; }
+  .nav-tab { flex:1 1 0; min-width:0; padding:7px 5px; font-size:.78rem; border-radius:8px; }
+
+  .workspace-heading {
+    display:grid; grid-template-columns:minmax(0,1fr) 108px; align-items:center;
+    gap:9px; padding:10px 11px; margin:8px 0;
+  }
+  .workspace-heading .eyebrow { margin-bottom:3px; font-size:.59rem; letter-spacing:.1em; }
+  .workspace-heading h2 { margin:0; font-size:1.08rem; line-height:1.08; }
+  .season-picker { gap:3px; font-size:.66rem; }
+  .season-picker select { min-width:0; width:108px; padding:7px 8px; min-height:36px; font-size:.78rem; }
+
+  .summary-grid {
+    grid-template-columns:repeat(6,minmax(0,1fr)); gap:6px; margin-bottom:8px;
+  }
+  .summary-card { grid-column:span 2; padding:9px 9px 8px; border-radius:11px; min-height:74px; }
+  .summary-card:nth-child(4), .summary-card:nth-child(5) { grid-column:span 3; }
+  .summary-card .label { font-size:.61rem; letter-spacing:.045em; }
+  .summary-card .value { margin-top:3px; font-size:1rem; line-height:1.05; }
+  .summary-card .subvalue { margin-top:3px; font-size:.66rem; line-height:1.2; }
+
+  .view-panel { padding:9px; border-radius:14px; }
+  .subpanel { padding:10px; border-radius:12px; }
+  .section-title-row { gap:8px; }
+  .subpanel .eyebrow { margin-bottom:3px; font-size:.62rem; }
+  .subpanel h3 { font-size:1rem; margin-bottom:7px; }
+
+  .overview-stack { gap:8px; }
+  .overview-status-grid { grid-template-columns:1fr 1fr; gap:7px; }
+  .overview-status-grid .activity-panel { grid-column:1 / -1; }
+  .compact-status-panel { padding:9px; }
+  .compact-status-panel h3 { font-size:.9rem; }
+  .compact-copy { font-size:.69rem; line-height:1.3; }
+  .compact-list .issue-item,
+  .compact-list .activity-item { padding:7px 8px; font-size:.72rem; }
+  .activity-panel .activity-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .activity-panel .activity-item:nth-child(n+3) { display:none; }
+
+  .commitments-panel { padding:9px; }
+  .commitments-table { min-width:560px; }
+  .commitments-table th, .commitments-table td { padding:8px 9px; }
+
+  .table-toolbar { display:grid; gap:7px; margin-bottom:8px; }
+  .table-toolbar .toolbar-group { width:100%; display:grid; gap:6px; }
+  .table-toolbar .toolbar-group:first-child { grid-template-columns:minmax(0,1.55fr) minmax(110px,.8fr); }
+  .table-toolbar .toolbar-group:last-child { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .search-input { min-width:0; }
+  .table-toolbar input, .table-toolbar select { min-height:38px; padding:7px 9px; font-size:.78rem; }
+  .table-toolbar .btn { width:100%; padding:7px 6px; min-height:38px; font-size:.69rem; white-space:nowrap; }
+
+  table { min-width:640px; }
+  th, td { padding:8px 9px; }
+  th { font-size:.66rem; }
+  td { font-size:.78rem; }
+  .status-pill { padding:3px 6px; font-size:.65rem; }
+  .total-row td { padding-top:8px; padding-bottom:8px; }
+
+  #rosterView .subpanel[style] { margin-top:8px !important; }
+  #rosterView .subpanel h3 { margin-bottom:7px; }
+}
+
+@media (max-width: 390px) {
+  .workspace-heading { grid-template-columns:minmax(0,1fr) 100px; }
+  .season-picker select { width:100px; }
+  .summary-card { min-height:70px; padding:8px; }
+  .summary-card .value { font-size:.94rem; }
+  .summary-card .subvalue { font-size:.62rem; }
+  .table-toolbar .toolbar-group:last-child { grid-template-columns:1fr 1fr; }
+  .table-toolbar .toolbar-group:last-child #addPlayerBtn { grid-column:1 / -1; }
+  .activity-panel .activity-list { grid-template-columns:1fr; }
+  .activity-panel .activity-item:nth-child(n+2) { display:none; }
+}
+
 </style>
 </head>
 <body>
@@ -463,7 +565,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
           <span id="userEmail" class="user-email"></span>
         </div>
         <button id="backToOfficesBtn" class="btn btn-ghost" type="button">My Front Offices</button>
-        <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
+        <button id="exportBtn" class="btn btn-secondary" type="button">Export</button>
         <button id="signOutBtn" class="btn btn-ghost" type="button">Sign out</button>
       </div>
     </header>
@@ -949,33 +1051,29 @@ html, body { max-width: 100%; overflow-x: hidden; }
     const activities = state.activity.slice(0, 6).map((a) => `<div class="activity-item"><p><strong>${escapeHtml(a.label)}</strong></p><small>${formatDateTime(a.at)}</small></div>`).join('') || '<div class="activity-item"><p class="muted">No activity yet.</p></div>';
 
     el('overviewView').innerHTML = `
-      <div class="section-grid">
-        <div class="stack">
-          <div class="subpanel">
-            <div class="section-title-row"><div><p class="eyebrow">Future commitments</p><h3>Cap by season</h3></div></div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Season</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Cap Space</th></tr></thead>
-                <tbody>${futureRows}</tbody>
-              </table>
-            </div>
-          </div>
-          <div class="subpanel">
-            <p class="eyebrow">Recent activity</p>
-            <h3>Changes</h3>
-            <div class="activity-list">${activities}</div>
+      <div class="overview-stack">
+        <div class="subpanel commitments-panel">
+          <div class="section-title-row"><div><p class="eyebrow">Future commitments</p><h3>Cap by season</h3></div></div>
+          <div class="table-wrap compact-table-wrap">
+            <table class="commitments-table">
+              <thead><tr><th>Season</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Cap Space</th></tr></thead>
+              <tbody>${futureRows}</tbody>
+            </table>
           </div>
         </div>
-        <div class="stack">
-          <div class="subpanel">
-            <p class="eyebrow">Data quality</p>
-            <h3>Issues</h3>
-            <div class="issue-list">${issues.join('')}</div>
-          </div>
-          <div class="subpanel">
+        <div class="overview-status-grid">
+          <div class="subpanel compact-status-panel">
             <p class="eyebrow">Setup</p>
-            <h3>${calc.complete ? '<span class="good">Front Office Ready</span>' : '<span class="warning">Financial Setup Incomplete</span>'}</h3>
-            <p class="muted">Current cap remains incomplete until every cap-counting player has a current-season salary.</p>
+            <h3>${calc.complete ? '<span class="good">Front Office Ready</span>' : '<span class="warning">Setup Incomplete</span>'}</h3>
+            <p class="muted compact-copy">${calc.complete ? 'Current-season roster and cap data are complete.' : 'Add a salary for every cap-counting player to complete the current cap.'}</p>
+          </div>
+          <div class="subpanel compact-status-panel">
+            <p class="eyebrow">Data quality</p>
+            <div class="issue-list compact-list">${issues.join('')}</div>
+          </div>
+          <div class="subpanel compact-status-panel activity-panel">
+            <p class="eyebrow">Recent activity</p>
+            <div class="activity-list compact-list">${activities}</div>
           </div>
         </div>
       </div>`;
