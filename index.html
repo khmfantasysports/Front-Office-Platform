@@ -634,26 +634,230 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .summary-card .value { font-size: .86rem; }
 }
 
+
+
+/* V1.7 sticky app menu + overview-only KPI strip
+   The workspace chrome behaves like a compact management application rather than stacked cards. */
+.app-menu-bar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(8, 20, 30, .94);
+  box-shadow: 0 8px 24px rgba(0,0,0,.16);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.app-menu-bar .brand-lockup { gap: 7px; min-width: 0; }
+.app-menu-bar .brand-mark {
+  width: 31px;
+  height: 31px;
+  border-radius: 9px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(150deg, rgba(62,181,255,.25), rgba(24,88,126,.20));
+  border-color: rgba(119,201,255,.34);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+.app-menu-bar .brand-mark::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 1px;
+  right: -4px;
+  bottom: 7px;
+  transform: rotate(-38deg);
+  background: rgba(119,201,255,.50);
+}
+.app-menu-bar .brand-mark span { position: relative; z-index: 1; }
+.app-menu-bar .brand-copy h1 { margin: 0; font-size: .82rem; white-space: nowrap; }
+.app-menu-bar .workspace-nav {
+  position: static;
+  top: auto;
+  margin: 0;
+  padding: 2px;
+  gap: 2px;
+  border: 0;
+  border-radius: 9px;
+  box-shadow: none;
+  background: rgba(15,29,40,.72);
+  min-width: 0;
+}
+.app-menu-bar .nav-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 30px;
+  padding: 5px 9px;
+  border-radius: 7px;
+  font-size: .72rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.app-menu-bar .nav-tab.active { background: rgba(50,173,255,.10); color: #eef8ff; }
+.app-menu-bar .topbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
+.utility-menu { position: relative; }
+.utility-menu > summary {
+  list-style: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: rgba(15,29,40,.86);
+  cursor: pointer;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+.utility-menu > summary::-webkit-details-marker { display: none; }
+.utility-menu-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 7px);
+  width: 180px;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #0b1721;
+  box-shadow: 0 18px 42px rgba(0,0,0,.34);
+  z-index: 80;
+}
+.utility-menu-popover .user-email {
+  display: block;
+  max-width: 100%;
+  padding: 3px 4px 7px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: .68rem;
+}
+.utility-menu-popover .btn { width: 100%; min-height: 34px; padding: 7px 9px; text-align: left; font-size: .72rem; }
+.utility-menu-popover #backToOfficesBtn { display: block; }
+
+/* Team context becomes a compact subheader beneath the sticky menu. */
+.workspace-heading {
+  min-height: 46px;
+  margin: 0 0 6px;
+  padding: 5px 4px 6px;
+  border: 0;
+  border-bottom: 1px solid var(--border-soft);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.workspace-heading .eyebrow { margin-bottom: 2px; font-size: .56rem; }
+.workspace-heading h2 { margin: 0; font-size: 1rem; line-height: 1.05; }
+.workspace-heading .season-picker { min-width: 92px; }
+.workspace-heading .season-picker select { min-height: 31px; padding: 4px 7px; }
+
+/* Overview snapshot: five compact cells, not five cards. */
+.summary-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 3px;
+  margin: 0 0 6px;
+  padding: 3px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: rgba(10, 21, 30, .72);
+}
+.summary-card,
+.summary-card:nth-child(4),
+.summary-card:nth-child(5) {
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 6px 5px;
+  border: 0;
+  border-radius: 7px;
+  box-shadow: none;
+  background: transparent;
+}
+.summary-card + .summary-card { border-left: 1px solid var(--border-soft); border-radius: 0; }
+.summary-card .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .50rem;
+  line-height: 1;
+  letter-spacing: .035em;
+}
+.summary-card .value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 4px;
+  font-size: .82rem;
+  line-height: 1;
+}
+.summary-card .subvalue { display: none; }
+
+@media (max-width: 720px) {
+  .app-shell { padding-top: 4px; }
+  .app-menu-bar { grid-template-columns: auto minmax(0,1fr) auto; gap: 5px; min-height: 43px; padding: 4px 5px; border-radius: 10px; }
+  .app-menu-bar .brand-mark { width: 29px; height: 29px; border-radius: 8px; font-size: .70rem; }
+  .app-menu-bar .brand-copy { display: none; }
+  .app-menu-bar .workspace-nav { padding: 2px; }
+  .app-menu-bar .nav-tab { min-height: 29px; padding: 4px 3px; font-size: .64rem; }
+  .app-menu-bar .cloud-pill { width: 18px; height: 18px; padding: 0; font-size: 0; justify-content: center; }
+  .app-menu-bar .cloud-pill::before { width: 6px; height: 6px; }
+  .utility-menu > summary { width: 28px; height: 28px; border-radius: 7px; font-size: .72rem; }
+  .workspace-heading { grid-template-columns: minmax(0,1fr) 88px; min-height: 40px; padding: 3px 2px 5px; }
+  .workspace-heading .eyebrow { font-size: .48rem; }
+  .workspace-heading h2 { font-size: .86rem; }
+  .season-picker { font-size: .48rem; }
+  .workspace-heading .season-picker select { width: 88px; min-height: 28px; font-size: .64rem; }
+  .summary-grid { grid-template-columns: repeat(5, minmax(0,1fr)); gap: 0; padding: 2px; }
+  .summary-card,
+  .summary-card:nth-child(4),
+  .summary-card:nth-child(5) { min-height: 40px; padding: 5px 4px 4px; }
+  .summary-card .label { font-size: .43rem; }
+  .summary-card .value { margin-top: 4px; font-size: .68rem; }
+}
+
+@media (max-width: 370px) {
+  .app-menu-bar .nav-tab { font-size: .59rem; }
+  .summary-card .label { font-size: .40rem; }
+  .summary-card .value { font-size: .62rem; }
+}
+
 </style>
 </head>
 <body>
   <div id="app" class="app-shell">
-    <header class="topbar">
-      <div class="brand-lockup">
-        <div class="brand-mark" aria-hidden="true">FO</div>
+    <header class="topbar app-menu-bar">
+      <div class="brand-lockup" aria-label="Fantasy Front Office">
+        <div class="brand-mark" aria-hidden="true"><span>FO</span></div>
         <div class="brand-copy">
           <h1>Fantasy Front Office</h1>
-          <p>Personal cap &amp; contract manager</p>
         </div>
       </div>
+
+      <nav id="workspaceNav" class="workspace-nav hidden" aria-label="Front office navigation">
+        <button class="nav-tab active" data-view="overview" type="button">Overview</button>
+        <button class="nav-tab" data-view="roster" type="button">Roster</button>
+        <button class="nav-tab" data-view="cap" type="button">Cap</button>
+        <button class="nav-tab" data-view="settings" type="button">Settings</button>
+      </nav>
+
       <div id="topbarActions" class="topbar-actions hidden">
-        <div class="auth-meta">
-          <span id="cloudStatus" class="cloud-pill">Cloud</span>
-          <span id="userEmail" class="user-email"></span>
-        </div>
-        <button id="backToOfficesBtn" class="btn btn-ghost" type="button">My Front Offices</button>
-        <button id="exportBtn" class="btn btn-secondary" type="button">Export</button>
-        <button id="signOutBtn" class="btn btn-ghost" type="button">Sign out</button>
+        <span id="cloudStatus" class="cloud-pill">Cloud</span>
+        <details class="utility-menu">
+          <summary aria-label="Workspace menu" title="Workspace menu">•••</summary>
+          <div class="utility-menu-popover">
+            <span id="userEmail" class="user-email"></span>
+            <button id="backToOfficesBtn" class="btn btn-ghost" type="button">My Front Offices</button>
+            <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
+            <button id="signOutBtn" class="btn btn-ghost" type="button">Sign out</button>
+          </div>
+        </details>
       </div>
     </header>
 
@@ -754,13 +958,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </section>
 
       <section id="workspace" class="hidden">
-        <nav class="workspace-nav" aria-label="Front office navigation">
-          <button class="nav-tab active" data-view="overview" type="button">Overview</button>
-          <button class="nav-tab" data-view="roster" type="button">Roster</button>
-          <button class="nav-tab" data-view="cap" type="button">Cap</button>
-          <button class="nav-tab" data-view="settings" type="button">Settings</button>
-        </nav>
-
         <section class="workspace-heading">
           <div>
             <p id="leagueLabel" class="eyebrow"></p>
@@ -1064,6 +1261,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       onboarding.classList.add('hidden');
       workspace.classList.add('hidden');
       el('topbarActions').classList.add('hidden');
+      el('workspaceNav').classList.add('hidden');
       return;
     }
 
@@ -1076,6 +1274,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     officePicker.classList.add('hidden');
     onboarding.classList.add('hidden');
     workspace.classList.remove('hidden');
+    el('workspaceNav').classList.remove('hidden');
     el('exportBtn').disabled = false;
     el('exportBtn').classList.remove('hidden');
 
@@ -1330,8 +1529,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
-    // Settings is configuration-first; the global KPI strip is intentionally hidden there.
-    el('summaryCards').classList.toggle('hidden', view === 'settings');
+    // KPI strip is an Overview-only snapshot; operational pages stay focused on their own content.
+    el('summaryCards').classList.toggle('hidden', view !== 'overview');
   }
 
   function openPlayerDialog(playerId = null) {
@@ -1760,6 +1959,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     authGate.classList.add('hidden');
     onboarding.classList.add('hidden');
     workspace.classList.add('hidden');
+    el('workspaceNav').classList.add('hidden');
     el('exportBtn').classList.add('hidden');
     officePicker.classList.remove('hidden');
     el('topbarActions').classList.remove('hidden');
@@ -1772,6 +1972,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     state = emptyState();
     officePicker.classList.add('hidden');
     workspace.classList.add('hidden');
+    el('workspaceNav').classList.add('hidden');
     el('exportBtn').classList.add('hidden');
     onboarding.classList.remove('hidden');
     el('teamName').value = '';
