@@ -1963,6 +1963,97 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .depth-slot-name { font-size: .66rem; }
 }
 
+
+
+/* V2.11 compact lineup + combined defense/goalie rows */
+.depth-lineup-all { gap: 9px; }
+.depth-section-card { padding: 8px; gap: 7px; }
+.depth-section-head { min-height: 24px; }
+.depth-section-head h4 { font-size: .73rem; }
+.depth-section-head span { font-size: .61rem; }
+.depth-slot,
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label,
+.depth-position-row .depth-slot,
+.depth-position-row .depth-role-label {
+  height: 88px;
+  min-height: 88px;
+}
+.depth-slot {
+  padding: 6px 7px;
+  grid-template-rows: auto minmax(1.95em, auto) auto auto;
+  gap: 2px;
+}
+.depth-slot-name {
+  min-height: 1.95em;
+  font-size: .70rem;
+  line-height: 1.04;
+}
+.depth-slot-position { font-size: .48rem; }
+.depth-slot-status { font-size: .45rem; }
+.depth-slot-meta { font-size: .49rem; }
+.depth-slot-finance { padding-top: 2px; }
+.depth-slot-finance strong { font-size: .54rem; }
+.depth-slot-finance span { font-size: .43rem; }
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label { padding: 4px; font-size: .54rem; }
+.depth-line-label strong,
+.depth-pair-label strong { font-size: .78rem; }
+.depth-defense-goalie-lines { display:grid; gap:6px; }
+.depth-defense-goalie-row {
+  display:grid;
+  grid-template-columns: 50px repeat(3,minmax(0,1fr));
+  gap:6px;
+  align-items:stretch;
+}
+.depth-defense-goalie-row .depth-pair-label {
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:2px;
+  text-align:center;
+}
+.depth-defense-goalie-row .depth-pair-label span { font-size:.48rem; text-transform:uppercase; letter-spacing:.07em; }
+.depth-defense-goalie-row .depth-pair-label strong { font-size:.78rem; }
+.depth-goalie-card .depth-slot-position { color:#8ed8ff; }
+
+@media (max-width: 720px) {
+  .depth-section-card { padding: 7px 6px; }
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 458px; }
+  .depth-rows-scroll .depth-forward-line {
+    grid-template-columns: 36px repeat(3, 132px);
+    gap: 5px;
+  }
+  .depth-defense-goalie-row {
+    grid-template-columns: 36px repeat(3, 132px);
+    gap:5px;
+  }
+  .depth-slot,
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-position-row .depth-slot,
+  .depth-position-row .depth-role-label {
+    height: 88px;
+    min-height: 88px;
+  }
+  .depth-slot { padding: 6px 6px 5px; }
+  .depth-slot-name { font-size: .66rem; }
+  .depth-slot-meta { font-size: .47rem; }
+  .depth-slot-finance strong { font-size: .52rem; }
+  .depth-slot-finance span { font-size: .41rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 446px; }
+  .depth-rows-scroll .depth-forward-line,
+  .depth-defense-goalie-row { grid-template-columns: 34px repeat(3, 132px); gap:4px; }
+}
+
 </style>
 </head>
 <body>
@@ -2723,16 +2814,23 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const rw = resolvedDepthPlayers('RW');
     const defense = resolvedDepthPlayers('D');
     const goalies = resolvedDepthPlayers('G');
+
     const forwardLines = Array.from({ length: 4 }, (_, index) => `<div class="depth-forward-line"><div class="depth-line-label"><span>Line</span><strong>${index + 1}</strong></div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`).join('');
-    const defensePairs = Array.from({ length: 3 }, (_, index) => `<div class="depth-pair-grid"><div class="depth-pair-label"><span>Pair</span><strong>${index + 1}</strong></div>${depthSlot(defense[index * 2], 'D', current)}${depthSlot(defense[index * 2 + 1], 'D', current)}</div>`).join('');
-    const goalieUnits = [0,1].map((index) => `<div class="depth-goalie-unit"><div class="depth-role-label">${index === 0 ? 'Starter' : 'Backup'}</div>${depthSlot(goalies[index], 'G', current)}</div>`).join('');
     const extraForwards = Math.max(lw.length, centers.length, rw.length) > 4 ? `<div class="depth-extra-list">${Array.from({ length: Math.max(lw.length, centers.length, rw.length) - 4 }, (_, offset) => { const index = offset + 4; return `<div class="depth-forward-line"><div class="depth-line-label"><span>Depth</span><strong>${index + 1}</strong></div>${depthSlot(lw[index], 'LW', current)}${depthSlot(centers[index], 'C', current)}${depthSlot(rw[index], 'RW', current)}</div>`; }).join('')}</div>` : '';
-    const extraDefense = defense.slice(6).map((player, offset) => `<div class="depth-extra-row"><div class="depth-role-label">D${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
-    const extraGoalies = goalies.slice(2).map((player, offset) => `<div class="depth-goalie-unit"><div class="depth-role-label">G${offset + 3}</div>${depthSlot(player, 'G', current)}</div>`).join('');
+
+    const defenseGoalieRows = Math.max(3, Math.ceil(defense.length / 2), goalies.length);
+    const defenseGoalieGrid = Array.from({ length: defenseGoalieRows }, (_, index) => {
+      const leftD = defense[index * 2];
+      const rightD = defense[index * 2 + 1];
+      const goalie = goalies[index];
+      const rowLabel = index < 3 ? `<span>Pair</span><strong>${index + 1}</strong>` : `<span>Depth</span><strong>${index + 1}</strong>`;
+      const goalieLabel = index === 0 ? 'G · Starter' : index === 1 ? 'G · Backup' : `G${index + 1}`;
+      return `<div class="depth-defense-goalie-row"><div class="depth-pair-label">${rowLabel}</div>${depthSlot(leftD, 'D', current)}${depthSlot(rightD, 'D', current)}<div class="depth-goalie-card">${depthSlot(goalie, goalieLabel, current)}</div></div>`;
+    }).join('');
+
     return `<div class="depth-lineup-shell depth-lineup-all">
       <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Forward lines</h4><span>${lw.length + centers.length + rw.length} forwards</span></div><div class="depth-rows-scroll" role="region" aria-label="Forward lines. Swipe horizontally if needed." tabindex="0"><div class="depth-forward-lines">${forwardLines}${extraForwards}</div></div></section>
-      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Defense pairs</h4><span>${defense.length} defensemen</span></div><div class="depth-rows-scroll" role="region" aria-label="Defense pairs. Swipe horizontally if needed." tabindex="0"><div class="depth-defense-lines">${defensePairs}${extraDefense ? `<div class="depth-extra-list">${extraDefense}</div>` : ''}</div></div></section>
-      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Goalies</h4><span>${goalies.length} goalies</span></div><div class="depth-rows-scroll" role="region" aria-label="Goalie depth. Swipe horizontally if needed." tabindex="0"><div class="depth-goalie-lines"><div class="depth-goalie-pair">${goalieUnits}</div>${extraGoalies ? `<div class="depth-extra-goalies">${extraGoalies}</div>` : ''}</div></div></section>
+      <section class="depth-section depth-section-card"><div class="depth-section-head"><h4>Defense + goalies</h4><span>${defense.length} D · ${goalies.length} G</span></div><div class="depth-rows-scroll" role="region" aria-label="Defense pairs and goalie depth. Swipe horizontally if needed." tabindex="0"><div class="depth-defense-goalie-lines">${defenseGoalieGrid}</div></div></section>
     </div>`;
   }
 
