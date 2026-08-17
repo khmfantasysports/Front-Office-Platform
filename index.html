@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.2" />
+  <meta name="application-name" content="Fantasy Front Office v2.3" />
   <style>
 :root {
   color-scheme: dark;
@@ -1114,6 +1114,83 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .empty-state-actions .btn { width:100%; }
 }
 
+
+
+/* V2.3 reliable mobile roster horizontal scrolling */
+.roster-table-panel {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+.roster-table-scroll-shell {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+.roster-table-panel .table-wrap.roster-horizontal-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: scroll !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(119,201,255,.42) rgba(255,255,255,.04);
+}
+.roster-table-panel .table-wrap.roster-horizontal-scroll::-webkit-scrollbar { height: 6px; }
+.roster-table-panel .table-wrap.roster-horizontal-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.035); }
+.roster-table-panel .table-wrap.roster-horizontal-scroll::-webkit-scrollbar-thumb { background: rgba(119,201,255,.40); border-radius: 999px; }
+.roster-scroll-hint {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin: 0 2px 6px;
+  color: var(--muted);
+  font-size: .66rem;
+  font-weight: 750;
+}
+.roster-scroll-hint .scroll-arrow { color: var(--accent); font-size: .82rem; }
+.roster-table-scroll-shell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 6px;
+  width: 22px;
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(90deg, transparent, rgba(7,16,25,.72));
+  pointer-events: none;
+  opacity: .78;
+}
+/* Keep the player identity visible while moving through salary years. */
+.roster-table-compact thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: #101b25;
+  box-shadow: 1px 0 0 var(--border);
+}
+.roster-table-compact tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #0d1822;
+  box-shadow: 1px 0 0 var(--border);
+}
+.roster-table-compact tbody tr:nth-child(even) td:first-child { background: #0c1720; }
+.roster-table-compact tbody tr:hover td:first-child { background: #101e29; }
+.roster-table-compact .total-row td:first-child { position: static; box-shadow: none; }
+
+@media (max-width: 900px) {
+  .roster-scroll-hint { display: flex; }
+}
+
 </style>
 </head>
 <body>
@@ -1786,13 +1863,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
         </div>
 
         <div class="roster-table-panel">
-          ${rows ? `<div class="table-wrap">
+          ${rows ? `<div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Roster table. Swipe horizontally to view salary years and contract end." tabindex="0">
             <table id="rosterTable" class="roster-table-v18 roster-table-compact">
               <thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead>
               <tbody>${rows}</tbody>
               <tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot>
             </table>
-          </div>` : `<div class="empty-state">
+          </div></div>` : `<div class="empty-state">
             <h4>No players yet</h4>
             <p>Add your first player manually or import a Fantrax roster to populate this Front Office.</p>
             <div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div>
