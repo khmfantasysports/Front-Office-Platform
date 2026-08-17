@@ -1191,6 +1191,153 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .roster-scroll-hint { display: flex; }
 }
 
+
+
+/* V2.4 mobile-first workspace views */
+.view-panel { min-width: 0; }
+.roster-page, .overview-page, .cap-page { display:grid; gap:12px; }
+.page-heading-row { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.page-heading-row h3 { margin:0; }
+.page-heading-row .eyebrow { margin-bottom:3px; }
+.view-switch {
+  display:inline-grid; grid-template-columns:1fr 1fr; padding:3px; gap:2px;
+  border:1px solid var(--border); border-radius:10px; background:#0a151e;
+}
+.view-switch button { border:0; border-radius:7px; padding:7px 12px; background:transparent; color:var(--muted); font-weight:800; font-size:.76rem; }
+.view-switch button.active { background:var(--panel-2); color:var(--text); }
+.roster-commandbar {
+  display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:8px; align-items:center;
+  padding:10px; border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.9);
+}
+.roster-commandbar .search-input { min-width:0; }
+.filter-menu, .tools-menu { position:relative; }
+.filter-menu > summary, .tools-menu > summary {
+  list-style:none; min-height:38px; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:7px 11px; border:1px solid var(--border); border-radius:9px; background:var(--panel-2); color:var(--text);
+  cursor:pointer; font-size:.74rem; font-weight:800; white-space:nowrap;
+}
+.filter-menu > summary::-webkit-details-marker, .tools-menu > summary::-webkit-details-marker { display:none; }
+.filter-menu[open] > summary, .tools-menu[open] > summary { border-color:rgba(119,201,255,.45); }
+.filter-popover, .tools-popover {
+  position:absolute; right:0; top:calc(100% + 7px); z-index:45; width:min(330px, calc(100vw - 36px));
+  padding:11px; border:1px solid var(--border); border-radius:12px; background:#0b1721; box-shadow:0 18px 44px rgba(0,0,0,.36);
+}
+.filter-popover { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.filter-popover label { display:grid; gap:5px; color:var(--muted); font-size:.72rem; font-weight:700; }
+.filter-popover .filter-check { display:flex; align-items:center; gap:7px; min-height:36px; color:var(--text); }
+.filter-popover .filter-check input { width:auto; }
+.filter-actions { grid-column:1 / -1; display:flex; justify-content:flex-end; }
+.tools-popover { display:grid; gap:6px; width:210px; }
+.tools-popover .btn { width:100%; text-align:left; }
+.filter-count { display:inline-grid; place-items:center; min-width:18px; height:18px; padding:0 4px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:.62rem; }
+
+.roster-list-shell { border:1px solid var(--border); border-radius:14px; overflow:hidden; background:rgba(13,24,34,.76); }
+.roster-list-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); }
+.roster-list-head strong { font-size:.82rem; }
+.roster-list { display:grid; }
+.roster-list-row {
+  width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px 14px; align-items:center;
+  padding:11px 12px; border:0; border-bottom:1px solid var(--border); background:transparent; color:var(--text); text-align:left;
+}
+.roster-list-row:last-child { border-bottom:0; }
+.roster-list-row[hidden] { display:none !important; }
+.roster-list-row:hover, .roster-list-row:focus-visible { background:rgba(255,255,255,.025); outline:none; }
+.roster-list-main { min-width:0; }
+.roster-list-name { display:flex; align-items:center; gap:7px; min-width:0; }
+.roster-list-name strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.91rem; }
+.roster-list-meta { margin-top:3px; color:var(--muted); font-size:.72rem; line-height:1.35; }
+.roster-list-submeta { margin-top:2px; color:#b8c8d5; font-size:.68rem; line-height:1.3; }
+.roster-list-finance { text-align:right; min-width:88px; }
+.roster-list-finance strong { display:block; font-size:.9rem; font-variant-numeric:tabular-nums; }
+.roster-list-finance span { display:block; margin-top:4px; color:var(--muted); font-size:.65rem; }
+.roster-list-empty-filter { padding:20px 14px; text-align:center; color:var(--muted); }
+.roster-list-row .status-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:5px; vertical-align:1px; }
+.cap-grid-panel { display:grid; gap:7px; }
+.cap-grid-panel.hidden { display:none !important; }
+.roster-list-shell.hidden { display:none !important; }
+
+.attention-panel { border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.82); overflow:hidden; }
+.attention-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 12px; border-bottom:1px solid var(--border); }
+.attention-head h3 { margin:0; font-size:.94rem; }
+.attention-list { display:grid; }
+.attention-item { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:9px; align-items:center; padding:10px 12px; border-bottom:1px solid var(--border-soft); }
+.attention-item:last-child { border-bottom:0; }
+.attention-icon { width:24px; height:24px; display:grid; place-items:center; border-radius:7px; background:rgba(255,255,255,.04); font-size:.72rem; font-weight:900; }
+.attention-item.good .attention-icon { color:var(--good); background:rgba(111,213,154,.10); }
+.attention-item.warning .attention-icon { color:var(--warning); background:rgba(242,198,109,.10); }
+.attention-item.danger .attention-icon { color:var(--danger); background:rgba(246,123,123,.10); }
+.attention-copy strong { display:block; font-size:.79rem; }
+.attention-copy span { display:block; margin-top:2px; color:var(--muted); font-size:.68rem; }
+.attention-value { color:var(--muted); font-size:.72rem; white-space:nowrap; }
+.overview-actions { display:flex; justify-content:flex-end; }
+.overview-actions .btn { min-width:150px; }
+.recent-strip { display:flex; align-items:center; gap:9px; min-height:42px; padding:8px 11px; border:1px solid var(--border); border-radius:11px; background:rgba(13,24,34,.72); }
+.recent-strip .eyebrow { margin:0; white-space:nowrap; }
+.recent-strip strong { font-size:.73rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.recent-strip small { margin-left:auto; font-size:.64rem; white-space:nowrap; }
+
+.cap-page .cap-visual-grid { margin:0; }
+.cap-detail-card { border:1px solid var(--border); border-radius:13px; padding:11px; background:rgba(13,24,34,.82); }
+.cap-detail-card h3 { margin-bottom:8px; }
+.cap-detail-table { min-width:650px; }
+.cap-history-disclosure, .settings-disclosure {
+  border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.82); overflow:hidden;
+}
+.cap-history-disclosure > summary, .settings-disclosure > summary {
+  list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 13px; cursor:pointer;
+}
+.cap-history-disclosure > summary::-webkit-details-marker, .settings-disclosure > summary::-webkit-details-marker { display:none; }
+.cap-history-disclosure > summary::after, .settings-disclosure > summary::after { content:'+'; color:var(--accent); font-size:1rem; }
+.cap-history-disclosure[open] > summary::after, .settings-disclosure[open] > summary::after { content:'−'; }
+.cap-history-body, .settings-disclosure-body { padding:0 13px 13px; border-top:1px solid var(--border-soft); }
+.settings-accordion { display:grid; gap:9px; }
+.settings-disclosure-title strong { display:block; font-size:.86rem; }
+.settings-disclosure-title span { display:block; margin-top:2px; color:var(--muted); font-size:.68rem; }
+.settings-disclosure .settings-fields { margin-top:12px; }
+.settings-disclosure .status-settings-list, .settings-disclosure .cap-settings-list { margin-top:12px; }
+.settings-data-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
+.settings-data-actions .btn { width:100%; }
+
+@media (min-width: 900px) {
+  .roster-list-row { grid-template-columns:minmax(0,1fr) 150px; padding:12px 15px; }
+  .roster-list-name strong { font-size:.96rem; }
+  .roster-list-meta { font-size:.75rem; }
+  .roster-commandbar-desktop { max-width:100%; }
+}
+@media (max-width: 720px) {
+  #summaryCards { display:none !important; }
+  .roster-page, .overview-page, .cap-page { gap:9px; }
+  .page-heading-row { align-items:flex-end; }
+  .view-switch button { padding:6px 9px; font-size:.69rem; }
+  .roster-commandbar { grid-template-columns:minmax(0,1fr) auto auto; gap:6px; padding:7px; border-radius:11px; }
+  .roster-commandbar input { min-height:36px; padding:7px 9px; font-size:.73rem; }
+  .filter-menu > summary, .tools-menu > summary { min-height:36px; padding:6px 9px; font-size:.68rem; }
+  .roster-commandbar > .btn { min-height:36px; padding:6px 10px; font-size:.68rem; }
+  .filter-popover { right:-56px; }
+  .roster-list-head { padding:8px 10px; }
+  .roster-list-row { padding:10px; gap:7px 10px; }
+  .roster-list-name strong { font-size:.84rem; }
+  .roster-list-meta { font-size:.67rem; }
+  .roster-list-submeta { font-size:.63rem; }
+  .roster-list-finance { min-width:80px; }
+  .roster-list-finance strong { font-size:.82rem; }
+  .roster-list-finance span { font-size:.61rem; }
+  .source-badge { transform:scale(.9); transform-origin:left center; }
+  .attention-item { padding:9px 10px; }
+  .attention-copy strong { font-size:.74rem; }
+  .attention-copy span { font-size:.64rem; }
+  .recent-strip { min-height:38px; padding:7px 9px; }
+  .settings-disclosure > summary { padding:10px 11px; }
+  .settings-disclosure-body { padding:0 11px 11px; }
+  .settings-data-actions { grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 390px) {
+  .roster-commandbar { grid-template-columns:minmax(0,1fr) auto; }
+  .roster-commandbar > .btn { grid-column:1 / -1; width:100%; }
+  .filter-popover { right:-44px; }
+  .settings-data-actions { grid-template-columns:1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -1538,7 +1685,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  const APP_VERSION = '1.9';
+  const APP_VERSION = '2.4';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
@@ -1547,6 +1694,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
   let pendingImport = [];
   let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
   let frontOfficeList = [];
+  let rosterMode = 'list';
+  let rosterFilters = { status: '', position: '', team: '', expiring: '', missingSalary: false, fantrax: false };
 
   const el = (id) => document.getElementById(id);
   const authGate = el('authGate');
@@ -1687,6 +1836,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('leagueLabel').textContent = `${state.frontOffice.leagueName} · ${state.frontOffice.sport}`;
     renderSeasonSelect();
     renderSummaryCards();
+    el('summaryCards').classList.add('hidden');
     renderOverview();
     renderRoster();
     renderCap();
@@ -1818,77 +1968,131 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </div>`;
   }
 
+
+  function effectivePlayerCharge(player, seasonId) {
+    const row = player?.salaries?.[seasonId];
+    if (!row) return null;
+    return row.capOverride !== null && row.capOverride !== undefined ? row.capOverride : row.salary;
+  }
+
+  function activeRosterFilterCount() {
+    return [rosterFilters.status, rosterFilters.position, rosterFilters.team, rosterFilters.expiring].filter(Boolean).length
+      + (rosterFilters.missingSalary ? 1 : 0) + (rosterFilters.fantrax ? 1 : 0);
+  }
+
+  function filteredRosterPlayers(query = '') {
+    const q = String(query || '').trim().toLowerCase();
+    const season = currentSeason();
+    return state.players.filter((player) => {
+      const status = statusById(player.statusId);
+      const haystack = `${player.name} ${player.position} ${player.eligiblePositions || ''} ${player.realTeam || ''} ${player.ageSnapshot ?? ''} ${status?.name || ''}`.toLowerCase();
+      if (q && !haystack.includes(q)) return false;
+      if (rosterFilters.status && player.statusId !== rosterFilters.status) return false;
+      if (rosterFilters.position && player.position !== rosterFilters.position) return false;
+      if (rosterFilters.team && player.realTeam !== rosterFilters.team) return false;
+      if (rosterFilters.expiring === 'current' && player.contractEndSeasonId !== season.id) return false;
+      if (rosterFilters.expiring === 'next') {
+        const next = contractHorizonSeasons().find((s) => s.startYear === season.startYear + 1);
+        if (!next || player.contractEndSeasonId !== next.id) return false;
+      }
+      if (rosterFilters.missingSalary && effectivePlayerCharge(player, season.id) !== null) return false;
+      if (rosterFilters.fantrax && !player.fantraxId) return false;
+      return true;
+    });
+  }
+
+  function closeRosterMenus() {
+    document.querySelectorAll('#rosterView details[open]').forEach((details) => details.removeAttribute('open'));
+  }
+
+
   function renderRoster() {
     const seasons = visibleSeasons();
-    const rows = state.players.map((player) => {
+    const current = currentSeason();
+    const positions = [...new Set(state.players.map((p) => p.position).filter(Boolean))].sort();
+    const teams = [...new Set(state.players.map((p) => p.realTeam).filter(Boolean))].sort();
+    const query = '';
+    const players = filteredRosterPlayers(query);
+    const filterCount = activeRosterFilterCount();
+
+    const listRows = state.players.map((player) => {
       const status = statusById(player.statusId);
-      const seasonCells = seasons.map((season) => {
-        const salary = player.salaries[season.id];
-        const value = salary?.salary ?? null;
-        return `<td class="money col-salary ${value === null ? 'empty-cell' : ''}">${value === null ? '—' : formatMoney(value)}</td>`;
-      }).join('');
-      return `<tr>
-        <td class="col-player"><button class="player-button" data-edit-player="${player.id}" type="button"><span class="roster-player-name">${escapeHtml(player.name)}</span>${player.fantraxId ? `<span class="source-badge">FX</span>` : ''}</button></td>
-        <td class="col-pos">${escapeHtml(player.position)}</td>
-        <td class="eligible-cell col-eligible">${escapeHtml(player.eligiblePositions || player.position || '—')}</td>
-        <td class="col-team">${escapeHtml(player.realTeam || '—')}</td>
-        <td class="age-cell col-age">${player.ageSnapshot ?? '—'}</td>
-        <td class="col-status"><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>
-        ${seasonCells}
-        <td class="col-end">${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td>
-      </tr>`;
+      const charge = effectivePlayerCharge(player, current.id);
+      const salary = player.salaries?.[current.id]?.salary ?? null;
+      const capOverride = player.salaries?.[current.id]?.capOverride ?? null;
+      const end = player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : 'No end set';
+      const eligibility = player.eligiblePositions || player.position || '—';
+      const teamAge = [player.position, player.realTeam || 'No NHL team', player.ageSnapshot !== null && player.ageSnapshot !== undefined ? `Age ${player.ageSnapshot}` : null].filter(Boolean).join(' · ');
+      const capLabel = capOverride !== null && capOverride !== undefined && capOverride !== salary ? `Cap ${formatMoney(capOverride)}` : null;
+      return `<button class="roster-list-row" data-roster-list-player="${player.id}" data-player-id="${player.id}" type="button">
+        <span class="roster-list-main"><span class="roster-list-name"><strong>${escapeHtml(player.name)}</strong>${player.fantraxId ? '<span class="source-badge">FX</span>' : ''}</span><span class="roster-list-meta"><span class="status-dot"></span>${escapeHtml(teamAge)} · ${escapeHtml(status?.name || 'Other')}</span><span class="roster-list-submeta">${escapeHtml(eligibility)} eligible · Ends ${escapeHtml(end)}</span></span>
+        <span class="roster-list-finance"><strong>${charge === null ? '—' : formatMoney(charge)}</strong><span>${capLabel ? escapeHtml(capLabel) : seasonLabel(current.startYear)}</span></span>
+      </button>`;
     }).join('');
 
+    const gridRows = state.players.map((player) => {
+      const status = statusById(player.statusId);
+      const seasonCells = seasons.map((season) => {
+        const value = player.salaries?.[season.id]?.salary ?? null;
+        return `<td class="money col-salary ${value === null ? 'empty-cell' : ''}">${value === null ? '—' : formatMoney(value)}</td>`;
+      }).join('');
+      return `<tr data-player-grid-row="${player.id}" data-player-id="${player.id}"><td class="col-player"><button class="player-button" data-edit-player="${player.id}" type="button"><span class="roster-player-name">${escapeHtml(player.name)}</span>${player.fantraxId ? '<span class="source-badge">FX</span>' : ''}</button></td><td class="col-pos">${escapeHtml(player.position)}</td><td class="eligible-cell col-eligible">${escapeHtml(player.eligiblePositions || player.position || '—')}</td><td class="col-team">${escapeHtml(player.realTeam || '—')}</td><td class="age-cell col-age">${player.ageSnapshot ?? '—'}</td><td class="col-status"><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>${seasonCells}<td class="col-end">${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td></tr>`;
+    }).join('');
     const totalCells = seasons.map((s) => `<td class="money col-salary">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
-    const count = state.players.length;
 
     el('rosterView').innerHTML = `
-      <div class="roster-layout">
-        <div class="roster-tools">
-          <div class="roster-tools-head">
-            <div><p class="eyebrow">Roster</p><h3>Players & contracts</h3></div>
-            <div class="roster-meta"><span class="meta-pill">${count} ${count === 1 ? 'player' : 'players'}</span><span class="meta-pill">${seasons.length} seasons visible</span></div>
-          </div>
-          <div class="table-toolbar">
-            <div class="toolbar-group">
-              <input id="rosterSearch" class="search-input" placeholder="Search players..." />
-              <select id="statusFilter"><option value="">All statuses</option>${state.statuses.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
-            </div>
-            <div class="toolbar-group">
-              <button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button>
-              <button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button>
-              <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
-            </div>
-          </div>
+      <div class="roster-page">
+        <div class="page-heading-row">
+          <div><p class="eyebrow">Roster</p><h3>${state.players.length} / ${state.frontOffice.rosterLimit ?? '—'} players</h3></div>
+          <div class="view-switch" aria-label="Roster view"><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
         </div>
+        <div class="roster-commandbar">
+          <input id="rosterSearch" class="search-input" placeholder="Search players..." />
+          <details class="filter-menu"><summary>Filters ${filterCount ? `<span class="filter-count">${filterCount}</span>` : ''}</summary><div class="filter-popover">
+            <label>Status<select id="rosterStatusFilter"><option value="">All</option>${state.statuses.map((s) => `<option value="${s.id}" ${rosterFilters.status === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}</select></label>
+            <label>Position<select id="rosterPositionFilter"><option value="">All</option>${positions.map((p) => `<option value="${escapeAttr(p)}" ${rosterFilters.position === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('')}</select></label>
+            <label>NHL team<select id="rosterTeamFilter"><option value="">All</option>${teams.map((t) => `<option value="${escapeAttr(t)}" ${rosterFilters.team === t ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('')}</select></label>
+            <label>Contract<select id="rosterExpiringFilter"><option value="">Any length</option><option value="current" ${rosterFilters.expiring === 'current' ? 'selected' : ''}>Expires this season</option><option value="next" ${rosterFilters.expiring === 'next' ? 'selected' : ''}>Expires next season</option></select></label>
+            <label class="filter-check"><input id="rosterMissingFilter" type="checkbox" ${rosterFilters.missingSalary ? 'checked' : ''} /> Missing current salary</label>
+            <label class="filter-check"><input id="rosterFantraxFilter" type="checkbox" ${rosterFilters.fantrax ? 'checked' : ''} /> Fantrax linked</label>
+            <div class="filter-actions"><button id="clearRosterFiltersBtn" class="btn btn-ghost btn-small" type="button">Clear filters</button></div>
+          </div></details>
+          <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
+        </div>
+        <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
 
-        <div class="roster-table-panel">
-          ${rows ? `<div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Roster table. Swipe horizontally to view salary years and contract end." tabindex="0">
-            <table id="rosterTable" class="roster-table-v18 roster-table-compact">
-              <thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead>
-              <tbody>${rows}</tbody>
-              <tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot>
-            </table>
-          </div></div>` : `<div class="empty-state">
-            <h4>No players yet</h4>
-            <p>Add your first player manually or import a Fantrax roster to populate this Front Office.</p>
-            <div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div>
-          </div>`}
-        </div>
+        ${state.players.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
+
+        ${state.players.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
         ${renderAdjustmentTable()}
       </div>`;
 
+    const rerenderMode = (mode) => { rosterMode = mode; renderRoster(); };
+    el('rosterListModeBtn').addEventListener('click', () => rerenderMode('list'));
+    el('rosterGridModeBtn').addEventListener('click', () => rerenderMode('grid'));
     el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());
-    el('importRosterBtn').addEventListener('click', openImportDialog);
-    el('addAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
+    el('importRosterBtn').addEventListener('click', () => { closeRosterMenus(); openImportDialog(); });
+    el('addAdjustmentBtn').addEventListener('click', () => { closeRosterMenus(); openAdjustmentDialog(); });
+    el('rosterExportBtn').addEventListener('click', () => { closeRosterMenus(); exportRosterCsv(); });
+    document.querySelectorAll('[data-roster-list-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.rosterListPlayer)));
     document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
-    el('rosterSearch').addEventListener('input', applyRosterFilters);
-    el('statusFilter').addEventListener('change', applyRosterFilters);
     if (el('emptyAddPlayerBtn')) el('emptyAddPlayerBtn').addEventListener('click', () => openPlayerDialog());
     if (el('emptyImportRosterBtn')) el('emptyImportRosterBtn').addEventListener('click', openImportDialog);
     if (el('emptyAddAdjustmentBtn')) el('emptyAddAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
     document.querySelectorAll('[data-delete-adjustment]').forEach((button) => button.addEventListener('click', () => deleteAdjustment(button.dataset.deleteAdjustment)));
+
+    const refreshFilters = () => applyRosterFilters();
+    el('rosterSearch').addEventListener('input', refreshFilters);
+    el('rosterStatusFilter').addEventListener('change', (e) => { rosterFilters.status = e.target.value; renderRoster(); });
+    el('rosterPositionFilter').addEventListener('change', (e) => { rosterFilters.position = e.target.value; renderRoster(); });
+    el('rosterTeamFilter').addEventListener('change', (e) => { rosterFilters.team = e.target.value; renderRoster(); });
+    el('rosterExpiringFilter').addEventListener('change', (e) => { rosterFilters.expiring = e.target.value; renderRoster(); });
+    el('rosterMissingFilter').addEventListener('change', (e) => { rosterFilters.missingSalary = e.target.checked; renderRoster(); });
+    el('rosterFantraxFilter').addEventListener('change', (e) => { rosterFilters.fantrax = e.target.checked; renderRoster(); });
+    el('clearRosterFiltersBtn').addEventListener('click', () => { rosterFilters = { status:'', position:'', team:'', expiring:'', missingSalary:false, fantrax:false }; renderRoster(); });
+    applyRosterFilters();
   }
+
 
   function renderAdjustmentTable() {
     const seasons = visibleSeasons();
@@ -1903,186 +2107,73 @@ html, body { max-width: 100%; overflow-x: hidden; }
       </div>`;
   }
 
+
   function applyRosterFilters() {
-    const q = el('rosterSearch').value.trim().toLowerCase();
-    const statusId = el('statusFilter').value;
-    document.querySelectorAll('#rosterTable tbody tr').forEach((row) => {
-      const playerButton = row.querySelector('[data-edit-player]');
-      if (!playerButton) return;
-      const player = state.players.find((p) => p.id === playerButton.dataset.editPlayer);
-      const haystack = `${player.name} ${player.position} ${player.eligiblePositions || ''} ${player.realTeam} ${player.ageSnapshot ?? ''}`.toLowerCase();
-      row.hidden = Boolean((q && !haystack.includes(q)) || (statusId && player.statusId !== statusId));
-    });
+    const search = el('rosterSearch')?.value || '';
+    const allowed = new Set(filteredRosterPlayers(search).map((p) => p.id));
+    document.querySelectorAll('[data-roster-list-player]').forEach((row) => { row.hidden = !allowed.has(row.dataset.rosterListPlayer); });
+    document.querySelectorAll('[data-player-grid-row]').forEach((row) => { row.hidden = !allowed.has(row.dataset.playerGridRow); });
+    const shown = allowed.size;
+    if (el('rosterResultCount')) el('rosterResultCount').textContent = `${shown} shown`;
+    if (el('rosterNoMatches')) el('rosterNoMatches').classList.toggle('hidden', shown !== 0);
+    if (el('gridNoMatches')) el('gridNoMatches').classList.toggle('hidden', shown !== 0);
   }
+
+
 
   function renderCap() {
     const rows = contractHorizonSeasons().map((s) => {
       const c = calculateSeason(s.id);
-      return `<tr>
-        <td>${seasonLabel(s.startYear)}</td>
-        <td class="money">${c.salaryCap === null ? '—' : formatMoney(c.salaryCap)}</td>
-        <td class="money">${formatMoney(c.knownRosterCap)}</td>
-        <td class="money">${formatMoney(c.adjustmentsTotal)}</td>
-        <td class="money">${formatMoney(c.knownCapUsed)}</td>
-        <td class="money">${c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : 'Incomplete'}</td>
-      </tr>`;
+      const space = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : 'Incomplete';
+      return `<tr><td>${seasonLabel(s.startYear)}</td><td class="money">${c.salaryCap === null ? '—' : formatMoney(c.salaryCap)}</td><td class="money">${formatMoney(c.knownRosterCap)}</td><td class="money">${formatMoney(c.adjustmentsTotal)}</td><td class="money">${formatMoney(c.knownCapUsed)}</td><td class="money">${space}</td></tr>`;
     }).join('');
-
     const activeSeason = currentSeason();
-    const historicalSeasons = [...state.seasons]
-      .filter((season) => activeSeason && season.startYear < activeSeason.startYear)
-      .sort((a, b) => b.startYear - a.startYear);
-    const historyRows = historicalSeasons.map((season) => `<tr>
-      <td>${seasonLabel(season.startYear)}</td>
-      <td class="money">${season.salaryCap === null ? '—' : formatMoney(season.salaryCap)}</td>
-    </tr>`).join('');
+    const historicalSeasons = [...state.seasons].filter((season) => activeSeason && season.startYear < activeSeason.startYear).sort((a,b) => b.startYear - a.startYear);
+    const historyRows = historicalSeasons.map((season) => `<tr><td>${seasonLabel(season.startYear)}</td><td class="money">${season.salaryCap === null ? '—' : formatMoney(season.salaryCap)}</td></tr>`).join('');
 
-    const capVisuals = renderCapVisuals();
-
-    el('capView').innerHTML = `
-      ${capVisuals}
-      <div class="subpanel tone-neutral">
-        <p class="eyebrow">Cap table</p>
-        <h3>Multi-year financial view</h3>
-        <div class="table-wrap"><table><thead><tr><th>Season</th><th>Cap</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div>
-      </div>
-      <div class="subpanel season-history-panel">
-        <div class="section-title-row"><div><p class="eyebrow">History</p><h3>Past seasons</h3><p class="season-history-copy">When the active season moves forward, prior season settings stay available here for reference.</p></div></div>
-        ${historyRows
-          ? `<div class="table-wrap"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div>`
-          : '<p class="season-history-empty">No past seasons yet. The first historical row will appear after you advance the active season.</p>'}
-      </div>`;
+    el('capView').innerHTML = `<div class="cap-page">
+      <div class="page-heading-row"><div><p class="eyebrow">Financials</p><h3>${seasonLabel(activeSeason.startYear)} cap position</h3></div></div>
+      ${renderCapVisuals()}
+      <div class="cap-detail-card"><p class="eyebrow">Details</p><h3>Seven-season cap table</h3><div class="table-wrap"><table class="cap-detail-table"><thead><tr><th>Season</th><th>Cap</th><th>Players</th><th>Adjustments</th><th>Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+      <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="table-wrap"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
+    </div>`;
   }
+
+
 
   function renderSettings() {
     const horizonSeasons = contractHorizonSeasons();
     const seasonSettings = horizonSeasons.map((s) => {
-      const calc = calculateSeason(s.id);
-      const stateLabel = s.id === state.frontOffice.currentSeasonId ? 'Current' : (calc.salaryCap === null ? 'Unset' : 'Set');
-      return `<div class="compact-cap-row" data-season-setting="${s.id}">
-        <div class="season-name">${seasonLabel(s.startYear)}</div>
-        <label><input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Salary cap" /></label>
-        <div class="cap-state">${stateLabel}</div>
-      </div>`;
+      const stateLabel = s.id === state.frontOffice.currentSeasonId ? 'Current' : (s.salaryCap === null ? 'Unset' : 'Set');
+      return `<div class="compact-cap-row" data-season-setting="${s.id}"><div class="season-name">${seasonLabel(s.startYear)}</div><label><input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Salary cap" /></label><div class="cap-state">${stateLabel}</div></div>`;
     }).join('');
+    const statusSettings = state.statuses.map((s) => `<div class="status-setting-compact" data-status-setting="${s.id}"><input data-status-name="${s.id}" value="${escapeAttr(s.name)}" aria-label="Status name" /><select data-status-cap="${s.id}" aria-label="Cap rule for ${escapeAttr(s.name)}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select><button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">×</button></div>`).join('');
 
-    const statusSettings = state.statuses.map((s) => `<div class="status-setting-compact" data-status-setting="${s.id}">
-      <input data-status-name="${s.id}" value="${escapeAttr(s.name)}" aria-label="Status name" />
-      <select data-status-cap="${s.id}" aria-label="Cap rule for ${escapeAttr(s.name)}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select>
-      <button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">×</button>
-    </div>`).join('');
+    el('settingsView').innerHTML = `<div class="settings-accordion">
+      <details class="settings-disclosure" open><summary><span class="settings-disclosure-title"><strong>Team & League</strong><span>Name, roster limit and currency</span></span></summary><div class="settings-disclosure-body"><div class="settings-fields"><label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label><label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label><label>Roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label><label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label></div><div class="settings-context-strip"><div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div><div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div></div></div></details>
+      <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span></summary><div class="settings-disclosure-body"><div class="settings-card-head"><p class="settings-card-copy">Configure which roster statuses count against the cap.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div><div class="status-settings-list">${statusSettings}</div></div></details>
+      <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Salary Caps</strong><span>Current + six future seasons</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p><div class="cap-settings-list">${seasonSettings}</div></div></details>
+      <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Fantrax import and portable backups</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Fantrax imports can refresh roster identity and current salary without touching future contracts.</p><div class="settings-data-actions"><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div></div></details>
+    </div>`;
 
-    el('settingsView').innerHTML = `
-      <div class="settings-layout">
-        <div class="settings-column">
-          <div class="settings-card">
-            <div class="settings-card-head"><div><p class="eyebrow">Workspace</p><h3>Front Office details</h3><p class="settings-card-copy">The essentials for this team and league.</p></div></div>
-            <div class="settings-fields">
-              <label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label>
-              <label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label>
-              <label>Roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label>
-              <label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label>
-            </div>
-            <div class="settings-context-strip">
-              <div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div>
-              <div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div>
-            </div>
-            <p class="settings-footer-note">Change the active season from the season selector above. The seventh future year is added automatically.</p>
-          </div>
-
-          <div class="settings-card">
-            <div class="settings-card-head"><div><p class="eyebrow">Salary caps</p><h3>Seven-season horizon</h3><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p></div></div>
-            <div class="cap-settings-list">${seasonSettings}</div>
-          </div>
-        </div>
-
-        <div class="settings-column">
-          <div class="settings-card">
-            <div class="settings-card-head"><div><p class="eyebrow">Roster rules</p><h3>Status & cap treatment</h3><p class="settings-card-copy">Set which statuses count against the cap.</p></div><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add</button></div>
-            <div class="status-settings-list">${statusSettings}</div>
-          </div>
-        </div>
-      </div>`;
-
-    document.querySelectorAll('[data-office-team]').forEach((input) => input.addEventListener('change', async () => {
-      const value = input.value.trim() || state.frontOffice.teamName;
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_offices').update({ team_name: value }).eq('front_office_id', state.frontOffice.id);
-        if (error) throw error;
-        state.frontOffice.teamName = value;
-      });
-      render();
-    }));
-    document.querySelectorAll('[data-office-league]').forEach((input) => input.addEventListener('change', async () => {
-      const value = input.value.trim() || state.frontOffice.leagueName;
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_offices').update({ league_name: value }).eq('front_office_id', state.frontOffice.id);
-        if (error) throw error;
-        state.frontOffice.leagueName = value;
-      });
-      render();
-    }));
-    document.querySelectorAll('[data-office-roster-limit]').forEach((input) => input.addEventListener('change', async () => {
-      const value = nullableInteger(input.value);
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_offices').update({ roster_limit: value }).eq('front_office_id', state.frontOffice.id);
-        if (error) throw error;
-        state.frontOffice.rosterLimit = value;
-      });
-      render();
-    }));
-    document.querySelectorAll('[data-office-currency]').forEach((input) => input.addEventListener('change', async () => {
-      const value = input.value.trim().toUpperCase();
-      if (!/^[A-Z]{3}$/.test(value)) { alert('Currency must use a three-letter code such as USD or CAD.'); render(); return; }
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_offices').update({ currency_code: value }).eq('front_office_id', state.frontOffice.id);
-        if (error) throw error;
-        state.frontOffice.currency = value;
-      });
-      render();
-    }));
-    document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', async () => {
-      const value = nullableNumber(input.value);
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_office_seasons').update({ salary_cap: value })
-          .eq('front_office_id', state.frontOffice.id)
-          .eq('front_office_season_id', input.dataset.seasonCap);
-        if (error) throw error;
-        seasonById(input.dataset.seasonCap).salaryCap = value;
-      });
-      render();
-    }));
-    document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', async () => {
-      const name = input.value.trim() || 'Status';
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_office_roster_statuses').update({ status_name: name })
-          .eq('front_office_id', state.frontOffice.id)
-          .eq('roster_status_id', input.dataset.statusName);
-        if (error) throw error;
-        statusById(input.dataset.statusName).name = name;
-      });
-      render();
-    }));
-    document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', async () => {
-      const counts = select.value === 'true';
-      await runCloudAction(async () => {
-        const { error } = await db.from('front_office_roster_statuses').update({ counts_toward_cap: counts })
-          .eq('front_office_id', state.frontOffice.id)
-          .eq('roster_status_id', select.dataset.statusCap);
-        if (error) throw error;
-        statusById(select.dataset.statusCap).countsTowardCap = counts;
-      });
-      render();
-    }));
+    document.querySelectorAll('[data-office-team]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim() || state.frontOffice.teamName; await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ team_name:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.teamName = value; }); render(); }));
+    document.querySelectorAll('[data-office-league]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim() || state.frontOffice.leagueName; await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ league_name:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.leagueName = value; }); render(); }));
+    document.querySelectorAll('[data-office-roster-limit]').forEach((input) => input.addEventListener('change', async () => { const value = nullableInteger(input.value); await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ roster_limit:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.rosterLimit = value; }); render(); }));
+    document.querySelectorAll('[data-office-currency]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim().toUpperCase(); if (!/^[A-Z]{3}$/.test(value)) { alert('Currency must use a three-letter code such as USD or CAD.'); render(); return; } await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ currency_code:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.currency = value; }); render(); }));
+    document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', async () => { const value = nullableNumber(input.value); await runCloudAction(async () => { const { error } = await db.from('front_office_seasons').update({ salary_cap:value }).eq('front_office_id', state.frontOffice.id).eq('front_office_season_id', input.dataset.seasonCap); if (error) throw error; seasonById(input.dataset.seasonCap).salaryCap = value; }); render(); }));
+    document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', async () => { const name = input.value.trim() || 'Status'; await runCloudAction(async () => { const { error } = await db.from('front_office_roster_statuses').update({ status_name:name }).eq('front_office_id', state.frontOffice.id).eq('roster_status_id', input.dataset.statusName); if (error) throw error; statusById(input.dataset.statusName).name = name; }); render(); }));
+    document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', async () => { const counts = select.value === 'true'; await runCloudAction(async () => { const { error } = await db.from('front_office_roster_statuses').update({ counts_toward_cap:counts }).eq('front_office_id', state.frontOffice.id).eq('roster_status_id', select.dataset.statusCap); if (error) throw error; statusById(select.dataset.statusCap).countsTowardCap = counts; }); render(); }));
     document.querySelectorAll('[data-remove-status]').forEach((button) => button.addEventListener('click', () => removeStatus(button.dataset.removeStatus)));
     el('addStatusBtn').addEventListener('click', addStatus);
+    el('settingsImportBtn').addEventListener('click', openImportDialog);
+    el('settingsExportBtn').addEventListener('click', exportRosterCsv);
   }
 
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
     // KPI strip is an Overview-only snapshot; operational pages stay focused on their own content.
-    el('summaryCards').classList.toggle('hidden', view !== 'overview');
+    el('summaryCards').classList.add('hidden');
   }
 
   function setPlayerSaveStatus(label = '', mode = '') {
