@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.1" />
+  <meta name="application-name" content="Fantasy Front Office v2.2" />
   <style>
 :root {
   color-scheme: dark;
@@ -1021,12 +1021,106 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .season-history-panel th, .season-history-panel td { padding: 8px 9px; }
 }
 
+
+
+/* V2.2 semantic states, visual cap summaries, actionable empty states, and wayfinding */
+:root {
+  --healthy: #52d7c2;
+  --healthy-soft: rgba(82,215,194,.10);
+  --warning-soft: rgba(242,198,109,.10);
+  --danger-soft: rgba(246,123,123,.10);
+}
+
+/* Structural panels stay neutral. Status-aware components opt into a semantic tone. */
+.tone-neutral { border-color: var(--border) !important; }
+.tone-good { border-color: rgba(82,215,194,.44) !important; }
+.tone-warning { border-color: rgba(242,198,109,.48) !important; }
+.tone-danger { border-color: rgba(246,123,123,.52) !important; }
+.tone-good .semantic-value, .tone-good .value { color: var(--healthy); }
+.tone-warning .semantic-value, .tone-warning .value { color: var(--warning); }
+.tone-danger .semantic-value, .tone-danger .value { color: var(--danger); }
+
+.workspace-back-btn {
+  width: 31px; height: 31px; display:grid; place-items:center; flex:0 0 auto;
+  border:1px solid var(--border); border-radius:9px; background:rgba(15,29,40,.86);
+  color:var(--text); font-size:1rem; font-weight:850; line-height:1;
+}
+.workspace-back-btn:hover { border-color:rgba(119,201,255,.42); background:rgba(50,173,255,.08); }
+
+.save-status {
+  min-width: 88px; text-align:right; color:var(--muted); font-size:.72rem; font-weight:750;
+  white-space:nowrap; transition:color .15s ease;
+}
+.save-status.unsaved { color:var(--warning); }
+.save-status.saving { color:var(--accent); }
+.save-status.saved { color:var(--healthy); }
+.save-status.error { color:var(--danger); }
+
+.empty-state {
+  display:grid; justify-items:start; gap:8px; padding:18px;
+  border:1px dashed var(--border); border-radius:12px; background:rgba(255,255,255,.015);
+}
+.empty-state h4 { margin:0; font-size:1rem; }
+.empty-state p { margin:0; color:var(--muted); font-size:.8rem; line-height:1.4; }
+.empty-state-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:2px; }
+.empty-state.compact { padding:13px; }
+
+.cap-visual-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:8px; }
+.cap-utilization-panel, .cap-trend-panel { min-width:0; }
+.cap-util-head { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; }
+.cap-util-head strong { font-size:1rem; }
+.cap-util-head span { color:var(--muted); font-size:.7rem; }
+.cap-bar {
+  position:relative; height:10px; margin-top:10px; overflow:hidden; border-radius:999px;
+  background:#07111a; border:1px solid var(--border-soft);
+}
+.cap-bar-fill { height:100%; min-width:0; border-radius:inherit; background:var(--healthy); transition:width .2s ease; }
+.tone-warning .cap-bar-fill { background:var(--warning); }
+.tone-danger .cap-bar-fill { background:var(--danger); }
+.cap-bar-meta { display:flex; justify-content:space-between; gap:10px; margin-top:6px; color:var(--muted); font-size:.68rem; }
+.cap-bar-meta strong { color:var(--text); font-weight:800; }
+
+.trend-chart { display:flex; align-items:flex-end; gap:7px; min-height:92px; margin-top:7px; }
+.trend-item { flex:1 1 0; min-width:0; display:grid; grid-template-rows:58px auto auto; gap:3px; align-items:end; text-align:center; }
+.trend-bar-track { height:58px; display:flex; align-items:flex-end; justify-content:center; border-bottom:1px solid var(--border-soft); }
+.trend-bar { width:min(20px,70%); min-height:3px; border-radius:5px 5px 2px 2px; background:var(--accent); opacity:.85; }
+.trend-bar.good { background:var(--healthy); }
+.trend-bar.warning { background:var(--warning); }
+.trend-bar.danger { background:var(--danger); }
+.trend-season { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:.56rem; }
+.trend-value { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#dce7ef; font-size:.59rem; font-weight:750; }
+
+.summary-card.tone-good { background:linear-gradient(180deg,var(--healthy-soft),transparent 90%); }
+.summary-card.tone-warning { background:linear-gradient(180deg,var(--warning-soft),transparent 90%); }
+.summary-card.tone-danger { background:linear-gradient(180deg,var(--danger-soft),transparent 90%); }
+
+@media (max-width:720px) {
+  .workspace-back-btn { width:28px; height:28px; border-radius:8px; font-size:.88rem; }
+  .app-menu-bar .brand-lockup { gap:4px; }
+  .drawer-footer-right { align-items:center; }
+  .save-status { min-width:74px; font-size:.64rem; }
+  .cap-visual-grid { grid-template-columns:1fr; gap:6px; }
+  .cap-utilization-panel, .cap-trend-panel { padding:8px; }
+  .trend-chart { min-height:76px; gap:4px; }
+  .trend-item { grid-template-rows:46px auto auto; }
+  .trend-bar-track { height:46px; }
+  .trend-bar { width:min(17px,72%); }
+  .trend-season { font-size:.50rem; }
+  .trend-value { font-size:.53rem; }
+  .empty-state { padding:14px; }
+}
+@media (max-width:390px) {
+  .save-status { min-width:0; max-width:66px; overflow:hidden; text-overflow:ellipsis; }
+  .empty-state-actions .btn { width:100%; }
+}
+
 </style>
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar app-menu-bar">
       <div class="brand-lockup" aria-label="Fantasy Front Office">
+        <button id="workspaceBackBtn" class="workspace-back-btn hidden" type="button" aria-label="Back to My Front Offices" title="My Front Offices">←</button>
         <div class="brand-mark" aria-hidden="true"><span>FO</span></div>
         <div class="brand-copy">
           <h1>Fantasy Front Office</h1>
@@ -1278,6 +1372,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <footer class="drawer-footer">
         <button id="deletePlayerBtn" class="btn btn-danger hidden" type="button">Remove</button>
         <div class="drawer-footer-right">
+          <span id="playerSaveStatus" class="save-status" aria-live="polite"></span>
           <button id="cancelPlayerBtn" class="btn btn-ghost" type="button">Cancel</button>
           <button id="savePlayerBtn" class="btn btn-primary" type="submit">Save Player</button>
         </div>
@@ -1371,6 +1466,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
   let state = emptyState();
   let session = null;
   let editingPlayerId = null;
+  let playerFormDirty = false;
   let pendingImport = [];
   let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0 };
   let frontOfficeList = [];
@@ -1415,6 +1511,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('googleSignInBtn').addEventListener('click', signInWithGoogle);
     el('signOutBtn').addEventListener('click', signOut);
     el('backToOfficesBtn').addEventListener('click', showOfficePicker);
+    el('workspaceBackBtn').addEventListener('click', showOfficePicker);
     el('newOfficeBtn').addEventListener('click', showCreateOffice);
     el('frontOfficeForm').addEventListener('submit', handleCreateFrontOffice);
     el('salaryCap').addEventListener('input', (event) => formatWholeDollarInput(event.target));
@@ -1441,6 +1538,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('closePlayerDialog').addEventListener('click', () => playerDialog.close());
     el('cancelPlayerBtn').addEventListener('click', () => playerDialog.close());
     el('playerForm').addEventListener('submit', savePlayerFromDialog);
+    el('playerForm').addEventListener('input', markPlayerDirty);
+    el('playerForm').addEventListener('change', markPlayerDirty);
     el('deletePlayerBtn').addEventListener('click', removeEditingPlayer);
     el('applyQuickContractBtn').addEventListener('click', applyQuickContract);
     el('quickSalary').addEventListener('blur', (event) => formatWholeDollarInput(event.target));
@@ -1489,6 +1588,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       workspace.classList.add('hidden');
       el('topbarActions').classList.add('hidden');
       el('workspaceNav').classList.add('hidden');
+      el('workspaceBackBtn').classList.add('hidden');
       return;
     }
 
@@ -1497,6 +1597,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     authGate.classList.add('hidden');
 
     const hasOffice = Boolean(state.frontOffice);
+    el('workspaceBackBtn').classList.toggle('hidden', !hasOffice);
     if (!hasOffice) return;
     officePicker.classList.add('hidden');
     onboarding.classList.add('hidden');
@@ -1522,6 +1623,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
       .join('');
   }
 
+  function capTone(calc) {
+    if (!calc.complete || calc.salaryCap === null) return 'warning';
+    if (calc.capSpace < 0) return 'danger';
+    if (calc.salaryCap > 0 && calc.capUsed / calc.salaryCap >= 0.95) return 'warning';
+    return 'good';
+  }
+
   function renderSummaryCards() {
     const season = currentSeason();
     const calc = calculateSeason(season.id);
@@ -1533,18 +1641,58 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
     const capSpaceValue = calc.complete && calc.salaryCap !== null ? formatMoney(calc.capSpace) : 'Incomplete';
     const capSpaceSub = calc.missingPlayerIds.length ? `${calc.missingPlayerIds.length} missing salary` : 'Current cap result';
+    const capState = capTone(calc);
+    const rosterState = rosterLimit && state.players.length > rosterLimit ? 'danger' : 'neutral';
 
     el('summaryCards').innerHTML = [
-      summaryCard('Cap Used', calc.complete ? formatMoney(calc.capUsed) : `${formatMoney(calc.knownCapUsed)} known`, calc.complete ? 'Complete' : 'Incomplete'),
-      summaryCard('Cap Space', capSpaceValue, capSpaceSub),
-      summaryCard('Players', `${state.players.length}${rosterLimit ? ` / ${rosterLimit}` : ''}`, 'Current roster'),
-      summaryCard('Expiring', String(expiring), seasonLabel(season.startYear)),
-      summaryCard('Dead Cap', formatMoney(deadCap), seasonLabel(season.startYear))
+      summaryCard('Cap Used', calc.complete ? formatMoney(calc.capUsed) : `${formatMoney(calc.knownCapUsed)} known`, calc.complete ? 'Complete' : 'Incomplete', capState),
+      summaryCard('Cap Space', capSpaceValue, capSpaceSub, capState),
+      summaryCard('Players', `${state.players.length}${rosterLimit ? ` / ${rosterLimit}` : ''}`, 'Current roster', rosterState),
+      summaryCard('Expiring', String(expiring), seasonLabel(season.startYear), expiring > 0 ? 'warning' : 'neutral'),
+      summaryCard('Dead Cap', formatMoney(deadCap), seasonLabel(season.startYear), deadCap > 0 ? 'warning' : 'neutral')
     ].join('');
   }
 
-  function summaryCard(label, value, subvalue) {
-    return `<article class="summary-card"><div class="label">${escapeHtml(label)}</div><div class="value">${escapeHtml(value)}</div><div class="subvalue">${escapeHtml(subvalue)}</div></article>`;
+  function summaryCard(label, value, subvalue, tone = 'neutral') {
+    return `<article class="summary-card tone-${tone}"><div class="label">${escapeHtml(label)}</div><div class="value semantic-value">${escapeHtml(value)}</div><div class="subvalue">${escapeHtml(subvalue)}</div></article>`;
+  }
+
+  function renderCapVisuals() {
+    const season = currentSeason();
+    const calc = calculateSeason(season.id);
+    const tone = capTone(calc);
+    const rawPct = calc.salaryCap && calc.salaryCap > 0 ? (calc.knownCapUsed / calc.salaryCap) * 100 : 0;
+    const displayPct = Math.max(0, Math.min(100, rawPct));
+    const usedLabel = calc.complete ? formatMoney(calc.knownCapUsed) : `${formatMoney(calc.knownCapUsed)} known`;
+    const spaceLabel = calc.complete && calc.salaryCap !== null ? formatMoney(calc.capSpace) : 'Incomplete';
+
+    const horizon = contractHorizonSeasons();
+    const points = horizon.map((s) => ({ season:s, calc:calculateSeason(s.id) }));
+    const maxUsed = Math.max(1, ...points.map((p) => Math.max(0, p.calc.knownCapUsed)));
+    const trend = points.map((p) => {
+      const value = Math.max(0, p.calc.knownCapUsed);
+      const height = value === 0 ? 3 : Math.max(8, Math.round((value / maxUsed) * 100));
+      const pointTone = p.calc.salaryCap === null ? 'neutral' : capTone(p.calc);
+      const shortSeason = String(p.season.startYear).slice(2) + '-' + String((p.season.startYear + 1) % 100).padStart(2,'0');
+      return `<div class="trend-item" title="${escapeAttr(seasonLabel(p.season.startYear))}: ${escapeAttr(formatMoney(value))}">
+        <div class="trend-bar-track"><div class="trend-bar ${pointTone}" style="height:${height}%"></div></div>
+        <div class="trend-season">${shortSeason}</div>
+        <div class="trend-value">${formatMoney(value)}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="cap-visual-grid">
+      <div class="subpanel cap-utilization-panel tone-${tone}">
+        <p class="eyebrow">Current cap</p>
+        <div class="cap-util-head"><strong class="semantic-value">${usedLabel}</strong><span>${calc.salaryCap === null ? 'Cap not set' : `${Math.round(rawPct)}% used`}</span></div>
+        <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
+        <div class="cap-bar-meta"><span>Used <strong>${usedLabel}</strong></span><span>Space <strong>${spaceLabel}</strong></span></div>
+      </div>
+      <div class="subpanel cap-trend-panel tone-neutral">
+        <p class="eyebrow">Seven-season trend</p>
+        <div class="trend-chart" aria-label="Known cap commitments by season">${trend}</div>
+      </div>
+    </div>`;
   }
 
   function renderOverview() {
@@ -1565,7 +1713,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
     el('overviewView').innerHTML = `
       <div class="overview-stack">
-        <div class="subpanel commitments-panel">
+        ${renderCapVisuals()}
+        <div class="subpanel commitments-panel tone-neutral">
           <div class="section-title-row"><div><p class="eyebrow">Future commitments</p><h3>Cap by season</h3></div></div>
           <div class="table-wrap compact-table-wrap">
             <table class="commitments-table">
@@ -1575,16 +1724,16 @@ html, body { max-width: 100%; overflow-x: hidden; }
           </div>
         </div>
         <div class="overview-status-grid">
-          <div class="subpanel compact-status-panel">
+          <div class="subpanel compact-status-panel tone-${calc.complete ? 'good' : 'warning'}">
             <p class="eyebrow">Setup</p>
             <h3>${calc.complete ? '<span class="good">Front Office Ready</span>' : '<span class="warning">Setup Incomplete</span>'}</h3>
             <p class="muted compact-copy">${calc.complete ? 'Current-season roster and cap data are complete.' : 'Add a salary for every cap-counting player to complete the current cap.'}</p>
           </div>
-          <div class="subpanel compact-status-panel">
+          <div class="subpanel compact-status-panel tone-${issues.length === 1 && !missingPlayers.length ? 'good' : 'warning'}">
             <p class="eyebrow">Data quality</p>
             <div class="issue-list compact-list">${issues.join('')}</div>
           </div>
-          <div class="subpanel compact-status-panel activity-panel">
+          <div class="subpanel compact-status-panel activity-panel tone-neutral">
             <p class="eyebrow">Recent activity</p>
             <div class="activity-list compact-list">${activities}</div>
           </div>
@@ -1637,13 +1786,17 @@ html, body { max-width: 100%; overflow-x: hidden; }
         </div>
 
         <div class="roster-table-panel">
-          <div class="table-wrap">
+          ${rows ? `<div class="table-wrap">
             <table id="rosterTable" class="roster-table-v18 roster-table-compact">
               <thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead>
-              <tbody>${rows || `<tr><td colspan="${7 + seasons.length}"><span class="muted">No players yet. Add a player or import a Fantrax roster.</span></td></tr>`}</tbody>
+              <tbody>${rows}</tbody>
               <tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot>
             </table>
-          </div>
+          </div>` : `<div class="empty-state">
+            <h4>No players yet</h4>
+            <p>Add your first player manually or import a Fantrax roster to populate this Front Office.</p>
+            <div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div>
+          </div>`}
         </div>
         ${renderAdjustmentTable()}
       </div>`;
@@ -1654,6 +1807,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
     document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
     el('rosterSearch').addEventListener('input', applyRosterFilters);
     el('statusFilter').addEventListener('change', applyRosterFilters);
+    if (el('emptyAddPlayerBtn')) el('emptyAddPlayerBtn').addEventListener('click', () => openPlayerDialog());
+    if (el('emptyImportRosterBtn')) el('emptyImportRosterBtn').addEventListener('click', openImportDialog);
+    if (el('emptyAddAdjustmentBtn')) el('emptyAddAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
     document.querySelectorAll('[data-delete-adjustment]').forEach((button) => button.addEventListener('click', () => deleteAdjustment(button.dataset.deleteAdjustment)));
   }
 
@@ -1666,7 +1822,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     return `
       <div class="adjustments-panel">
         <div class="section-title-row"><div><p class="eyebrow">Financial adjustments</p><h3>Dead cap, retention & credits</h3></div></div>
-        <div class="table-wrap"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th></th></tr></thead><tbody>${rows || `<tr><td colspan="${3 + seasons.length}"><span class="muted">No financial adjustments.</span></td></tr>`}</tbody></table></div>
+        ${rows ? `<div class="table-wrap"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th></th></tr></thead><tbody>${rows}</tbody></table></div>` : `<div class="empty-state compact"><h4>No financial adjustments</h4><p>Add dead cap, retained salary, penalties or cap credits only when your league requires them.</p><div class="empty-state-actions"><button id="emptyAddAdjustmentBtn" class="btn btn-secondary btn-small" type="button">+ Add adjustment</button></div></div>`}
       </div>`;
   }
 
@@ -1704,8 +1860,11 @@ html, body { max-width: 100%; overflow-x: hidden; }
       <td class="money">${season.salaryCap === null ? '—' : formatMoney(season.salaryCap)}</td>
     </tr>`).join('');
 
+    const capVisuals = renderCapVisuals();
+
     el('capView').innerHTML = `
-      <div class="subpanel">
+      ${capVisuals}
+      <div class="subpanel tone-neutral">
         <p class="eyebrow">Cap table</p>
         <h3>Multi-year financial view</h3>
         <div class="table-wrap"><table><thead><tr><th>Season</th><th>Cap</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div>
@@ -1849,6 +2008,19 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('summaryCards').classList.toggle('hidden', view !== 'overview');
   }
 
+  function setPlayerSaveStatus(label = '', mode = '') {
+    const status = el('playerSaveStatus');
+    if (!status) return;
+    status.textContent = label;
+    status.className = `save-status${mode ? ` ${mode}` : ''}`;
+  }
+
+  function markPlayerDirty() {
+    if (!playerDialog.open) return;
+    playerFormDirty = true;
+    setPlayerSaveStatus('Unsaved changes', 'unsaved');
+  }
+
   function openPlayerDialog(playerId = null) {
     editingPlayerId = playerId;
     const player = playerId ? state.players.find((p) => p.id === playerId) : null;
@@ -1873,6 +2045,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('playerNotes').value = player?.notes || '';
     el('deletePlayerBtn').classList.toggle('hidden', !player);
     validatePlayerDialog();
+    playerFormDirty = false;
+    setPlayerSaveStatus(player ? 'Saved' : 'New player', player ? 'saved' : '');
     playerDialog.showModal();
   }
 
@@ -1972,6 +2146,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     });
     el('quickSalary').value = formatWholeDollarValue(amount);
     validatePlayerDialog();
+    markPlayerDirty();
   }
 
   async function savePlayerFromDialog(event) {
@@ -2003,6 +2178,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
       saveButton.disabled = true;
       saveButton.dataset.originalLabel = saveButton.textContent;
       saveButton.textContent = 'Saving…';
+      setPlayerSaveStatus('Saving…', 'saving');
     }
 
     try {
@@ -2027,7 +2203,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
         if (error) throw error;
         await loadOffice(frontOfficeId, false);
       });
-      if (saved) playerDialog.close();
+      if (saved) {
+        playerFormDirty = false;
+        setPlayerSaveStatus('Saved', 'saved');
+        playerDialog.close();
+      } else {
+        setPlayerSaveStatus('Save failed', 'error');
+      }
     } finally {
       if (saveButton) {
         saveButton.disabled = false;
@@ -2509,6 +2691,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     onboarding.classList.add('hidden');
     workspace.classList.add('hidden');
     el('workspaceNav').classList.add('hidden');
+    el('workspaceBackBtn').classList.add('hidden');
     el('exportBtn').classList.add('hidden');
     officePicker.classList.remove('hidden');
     el('topbarActions').classList.remove('hidden');
@@ -2522,6 +2705,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     officePicker.classList.add('hidden');
     workspace.classList.add('hidden');
     el('workspaceNav').classList.add('hidden');
+    el('workspaceBackBtn').classList.add('hidden');
     el('exportBtn').classList.add('hidden');
     onboarding.classList.remove('hidden');
     el('teamName').value = '';
