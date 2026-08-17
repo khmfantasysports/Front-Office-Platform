@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v1.6" />
+  <meta name="application-name" content="Fantasy Front Office v2.0" />
   <style>
 :root {
   color-scheme: dark;
@@ -866,6 +866,148 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .quick-contract-grid-v19 { grid-template-columns:1fr 1fr; }
 }
 
+
+
+/* V2.0 roster alignment + compact settings */
+.roster-layout { display:grid; gap:10px; }
+.roster-tools,
+.roster-table-panel,
+.adjustments-panel,
+.settings-card {
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(13,24,34,.92);
+  padding:12px;
+}
+.roster-tools-head,
+.settings-card-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+}
+.roster-tools-head h3,
+.settings-card-head h3 { margin:0; font-size:.95rem; }
+.roster-tools-head .eyebrow,
+.settings-card-head .eyebrow { margin-bottom:3px; }
+.roster-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+.meta-pill {
+  display:inline-flex; align-items:center; min-height:24px; padding:4px 8px;
+  border:1px solid var(--border); border-radius:999px;
+  background:rgba(50,173,255,.06); color:#cfeaff; font-size:.65rem; font-weight:800; white-space:nowrap;
+}
+.roster-tools .table-toolbar { margin:0; gap:7px; }
+.roster-tools .toolbar-group { display:grid; gap:7px; width:100%; }
+.roster-tools .toolbar-group:first-child { grid-template-columns:minmax(0,1.45fr) minmax(130px,.72fr); }
+.roster-tools .toolbar-group:last-child { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.roster-tools .btn,
+.roster-tools input,
+.roster-tools select { min-height:36px; }
+.roster-table-panel .table-wrap { border-radius:10px; }
+.roster-table-compact {
+  min-width:800px;
+  table-layout:fixed;
+}
+.roster-table-compact th,
+.roster-table-compact td { padding:8px 7px; }
+.roster-table-compact th { font-size:.64rem; text-align:center; }
+.roster-table-compact th:first-child,
+.roster-table-compact td:first-child { text-align:left; }
+.roster-table-compact td:not(:first-child) { text-align:center; }
+.roster-table-compact .money { text-align:right !important; }
+.roster-table-compact .col-player { width:160px; }
+.roster-table-compact .col-pos { width:48px; }
+.roster-table-compact .col-eligible { width:82px; }
+.roster-table-compact .col-team { width:62px; }
+.roster-table-compact .col-age { width:48px; }
+.roster-table-compact .col-status { width:82px; }
+.roster-table-compact .col-salary { width:76px; }
+.roster-table-compact .col-end { width:76px; }
+.roster-player-name { display:inline; }
+.source-badge {
+  display:inline-flex; vertical-align:1px; margin-left:5px; padding:1px 4px;
+  border:1px solid rgba(119,201,255,.23); border-radius:5px; color:#8fcfff;
+  font-size:.48rem; line-height:1.2; font-weight:900; letter-spacing:.04em;
+}
+.adjustments-panel .table-wrap table { min-width:690px; }
+.adjustments-panel .section-title-row { margin-bottom:7px; }
+.adjustments-panel .section-title-row h3 { font-size:.9rem; }
+
+.settings-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; align-items:start; }
+.settings-column { display:grid; gap:10px; }
+.settings-card { padding:12px; }
+.settings-card-head { margin-bottom:10px; }
+.settings-card-copy { margin:3px 0 0; color:var(--muted); font-size:.72rem; line-height:1.35; }
+.settings-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.settings-fields label,
+.compact-cap-row label { display:grid; gap:5px; color:var(--muted); font-size:.72rem; font-weight:700; }
+.settings-fields .full { grid-column:1 / -1; }
+.settings-context-strip {
+  display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:9px;
+}
+.settings-context-item {
+  border:1px solid var(--border-soft); border-radius:9px; background:#0b141d; padding:8px 9px;
+}
+.settings-context-item span { display:block; color:var(--muted); font-size:.58rem; text-transform:uppercase; letter-spacing:.06em; font-weight:800; }
+.settings-context-item strong { display:block; margin-top:2px; font-size:.78rem; }
+.cap-settings-list { display:grid; gap:5px; }
+.compact-cap-row {
+  display:grid; grid-template-columns:78px minmax(0,1fr) 58px; gap:7px; align-items:center;
+  min-height:42px; padding:5px 7px; border:1px solid var(--border-soft); border-radius:9px; background:#0b141d;
+}
+.compact-cap-row .season-name { font-weight:800; font-size:.75rem; }
+.compact-cap-row input { min-height:31px; padding:5px 7px; font-size:.72rem; text-align:right; }
+.cap-state { color:var(--muted); font-size:.58rem; text-align:right; text-transform:uppercase; letter-spacing:.04em; font-weight:800; }
+.status-settings-list { display:grid; gap:6px; }
+.status-setting-compact {
+  display:grid; grid-template-columns:minmax(0,1fr) 132px auto; gap:7px; align-items:center;
+  padding:6px; border:1px solid var(--border-soft); border-radius:9px; background:#0b141d;
+}
+.status-setting-compact input,
+.status-setting-compact select { min-height:32px; padding:5px 7px; font-size:.71rem; }
+.status-setting-compact .btn { min-height:32px; padding:5px 7px; }
+.settings-footer-note { margin:8px 0 0; color:var(--muted); font-size:.65rem; line-height:1.35; }
+
+@media (max-width:900px) {
+  .settings-layout { grid-template-columns:1fr; }
+}
+@media (max-width:720px) {
+  .roster-layout { gap:8px; }
+  .roster-tools,
+  .roster-table-panel,
+  .adjustments-panel,
+  .settings-card { padding:9px; border-radius:11px; }
+  .roster-tools-head { margin-bottom:7px; }
+  .roster-tools-head h3 { font-size:.85rem; }
+  .roster-tools .toolbar-group:first-child { grid-template-columns:minmax(0,1.35fr) 112px; }
+  .roster-tools .toolbar-group:last-child { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .roster-tools .btn,
+  .roster-tools input,
+  .roster-tools select { min-height:34px; font-size:.67rem; padding:6px 7px; }
+  .roster-table-compact { min-width:750px; }
+  .roster-table-compact th,
+  .roster-table-compact td { padding:7px 6px; font-size:.72rem; }
+  .roster-table-compact .col-player { width:150px; }
+  .roster-table-compact .col-pos { width:44px; }
+  .roster-table-compact .col-eligible { width:76px; }
+  .roster-table-compact .col-team { width:58px; }
+  .roster-table-compact .col-age { width:44px; }
+  .roster-table-compact .col-status { width:78px; }
+  .roster-table-compact .col-salary { width:72px; }
+  .roster-table-compact .col-end { width:72px; }
+  .settings-fields { grid-template-columns:1fr 1fr; gap:7px; }
+  .status-setting-compact { grid-template-columns:minmax(0,1fr) 116px auto; }
+}
+@media (max-width:430px) {
+  .roster-meta { display:none; }
+  .roster-tools .toolbar-group:last-child { grid-template-columns:1fr 1fr; }
+  .roster-tools .toolbar-group:last-child #addPlayerBtn { grid-column:1 / -1; }
+  .settings-fields { grid-template-columns:1fr 1fr; }
+  .compact-cap-row { grid-template-columns:72px minmax(0,1fr) 48px; }
+  .status-setting-compact { grid-template-columns:minmax(0,1fr) 106px auto; gap:5px; }
+}
+
 </style>
 </head>
 <body>
@@ -1444,42 +1586,54 @@ html, body { max-width: 100%; overflow-x: hidden; }
       const seasonCells = seasons.map((season) => {
         const salary = player.salaries[season.id];
         const value = salary?.salary ?? null;
-        return `<td class="money ${value === null ? 'empty-cell' : ''}">${value === null ? '—' : formatMoney(value)}</td>`;
+        return `<td class="money col-salary ${value === null ? 'empty-cell' : ''}">${value === null ? '—' : formatMoney(value)}</td>`;
       }).join('');
       return `<tr>
-        <td><button class="player-button" data-edit-player="${player.id}" type="button">${escapeHtml(player.name)}</button>${player.fantraxId ? `<div class="source-note">Fantrax linked</div>` : ''}</td>
-        <td>${escapeHtml(player.position)}</td>
-        <td class="eligible-cell">${escapeHtml(player.eligiblePositions || player.position || '—')}</td>
-        <td>${escapeHtml(player.realTeam || '—')}</td>
-        <td class="age-cell">${player.ageSnapshot ?? '—'}</td>
-        <td><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>
+        <td class="col-player"><button class="player-button" data-edit-player="${player.id}" type="button"><span class="roster-player-name">${escapeHtml(player.name)}</span>${player.fantraxId ? `<span class="source-badge">FX</span>` : ''}</button></td>
+        <td class="col-pos">${escapeHtml(player.position)}</td>
+        <td class="eligible-cell col-eligible">${escapeHtml(player.eligiblePositions || player.position || '—')}</td>
+        <td class="col-team">${escapeHtml(player.realTeam || '—')}</td>
+        <td class="age-cell col-age">${player.ageSnapshot ?? '—'}</td>
+        <td class="col-status"><span class="status-pill">${escapeHtml(status?.name || 'Other')}</span></td>
         ${seasonCells}
-        <td>${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td>
+        <td class="col-end">${player.contractEndSeasonId ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear) : '—'}</td>
       </tr>`;
     }).join('');
 
-    const totalCells = seasons.map((s) => `<td class="money">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
+    const totalCells = seasons.map((s) => `<td class="money col-salary">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
+    const count = state.players.length;
 
     el('rosterView').innerHTML = `
-      <div class="table-toolbar">
-        <div class="toolbar-group">
-          <input id="rosterSearch" class="search-input" placeholder="Search players..." />
-          <select id="statusFilter"><option value="">All statuses</option>${state.statuses.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+      <div class="roster-layout">
+        <div class="roster-tools">
+          <div class="roster-tools-head">
+            <div><p class="eyebrow">Roster</p><h3>Players & contracts</h3></div>
+            <div class="roster-meta"><span class="meta-pill">${count} ${count === 1 ? 'player' : 'players'}</span><span class="meta-pill">${seasons.length} seasons visible</span></div>
+          </div>
+          <div class="table-toolbar">
+            <div class="toolbar-group">
+              <input id="rosterSearch" class="search-input" placeholder="Search players..." />
+              <select id="statusFilter"><option value="">All statuses</option>${state.statuses.map((s) => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+            </div>
+            <div class="toolbar-group">
+              <button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button>
+              <button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button>
+              <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
+            </div>
+          </div>
         </div>
-        <div class="toolbar-group">
-          <button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button>
-          <button id="addAdjustmentBtn" class="btn btn-secondary" type="button">Add Adjustment</button>
-          <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
+
+        <div class="roster-table-panel">
+          <div class="table-wrap">
+            <table id="rosterTable" class="roster-table-v18 roster-table-compact">
+              <thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead>
+              <tbody>${rows || `<tr><td colspan="${7 + seasons.length}"><span class="muted">No players yet. Add a player or import a Fantrax roster.</span></td></tr>`}</tbody>
+              <tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot>
+            </table>
+          </div>
         </div>
-      </div>
-      <div class="table-wrap">
-        <table id="rosterTable" class="roster-table-v18">
-          <thead><tr><th>Player</th><th>Pos</th><th>Eligible</th><th>NHL Team</th><th>Age</th><th>Status</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Ends</th></tr></thead>
-          <tbody>${rows || `<tr><td colspan="${7 + seasons.length}"><span class="muted">No players yet. Add a player or import a Fantrax roster.</span></td></tr>`}</tbody>
-          <tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot>
-        </table>
-      </div>
-      ${renderAdjustmentTable()}`;
+        ${renderAdjustmentTable()}
+      </div>`;
 
     el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());
     el('importRosterBtn').addEventListener('click', openImportDialog);
@@ -1497,8 +1651,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
       return `<tr><td>${escapeHtml(a.description)}</td><td>${escapeHtml(a.type)}</td>${cells}<td><button class="btn btn-ghost btn-small" data-delete-adjustment="${a.id}" type="button">Remove</button></td></tr>`;
     }).join('');
     return `
-      <div class="subpanel" style="margin-top:14px">
-        <div class="section-title-row"><div><p class="eyebrow">Financial adjustments</p><h3>Separate from roster players</h3></div></div>
+      <div class="adjustments-panel">
+        <div class="section-title-row"><div><p class="eyebrow">Financial adjustments</p><h3>Dead cap, retention & credits</h3></div></div>
         <div class="table-wrap"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th></th></tr></thead><tbody>${rows || `<tr><td colspan="${3 + seasons.length}"><span class="muted">No financial adjustments.</span></td></tr>`}</tbody></table></div>
       </div>`;
   }
@@ -1537,30 +1691,92 @@ html, body { max-width: 100%; overflow-x: hidden; }
   }
 
   function renderSettings() {
-    const seasonSettings = state.seasons.map((s) => `<div class="season-setting" data-season-setting="${s.id}">
-      <label>Season<input value="${seasonLabel(s.startYear)}" disabled /></label>
-      <label>Salary cap<input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Unknown" /></label>
-      <button class="btn btn-ghost btn-small" data-remove-season="${s.id}" type="button" ${contractHorizonSeasons().some((h) => h.id === s.id) ? 'disabled title="Seven-season rolling horizon"' : ''}>Remove</button>
-    </div>`).join('');
+    const horizonSeasons = contractHorizonSeasons();
+    const seasonSettings = horizonSeasons.map((s) => {
+      const calc = calculateSeason(s.id);
+      const stateLabel = s.id === state.frontOffice.currentSeasonId ? 'Current' : (calc.salaryCap === null ? 'Unset' : 'Set');
+      return `<div class="compact-cap-row" data-season-setting="${s.id}">
+        <div class="season-name">${seasonLabel(s.startYear)}</div>
+        <label><input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Salary cap" /></label>
+        <div class="cap-state">${stateLabel}</div>
+      </div>`;
+    }).join('');
 
-    const statusSettings = state.statuses.map((s) => `<div class="status-setting" data-status-setting="${s.id}">
-      <input data-status-name="${s.id}" value="${escapeAttr(s.name)}" />
-      <label><select data-status-cap="${s.id}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select></label>
-      <button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">Remove</button>
+    const statusSettings = state.statuses.map((s) => `<div class="status-setting-compact" data-status-setting="${s.id}">
+      <input data-status-name="${s.id}" value="${escapeAttr(s.name)}" aria-label="Status name" />
+      <select data-status-cap="${s.id}" aria-label="Cap rule for ${escapeAttr(s.name)}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select>
+      <button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">×</button>
     </div>`).join('');
 
     el('settingsView').innerHTML = `
-      <div class="section-grid">
-        <div class="subpanel">
-          <div class="section-title-row"><div><p class="eyebrow">Seasons</p><h3>Salary caps</h3></div><button id="addSeasonBtn" class="btn btn-secondary btn-small" type="button">+ Add Season</button></div>
-          <div class="settings-list">${seasonSettings}</div>
+      <div class="settings-layout">
+        <div class="settings-column">
+          <div class="settings-card">
+            <div class="settings-card-head"><div><p class="eyebrow">Workspace</p><h3>Front Office details</h3><p class="settings-card-copy">The essentials for this team and league.</p></div></div>
+            <div class="settings-fields">
+              <label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label>
+              <label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label>
+              <label>Roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label>
+              <label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label>
+            </div>
+            <div class="settings-context-strip">
+              <div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div>
+              <div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div>
+            </div>
+            <p class="settings-footer-note">Change the active season from the season selector above. The seventh future year is added automatically.</p>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-head"><div><p class="eyebrow">Salary caps</p><h3>Seven-season horizon</h3><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p></div></div>
+            <div class="cap-settings-list">${seasonSettings}</div>
+          </div>
         </div>
-        <div class="subpanel">
-          <div class="section-title-row"><div><p class="eyebrow">Roster</p><h3>Status rules</h3></div><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div>
-          <div class="settings-list">${statusSettings}</div>
+
+        <div class="settings-column">
+          <div class="settings-card">
+            <div class="settings-card-head"><div><p class="eyebrow">Roster rules</p><h3>Status & cap treatment</h3><p class="settings-card-copy">Set which statuses count against the cap.</p></div><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add</button></div>
+            <div class="status-settings-list">${statusSettings}</div>
+          </div>
         </div>
       </div>`;
 
+    document.querySelectorAll('[data-office-team]').forEach((input) => input.addEventListener('change', async () => {
+      const value = input.value.trim() || state.frontOffice.teamName;
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_offices').update({ team_name: value }).eq('front_office_id', state.frontOffice.id);
+        if (error) throw error;
+        state.frontOffice.teamName = value;
+      });
+      render();
+    }));
+    document.querySelectorAll('[data-office-league]').forEach((input) => input.addEventListener('change', async () => {
+      const value = input.value.trim() || state.frontOffice.leagueName;
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_offices').update({ league_name: value }).eq('front_office_id', state.frontOffice.id);
+        if (error) throw error;
+        state.frontOffice.leagueName = value;
+      });
+      render();
+    }));
+    document.querySelectorAll('[data-office-roster-limit]').forEach((input) => input.addEventListener('change', async () => {
+      const value = nullableInteger(input.value);
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_offices').update({ roster_limit: value }).eq('front_office_id', state.frontOffice.id);
+        if (error) throw error;
+        state.frontOffice.rosterLimit = value;
+      });
+      render();
+    }));
+    document.querySelectorAll('[data-office-currency]').forEach((input) => input.addEventListener('change', async () => {
+      const value = input.value.trim().toUpperCase();
+      if (!/^[A-Z]{3}$/.test(value)) { alert('Currency must use a three-letter code such as USD or CAD.'); render(); return; }
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_offices').update({ currency_code: value }).eq('front_office_id', state.frontOffice.id);
+        if (error) throw error;
+        state.frontOffice.currency = value;
+      });
+      render();
+    }));
     document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', async () => {
       const value = nullableNumber(input.value);
       await runCloudAction(async () => {
@@ -1572,7 +1788,6 @@ html, body { max-width: 100%; overflow-x: hidden; }
       });
       render();
     }));
-    document.querySelectorAll('[data-remove-season]').forEach((button) => button.addEventListener('click', () => removeSeason(button.dataset.removeSeason)));
     document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', async () => {
       const name = input.value.trim() || 'Status';
       await runCloudAction(async () => {
@@ -1596,9 +1811,9 @@ html, body { max-width: 100%; overflow-x: hidden; }
       render();
     }));
     document.querySelectorAll('[data-remove-status]').forEach((button) => button.addEventListener('click', () => removeStatus(button.dataset.removeStatus)));
-    el('addSeasonBtn').addEventListener('click', addSeason);
     el('addStatusBtn').addEventListener('click', addStatus);
   }
+
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
