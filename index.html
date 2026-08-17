@@ -322,6 +322,50 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
   .onboarding-intro { padding: 20px 18px 16px; }
   .onboarding-form-wrap { padding: 17px 18px 19px; }
 }
+
+
+/* V1.3 cloud/auth additions */
+.auth-panel,
+.office-picker-panel {
+  max-width: 760px;
+  margin: 56px auto 32px;
+  text-align: center;
+}
+.auth-panel { padding: 34px 28px; }
+.auth-panel h2,
+.office-picker-panel h2 { margin: 8px 0 10px; letter-spacing: -.025em; }
+.auth-panel p { max-width: 560px; margin: 0 auto 20px; }
+.auth-actions { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+.google-btn { min-width: 220px; }
+.office-picker-panel { text-align: left; }
+.office-picker-header { display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin-bottom:18px; }
+.office-list { display:grid; gap:10px; }
+.office-card {
+  width:100%; display:flex; align-items:center; justify-content:space-between; gap:14px;
+  padding:16px; border:1px solid var(--border); border-radius:13px; background:#0b151e; color:var(--text); text-align:left;
+}
+.office-card:hover { border-color:rgba(119,201,255,.42); background:#0d1a24; }
+.office-card h3 { margin:0 0 4px; font-size:1rem; }
+.office-card p { margin:0; color:var(--muted); font-size:.8rem; }
+.office-card .office-open { color:var(--accent); font-weight:850; white-space:nowrap; }
+.auth-meta { display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.user-email { color:var(--muted); font-size:.78rem; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cloud-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 8px; border-radius:999px; border:1px solid var(--border); color:var(--muted); font-size:.7rem; font-weight:800; }
+.cloud-pill::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--good); }
+.cloud-pill.busy::before { background:var(--warning); }
+.cloud-pill.error::before { background:var(--danger); }
+.auth-error { margin-top:14px; color:var(--danger); font-size:.83rem; }
+@media (max-width: 720px) {
+  .auth-panel,.office-picker-panel { margin:24px auto 20px; padding:22px 18px; }
+  .office-picker-header { align-items:stretch; flex-direction:column; }
+  .office-picker-header .btn { width:100%; }
+  .auth-meta { width:100%; justify-content:flex-end; }
+  .user-email { display:none; }
+  .topbar { align-items:flex-start; }
+  .topbar-actions { gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+  #backToOfficesBtn { display:none; }
+}
+
 </style>
 </head>
 <body>
@@ -334,13 +378,40 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
           <p>Personal cap &amp; contract manager</p>
         </div>
       </div>
-      <div id="topbarActions" class="topbar-actions">
-        <button id="resetBtn" class="btn btn-ghost" type="button">Reset Demo</button>
+      <div id="topbarActions" class="topbar-actions hidden">
+        <div class="auth-meta">
+          <span id="cloudStatus" class="cloud-pill">Cloud</span>
+          <span id="userEmail" class="user-email"></span>
+        </div>
+        <button id="backToOfficesBtn" class="btn btn-ghost" type="button">My Front Offices</button>
         <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
+        <button id="signOutBtn" class="btn btn-ghost" type="button">Sign out</button>
       </div>
     </header>
 
     <main>
+      <section id="authGate" class="panel auth-panel">
+        <span class="setup-badge">Cloud workspace</span>
+        <h2>Sign in to your Front Office</h2>
+        <p class="muted">Your rosters, contracts and cap data will be saved to your private Supabase account instead of only this browser.</p>
+        <div class="auth-actions">
+          <button id="googleSignInBtn" class="btn btn-primary google-btn" type="button">Continue with Google</button>
+        </div>
+        <div id="authError" class="auth-error hidden"></div>
+      </section>
+
+      <section id="officePicker" class="panel office-picker-panel hidden">
+        <div class="office-picker-header">
+          <div>
+            <p class="eyebrow">Your workspaces</p>
+            <h2>My Front Offices</h2>
+            <p class="muted">Choose a team or create another private Front Office.</p>
+          </div>
+          <button id="newOfficeBtn" class="btn btn-primary" type="button">+ Create Front Office</button>
+        </div>
+        <div id="officeList" class="office-list"></div>
+      </section>
+
       <section id="onboarding" class="panel onboarding-panel hidden" aria-labelledby="onboardingTitle">
         <div class="onboarding-intro">
           <div>
@@ -582,24 +653,28 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     </form>
   </dialog>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
 (() => {
   'use strict';
 
-  const STORAGE_KEY = 'fantasyFrontOfficeV1';
-  const DEFAULT_STATUSES = [
-    { id: uid(), name: 'Active', countsTowardCap: true },
-    { id: uid(), name: 'Reserve', countsTowardCap: true },
-    { id: uid(), name: 'IR', countsTowardCap: true },
-    { id: uid(), name: 'Prospect', countsTowardCap: false },
-    { id: uid(), name: 'Other', countsTowardCap: true }
-  ];
+  const SUPABASE_URL = 'https://gmkmmocunrckiqwwhxhv.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vU3vgT3e10spDzXPiva_Nw__TJy-HT7';
+  const SITE_URL = 'https://khmfantasysports.github.io/Front-Office-Platform/';
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
 
-  let state = loadState();
+  const DEFAULT_STATUSES = [];
+  let state = emptyState();
+  let session = null;
   let editingPlayerId = null;
   let pendingImport = [];
+  let frontOfficeList = [];
 
   const el = (id) => document.getElementById(id);
+  const authGate = el('authGate');
+  const officePicker = el('officePicker');
   const onboarding = el('onboarding');
   const workspace = el('workspace');
   const playerDialog = el('playerDialog');
@@ -608,31 +683,50 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
 
   init();
 
-  function init() {
+  async function init() {
     bindEvents();
-    render();
-  }
+    setCloudStatus('Connecting…', 'busy');
+    const { data, error } = await db.auth.getSession();
+    if (error) showAuthError(error.message);
+    session = data?.session || null;
+    await handleSessionChange(session);
 
+    db.auth.onAuthStateChange((_event, nextSession) => {
+      window.setTimeout(async () => {
+        session = nextSession;
+        await handleSessionChange(session);
+      }, 0);
+    });
+  }
   function emptyState() {
     return {
       frontOffice: null,
       seasons: [],
-      statuses: structuredClone(DEFAULT_STATUSES),
+      statuses: [],
       players: [],
       adjustments: [],
       activity: []
     };
   }
-
   function bindEvents() {
+    el('googleSignInBtn').addEventListener('click', signInWithGoogle);
+    el('signOutBtn').addEventListener('click', signOut);
+    el('backToOfficesBtn').addEventListener('click', showOfficePicker);
+    el('newOfficeBtn').addEventListener('click', showCreateOffice);
     el('frontOfficeForm').addEventListener('submit', handleCreateFrontOffice);
     el('salaryCap').addEventListener('input', (event) => formatWholeDollarInput(event.target));
     el('salaryCap').addEventListener('blur', (event) => formatWholeDollarInput(event.target));
-    el('resetBtn').addEventListener('click', resetApp);
     el('exportBtn').addEventListener('click', exportRosterCsv);
-    el('seasonSelect').addEventListener('change', () => {
-      state.frontOffice.currentSeasonId = el('seasonSelect').value;
-      saveState();
+    el('seasonSelect').addEventListener('change', async () => {
+      const seasonId = el('seasonSelect').value;
+      await runCloudAction(async () => {
+        const { error } = await db.rpc('set_current_front_office_season_v1', {
+          p_front_office_id: state.frontOffice.id,
+          p_front_office_season_id: seasonId
+        });
+        if (error) throw error;
+        state.frontOffice.currentSeasonId = seasonId;
+      });
       render();
     });
 
@@ -655,9 +749,9 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     el('cancelAdjustmentBtn').addEventListener('click', () => adjustmentDialog.close());
     el('adjustmentForm').addEventListener('submit', saveAdjustment);
   }
-
-  function handleCreateFrontOffice(event) {
+  async function handleCreateFrontOffice(event) {
     event.preventDefault();
+    if (!session?.user) return showAuthError('Sign in before creating a Front Office.');
     const currentSeason = el('currentSeason').value.trim();
     const startYear = parseSeasonStart(currentSeason);
     if (!startYear) {
@@ -665,40 +759,41 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
       return;
     }
 
-    const seasons = [];
-    for (let i = 0; i < 4; i += 1) {
-      const year = startYear + i;
-      seasons.push({
-        id: uid(),
-        startYear: year,
-        salaryCap: i === 0 ? nullableNumber(el('salaryCap').value) : null
+    await runCloudAction(async () => {
+      const { data, error } = await db.rpc('create_front_office_with_seasons_v1', {
+        p_team_name: el('teamName').value.trim(),
+        p_league_name: el('leagueName').value.trim(),
+        p_sport: el('sport').value,
+        p_currency_code: el('currency').value,
+        p_roster_limit: nullableNumber(el('rosterLimit').value),
+        p_current_season_start_year: startYear,
+        p_current_salary_cap: nullableNumber(el('salaryCap').value),
+        p_season_count: 4
       });
+      if (error) throw error;
+      await loadOffice(data);
+    });
+  }
+  function render() {
+    if (!session?.user) {
+      authGate.classList.remove('hidden');
+      officePicker.classList.add('hidden');
+      onboarding.classList.add('hidden');
+      workspace.classList.add('hidden');
+      el('topbarActions').classList.add('hidden');
+      return;
     }
 
-    state = emptyState();
-    state.seasons = seasons;
-    state.frontOffice = {
-      id: uid(),
-      teamName: el('teamName').value.trim(),
-      leagueName: el('leagueName').value.trim(),
-      sport: el('sport').value,
-      currency: el('currency').value,
-      rosterLimit: nullableNumber(el('rosterLimit').value),
-      currentSeasonId: seasons[0].id,
-      createdAt: new Date().toISOString()
-    };
-    state.activity.unshift(activity('Front Office created'));
-    saveState();
-    render();
-  }
+    el('topbarActions').classList.remove('hidden');
+    el('userEmail').textContent = session.user.email || session.user.user_metadata?.full_name || 'Signed in';
+    authGate.classList.add('hidden');
 
-  function render() {
     const hasOffice = Boolean(state.frontOffice);
-    onboarding.classList.toggle('hidden', hasOffice);
-    workspace.classList.toggle('hidden', !hasOffice);
-    el('exportBtn').disabled = !hasOffice;
-    el('topbarActions').classList.toggle('hidden', !hasOffice);
     if (!hasOffice) return;
+    officePicker.classList.add('hidden');
+    onboarding.classList.add('hidden');
+    workspace.classList.remove('hidden');
+    el('exportBtn').disabled = false;
 
     el('teamLabel').textContent = state.frontOffice.teamName;
     el('leagueLabel').textContent = `${state.frontOffice.leagueName} · ${state.frontOffice.sport}`;
@@ -709,7 +804,6 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     renderCap();
     renderSettings();
   }
-
   function renderSeasonSelect() {
     const select = el('seasonSelect');
     select.innerHTML = state.seasons
@@ -915,26 +1009,44 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
         </div>
       </div>`;
 
-    document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', () => {
-      seasonById(input.dataset.seasonCap).salaryCap = nullableNumber(input.value);
-      state.activity.unshift(activity(`Updated ${seasonLabel(seasonById(input.dataset.seasonCap).startYear)} salary cap`));
-      saveState(); render();
+    document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', async () => {
+      const value = nullableNumber(input.value);
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_office_seasons').update({ salary_cap: value })
+          .eq('front_office_id', state.frontOffice.id)
+          .eq('front_office_season_id', input.dataset.seasonCap);
+        if (error) throw error;
+        seasonById(input.dataset.seasonCap).salaryCap = value;
+      });
+      render();
     }));
     document.querySelectorAll('[data-remove-season]').forEach((button) => button.addEventListener('click', () => removeSeason(button.dataset.removeSeason)));
-    document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', () => {
-      statusById(input.dataset.statusName).name = input.value.trim() || 'Status';
-      saveState(); render();
+    document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', async () => {
+      const name = input.value.trim() || 'Status';
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_office_roster_statuses').update({ status_name: name })
+          .eq('front_office_id', state.frontOffice.id)
+          .eq('roster_status_id', input.dataset.statusName);
+        if (error) throw error;
+        statusById(input.dataset.statusName).name = name;
+      });
+      render();
     }));
-    document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', () => {
-      statusById(select.dataset.statusCap).countsTowardCap = select.value === 'true';
-      state.activity.unshift(activity('Updated roster cap-counting rule'));
-      saveState(); render();
+    document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', async () => {
+      const counts = select.value === 'true';
+      await runCloudAction(async () => {
+        const { error } = await db.from('front_office_roster_statuses').update({ counts_toward_cap: counts })
+          .eq('front_office_id', state.frontOffice.id)
+          .eq('roster_status_id', select.dataset.statusCap);
+        if (error) throw error;
+        statusById(select.dataset.statusCap).countsTowardCap = counts;
+      });
+      render();
     }));
     document.querySelectorAll('[data-remove-status]').forEach((button) => button.addEventListener('click', () => removeStatus(button.dataset.removeStatus)));
     el('addSeasonBtn').addEventListener('click', addSeason);
     el('addStatusBtn').addEventListener('click', addStatus);
   }
-
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
     ['overview', 'roster', 'cap', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
@@ -991,52 +1103,37 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     validatePlayerDialog();
   }
 
-  function savePlayerFromDialog(event) {
+  async function savePlayerFromDialog(event) {
     event.preventDefault();
     const name = el('playerName').value.trim();
     if (!name) return;
-    const salaries = {};
-    state.seasons.forEach((season) => {
+    const salaryRows = state.seasons.map((season) => {
       const salaryInput = document.querySelector(`[data-contract-salary="${season.id}"]`);
       const overrideInput = document.querySelector(`[data-contract-override="${season.id}"]`);
-      salaries[season.id] = {
+      return {
+        season_id: season.id,
         salary: nullableNumber(salaryInput.value),
-        capOverride: nullableNumber(overrideInput.value)
+        cap_override: nullableNumber(overrideInput.value)
       };
     });
 
-    if (editingPlayerId) {
-      const player = state.players.find((p) => p.id === editingPlayerId);
-      player.name = name;
-      player.position = el('playerPosition').value;
-      player.realTeam = el('realTeam').value.trim().toUpperCase();
-      player.statusId = el('rosterStatus').value;
-      player.contractEndSeasonId = el('contractEnd').value || null;
-      player.notes = el('playerNotes').value.trim();
-      player.salaries = salaries;
-      player.updatedAt = new Date().toISOString();
-      state.activity.unshift(activity(`Updated ${player.name}`));
-    } else {
-      const player = {
-        id: uid(),
-        name,
-        position: el('playerPosition').value,
-        realTeam: el('realTeam').value.trim().toUpperCase(),
-        statusId: el('rosterStatus').value,
-        contractEndSeasonId: el('contractEnd').value || null,
-        notes: el('playerNotes').value.trim(),
-        salaries,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      state.players.push(player);
-      state.activity.unshift(activity(`Added ${player.name}`));
-    }
-    saveState();
-    playerDialog.close();
-    render();
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('save_front_office_player_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_front_office_player_id: editingPlayerId || null,
+        p_player_name: name,
+        p_position: el('playerPosition').value,
+        p_real_team: el('realTeam').value.trim().toUpperCase() || null,
+        p_roster_status_id: el('rosterStatus').value,
+        p_contract_end_season_id: el('contractEnd').value || null,
+        p_notes: el('playerNotes').value.trim() || null,
+        p_salary_rows: salaryRows
+      });
+      if (error) throw error;
+      playerDialog.close();
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
   function validatePlayerDialog() {
     const endId = el('contractEnd').value;
     const warnings = [];
@@ -1053,17 +1150,20 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     box.innerHTML = warnings.length ? `<strong>Review:</strong><br>${warnings.map(escapeHtml).join('<br>')}` : '';
   }
 
-  function removeEditingPlayer() {
+  async function removeEditingPlayer() {
     const player = state.players.find((p) => p.id === editingPlayerId);
     if (!player) return;
-    if (!confirm(`Remove ${player.name} from this Front Office? Contract history in this prototype will also be removed.`)) return;
-    state.players = state.players.filter((p) => p.id !== editingPlayerId);
-    state.activity.unshift(activity(`Removed ${player.name}`));
-    saveState();
-    playerDialog.close();
-    render();
+    if (!confirm(`Remove ${player.name} from this Front Office? Their historical database record will be archived.`)) return;
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('remove_front_office_player_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_front_office_player_id: editingPlayerId
+      });
+      if (error) throw error;
+      playerDialog.close();
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
   function openAdjustmentDialog() {
     el('adjustmentSeason').innerHTML = state.seasons.map((s) => `<option value="${s.id}" ${s.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${seasonLabel(s.startYear)}</option>`).join('');
     el('adjustmentDescription').value = '';
@@ -1071,32 +1171,37 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     adjustmentDialog.showModal();
   }
 
-  function saveAdjustment(event) {
+  async function saveAdjustment(event) {
     event.preventDefault();
     const amount = nullableNumber(el('adjustmentAmount').value);
     if (amount === null) return;
-    state.adjustments.push({
-      id: uid(),
-      type: el('adjustmentType').value,
-      seasonId: el('adjustmentSeason').value,
-      description: el('adjustmentDescription').value.trim(),
-      amount,
-      createdAt: new Date().toISOString()
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('save_financial_adjustment_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_adjustment_type: el('adjustmentType').value,
+        p_description: el('adjustmentDescription').value.trim(),
+        p_front_office_season_id: el('adjustmentSeason').value,
+        p_amount: amount,
+        p_front_office_player_id: null,
+        p_notes: null
+      });
+      if (error) throw error;
+      adjustmentDialog.close();
+      await loadOffice(state.frontOffice.id, false);
     });
-    state.activity.unshift(activity(`Added ${el('adjustmentType').value} adjustment`));
-    saveState();
-    adjustmentDialog.close();
-    render();
   }
-
-  function deleteAdjustment(id) {
+  async function deleteAdjustment(id) {
     const a = state.adjustments.find((x) => x.id === id);
     if (!a || !confirm(`Remove adjustment “${a.description}”?`)) return;
-    state.adjustments = state.adjustments.filter((x) => x.id !== id);
-    state.activity.unshift(activity(`Removed adjustment: ${a.description}`));
-    saveState(); render();
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('delete_financial_adjustment_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_financial_adjustment_id: id
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
   function openImportDialog() {
     pendingImport = [];
     el('csvFile').value = '';
@@ -1153,43 +1258,39 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     el('applyImportBtn').disabled = valid.length === 0;
   }
 
-  function applyImport() {
+  async function applyImport() {
     const rows = pendingImport.filter((r) => r.valid);
-    let added = 0;
-    let updated = 0;
-    rows.forEach((r) => {
-      let player = state.players.find((p) => p.name.toLowerCase() === r.name.toLowerCase() && (!r.realTeam || !p.realTeam || p.realTeam === r.realTeam));
-      if (!player) {
-        player = {
-          id: uid(), name: r.name, position: r.position, realTeam: r.realTeam,
-          statusId: r.statusId, contractEndSeasonId: null, notes: '', salaries: {},
-          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-        };
-        state.players.push(player);
-        added += 1;
-      } else {
-        player.position = r.position || player.position;
-        player.realTeam = r.realTeam || player.realTeam;
-        player.statusId = r.statusId || player.statusId;
-        updated += 1;
+    if (!rows.length) return;
+    await runCloudAction(async () => {
+      for (const r of rows) {
+        const existing = state.players.find((p) => p.name.toLowerCase() === r.name.toLowerCase() && (!r.realTeam || !p.realTeam || p.realTeam === r.realTeam));
+        const salaryRows = state.seasons.map((season) => {
+          const current = existing?.salaries?.[season.id] || { salary: null, capOverride: null };
+          const incoming = r.salaries[season.id];
+          return {
+            season_id: season.id,
+            salary: incoming === null ? current.salary : incoming,
+            cap_override: current.capOverride ?? null
+          };
+        });
+        const { error } = await db.rpc('save_front_office_player_v1', {
+          p_front_office_id: state.frontOffice.id,
+          p_front_office_player_id: existing?.id || null,
+          p_player_name: r.name,
+          p_position: r.position || existing?.position || 'F',
+          p_real_team: r.realTeam || existing?.realTeam || null,
+          p_roster_status_id: r.statusId || existing?.statusId || state.statuses[0]?.id,
+          p_contract_end_season_id: existing?.contractEndSeasonId || null,
+          p_notes: existing?.notes || null,
+          p_salary_rows: salaryRows
+        });
+        if (error) throw error;
       }
-      state.seasons.forEach((season) => {
-        const incoming = r.salaries[season.id];
-        const existing = player.salaries[season.id] || { salary: null, capOverride: null };
-        player.salaries[season.id] = {
-          salary: incoming === null ? existing.salary : incoming,
-          capOverride: existing.capOverride ?? null
-        };
-      });
-      player.updatedAt = new Date().toISOString();
+      importDialog.close();
+      pendingImport = [];
+      await loadOffice(state.frontOffice.id, false);
     });
-    state.activity.unshift(activity(`CSV import applied: ${added} added, ${updated} updated`));
-    saveState();
-    importDialog.close();
-    pendingImport = [];
-    render();
   }
-
   function calculateSeason(seasonId) {
     const season = seasonById(seasonId);
     let knownRosterCap = 0;
@@ -1211,46 +1312,66 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
     return { knownRosterCap, adjustmentsTotal, knownCapUsed, capUsed, salaryCap, capSpace, complete, missingPlayerIds };
   }
 
-  function addSeason() {
+  async function addSeason() {
     const maxYear = Math.max(...state.seasons.map((s) => s.startYear));
-    state.seasons.push({ id: uid(), startYear: maxYear + 1, salaryCap: null });
-    state.players.forEach((p) => { p.salaries[state.seasons[state.seasons.length - 1].id] = { salary: null, capOverride: null }; });
-    state.activity.unshift(activity(`Added ${seasonLabel(maxYear + 1)} season`));
-    saveState(); render();
+    await runCloudAction(async () => {
+      const { error } = await db.from('front_office_seasons').insert({
+        front_office_id: state.frontOffice.id,
+        season_start_year: maxYear + 1,
+        salary_cap: null,
+        sort_order: (state.seasons.length + 1) * 10,
+        is_current: false
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
-  function removeSeason(id) {
+  async function removeSeason(id) {
     if (state.seasons.length <= 1) return;
     const season = seasonById(id);
     if (!confirm(`Remove ${seasonLabel(season.startYear)} and its salary/adjustment values?`)) return;
-    state.seasons = state.seasons.filter((s) => s.id !== id);
-    state.players.forEach((p) => { delete p.salaries[id]; if (p.contractEndSeasonId === id) p.contractEndSeasonId = null; });
-    state.adjustments = state.adjustments.filter((a) => a.seasonId !== id);
-    if (state.frontOffice.currentSeasonId === id) state.frontOffice.currentSeasonId = state.seasons[0].id;
-    state.activity.unshift(activity(`Removed ${seasonLabel(season.startYear)} season`));
-    saveState(); render();
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('remove_front_office_season_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_front_office_season_id: id
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
-  function addStatus() {
-    state.statuses.push({ id: uid(), name: 'New Status', countsTowardCap: true });
-    saveState(); render();
+  async function addStatus() {
+    const existing = new Set(state.statuses.map((s) => s.name.toLowerCase()));
+    let index = 1;
+    let name = 'New Status';
+    while (existing.has(name.toLowerCase())) name = `New Status ${++index}`;
+    await runCloudAction(async () => {
+      const { error } = await db.from('front_office_roster_statuses').insert({
+        front_office_id: state.frontOffice.id,
+        status_name: name,
+        counts_toward_cap: true,
+        sort_order: (state.statuses.length + 1) * 10,
+        is_active: true
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
-  function removeStatus(id) {
+  async function removeStatus(id) {
     const status = statusById(id);
     if (!status) return;
-    if (state.statuses.length <= 1) {
-      alert('Keep at least one roster status.');
-      return;
-    }
     if (state.players.some((p) => p.statusId === id)) {
       alert('This status is currently assigned to one or more players. Reassign them before removing it.');
       return;
     }
-    state.statuses = state.statuses.filter((s) => s.id !== id);
-    saveState(); render();
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('archive_roster_status_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_roster_status_id: id
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
-
   function visibleSeasons() {
     const sorted = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
     const current = currentSeason();
@@ -1263,12 +1384,8 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
   function statusById(id) { return state.statuses.find((s) => s.id === id); }
 
   function resetApp() {
-    if (!confirm('Reset this local prototype and delete its saved Front Office data?')) return;
-    state = emptyState();
-    localStorage.removeItem(STORAGE_KEY);
-    render();
+    showOfficePicker();
   }
-
   function exportRosterCsv() {
     if (!state.frontOffice) return;
     const sortedSeasons = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
@@ -1283,23 +1400,220 @@ tbody tr:hover { background: rgba(255,255,255,.025); }
   }
 
   function saveState() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (error) {
-      console.warn('Local persistence is unavailable in this browser context.', error);
+    // V1.3 writes live data through Supabase. Local storage is no longer the source of truth.
+  }
+  function loadState() {
+    return emptyState();
+  }
+  async function signInWithGoogle() {
+    showAuthError('');
+    setCloudStatus('Redirecting…', 'busy');
+    const { error } = await db.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: SITE_URL }
+    });
+    if (error) {
+      setCloudStatus('Auth error', 'error');
+      showAuthError(error.message);
     }
   }
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return emptyState();
-      const parsed = JSON.parse(raw);
-      if (!parsed.statuses?.length) parsed.statuses = structuredClone(DEFAULT_STATUSES);
-      return parsed;
-    } catch {
-      return emptyState();
+  async function signOut() {
+    setCloudStatus('Signing out…', 'busy');
+    const { error } = await db.auth.signOut();
+    if (error) return showAuthError(error.message);
+    session = null;
+    state = emptyState();
+    frontOfficeList = [];
+    render();
+  }
+
+  async function handleSessionChange(nextSession) {
+    session = nextSession || null;
+    if (!session?.user) {
+      state = emptyState();
+      frontOfficeList = [];
+      setCloudStatus('Signed out', '');
+      render();
+      return;
     }
+    setCloudStatus('Synced', '');
+    await loadFrontOffices();
+  }
+
+  async function loadFrontOffices() {
+    await runCloudAction(async () => {
+      const { data, error } = await db.from('front_offices')
+        .select('front_office_id,team_name,league_name,sport,currency_code,roster_limit,updated_at')
+        .eq('is_archived', false)
+        .order('updated_at', { ascending: false });
+      if (error) throw error;
+      frontOfficeList = data || [];
+      state = emptyState();
+      showOfficePicker(false);
+    }, false);
+  }
+
+  function showOfficePicker(shouldReload = true) {
+    if (!session?.user) return render();
+    state = emptyState();
+    authGate.classList.add('hidden');
+    onboarding.classList.add('hidden');
+    workspace.classList.add('hidden');
+    officePicker.classList.remove('hidden');
+    el('topbarActions').classList.remove('hidden');
+    el('userEmail').textContent = session.user.email || 'Signed in';
+    renderOfficeList();
+    if (shouldReload) loadFrontOffices();
+  }
+
+  function showCreateOffice() {
+    state = emptyState();
+    officePicker.classList.add('hidden');
+    workspace.classList.add('hidden');
+    onboarding.classList.remove('hidden');
+    el('teamName').value = '';
+    el('leagueName').value = '';
+    el('currentSeason').value = '2026-27';
+    el('salaryCap').value = '$119,600,000';
+    el('rosterLimit').value = '30';
+  }
+
+  function renderOfficeList() {
+    if (!officePicker || officePicker.classList.contains('hidden')) return;
+    const list = el('officeList');
+    if (!frontOfficeList.length) {
+      list.innerHTML = `<div class="issue-item"><p><strong>No Front Offices yet.</strong></p><span class="muted">Create your first workspace to begin.</span></div>`;
+      return;
+    }
+    list.innerHTML = frontOfficeList.map((office) => `
+      <button class="office-card" type="button" data-open-office="${office.front_office_id}">
+        <span><h3>${escapeHtml(office.team_name)}</h3><p>${escapeHtml(office.league_name)} · ${escapeHtml(office.sport)}</p></span>
+        <span class="office-open">Open →</span>
+      </button>`).join('');
+    document.querySelectorAll('[data-open-office]').forEach((button) => {
+      button.addEventListener('click', () => loadOffice(button.dataset.openOffice));
+    });
+  }
+
+  async function loadOffice(frontOfficeId, showBusy = true) {
+    if (showBusy) setCloudStatus('Loading…', 'busy');
+    const queries = await Promise.all([
+      db.from('front_offices').select('*').eq('front_office_id', frontOfficeId).single(),
+      db.from('front_office_seasons').select('*').eq('front_office_id', frontOfficeId).order('season_start_year'),
+      db.from('front_office_roster_statuses').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).order('sort_order'),
+      db.from('front_office_players').select('*').eq('front_office_id', frontOfficeId).is('archived_at', null),
+      db.from('roster_entries').select('*').eq('front_office_id', frontOfficeId).is('removed_at', null),
+      db.from('contracts').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).is('archived_at', null),
+      db.from('contract_seasons').select('*').eq('front_office_id', frontOfficeId),
+      db.from('financial_adjustments').select('*').eq('front_office_id', frontOfficeId).eq('is_active', true).is('archived_at', null),
+      db.from('financial_adjustment_seasons').select('*').eq('front_office_id', frontOfficeId)
+    ]);
+    const errorResult = queries.find((q) => q.error);
+    if (errorResult?.error) {
+      setCloudStatus('Load error', 'error');
+      alert(errorResult.error.message);
+      return;
+    }
+
+    const [officeQ,seasonsQ,statusesQ,playersQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ] = queries;
+    const office = officeQ.data;
+    const seasons = seasonsQ.data || [];
+    const statuses = statusesQ.data || [];
+    const rosterByPlayer = new Map((rosterQ.data || []).map((r) => [r.front_office_player_id, r]));
+    const contractsByPlayer = new Map((contractsQ.data || []).map((c) => [c.front_office_player_id, c]));
+    const contractSeasonGroups = new Map();
+    (contractSeasonsQ.data || []).forEach((cs) => {
+      if (!contractSeasonGroups.has(cs.contract_id)) contractSeasonGroups.set(cs.contract_id, []);
+      contractSeasonGroups.get(cs.contract_id).push(cs);
+    });
+
+    const players = (playersQ.data || []).filter((p) => rosterByPlayer.has(p.front_office_player_id)).map((p) => {
+      const roster = rosterByPlayer.get(p.front_office_player_id);
+      const contract = contractsByPlayer.get(p.front_office_player_id);
+      const salaries = {};
+      seasons.forEach((s) => { salaries[s.front_office_season_id] = { salary: null, capOverride: null }; });
+      (contractSeasonGroups.get(contract?.contract_id) || []).forEach((cs) => {
+        salaries[cs.front_office_season_id] = {
+          salary: cs.salary_amount === null ? null : Number(cs.salary_amount),
+          capOverride: cs.cap_charge_override_amount === null ? null : Number(cs.cap_charge_override_amount)
+        };
+      });
+      return {
+        id: p.front_office_player_id,
+        name: p.player_name,
+        position: p.position || 'F',
+        realTeam: p.real_team || '',
+        statusId: roster.roster_status_id,
+        contractEndSeasonId: contract?.end_season_id || null,
+        notes: contract?.notes || '',
+        salaries,
+        createdAt: p.created_at,
+        updatedAt: p.updated_at
+      };
+    });
+
+    const adjustmentById = new Map((adjustmentsQ.data || []).map((a) => [a.financial_adjustment_id, a]));
+    const adjustments = (adjustmentSeasonsQ.data || []).filter((row) => adjustmentById.has(row.financial_adjustment_id)).map((row) => {
+      const header = adjustmentById.get(row.financial_adjustment_id);
+      return {
+        id: header.financial_adjustment_id,
+        type: header.adjustment_type,
+        description: header.description,
+        seasonId: row.front_office_season_id,
+        amount: Number(row.amount),
+        createdAt: header.created_at
+      };
+    });
+
+    state = {
+      frontOffice: {
+        id: office.front_office_id,
+        teamName: office.team_name,
+        leagueName: office.league_name,
+        sport: office.sport,
+        currency: office.currency_code,
+        rosterLimit: office.roster_limit,
+        currentSeasonId: seasons.find((s) => s.is_current)?.front_office_season_id || seasons[0]?.front_office_season_id || null,
+        createdAt: office.created_at
+      },
+      seasons: seasons.map((s) => ({ id: s.front_office_season_id, startYear: s.season_start_year, salaryCap: s.salary_cap === null ? null : Number(s.salary_cap) })),
+      statuses: statuses.map((s) => ({ id: s.roster_status_id, name: s.status_name, countsTowardCap: s.counts_toward_cap })),
+      players,
+      adjustments,
+      activity: [activity('Cloud data loaded')]
+    };
+    setCloudStatus('Synced', '');
+    render();
+  }
+
+  async function runCloudAction(action, showAlerts = true) {
+    setCloudStatus('Saving…', 'busy');
+    try {
+      await action();
+      setCloudStatus('Synced', '');
+      return true;
+    } catch (error) {
+      console.error(error);
+      setCloudStatus('Save error', 'error');
+      if (showAlerts) alert(error?.message || 'Cloud save failed.');
+      return false;
+    }
+  }
+
+  function setCloudStatus(label, mode = '') {
+    const pill = el('cloudStatus');
+    if (!pill) return;
+    pill.textContent = label;
+    pill.classList.toggle('busy', mode === 'busy');
+    pill.classList.toggle('error', mode === 'error');
+  }
+
+  function showAuthError(message) {
+    const box = el('authError');
+    if (!box) return;
+    box.textContent = message || '';
+    box.classList.toggle('hidden', !message);
   }
 
   function activity(label) { return { id: uid(), label, at: new Date().toISOString() }; }
