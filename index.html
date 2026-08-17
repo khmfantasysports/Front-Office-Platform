@@ -1338,6 +1338,117 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .settings-data-actions { grid-template-columns:1fr; }
 }
 
+
+
+/* V2.5 cap scrolling + seven-season roster horizon + positional depth view */
+.cap-detail-scroll-shell,
+.cap-history-scroll-shell,
+.roster-table-scroll-shell {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.cap-horizontal-scroll,
+.roster-horizontal-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(119,201,255,.42) rgba(255,255,255,.035);
+}
+.cap-horizontal-scroll::-webkit-scrollbar,
+.roster-horizontal-scroll::-webkit-scrollbar { height: 7px; }
+.cap-horizontal-scroll::-webkit-scrollbar-track,
+.roster-horizontal-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.035); }
+.cap-horizontal-scroll::-webkit-scrollbar-thumb,
+.roster-horizontal-scroll::-webkit-scrollbar-thumb { background: rgba(119,201,255,.42); border-radius:999px; }
+.cap-detail-table-v25 { min-width: 760px; }
+.cap-detail-table-v25 thead th:first-child,
+.cap-detail-table-v25 tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: #101b25;
+  box-shadow: 1px 0 0 var(--border);
+}
+.cap-detail-table-v25 tbody td:first-child { z-index:3; background:#0d1822; }
+.cap-scroll-hint { display:none; align-items:center; justify-content:flex-end; gap:5px; color:var(--muted); font-size:.64rem; margin-bottom:4px; }
+.cap-scroll-hint .scroll-arrow { color:var(--accent); font-weight:900; }
+
+.view-switch.v25 { grid-template-columns:repeat(3,1fr); }
+.depth-panel { display:grid; gap:10px; }
+.depth-panel.hidden { display:none !important; }
+.depth-summary-strip {
+  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+  padding:8px 10px; border:1px solid var(--border); border-radius:11px; background:rgba(13,24,34,.78);
+}
+.depth-summary-pill {
+  display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border:1px solid var(--border-soft); border-radius:999px;
+  background:rgba(50,173,255,.06); color:#d7e9f6; font-size:.67rem; font-weight:800;
+}
+.depth-summary-pill strong { color:var(--text); }
+.depth-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.depth-card {
+  min-width:0; border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.82); overflow:hidden;
+}
+.depth-card-head {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 10px; border-bottom:1px solid var(--border);
+}
+.depth-card-head strong { font-size:.84rem; }
+.depth-card-count { color:var(--muted); font-size:.66rem; }
+.depth-player-list { display:grid; }
+.depth-player-row {
+  width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center;
+  padding:9px 10px; border:0; border-bottom:1px solid var(--border-soft); background:transparent; color:var(--text); text-align:left;
+}
+.depth-player-row:last-child { border-bottom:0; }
+.depth-player-row[hidden] { display:none !important; }
+.depth-player-row:hover, .depth-player-row:focus-visible { background:rgba(255,255,255,.025); outline:none; }
+.depth-player-main { min-width:0; }
+.depth-player-name { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.79rem; font-weight:800; }
+.depth-player-meta { display:block; margin-top:2px; color:var(--muted); font-size:.62rem; line-height:1.25; }
+.depth-player-finance { text-align:right; white-space:nowrap; }
+.depth-player-finance strong { display:block; font-size:.73rem; font-variant-numeric:tabular-nums; }
+.depth-player-finance span { display:block; margin-top:2px; color:var(--muted); font-size:.57rem; }
+.depth-empty { padding:14px 10px; color:var(--muted); font-size:.7rem; text-align:center; }
+.depth-card[hidden] { display:none !important; }
+
+.roster-horizon-note {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+  padding:7px 9px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(50,173,255,.035); color:var(--muted); font-size:.65rem;
+}
+.roster-horizon-note strong { color:#d8e9f5; }
+.roster-table-seven { min-width:1120px; }
+.roster-table-seven .col-salary { min-width:92px; }
+
+@media (max-width: 980px) {
+  .depth-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 720px) {
+  .cap-scroll-hint { display:flex; }
+  .cap-detail-card { min-width:0; overflow:hidden; }
+  .cap-detail-scroll-shell { width:100%; }
+  .cap-horizontal-scroll { width:100%; max-width:100%; }
+  .cap-detail-table-v25 { min-width:700px; }
+  .view-switch.v25 button { padding:6px 7px; font-size:.65rem; }
+  .depth-grid { grid-template-columns:1fr; gap:8px; }
+  .depth-card-head { padding:8px 9px; }
+  .depth-player-row { padding:8px 9px; }
+  .depth-player-name { font-size:.76rem; }
+  .roster-table-seven { min-width:1080px; }
+  .roster-horizon-note { font-size:.61rem; }
+}
+
 </style>
 </head>
 <body>
@@ -2007,7 +2118,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
 
   function renderRoster() {
-    const seasons = visibleSeasons();
+    const seasons = contractHorizonSeasons();
     const current = currentSeason();
     const positions = [...new Set(state.players.map((p) => p.position).filter(Boolean))].sort();
     const teams = [...new Set(state.players.map((p) => p.realTeam).filter(Boolean))].sort();
@@ -2024,8 +2135,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
       const eligibility = player.eligiblePositions || player.position || '—';
       const teamAge = [player.position, player.realTeam || 'No NHL team', player.ageSnapshot !== null && player.ageSnapshot !== undefined ? `Age ${player.ageSnapshot}` : null].filter(Boolean).join(' · ');
       const capLabel = capOverride !== null && capOverride !== undefined && capOverride !== salary ? `Cap ${formatMoney(capOverride)}` : null;
+      const futureEntered = seasons.slice(1).filter((season) => player.salaries?.[season.id]?.salary !== null && player.salaries?.[season.id]?.salary !== undefined).length;
+      const futureLabel = futureEntered ? `${futureEntered} future ${futureEntered === 1 ? 'year' : 'years'} entered` : 'No future salary entered';
       return `<button class="roster-list-row" data-roster-list-player="${player.id}" data-player-id="${player.id}" type="button">
-        <span class="roster-list-main"><span class="roster-list-name"><strong>${escapeHtml(player.name)}</strong>${player.fantraxId ? '<span class="source-badge">FX</span>' : ''}</span><span class="roster-list-meta"><span class="status-dot"></span>${escapeHtml(teamAge)} · ${escapeHtml(status?.name || 'Other')}</span><span class="roster-list-submeta">${escapeHtml(eligibility)} eligible · Ends ${escapeHtml(end)}</span></span>
+        <span class="roster-list-main"><span class="roster-list-name"><strong>${escapeHtml(player.name)}</strong>${player.fantraxId ? '<span class="source-badge">FX</span>' : ''}</span><span class="roster-list-meta"><span class="status-dot"></span>${escapeHtml(teamAge)} · ${escapeHtml(status?.name || 'Other')}</span><span class="roster-list-submeta">${escapeHtml(eligibility)} eligible · Ends ${escapeHtml(end)} · ${escapeHtml(futureLabel)}</span></span>
         <span class="roster-list-finance"><strong>${charge === null ? '—' : formatMoney(charge)}</strong><span>${capLabel ? escapeHtml(capLabel) : seasonLabel(current.startYear)}</span></span>
       </button>`;
     }).join('');
@@ -2040,11 +2153,41 @@ html, body { max-width: 100%; overflow-x: hidden; }
     }).join('');
     const totalCells = seasons.map((s) => `<td class="money col-salary">${formatMoney(calculateSeason(s.id).knownRosterCap)}</td>`).join('');
 
+    const depthOrder = ['C','LW','RW','F','D','G'];
+    const playerDepthTokens = (player) => {
+      const raw = `${player.eligiblePositions || ''},${player.position || ''}`.split(',').map((v) => v.trim().toUpperCase()).filter(Boolean);
+      return [...new Set(raw)];
+    };
+    const discoveredDepth = [...new Set(state.players.flatMap(playerDepthTokens))];
+    const depthPositions = [...depthOrder.filter((p) => discoveredDepth.includes(p)), ...discoveredDepth.filter((p) => !depthOrder.includes(p)).sort()];
+    const depthSummary = depthPositions.map((position) => {
+      const count = state.players.filter((player) => playerDepthTokens(player).includes(position)).length;
+      return `<span class="depth-summary-pill"><strong>${escapeHtml(position)}</strong> ${count}</span>`;
+    }).join('');
+    const depthCards = depthPositions.map((position) => {
+      const members = state.players.filter((player) => playerDepthTokens(player).includes(position)).sort((a,b) => {
+        const aPrimary = String(a.position || '').toUpperCase() === position ? 0 : 1;
+        const bPrimary = String(b.position || '').toUpperCase() === position ? 0 : 1;
+        if (aPrimary !== bPrimary) return aPrimary - bPrimary;
+        const aCharge = effectivePlayerCharge(a, current.id) ?? -1;
+        const bCharge = effectivePlayerCharge(b, current.id) ?? -1;
+        if (aCharge !== bCharge) return bCharge - aCharge;
+        return a.name.localeCompare(b.name);
+      });
+      const memberRows = members.map((player) => {
+        const status = statusById(player.statusId);
+        const charge = effectivePlayerCharge(player, current.id);
+        const isPrimary = String(player.position || '').toUpperCase() === position;
+        return `<button class="depth-player-row" data-depth-player="${player.id}" type="button"><span class="depth-player-main"><span class="depth-player-name">${escapeHtml(player.name)}</span><span class="depth-player-meta">${escapeHtml(player.realTeam || 'No NHL team')} · ${escapeHtml(status?.name || 'Other')}${isPrimary ? ' · Primary' : ' · Eligible'}</span></span><span class="depth-player-finance"><strong>${charge === null ? '—' : formatMoney(charge)}</strong><span>${seasonLabel(current.startYear)}</span></span></button>`;
+      }).join('');
+      return `<section class="depth-card" data-depth-card="${escapeAttr(position)}"><div class="depth-card-head"><strong>${escapeHtml(position)}</strong><span class="depth-card-count">${members.length} eligible</span></div><div class="depth-player-list">${memberRows || '<div class="depth-empty">No players</div>'}</div></section>`;
+    }).join('');
+
     el('rosterView').innerHTML = `
       <div class="roster-page">
         <div class="page-heading-row">
           <div><p class="eyebrow">Roster</p><h3>${state.players.length} / ${state.frontOffice.rosterLimit ?? '—'} players</h3></div>
-          <div class="view-switch" aria-label="Roster view"><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
+          <div class="view-switch v25" aria-label="Roster view"><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
         </div>
         <div class="roster-commandbar">
           <input id="rosterSearch" class="search-input" placeholder="Search players..." />
@@ -2063,12 +2206,15 @@ html, body { max-width: 100%; overflow-x: hidden; }
 
         ${state.players.length ? `<div id="rosterListShell" class="roster-list-shell ${rosterMode === 'list' ? '' : 'hidden'}"><div class="roster-list-head"><strong>Current roster</strong><span class="muted">Tap a player to edit</span></div><div id="rosterList" class="roster-list">${listRows}</div><div id="rosterNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : `<div class="empty-state"><h4>No players yet</h4><p>Add your first player manually or import a Fantrax roster.</p><div class="empty-state-actions"><button id="emptyAddPlayerBtn" class="btn btn-primary" type="button">+ Add first player</button><button id="emptyImportRosterBtn" class="btn btn-secondary" type="button">Import Fantrax</button></div></div>`}
 
-        ${state.players.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
+        ${state.players.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}"><div class="depth-summary-strip"><span class="muted">Eligible positional depth</span>${depthSummary}</div><div id="depthGrid" class="depth-grid">${depthCards}</div><div id="depthNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
+
+        ${state.players.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-horizon-note"><span><strong>Seven-season contract horizon</strong> · current season + six future years</span><span>${seasonLabel(seasons[0]?.startYear)} → ${seasonLabel(seasons[seasons.length - 1]?.startYear)}</span></div><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view all seven contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact roster-table-seven"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
         ${renderAdjustmentTable()}
       </div>`;
 
     const rerenderMode = (mode) => { rosterMode = mode; renderRoster(); };
     el('rosterListModeBtn').addEventListener('click', () => rerenderMode('list'));
+    el('rosterDepthModeBtn').addEventListener('click', () => rerenderMode('depth'));
     el('rosterGridModeBtn').addEventListener('click', () => rerenderMode('grid'));
     el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());
     el('importRosterBtn').addEventListener('click', () => { closeRosterMenus(); openImportDialog(); });
@@ -2076,6 +2222,7 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('rosterExportBtn').addEventListener('click', () => { closeRosterMenus(); exportRosterCsv(); });
     document.querySelectorAll('[data-roster-list-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.rosterListPlayer)));
     document.querySelectorAll('[data-edit-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.editPlayer)));
+    document.querySelectorAll('[data-depth-player]').forEach((button) => button.addEventListener('click', () => openPlayerDialog(button.dataset.depthPlayer)));
     if (el('emptyAddPlayerBtn')) el('emptyAddPlayerBtn').addEventListener('click', () => openPlayerDialog());
     if (el('emptyImportRosterBtn')) el('emptyImportRosterBtn').addEventListener('click', openImportDialog);
     if (el('emptyAddAdjustmentBtn')) el('emptyAddAdjustmentBtn').addEventListener('click', openAdjustmentDialog);
@@ -2093,9 +2240,8 @@ html, body { max-width: 100%; overflow-x: hidden; }
     applyRosterFilters();
   }
 
-
   function renderAdjustmentTable() {
-    const seasons = visibleSeasons();
+    const seasons = contractHorizonSeasons();
     const rows = state.adjustments.map((a) => {
       const cells = seasons.map((s) => `<td class="money">${a.seasonId === s.id ? formatMoney(a.amount) : '—'}</td>`).join('');
       return `<tr><td>${escapeHtml(a.description)}</td><td>${escapeHtml(a.type)}</td>${cells}<td><button class="btn btn-ghost btn-small" data-delete-adjustment="${a.id}" type="button">Remove</button></td></tr>`;
@@ -2113,12 +2259,17 @@ html, body { max-width: 100%; overflow-x: hidden; }
     const allowed = new Set(filteredRosterPlayers(search).map((p) => p.id));
     document.querySelectorAll('[data-roster-list-player]').forEach((row) => { row.hidden = !allowed.has(row.dataset.rosterListPlayer); });
     document.querySelectorAll('[data-player-grid-row]').forEach((row) => { row.hidden = !allowed.has(row.dataset.playerGridRow); });
+    document.querySelectorAll('[data-depth-player]').forEach((row) => { row.hidden = !allowed.has(row.dataset.depthPlayer); });
+    document.querySelectorAll('[data-depth-card]').forEach((card) => {
+      const visibleRows = [...card.querySelectorAll('[data-depth-player]')].filter((row) => !row.hidden);
+      card.hidden = visibleRows.length === 0;
+    });
     const shown = allowed.size;
     if (el('rosterResultCount')) el('rosterResultCount').textContent = `${shown} shown`;
     if (el('rosterNoMatches')) el('rosterNoMatches').classList.toggle('hidden', shown !== 0);
     if (el('gridNoMatches')) el('gridNoMatches').classList.toggle('hidden', shown !== 0);
+    if (el('depthNoMatches')) el('depthNoMatches').classList.toggle('hidden', shown !== 0);
   }
-
 
 
   function renderCap() {
@@ -2134,11 +2285,10 @@ html, body { max-width: 100%; overflow-x: hidden; }
     el('capView').innerHTML = `<div class="cap-page">
       <div class="page-heading-row"><div><p class="eyebrow">Financials</p><h3>${seasonLabel(activeSeason.startYear)} cap position</h3></div></div>
       ${renderCapVisuals()}
-      <div class="cap-detail-card"><p class="eyebrow">Details</p><h3>Seven-season cap table</h3><div class="table-wrap"><table class="cap-detail-table"><thead><tr><th>Season</th><th>Cap</th><th>Players</th><th>Adjustments</th><th>Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div></div>
-      <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="table-wrap"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
+      <div class="cap-detail-card"><p class="eyebrow">Details</p><h3>Seven-season cap table</h3><div class="cap-scroll-hint" aria-hidden="true">Swipe for full financial detail <span class="scroll-arrow">→</span></div><div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll" role="region" aria-label="Seven-season cap table. Swipe horizontally to view all financial columns." tabindex="0"><table class="cap-detail-table cap-detail-table-v25"><thead><tr><th>Season</th><th>Cap</th><th>Players</th><th>Adjustments</th><th>Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>
+      <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="cap-history-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
     </div>`;
   }
-
 
 
   function renderSettings() {
