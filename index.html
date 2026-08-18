@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.28" />
+  <meta name="application-name" content="Fantasy Front Office v2.29" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/shell.css" />
   <link rel="stylesheet" href="./css/workspace.css" />
@@ -40,8 +40,12 @@
           <summary aria-label="Workspace menu" title="Workspace menu">•••</summary>
           <div class="utility-menu-popover">
             <span id="userEmail" class="user-email"></span>
+            <span class="utility-menu-section-label">Front Office</span>
             <button id="backToOfficesBtn" class="btn btn-ghost" type="button">My Front Offices</button>
             <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
+            <button id="deleteFrontOfficeBtn" class="btn btn-danger hidden" type="button">Delete Front Office</button>
+            <div class="utility-menu-divider"></div>
+            <span class="utility-menu-section-label">Account</span>
             <button id="signOutBtn" class="btn btn-ghost" type="button">Sign out</button>
           </div>
         </details>
