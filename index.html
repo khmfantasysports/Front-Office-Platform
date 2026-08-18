@@ -2547,6 +2547,52 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .cap-detail-table-v221 { min-width:790px; }
 }
 
+
+
+/* V2.22 smart transaction workflow + configurable penalty rules */
+.transaction-smart-note {
+  padding:10px 11px; border:1px solid var(--border); border-radius:11px;
+  background:rgba(50,173,255,.045); color:var(--muted); font-size:.72rem; line-height:1.4;
+}
+.transaction-player-snapshot {
+  display:grid; gap:9px; padding:11px; border:1px solid var(--border); border-radius:12px; background:#0b151e;
+}
+.transaction-player-snapshot.hidden { display:none !important; }
+.transaction-player-snapshot-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.transaction-player-snapshot-head strong { display:block; font-size:.88rem; }
+.transaction-player-snapshot-head span { display:block; margin-top:2px; color:var(--muted); font-size:.66rem; }
+.transaction-player-snapshot-badge { flex:0 0 auto; padding:4px 7px; border:1px solid var(--border); border-radius:999px; color:var(--accent); font-size:.61rem; font-weight:850; }
+.transaction-salary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+.transaction-salary-cell { min-width:0; padding:7px 8px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(255,255,255,.018); }
+.transaction-salary-cell span { display:block; color:var(--muted); font-size:.56rem; white-space:nowrap; }
+.transaction-salary-cell strong { display:block; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.72rem; font-variant-numeric:tabular-nums; }
+.transaction-salary-cell small { display:block; margin-top:2px; color:var(--accent); font-size:.54rem; white-space:nowrap; }
+.transaction-rule-preview {
+  display:grid; gap:8px; margin-top:10px; padding:10px 11px; border:1px solid rgba(242,198,109,.30); border-radius:11px; background:rgba(242,198,109,.055);
+}
+.transaction-rule-preview-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.transaction-rule-preview-head strong { display:block; font-size:.78rem; }
+.transaction-rule-preview-head span { display:block; margin-top:2px; color:var(--muted); font-size:.64rem; line-height:1.35; }
+.transaction-rule-preview .btn { flex:0 0 auto; }
+.transaction-financial-section.hidden { display:none !important; }
+.transaction-manual-financial-fields.hidden { display:none !important; }
+.transaction-rule-settings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+.transaction-rule-card { display:grid; gap:9px; padding:11px; border:1px solid var(--border); border-radius:11px; background:#0b151e; }
+.transaction-rule-card h4 { margin:0; font-size:.82rem; }
+.transaction-rule-card p { margin:0; color:var(--muted); font-size:.64rem; line-height:1.35; }
+.transaction-rule-card label { display:grid; gap:5px; color:var(--muted); font-size:.68rem; font-weight:700; }
+.transaction-rule-card input, .transaction-rule-card select { min-height:38px; padding:7px 9px; }
+.transaction-rule-value-wrap.hidden { display:none !important; }
+.transaction-rules-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+.transaction-rules-footer span { color:var(--muted); font-size:.64rem; line-height:1.35; }
+.transaction-rules-footer .btn { flex:0 0 auto; }
+@media (max-width:720px) {
+  .transaction-salary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .transaction-rule-settings { grid-template-columns:1fr; }
+  .transaction-rules-footer { align-items:flex-start; flex-direction:column; }
+  .transaction-rules-footer .btn { width:100%; }
+}
+
 </style>
 </head>
 <body>
@@ -2934,20 +2980,36 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         <div class="form-grid compact">
           <label>Type<select id="transactionType"><option>Trade</option><option>Signing</option><option>Extension</option><option>Call Up</option><option>Send Down</option><option>Waiver</option><option>Buyout</option><option>Release</option><option>Add</option><option>Drop</option><option>Other</option></select></label>
           <label>Date<input id="transactionDate" type="date" /></label>
-          <label class="full-width">Counterparty / team<input id="transactionCounterparty" placeholder="Optional" /></label>
-          <label class="full-width">Summary<input id="transactionSummary" required placeholder="Acquired Player A for 2028 1st" /></label>
-          <label>Linked player<select id="transactionPlayer"><option value="">None</option></select></label>
-          <label>Roster action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to minors</option><option value="REMOVE">Remove from roster</option></select></label>
-          <label>Roster status after move<select id="transactionRosterStatus"><option value="">Keep current status</option></select></label>
-          <label class="full-width">Incoming items<textarea id="transactionIncoming" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
-          <label class="full-width">Outgoing items<textarea id="transactionOutgoing" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
+          <div id="transactionTypeHelp" class="transaction-smart-note full-width"></div>
+          <label id="transactionCounterpartyField" class="full-width">Counterparty / team<input id="transactionCounterparty" placeholder="Optional" /></label>
+          <label id="transactionPlayerField">Player<select id="transactionPlayer"><option value="">None</option></select></label>
+          <label id="transactionRosterActionField">Selected player action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to minors</option><option value="REMOVE">Remove from roster</option></select></label>
+          <label id="transactionRosterStatusField">Roster status after move<select id="transactionRosterStatus"><option value="">Keep current status</option></select></label>
+          <label id="transactionSummaryField" class="full-width">Summary<input id="transactionSummary" required placeholder="Transaction summary" /></label>
+          <label id="transactionIncomingField" class="full-width">Incoming items<textarea id="transactionIncoming" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
+          <label id="transactionOutgoingField" class="full-width">Outgoing items<textarea id="transactionOutgoing" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
           <label class="full-width">Notes<textarea id="transactionNotes" rows="2" placeholder="Optional transaction notes"></textarea></label>
         </div>
-        <section class="transaction-financial-section">
-          <div><p class="eyebrow">Cap consequence</p><h4>Optional financial impact</h4><p class="muted">Use this for buyout penalties, retained salary, cap credits or other transaction-generated adjustments.</p></div>
-          <div class="form-grid compact">
-            <label>Adjustment type<select id="transactionAdjustmentType"><option value="Dead Cap">Dead Cap</option><option value="Retained Salary">Retained Salary</option><option value="Bonus/Penalty">Bonus/Penalty</option><option value="Cap Credit">Cap Credit</option><option value="Other">Other</option></select></label>
-            <label>Description<input id="transactionAdjustmentDescription" placeholder="e.g. Buyout penalty" /></label>
+
+        <section id="transactionPlayerSnapshot" class="transaction-player-snapshot hidden" aria-live="polite">
+          <div class="transaction-player-snapshot-head">
+            <div><strong id="transactionPlayerSnapshotName"></strong><span id="transactionPlayerSnapshotMeta"></span></div>
+            <span id="transactionPlayerSnapshotEnd" class="transaction-player-snapshot-badge"></span>
+          </div>
+          <div id="transactionSalaryGrid" class="transaction-salary-grid"></div>
+        </section>
+
+        <section id="transactionFinancialSection" class="transaction-financial-section hidden">
+          <div><p class="eyebrow">Cap consequence</p><h4 id="transactionFinancialTitle">Financial impact</h4><p id="transactionFinancialCopy" class="muted"></p></div>
+          <div id="transactionRulePreview" class="transaction-rule-preview hidden">
+            <div class="transaction-rule-preview-head">
+              <div><strong id="transactionRulePreviewTitle">Calculated from Settings</strong><span id="transactionRulePreviewCopy"></span></div>
+              <button id="recalculateTransactionPenaltyBtn" class="btn btn-secondary btn-small" type="button">Recalculate</button>
+            </div>
+          </div>
+          <div id="transactionManualFinancialFields" class="form-grid compact transaction-manual-financial-fields">
+            <label>Adjustment type<select id="transactionAdjustmentType"><option value="Dead Cap">Dead Cap</option><option value="Waiver Penalty">Waiver Penalty</option><option value="Retained Salary">Retained Salary</option><option value="Bonus/Penalty">Bonus/Penalty</option><option value="Cap Credit">Cap Credit</option><option value="Other">Other</option></select></label>
+            <label>Description<input id="transactionAdjustmentDescription" placeholder="Financial consequence" /></label>
           </div>
           <div id="transactionFinancialGrid" class="transaction-financial-grid"></div>
         </section>
@@ -2972,7 +3034,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  const APP_VERSION = '2.7';
+  const APP_VERSION = '2.22';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
@@ -2989,6 +3051,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   let depthEditMode = false;
   let depthDraftOrder = [];
   let depthSaving = false;
+  let transactionSummaryTouched = false;
 
   const el = (id) => document.getElementById(id);
   const authGate = el('authGate');
@@ -3078,6 +3141,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('closeTransactionDialog').addEventListener('click', () => transactionDialog.close());
     el('cancelTransactionBtn').addEventListener('click', () => transactionDialog.close());
     el('transactionForm').addEventListener('submit', saveTransactionFromDialog);
+    el('transactionType').addEventListener('change', handleTransactionTypeChange);
+    el('transactionPlayer').addEventListener('change', handleTransactionPlayerChange);
+    el('transactionRosterAction').addEventListener('change', updateTransactionRosterStatusVisibility);
+    el('transactionSummary').addEventListener('input', () => { transactionSummaryTouched = true; });
+    el('recalculateTransactionPenaltyBtn').addEventListener('click', applyAutomaticTransactionPenalty);
 
     el('closeAssetDialog').addEventListener('click', () => assetDialog.close());
     el('cancelAssetBtn').addEventListener('click', () => assetDialog.close());
@@ -3890,7 +3958,211 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('recordTransactionBtn').addEventListener('click', openTransactionDialog);
   }
 
+  function transactionTypeConfig(type) {
+    const configs = {
+      'Trade': { help:'Record the counterparty, assets moving in/out and any retained salary or other cap consequence.', player:'optional', counterparty:true, flow:true, rosterAction:true, summary:true, financial:'manual' },
+      'Signing': { help:'Record a signing. Salary and contract terms should be maintained on the player record.', player:'optional', summary:true },
+      'Extension': { help:'Choose the player being extended. Their current contract salary appears below for reference.', player:'required', autoSummary:true },
+      'Call Up': { help:'Choose a prospect currently in Minors. The roster move is handled automatically.', player:'required', rosterStatus:true, autoSummary:true, action:'CALL_UP' },
+      'Send Down': { help:'Choose an active prospect. The player will be moved to Minors automatically.', player:'required', rosterStatus:true, autoSummary:true, action:'SEND_TO_FARM' },
+      'Waiver': { help:'Choose the player being waived. The saved waiver rule can calculate the cap penalty automatically.', player:'required', autoSummary:true, action:'REMOVE', financial:'waiver' },
+      'Buyout': { help:'Choose the player being bought out. Remaining salary is shown and your saved buyout rule calculates the proposed dead cap.', player:'required', autoSummary:true, action:'REMOVE', financial:'buyout' },
+      'Release': { help:'Choose the player being released. This removes the player from the current roster.', player:'required', autoSummary:true, action:'REMOVE' },
+      'Drop': { help:'Choose the player being dropped. This removes the player from the current roster.', player:'required', autoSummary:true, action:'REMOVE' },
+      'Add': { help:'Record an addition to the ledger. Use Add Player on Roster or Minors to create the player record.', summary:true },
+      'Other': { help:'Use the general transaction form for a custom league event.', player:'optional', counterparty:true, flow:true, rosterAction:true, summary:true, financial:'manual' }
+    };
+    return configs[type] || { help:'Record this front-office move.', summary:true };
+  }
+
+  function transactionPlayerCandidates(type) {
+    if (type === 'Call Up') return state.players.filter((player) => player.isProspect && player.rosterGroup === 'FARM');
+    if (type === 'Send Down') return state.players.filter((player) => player.isProspect && player.rosterGroup !== 'FARM');
+    return [...state.players];
+  }
+
+  function transactionRuleForType(type) {
+    if (type === 'Waiver') return {
+      label:'Waiver',
+      mode:state.frontOffice.waiverPenaltyMode || 'NONE',
+      value:state.frontOffice.waiverPenaltyValue,
+      scope:state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON'
+    };
+    if (type === 'Buyout') return {
+      label:'Buyout',
+      mode:state.frontOffice.buyoutPenaltyMode || 'NONE',
+      value:state.frontOffice.buyoutPenaltyValue,
+      scope:state.frontOffice.buyoutPenaltyScope || 'REMAINING_CONTRACT'
+    };
+    return null;
+  }
+
+  function transactionRuleModeLabel(mode, value) {
+    if (mode === 'FULL_SALARY') return 'Full salary (100%)';
+    if (mode === 'HALF_SALARY') return 'Half salary (50%)';
+    if (mode === 'CUSTOM_PERCENT') return `${Number(value || 0).toLocaleString(undefined,{maximumFractionDigits:2})}% of salary`;
+    if (mode === 'FLAT_AMOUNT') return `${formatMoney(Number(value || 0))} per affected season`;
+    return 'No automatic penalty';
+  }
+
+  function transactionRuleScopeLabel(scope) {
+    return scope === 'REMAINING_CONTRACT' ? 'remaining contracted salary years' : 'current season only';
+  }
+
+  function transactionPlayerSalaryRows(player) {
+    if (!player) return [];
+    const endSeason = player.contractEndSeasonId ? seasonById(player.contractEndSeasonId) : null;
+    return contractHorizonSeasons().map((season) => {
+      const salaryRow = player.salaries?.[season.id] || {};
+      return {
+        season,
+        salary:salaryRow.salary ?? null,
+        capOverride:salaryRow.capOverride ?? null,
+        insideContract:!endSeason || season.startYear <= endSeason.startYear
+      };
+    });
+  }
+
+  function renderTransactionPlayerSnapshot() {
+    const player = state.players.find((item) => item.id === el('transactionPlayer').value);
+    const box = el('transactionPlayerSnapshot');
+    if (!player) {
+      box.classList.add('hidden');
+      return;
+    }
+    const status = statusById(player.statusId);
+    el('transactionPlayerSnapshotName').textContent = player.name;
+    el('transactionPlayerSnapshotMeta').textContent = [player.position, player.realTeam || 'No NHL team', status?.name || 'Other', player.rosterGroup === 'FARM' ? 'Minors' : 'Active roster'].filter(Boolean).join(' · ');
+    el('transactionPlayerSnapshotEnd').textContent = player.contractEndSeasonId ? `Ends ${seasonLabel(seasonById(player.contractEndSeasonId)?.startYear)}` : 'No end set';
+    const rows = transactionPlayerSalaryRows(player).filter((row) => row.salary !== null || row.capOverride !== null);
+    el('transactionSalaryGrid').innerHTML = rows.length ? rows.map((row) => {
+      const salaryLabel = row.salary === null ? 'Salary —' : formatMoney(row.salary);
+      const override = row.capOverride !== null && row.capOverride !== row.salary ? `<small>Cap ${formatMoney(row.capOverride)}</small>` : '';
+      return `<div class="transaction-salary-cell"><span>${seasonLabel(row.season.startYear)}</span><strong>${salaryLabel}</strong>${override}</div>`;
+    }).join('') : '<div class="transaction-smart-note" style="grid-column:1/-1">No salary has been entered for this player yet.</div>';
+    box.classList.remove('hidden');
+  }
+
+  function autoTransactionSummary() {
+    if (transactionSummaryTouched) return;
+    const type = el('transactionType').value;
+    const player = state.players.find((item) => item.id === el('transactionPlayer').value);
+    if (!player) return;
+    const summaries = {
+      'Signing':`Signed ${player.name}`,
+      'Extension':`Extended ${player.name}`,
+      'Call Up':`Called up ${player.name}`,
+      'Send Down':`Sent ${player.name} to Minors`,
+      'Waiver':`Waived ${player.name}`,
+      'Buyout':`Bought out ${player.name}`,
+      'Release':`Released ${player.name}`,
+      'Drop':`Dropped ${player.name}`
+    };
+    if (summaries[type]) el('transactionSummary').value = summaries[type];
+  }
+
+  function updateTransactionRosterStatusVisibility() {
+    const config = transactionTypeConfig(el('transactionType').value);
+    const action = el('transactionRosterAction').value;
+    const show = Boolean(config.rosterStatus || (config.rosterAction && ['CALL_UP','SEND_TO_FARM'].includes(action)));
+    el('transactionRosterStatusField').classList.toggle('hidden', !show);
+  }
+
+  function renderTransactionFinancialMode() {
+    const type = el('transactionType').value;
+    const config = transactionTypeConfig(type);
+    const section = el('transactionFinancialSection');
+    if (!config.financial) {
+      section.classList.add('hidden');
+      return;
+    }
+    section.classList.remove('hidden');
+    const automatic = config.financial === 'waiver' || config.financial === 'buyout';
+    el('transactionRulePreview').classList.toggle('hidden', !automatic);
+    el('transactionManualFinancialFields').classList.toggle('hidden', automatic);
+    if (automatic) {
+      const rule = transactionRuleForType(type);
+      el('transactionFinancialTitle').textContent = `${type} penalty`;
+      el('transactionFinancialCopy').textContent = 'Calculated from the selected player salary and your Transaction Rules. You can override any season before saving.';
+      el('transactionRulePreviewTitle').textContent = `${type} rule from Settings`;
+      el('transactionRulePreviewCopy').textContent = `${transactionRuleModeLabel(rule.mode, rule.value)} · ${transactionRuleScopeLabel(rule.scope)}.`;
+      el('transactionAdjustmentType').value = type === 'Buyout' ? 'Dead Cap' : 'Waiver Penalty';
+      const player = state.players.find((item) => item.id === el('transactionPlayer').value);
+      el('transactionAdjustmentDescription').value = player ? `${player.name} ${type.toLowerCase()} penalty` : `${type} penalty`;
+    } else {
+      el('transactionFinancialTitle').textContent = 'Optional financial impact';
+      el('transactionFinancialCopy').textContent = 'Enter retained salary, cap credits or another transaction-generated adjustment when applicable.';
+      if (type === 'Trade') el('transactionAdjustmentType').value = 'Retained Salary';
+    }
+  }
+
+  function automaticPenaltyRows(type, player) {
+    const rule = transactionRuleForType(type);
+    if (!rule || !player || rule.mode === 'NONE') return [];
+    let candidates = transactionPlayerSalaryRows(player);
+    if (rule.scope === 'CURRENT_SEASON') candidates = candidates.filter((row) => row.season.id === currentSeason().id);
+    else candidates = candidates.filter((row) => row.insideContract && row.salary !== null);
+    return candidates.map((row) => {
+      const salary = Number(row.salary || 0);
+      let amount = 0;
+      if (rule.mode === 'FULL_SALARY') amount = salary;
+      else if (rule.mode === 'HALF_SALARY') amount = salary * 0.5;
+      else if (rule.mode === 'CUSTOM_PERCENT') amount = salary * (Number(rule.value || 0) / 100);
+      else if (rule.mode === 'FLAT_AMOUNT') amount = Number(rule.value || 0);
+      return { seasonId:row.season.id, amount:Math.round(amount * 100) / 100 };
+    }).filter((row) => row.amount !== 0);
+  }
+
+  function applyAutomaticTransactionPenalty() {
+    const type = el('transactionType').value;
+    if (!['Waiver','Buyout'].includes(type)) return;
+    const player = state.players.find((item) => item.id === el('transactionPlayer').value);
+    document.querySelectorAll('[data-transaction-adjustment-season]').forEach((input) => { input.value = ''; });
+    const rule = transactionRuleForType(type);
+    if (!player || !rule || rule.mode === 'NONE') return;
+    automaticPenaltyRows(type, player).forEach((row) => {
+      const input = document.querySelector(`[data-transaction-adjustment-season="${row.seasonId}"]`);
+      if (input) input.value = String(row.amount);
+    });
+  }
+
+  function handleTransactionPlayerChange() {
+    renderTransactionPlayerSnapshot();
+    autoTransactionSummary();
+    renderTransactionFinancialMode();
+    applyAutomaticTransactionPenalty();
+  }
+
+  function handleTransactionTypeChange() {
+    const type = el('transactionType').value;
+    const config = transactionTypeConfig(type);
+    document.querySelectorAll('[data-transaction-adjustment-season]').forEach((input) => { input.value = ''; });
+    if (config.autoSummary) transactionSummaryTouched = false;
+    else if (!transactionSummaryTouched) el('transactionSummary').value = '';
+    if (config.financial === 'manual') el('transactionAdjustmentDescription').value = '';
+    el('transactionTypeHelp').textContent = config.help;
+    el('transactionCounterpartyField').classList.toggle('hidden', !config.counterparty);
+    el('transactionPlayerField').classList.toggle('hidden', !config.player);
+    el('transactionRosterActionField').classList.toggle('hidden', !config.rosterAction);
+    el('transactionSummaryField').classList.toggle('hidden', Boolean(config.autoSummary));
+    el('transactionIncomingField').classList.toggle('hidden', !config.flow);
+    el('transactionOutgoingField').classList.toggle('hidden', !config.flow);
+    el('transactionRosterAction').value = config.action || 'NONE';
+
+    const currentPlayerId = el('transactionPlayer').value;
+    const candidates = transactionPlayerCandidates(type);
+    el('transactionPlayer').innerHTML = `<option value="">${config.player === 'required' ? 'Select player…' : 'None'}</option>${candidates.map((player) => `<option value="${player.id}" ${player.id === currentPlayerId ? 'selected' : ''}>${escapeHtml(player.name)}${player.isProspect ? ' · Prospect' : ''}${player.rosterGroup === 'FARM' ? ' · Minors' : ''}</option>`).join('')}`;
+    el('transactionPlayer').required = config.player === 'required';
+    if (config.player === 'required' && !el('transactionPlayer').value && candidates.length === 1) el('transactionPlayer').value = candidates[0].id;
+    updateTransactionRosterStatusVisibility();
+    renderTransactionPlayerSnapshot();
+    renderTransactionFinancialMode();
+    autoTransactionSummary();
+    applyAutomaticTransactionPenalty();
+  }
+
   function openTransactionDialog(options = {}) {
+    transactionSummaryTouched = Boolean(options.summary);
     el('transactionType').value = options.type || 'Trade';
     el('transactionDate').value = options.date || todayIsoDate();
     el('transactionCounterparty').value = options.counterparty || '';
@@ -3901,9 +4173,13 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionRosterAction').value = options.rosterAction || 'NONE';
     el('transactionAdjustmentType').value = options.adjustmentType || 'Dead Cap';
     el('transactionAdjustmentDescription').value = options.adjustmentDescription || '';
-    el('transactionPlayer').innerHTML = `<option value="">None</option>${state.players.map((player) => `<option value="${player.id}" ${options.playerId === player.id ? 'selected' : ''}>${escapeHtml(player.name)}${player.isProspect ? ' · Prospect' : ''}</option>`).join('')}`;
     el('transactionRosterStatus').innerHTML = `<option value="">Keep current status</option>${state.statuses.map((status) => `<option value="${status.id}">${escapeHtml(status.name)}</option>`).join('')}`;
     el('transactionFinancialGrid').innerHTML = contractHorizonSeasons().map((season) => `<label><span>${seasonLabel(season.startYear)}</span><input data-transaction-adjustment-season="${season.id}" type="number" step="1" placeholder="0" /></label>`).join('');
+    handleTransactionTypeChange();
+    if (options.playerId) {
+      el('transactionPlayer').value = options.playerId;
+      handleTransactionPlayerChange();
+    }
     transactionDialog.showModal();
   }
 
@@ -3911,29 +4187,36 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     event.preventDefault();
     const button = el('saveTransactionBtn');
     if (button.disabled) return;
+    const type = el('transactionType').value;
+    const config = transactionTypeConfig(type);
+    const playerId = el('transactionPlayer').value || null;
+    if (config.player === 'required' && !playerId) { alert('Choose a player for this transaction.'); return; }
+    autoTransactionSummary();
     const summary = el('transactionSummary').value.trim();
-    if (!summary) return;
-    const rows = [...document.querySelectorAll('[data-transaction-adjustment-season]')].map((input) => ({ season_id: input.dataset.transactionAdjustmentSeason, amount: nullableNumber(input.value) })).filter((row) => row.amount !== null);
+    if (!summary) { alert('A transaction summary is required.'); return; }
+    const financialVisible = !el('transactionFinancialSection').classList.contains('hidden');
+    const rows = financialVisible ? [...document.querySelectorAll('[data-transaction-adjustment-season]')].map((input) => ({ season_id: input.dataset.transactionAdjustmentSeason, amount: nullableNumber(input.value) })).filter((row) => row.amount !== null && row.amount !== 0) : [];
     button.disabled = true;
     button.textContent = 'Saving…';
     try {
-      const incoming = el('transactionIncoming').value.split(/\n+/).map((value) => value.trim()).filter(Boolean);
-      const outgoing = el('transactionOutgoing').value.split(/\n+/).map((value) => value.trim()).filter(Boolean);
+      const incoming = config.flow ? el('transactionIncoming').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
+      const outgoing = config.flow ? el('transactionOutgoing').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
+      const rosterAction = config.action || (config.rosterAction ? el('transactionRosterAction').value : 'NONE');
       const success = await runCloudAction(async () => {
         const { error } = await db.rpc('record_front_office_transaction_v1', {
           p_front_office_id: state.frontOffice.id,
-          p_transaction_type: el('transactionType').value,
+          p_transaction_type: type,
           p_transaction_date: el('transactionDate').value || todayIsoDate(),
-          p_counterparty: el('transactionCounterparty').value.trim() || null,
+          p_counterparty: config.counterparty ? (el('transactionCounterparty').value.trim() || null) : null,
           p_summary: summary,
           p_notes: el('transactionNotes').value.trim() || null,
           p_in_items: incoming,
           p_out_items: outgoing,
-          p_front_office_player_id: el('transactionPlayer').value || null,
-          p_roster_action: el('transactionRosterAction').value,
-          p_roster_status_id: el('transactionRosterStatus').value || null,
+          p_front_office_player_id: playerId,
+          p_roster_action: rosterAction,
+          p_roster_status_id: !el('transactionRosterStatusField').classList.contains('hidden') ? (el('transactionRosterStatus').value || null) : null,
           p_adjustment_type: rows.length ? el('transactionAdjustmentType').value : null,
-          p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${el('transactionType').value} cap adjustment`) : null,
+          p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${type} cap adjustment`) : null,
           p_adjustment_rows: rows
         });
         if (error) throw error;
@@ -4002,8 +4285,32 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       <details class="settings-disclosure" open><summary><span class="settings-disclosure-title"><strong>Team & League</strong><span>Name, roster limit and currency</span></span></summary><div class="settings-disclosure-body"><div class="settings-fields"><label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label><label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label><label>Roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label><label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label></div><div class="settings-context-strip"><div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div><div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div></div></div></details>
       <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span></summary><div class="settings-disclosure-body"><div class="settings-card-head"><p class="settings-card-copy">Configure which roster statuses count against the cap.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div><div class="status-settings-list">${statusSettings}</div></div></details>
       <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Salary Caps</strong><span>Current + six future seasons</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p><div class="cap-settings-list">${seasonSettings}</div></div></details>
+      <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Transaction Rules</strong><span>Automate waiver and buyout penalties</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">These are league settings, not NHL rules. Choose how your league handles each penalty. Full Salary and Half Salary are included as quick options.</p><div class="transaction-rule-settings">
+        <div class="transaction-rule-card"><div><h4>Waiver penalty</h4><p>Applied automatically when you record a Waiver transaction.</p></div><label>Penalty method<select id="waiverPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="waiverPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="waiverPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="waiverPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
+        <div class="transaction-rule-card"><div><h4>Buyout penalty</h4><p>Applied automatically when you record a Buyout transaction.</p></div><label>Penalty method<select id="buyoutPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="buyoutPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="buyoutPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="buyoutPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
+      </div><div class="transaction-rules-footer"><span>For Custom Percentage, enter 0–100. For Flat Amount, enter the dollar penalty per affected season.</span><button id="saveTransactionRulesBtn" class="btn btn-primary btn-small" type="button">Save Transaction Rules</button></div></div></details>
       <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Fantrax import and portable backups</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Fantrax imports can refresh roster identity and current salary without touching future contracts.</p><div class="settings-data-actions"><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div></div></details>
     </div>`;
+
+    el('waiverPenaltyMode').value = state.frontOffice.waiverPenaltyMode || 'NONE';
+    el('waiverPenaltyScope').value = state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON';
+    el('waiverPenaltyValue').value = state.frontOffice.waiverPenaltyValue ?? '';
+    el('buyoutPenaltyMode').value = state.frontOffice.buyoutPenaltyMode || 'NONE';
+    el('buyoutPenaltyScope').value = state.frontOffice.buyoutPenaltyScope || 'REMAINING_CONTRACT';
+    el('buyoutPenaltyValue').value = state.frontOffice.buyoutPenaltyValue ?? '';
+    const updatePenaltyValueVisibility = () => {
+      ['waiver','buyout'].forEach((prefix) => {
+        const mode = el(`${prefix}PenaltyMode`).value;
+        const wrap = el(`${prefix}PenaltyValueWrap`);
+        wrap.classList.toggle('hidden', !['CUSTOM_PERCENT','FLAT_AMOUNT'].includes(mode));
+        const input = el(`${prefix}PenaltyValue`);
+        input.placeholder = mode === 'CUSTOM_PERCENT' ? 'e.g. 50' : 'e.g. 2000000';
+      });
+    };
+    el('waiverPenaltyMode').addEventListener('change', updatePenaltyValueVisibility);
+    el('buyoutPenaltyMode').addEventListener('change', updatePenaltyValueVisibility);
+    updatePenaltyValueVisibility();
+    el('saveTransactionRulesBtn').addEventListener('click', saveTransactionRuleSettings);
 
     document.querySelectorAll('[data-office-team]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim() || state.frontOffice.teamName; await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ team_name:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.teamName = value; }); render(); }));
     document.querySelectorAll('[data-office-league]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim() || state.frontOffice.leagueName; await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ league_name:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.leagueName = value; }); render(); }));
@@ -4016,6 +4323,49 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('addStatusBtn').addEventListener('click', addStatus);
     el('settingsImportBtn').addEventListener('click', openImportDialog);
     el('settingsExportBtn').addEventListener('click', exportRosterCsv);
+  }
+
+  async function saveTransactionRuleSettings() {
+    const waiverMode = el('waiverPenaltyMode').value;
+    const waiverScope = el('waiverPenaltyScope').value;
+    const waiverValue = ['CUSTOM_PERCENT','FLAT_AMOUNT'].includes(waiverMode) ? nullableNumber(el('waiverPenaltyValue').value) : null;
+    const buyoutMode = el('buyoutPenaltyMode').value;
+    const buyoutScope = el('buyoutPenaltyScope').value;
+    const buyoutValue = ['CUSTOM_PERCENT','FLAT_AMOUNT'].includes(buyoutMode) ? nullableNumber(el('buyoutPenaltyValue').value) : null;
+    if (waiverMode === 'CUSTOM_PERCENT' && (waiverValue === null || waiverValue < 0 || waiverValue > 100)) { alert('Waiver custom percentage must be between 0 and 100.'); return; }
+    if (buyoutMode === 'CUSTOM_PERCENT' && (buyoutValue === null || buyoutValue < 0 || buyoutValue > 100)) { alert('Buyout custom percentage must be between 0 and 100.'); return; }
+    if (waiverMode === 'FLAT_AMOUNT' && (waiverValue === null || waiverValue < 0)) { alert('Enter a valid waiver flat amount.'); return; }
+    if (buyoutMode === 'FLAT_AMOUNT' && (buyoutValue === null || buyoutValue < 0)) { alert('Enter a valid buyout flat amount.'); return; }
+    const button = el('saveTransactionRulesBtn');
+    button.disabled = true;
+    button.textContent = 'Saving…';
+    try {
+      const success = await runCloudAction(async () => {
+        const payload = {
+          waiver_penalty_mode:waiverMode,
+          waiver_penalty_value:waiverValue,
+          waiver_penalty_scope:waiverScope,
+          buyout_penalty_mode:buyoutMode,
+          buyout_penalty_value:buyoutValue,
+          buyout_penalty_scope:buyoutScope
+        };
+        const { error } = await db.from('front_offices').update(payload).eq('front_office_id', state.frontOffice.id);
+        if (error) throw error;
+        state.frontOffice.waiverPenaltyMode = waiverMode;
+        state.frontOffice.waiverPenaltyValue = waiverValue;
+        state.frontOffice.waiverPenaltyScope = waiverScope;
+        state.frontOffice.buyoutPenaltyMode = buyoutMode;
+        state.frontOffice.buyoutPenaltyValue = buyoutValue;
+        state.frontOffice.buyoutPenaltyScope = buyoutScope;
+        state.activity.unshift(activity('Updated transaction penalty rules'));
+      });
+      if (success) renderSettings();
+    } finally {
+      if (el('saveTransactionRulesBtn')) {
+        el('saveTransactionRulesBtn').disabled = false;
+        el('saveTransactionRulesBtn').textContent = 'Save Transaction Rules';
+      }
+    }
   }
 
   function switchView(view) {
@@ -4914,6 +5264,12 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         sport: office.sport,
         currency: office.currency_code,
         rosterLimit: office.roster_limit,
+        waiverPenaltyMode: office.waiver_penalty_mode || 'NONE',
+        waiverPenaltyValue: office.waiver_penalty_value === null || office.waiver_penalty_value === undefined ? null : Number(office.waiver_penalty_value),
+        waiverPenaltyScope: office.waiver_penalty_scope || 'CURRENT_SEASON',
+        buyoutPenaltyMode: office.buyout_penalty_mode || 'NONE',
+        buyoutPenaltyValue: office.buyout_penalty_value === null || office.buyout_penalty_value === undefined ? null : Number(office.buyout_penalty_value),
+        buyoutPenaltyScope: office.buyout_penalty_scope || 'REMAINING_CONTRACT',
         currentSeasonId: seasons.find((s) => s.is_current)?.front_office_season_id || seasons[0]?.front_office_season_id || null,
         createdAt: office.created_at
       },
