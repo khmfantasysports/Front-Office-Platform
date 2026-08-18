@@ -2054,6 +2054,87 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .depth-defense-goalie-row { grid-template-columns: 34px repeat(3, 132px); gap:4px; }
 }
 
+
+
+/* V2.12 uniform compact depth cards — Samuel Ersson footprint */
+.depth-slot,
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label,
+.depth-position-row .depth-slot,
+.depth-position-row .depth-role-label {
+  height: 84px;
+  min-height: 84px;
+}
+.depth-slot {
+  width: 100%;
+  padding: 5px 6px;
+  gap: 2px;
+  grid-template-rows: auto minmax(1.9em, auto) auto auto;
+}
+.depth-slot-name {
+  min-height: 1.9em;
+  font-size: .67rem;
+  line-height: 1.03;
+}
+.depth-slot-position { font-size: .46rem; }
+.depth-slot-status { font-size: .43rem; }
+.depth-slot-meta { font-size: .46rem; }
+.depth-slot-finance { gap: 3px; padding-top: 2px; }
+.depth-slot-finance strong { font-size: .51rem; }
+.depth-slot-finance span { font-size: .40rem; }
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label { padding: 3px; font-size: .50rem; }
+.depth-line-label span,
+.depth-pair-label span { font-size: .43rem; }
+.depth-line-label strong,
+.depth-pair-label strong { font-size: .72rem; }
+
+@media (max-width: 720px) {
+  .depth-section-card { padding: 7px 5px; }
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines {
+    min-width: 352px;
+  }
+  .depth-rows-scroll .depth-forward-line,
+  .depth-defense-goalie-row {
+    grid-template-columns: 28px repeat(3, 104px);
+    gap: 4px;
+  }
+  .depth-slot,
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-position-row .depth-slot,
+  .depth-position-row .depth-role-label {
+    height: 84px;
+    min-height: 84px;
+  }
+  .depth-slot { padding: 5px 5px 4px; }
+  .depth-slot-name { font-size: .64rem; }
+  .depth-slot-position { font-size: .44rem; }
+  .depth-slot-status { font-size: .41rem; }
+  .depth-slot-meta { font-size: .44rem; }
+  .depth-slot-finance strong { font-size: .49rem; }
+  .depth-slot-finance span { font-size: .38rem; }
+  .depth-section-head::after { font-size: .45rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 346px; }
+  .depth-rows-scroll .depth-forward-line,
+  .depth-defense-goalie-row {
+    grid-template-columns: 26px repeat(3, 102px);
+    gap: 4px;
+  }
+  .depth-slot-name { font-size: .62rem; }
+  .depth-slot-meta { font-size: .42rem; }
+  .depth-slot-finance strong { font-size: .47rem; }
+  .depth-slot-finance span { font-size: .37rem; }
+}
+
 </style>
 </head>
 <body>
