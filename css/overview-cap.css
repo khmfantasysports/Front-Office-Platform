@@ -557,3 +557,12 @@
   .cap-outlook-grid-v228 { grid-template-columns:repeat(7,126px); min-width:max-content; gap:6px; }
   .cap-section-head-v228 h3 { font-size:.88rem; }
 }
+
+
+/* V2.29 — roster-limit semantic state */
+.overview-snapshot-item.warning {
+  background:rgba(242,198,109,.045);
+}
+.overview-snapshot-item.warning strong {
+  color:var(--warning);
+}
