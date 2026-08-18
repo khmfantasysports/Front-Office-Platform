@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.17" />
+  <meta name="application-name" content="Fantasy Front Office v2.18" />
   <style>
 :root {
   color-scheme: dark;
@@ -2314,6 +2314,58 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   }
 }
 
+
+
+/* V2.18 — Assets */
+.assets-page { display:grid; gap:14px; }
+.asset-summary-strip { display:flex; gap:8px; flex-wrap:wrap; }
+.asset-summary-pill { display:inline-flex; align-items:center; gap:5px; min-height:30px; padding:5px 10px; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,.02); color:var(--muted); font-size:.72rem; }
+.asset-summary-pill strong { color:var(--text); }
+.asset-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px; padding:4px; border:1px solid var(--border); border-radius:12px; background:#0b151e; }
+.asset-tab { min-height:34px; border:0; border-radius:9px; background:transparent; color:var(--muted); font-weight:800; font-size:.74rem; }
+.asset-tab.active { background:rgba(50,173,255,.12); color:var(--text); }
+.asset-section { display:grid; gap:9px; }
+.asset-section-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.asset-section-head h4 { margin:0; font-size:.82rem; text-transform:uppercase; letter-spacing:.07em; color:#cbd7e1; }
+.asset-section-head span { color:var(--muted); font-size:.68rem; }
+.asset-year-group { display:grid; gap:7px; }
+.asset-year-label { margin:2px 0 0; color:var(--accent); font-size:.69rem; font-weight:900; letter-spacing:.08em; }
+.asset-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.asset-card { width:100%; min-width:0; min-height:94px; display:grid; align-content:space-between; gap:8px; padding:11px; border:1px solid var(--border); border-radius:13px; background:#0b151e; color:var(--text); text-align:left; }
+.asset-card:hover { border-color:rgba(119,201,255,.4); }
+.asset-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.asset-card-type { color:var(--accent); font-size:.59rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.asset-status { flex:0 0 auto; border-radius:999px; padding:3px 7px; border:1px solid var(--border); color:var(--muted); font-size:.56rem; font-weight:850; text-transform:uppercase; letter-spacing:.04em; }
+.asset-status.owned { color:var(--good); border-color:rgba(111,213,154,.28); background:rgba(111,213,154,.06); }
+.asset-status.conditional { color:var(--warning); border-color:rgba(242,198,109,.28); background:rgba(242,198,109,.06); }
+.asset-status.traded-away,.asset-status.expired { color:#8495a5; }
+.asset-card h5 { margin:0; font-size:.92rem; line-height:1.2; }
+.asset-card-meta { color:var(--muted); font-size:.68rem; line-height:1.35; }
+.asset-pick-main { display:flex; align-items:center; gap:9px; }
+.asset-round-badge { flex:0 0 auto; min-width:42px; height:42px; display:grid; place-items:center; border-radius:11px; border:1px solid rgba(119,201,255,.25); background:rgba(50,173,255,.08); color:#bfe6ff; font-size:.78rem; font-weight:900; }
+.asset-dialog .modal-card { max-width:680px; margin:auto; }
+.asset-draft-fields { display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:10px; }
+.asset-form-note { margin:4px 0 0; color:var(--muted); font-size:.72rem; line-height:1.4; }
+.asset-archive-btn { margin-right:auto; }
+
+@media (max-width: 900px) { .asset-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 720px) {
+  .assets-page { gap:10px; }
+  .asset-tabs { gap:3px; }
+  .asset-tab { min-height:32px; padding:5px 3px; font-size:.66rem; }
+  .asset-grid { grid-template-columns:1fr 1fr; gap:7px; }
+  .asset-card { min-height:88px; padding:9px; border-radius:11px; }
+  .asset-card h5 { font-size:.82rem; }
+  .asset-card-meta { font-size:.62rem; }
+  .asset-round-badge { min-width:36px; height:36px; font-size:.7rem; }
+  .asset-draft-fields { grid-template-columns:1fr 1fr; }
+  .asset-draft-fields label:last-child { grid-column:1 / -1; }
+}
+@media (max-width: 390px) {
+  .asset-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .asset-grid { grid-template-columns:1fr; }
+}
+
 </style>
 </head>
 <body>
@@ -2331,6 +2383,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         <button class="nav-tab active" data-view="overview" type="button">Overview</button>
         <button class="nav-tab" data-view="roster" type="button">Roster</button>
         <button class="nav-tab" data-view="farm" type="button">Minors</button>
+        <button class="nav-tab" data-view="assets" type="button">Assets</button>
         <button class="nav-tab" data-view="cap" type="button">Cap</button>
         <button class="nav-tab" data-view="transactions" type="button">Transactions</button>
         <button class="nav-tab" data-view="settings" type="button">Settings</button>
@@ -2463,6 +2516,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         <section id="overviewView" class="view-panel"></section>
         <section id="rosterView" class="view-panel hidden"></section>
         <section id="farmView" class="view-panel hidden"></section>
+        <section id="assetsView" class="view-panel hidden"></section>
         <section id="capView" class="view-panel hidden"></section>
         <section id="transactionsView" class="view-panel hidden"></section>
         <section id="settingsView" class="view-panel hidden"></section>
@@ -2623,6 +2677,53 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     </form>
   </dialog>
 
+
+  <dialog id="assetDialog" class="modal-dialog asset-dialog">
+    <form id="assetForm" method="dialog" class="modal-card">
+      <header class="drawer-header">
+        <div><p class="eyebrow">Front office asset</p><h3 id="assetDialogTitle">Add Asset</h3></div>
+        <button id="closeAssetDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-grid compact">
+          <label>Asset type
+            <select id="assetType">
+              <option value="DRAFT_PICK">Draft Pick</option>
+              <option value="PROSPECT_RIGHTS">Prospect Rights</option>
+              <option value="PLAYER_RIGHTS">Player Rights</option>
+              <option value="CONDITIONAL_ASSET">Conditional Asset</option>
+              <option value="FUTURE_CONSIDERATIONS">Future Considerations</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </label>
+          <label>Status
+            <select id="assetStatus">
+              <option value="OWNED">Owned</option>
+              <option value="CONDITIONAL">Conditional</option>
+              <option value="TRADED_AWAY">Traded Away</option>
+              <option value="EXPIRED">Expired</option>
+            </select>
+          </label>
+          <label class="full-width">Asset name
+            <input id="assetLabel" placeholder="Optional for draft picks" />
+          </label>
+        </div>
+        <div id="assetDraftFields" class="asset-draft-fields" style="margin-top:12px">
+          <label>Draft year<input id="assetDraftYear" type="number" min="1900" max="2200" step="1" placeholder="2028" /></label>
+          <label>Round<input id="assetDraftRound" type="number" min="1" max="99" step="1" placeholder="1" /></label>
+          <label>Original team<input id="assetOriginalTeam" placeholder="Fraser Valley" /></label>
+        </div>
+        <p id="assetFormNote" class="asset-form-note">Draft-pick identity is based on year, round and original team. The original team should never change when the pick is traded.</p>
+        <label style="display:grid;gap:6px;margin-top:14px;color:var(--muted);font-size:.82rem;font-weight:700">Notes<textarea id="assetNotes" rows="3" placeholder="Optional conditions, rights expiry or other details"></textarea></label>
+      </div>
+      <footer class="drawer-footer">
+        <button id="archiveAssetBtn" class="btn btn-danger asset-archive-btn hidden" type="button">Remove Asset</button>
+        <button id="cancelAssetBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="saveAssetBtn" class="btn btn-primary" type="submit">Save Asset</button>
+      </footer>
+    </form>
+  </dialog>
+
   <dialog id="transactionDialog" class="modal-dialog transaction-dialog">
     <form id="transactionForm" method="dialog" class="modal-card">
       <header class="drawer-header">
@@ -2676,6 +2777,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   let state = emptyState();
   let session = null;
   let editingPlayerId = null;
+  let editingAssetId = null;
+  let assetFilter = 'ALL';
   let playerFormDirty = false;
   let pendingImport = [];
   let pendingImportMeta = { type: 'generic', skaters: 0, goalies: 0, minors: 0 };
@@ -2695,6 +2798,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   const playerDialog = el('playerDialog');
   const importDialog = el('importDialog');
   const transactionDialog = el('transactionDialog');
+  const assetDialog = el('assetDialog');
 
   init();
 
@@ -2723,6 +2827,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       depthCharts: {},
       transactions: [],
       transactionItems: [],
+      assets: [],
       activity: []
     };
   }
@@ -2773,6 +2878,12 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('closeTransactionDialog').addEventListener('click', () => transactionDialog.close());
     el('cancelTransactionBtn').addEventListener('click', () => transactionDialog.close());
     el('transactionForm').addEventListener('submit', saveTransactionFromDialog);
+
+    el('closeAssetDialog').addEventListener('click', () => assetDialog.close());
+    el('cancelAssetBtn').addEventListener('click', () => assetDialog.close());
+    el('assetForm').addEventListener('submit', saveAssetFromDialog);
+    el('assetType').addEventListener('change', syncAssetTypeFields);
+    el('archiveAssetBtn').addEventListener('click', archiveEditingAsset);
     el('playerIsProspect').addEventListener('change', syncProspectLocationControls);
     el('playerRosterGroup').addEventListener('change', syncProspectLocationControls);
   }
@@ -2835,6 +2946,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     renderOverview();
     renderRoster();
     renderFarm();
+    renderAssets();
     renderCap();
     renderTransactions();
     renderSettings();
@@ -3325,6 +3437,146 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     document.querySelectorAll('[data-call-up]').forEach((button) => button.addEventListener('click', () => quickCallUp(button.dataset.callUp)));
   }
 
+
+  function assetTypeLabel(type) {
+    return ({
+      DRAFT_PICK:'Draft Pick',
+      PROSPECT_RIGHTS:'Prospect Rights',
+      PLAYER_RIGHTS:'Player Rights',
+      CONDITIONAL_ASSET:'Conditional Asset',
+      FUTURE_CONSIDERATIONS:'Future Considerations',
+      OTHER:'Other'
+    })[type] || 'Asset';
+  }
+
+  function assetStatusLabel(status) {
+    return ({ OWNED:'Owned', TRADED_AWAY:'Traded Away', CONDITIONAL:'Conditional', EXPIRED:'Expired' })[status] || status || 'Owned';
+  }
+
+  function ordinalRound(round) {
+    const n = Number(round);
+    if (!Number.isFinite(n)) return '—';
+    const mod100 = n % 100;
+    if (mod100 >= 11 && mod100 <= 13) return `${n}th`;
+    return `${n}${({1:'st',2:'nd',3:'rd'})[n % 10] || 'th'}`;
+  }
+
+  function assetStatusClass(status) { return String(status || '').toLowerCase().replace(/_/g,'-'); }
+
+  function renderAssetCard(asset) {
+    const status = `<span class="asset-status ${assetStatusClass(asset.status)}">${escapeHtml(assetStatusLabel(asset.status))}</span>`;
+    if (asset.type === 'DRAFT_PICK') {
+      const label = asset.label || `${asset.draftYear || '—'} ${asset.originalTeam || ''} ${ordinalRound(asset.draftRound)}`;
+      return `<button class="asset-card" data-edit-asset="${asset.id}" type="button"><div class="asset-card-top"><span class="asset-card-type">${escapeHtml(asset.draftYear || 'Draft')}</span>${status}</div><div class="asset-pick-main"><span class="asset-round-badge">R${escapeHtml(asset.draftRound || '—')}</span><div><h5>${escapeHtml(label)}</h5><div class="asset-card-meta">Original: ${escapeHtml(asset.originalTeam || '—')} · ${escapeHtml(ordinalRound(asset.draftRound))}</div></div></div></button>`;
+    }
+    return `<button class="asset-card" data-edit-asset="${asset.id}" type="button"><div class="asset-card-top"><span class="asset-card-type">${escapeHtml(assetTypeLabel(asset.type))}</span>${status}</div><div><h5>${escapeHtml(asset.label)}</h5>${asset.notes ? `<div class="asset-card-meta">${escapeHtml(asset.notes)}</div>` : `<div class="asset-card-meta">No additional notes</div>`}</div></button>`;
+  }
+
+  function renderAssets() {
+    const currentAssets = [...(state.assets || [])].filter((a) => !a.archivedAt);
+    const draftPicks = currentAssets.filter((a) => a.type === 'DRAFT_PICK').sort((a,b) => (a.draftYear-b.draftYear) || (a.draftRound-b.draftRound) || String(a.originalTeam).localeCompare(String(b.originalTeam)));
+    const rights = currentAssets.filter((a) => ['PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(a.type));
+    const other = currentAssets.filter((a) => !['DRAFT_PICK','PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(a.type));
+    const owned = currentAssets.filter((a) => a.status === 'OWNED').length;
+    const tabs = [
+      ['ALL','All'],['DRAFT','Draft Picks'],['RIGHTS','Rights'],['OTHER','Other']
+    ].map(([key,label]) => `<button class="asset-tab ${assetFilter === key ? 'active' : ''}" data-asset-filter="${key}" type="button">${label}</button>`).join('');
+
+    const draftYears = [...new Set(draftPicks.map((a) => a.draftYear))];
+    const draftHtml = draftYears.map((year) => {
+      const rows = draftPicks.filter((a) => a.draftYear === year).map(renderAssetCard).join('');
+      return `<div class="asset-year-group"><div class="asset-year-label">${escapeHtml(year)}</div><div class="asset-grid">${rows}</div></div>`;
+    }).join('');
+
+    const sections = [];
+    if ((assetFilter === 'ALL' || assetFilter === 'DRAFT') && draftPicks.length) sections.push(`<section class="asset-section"><div class="asset-section-head"><h4>Draft Picks</h4><span>${draftPicks.length} tracked</span></div>${draftHtml}</section>`);
+    if ((assetFilter === 'ALL' || assetFilter === 'RIGHTS') && rights.length) sections.push(`<section class="asset-section"><div class="asset-section-head"><h4>Rights</h4><span>${rights.length} tracked</span></div><div class="asset-grid">${rights.map(renderAssetCard).join('')}</div></section>`);
+    if ((assetFilter === 'ALL' || assetFilter === 'OTHER') && other.length) sections.push(`<section class="asset-section"><div class="asset-section-head"><h4>Other Assets</h4><span>${other.length} tracked</span></div><div class="asset-grid">${other.map(renderAssetCard).join('')}</div></section>`);
+
+    const filteredCount = assetFilter === 'ALL' ? currentAssets.length : assetFilter === 'DRAFT' ? draftPicks.length : assetFilter === 'RIGHTS' ? rights.length : other.length;
+    const emptyCopy = currentAssets.length ? 'No assets match this view.' : 'Add draft picks, rights or other future assets owned by this Front Office.';
+    el('assetsView').innerHTML = `<div class="assets-page"><div class="page-heading-row"><div><p class="eyebrow">Inventory</p><h3>Assets</h3><p class="page-copy">Track draft picks, rights and other non-roster assets. Draft-pick identity stays tied to the original team.</p></div><button id="addAssetBtn" class="btn btn-primary" type="button">+ Add Asset</button></div><div class="asset-summary-strip"><span class="asset-summary-pill"><strong>${owned}</strong> owned</span><span class="asset-summary-pill"><strong>${draftPicks.length}</strong> draft picks</span><span class="asset-summary-pill"><strong>${rights.length}</strong> rights</span></div><div class="asset-tabs" aria-label="Asset views">${tabs}</div>${filteredCount ? sections.join('') : `<div class="empty-state"><h4>${currentAssets.length ? 'Nothing in this category' : 'No assets yet'}</h4><p>${escapeHtml(emptyCopy)}</p></div>`}</div>`;
+
+    el('addAssetBtn').addEventListener('click', () => openAssetDialog());
+    document.querySelectorAll('[data-asset-filter]').forEach((button) => button.addEventListener('click', () => { assetFilter = button.dataset.assetFilter; renderAssets(); }));
+    document.querySelectorAll('[data-edit-asset]').forEach((button) => button.addEventListener('click', () => openAssetDialog(button.dataset.editAsset)));
+  }
+
+  function syncAssetTypeFields() {
+    const isDraft = el('assetType').value === 'DRAFT_PICK';
+    el('assetDraftFields').classList.toggle('hidden', !isDraft);
+    el('assetFormNote').textContent = isDraft
+      ? 'Draft-pick identity is based on year, round and original team. The original team should never change when the pick is traded.'
+      : 'Use the name and notes fields to describe this asset. Structured trade execution will connect these records to Transactions in the next integration pass.';
+    el('assetLabel').placeholder = isDraft ? 'Optional — generated from pick identity' : 'Asset name';
+  }
+
+  function openAssetDialog(assetId = null) {
+    editingAssetId = assetId || null;
+    const asset = assetId ? state.assets.find((a) => a.id === assetId) : null;
+    el('assetDialogTitle').textContent = asset ? 'Edit Asset' : 'Add Asset';
+    el('assetType').value = asset?.type || 'DRAFT_PICK';
+    el('assetStatus').value = asset?.status || 'OWNED';
+    el('assetLabel').value = asset?.label || '';
+    el('assetDraftYear').value = asset?.draftYear ?? '';
+    el('assetDraftRound').value = asset?.draftRound ?? '';
+    el('assetOriginalTeam').value = asset?.originalTeam || '';
+    el('assetNotes').value = asset?.notes || '';
+    el('archiveAssetBtn').classList.toggle('hidden', !asset);
+    syncAssetTypeFields();
+    assetDialog.showModal();
+  }
+
+  async function saveAssetFromDialog(event) {
+    event.preventDefault();
+    const button = el('saveAssetBtn');
+    if (button.disabled) return;
+    const isDraft = el('assetType').value === 'DRAFT_PICK';
+    if (isDraft && (!nullableInteger(el('assetDraftYear').value) || !nullableInteger(el('assetDraftRound').value) || !el('assetOriginalTeam').value.trim())) {
+      alert('Draft year, round and original team are required for a draft pick.');
+      return;
+    }
+    if (!isDraft && !el('assetLabel').value.trim()) {
+      alert('Asset name is required.');
+      return;
+    }
+    button.disabled = true;
+    button.textContent = 'Saving…';
+    try {
+      const success = await runCloudAction(async () => {
+        const { error } = await db.rpc('save_front_office_asset_v1', {
+          p_front_office_id: state.frontOffice.id,
+          p_asset_id: editingAssetId,
+          p_asset_type: el('assetType').value,
+          p_asset_label: el('assetLabel').value.trim() || null,
+          p_draft_year: isDraft ? nullableInteger(el('assetDraftYear').value) : null,
+          p_draft_round: isDraft ? nullableInteger(el('assetDraftRound').value) : null,
+          p_original_team: isDraft ? el('assetOriginalTeam').value.trim() : null,
+          p_asset_status: el('assetStatus').value,
+          p_notes: el('assetNotes').value.trim() || null
+        });
+        if (error) throw error;
+        await loadOffice(state.frontOffice.id, false);
+      });
+      if (success) assetDialog.close();
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Save Asset';
+    }
+  }
+
+  async function archiveEditingAsset() {
+    if (!editingAssetId) return;
+    const asset = state.assets.find((a) => a.id === editingAssetId);
+    if (!confirm(`Remove ${asset?.label || 'this asset'} from the current Assets inventory?`)) return;
+    const success = await runCloudAction(async () => {
+      const { error } = await db.rpc('archive_front_office_asset_v1', { p_front_office_id: state.frontOffice.id, p_asset_id: editingAssetId });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
+    if (success) assetDialog.close();
+  }
+
   function transactionItemsFor(transactionId, direction = null) {
     return state.transactionItems.filter((item) => item.transactionId === transactionId && (!direction || item.direction === direction));
   }
@@ -3465,7 +3717,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
   function switchView(view) {
     document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
-    ['overview', 'roster', 'farm', 'cap', 'transactions', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
+    ['overview', 'roster', 'farm', 'assets', 'cap', 'transactions', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
     // KPI strip is an Overview-only snapshot; operational pages stay focused on their own content.
     el('summaryCards').classList.add('hidden');
   }
@@ -4260,7 +4512,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       db.from('financial_adjustment_seasons').select('*').eq('front_office_id', frontOfficeId),
       db.from('front_office_depth_chart_entries').select('*').eq('front_office_id', frontOfficeId).order('position_code').order('depth_order'),
       db.from('front_office_transactions').select('*').eq('front_office_id', frontOfficeId).order('transaction_date', { ascending:false }).order('created_at', { ascending:false }),
-      db.from('front_office_transaction_items').select('*').eq('front_office_id', frontOfficeId).order('created_at')
+      db.from('front_office_transaction_items').select('*').eq('front_office_id', frontOfficeId).order('created_at'),
+      db.from('front_office_assets').select('*').eq('front_office_id', frontOfficeId).is('archived_at', null).order('created_at')
     ]);
     const errorResult = queries.find((q) => q.error);
     if (errorResult?.error) {
@@ -4269,7 +4522,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       return;
     }
 
-    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ,depthQ,transactionsQ,transactionItemsQ] = queries;
+    const [officeQ,seasonsQ,statusesQ,playersQ,sourceLinksQ,rosterQ,contractsQ,contractSeasonsQ,adjustmentsQ,adjustmentSeasonsQ,depthQ,transactionsQ,transactionItemsQ,assetsQ] = queries;
     const office = officeQ.data;
     const seasons = seasonsQ.data || [];
     const statuses = statusesQ.data || [];
@@ -4339,7 +4592,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     });
 
     const transactions = (transactionsQ.data || []).map((row) => ({ id:row.transaction_id, date:row.transaction_date, type:row.transaction_type, counterparty:row.counterparty || '', summary:row.summary, notes:row.notes || '', createdAt:row.created_at }));
-    const transactionItems = (transactionItemsQ.data || []).map((row) => ({ id:row.transaction_item_id, transactionId:row.transaction_id, kind:row.item_kind, direction:row.direction, playerId:row.front_office_player_id || null, label:row.item_label, metadata:row.metadata || {}, createdAt:row.created_at }));
+    const transactionItems = (transactionItemsQ.data || []).map((row) => ({ id:row.transaction_item_id, transactionId:row.transaction_id, kind:row.item_kind, direction:row.direction, playerId:row.front_office_player_id || null, assetId:row.front_office_asset_id || null, label:row.item_label, metadata:row.metadata || {}, createdAt:row.created_at }));
+
+    const assets = (assetsQ.data || []).map((row) => ({ id:row.asset_id, type:row.asset_type, label:row.asset_label, draftYear:row.draft_year === null ? null : Number(row.draft_year), draftRound:row.draft_round === null ? null : Number(row.draft_round), originalTeam:row.original_team || '', status:row.asset_status, notes:row.notes || '', createdAt:row.created_at, updatedAt:row.updated_at, archivedAt:row.archived_at || null }));
 
     state = {
       frontOffice: {
@@ -4359,6 +4614,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       depthCharts,
       transactions,
       transactionItems,
+      assets,
       activity: [activity('Cloud data loaded')]
     };
     setCloudStatus('Synced', '');
