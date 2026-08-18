@@ -39,6 +39,16 @@ function renderFarm() {
   const activeProspects = activeRosterPlayers().filter((player) => player.isProspect);
   const current = currentSeason();
   const totalProspects = prospects.length + activeProspects.length;
+  const minorsLimit = state.frontOffice.minorsLimit;
+  const minorsOver = minorsLimit !== null && minorsLimit !== undefined && prospects.length > minorsLimit;
+  const minorsOpen = minorsLimit === null || minorsLimit === undefined ? null : minorsLimit - prospects.length;
+  const minorsDisplay = minorsLimit === null || minorsLimit === undefined ? String(prospects.length) : `${prospects.length} / ${minorsLimit}`;
+  const minorsStatus = minorsLimit === null || minorsLimit === undefined
+    ? 'no limit set'
+    : minorsOver
+      ? `${Math.abs(minorsOpen)} over limit`
+      : `${minorsOpen} open`;
+
   const capCountingMinors = prospects.reduce((sum, player) => {
     const status = statusById(player.statusId);
     const charge = effectivePlayerCharge(player, current.id);
@@ -80,14 +90,16 @@ function renderFarm() {
     </div>
 
     <div class="farm-summary-grid-v228">
-      <div><span>In Minors</span><strong>${prospects.length}</strong><small>assigned prospects</small></div>
+      <div class="${minorsOver ? 'limit-warning' : ''}"><span>In Minors</span><strong>${escapeHtml(minorsDisplay)}</strong><small>${escapeHtml(minorsStatus)}</small></div>
       <div><span>Called Up</span><strong>${activeProspects.length}</strong><small>prospects active</small></div>
       <div><span>Total Prospects</span><strong>${totalProspects}</strong><small>tracked players</small></div>
       <div><span>Cap Counting</span><strong>${formatMoney(capCountingMinors)}</strong><small>Minors statuses</small></div>
     </div>
 
+    ${minorsOver ? `<div class="farm-limit-warning-v229"><span>!</span><div><strong>Minors limit exceeded</strong><small>${prospects.length} players are assigned to Minors against a ${minorsLimit}-player maximum. The app tracks the overage but does not block roster moves.</small></div></div>` : ''}
+
     <section class="farm-panel-v228">
-      <div class="farm-section-head-v228"><div><p class="eyebrow">Minors roster</p><h3>Assigned prospects</h3></div><span>${prospects.length} players</span></div>
+      <div class="farm-section-head-v228"><div><p class="eyebrow">Minors roster</p><h3>Assigned prospects</h3></div><span>${minorsLimit === null || minorsLimit === undefined ? `${prospects.length} players` : `${prospects.length} / ${minorsLimit} spots`}</span></div>
       ${prospects.length ? `<div class="farm-player-list farm-player-list-v228">${rows}</div>` : `<div class="empty-state"><h4>No players in Minors</h4><p>Use Add Player or Import Fantrax above. Players placed in Minors are automatically labelled Prospect.</p></div>`}
     </section>
 
