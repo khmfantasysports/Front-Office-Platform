@@ -1,0 +1,103 @@
+/* V2.22 smart transaction workflow + configurable penalty rules */
+.transaction-smart-note {
+  padding:10px 11px; border:1px solid var(--border); border-radius:11px;
+  background:rgba(50,173,255,.045); color:var(--muted); font-size:.72rem; line-height:1.4;
+}
+.transaction-player-snapshot {
+  display:grid; gap:9px; padding:11px; border:1px solid var(--border); border-radius:12px; background:#0b151e;
+}
+.transaction-player-snapshot.hidden { display:none !important; }
+.transaction-player-snapshot-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.transaction-player-snapshot-head strong { display:block; font-size:.88rem; }
+.transaction-player-snapshot-head span { display:block; margin-top:2px; color:var(--muted); font-size:.66rem; }
+.transaction-player-snapshot-badge { flex:0 0 auto; padding:4px 7px; border:1px solid var(--border); border-radius:999px; color:var(--accent); font-size:.61rem; font-weight:850; }
+.transaction-salary-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+.transaction-salary-cell { min-width:0; padding:7px 8px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(255,255,255,.018); }
+.transaction-salary-cell span { display:block; color:var(--muted); font-size:.56rem; white-space:nowrap; }
+.transaction-salary-cell strong { display:block; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.72rem; font-variant-numeric:tabular-nums; }
+.transaction-salary-cell small { display:block; margin-top:2px; color:var(--accent); font-size:.54rem; white-space:nowrap; }
+.transaction-rule-preview {
+  display:grid; gap:8px; margin-top:10px; padding:10px 11px; border:1px solid rgba(242,198,109,.30); border-radius:11px; background:rgba(242,198,109,.055);
+}
+.transaction-rule-preview-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.transaction-rule-preview-head strong { display:block; font-size:.78rem; }
+.transaction-rule-preview-head span { display:block; margin-top:2px; color:var(--muted); font-size:.64rem; line-height:1.35; }
+.transaction-rule-preview .btn { flex:0 0 auto; }
+.transaction-financial-section.hidden { display:none !important; }
+.transaction-manual-financial-fields.hidden { display:none !important; }
+.transaction-rule-settings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:12px; }
+.transaction-rule-card { display:grid; gap:9px; padding:11px; border:1px solid var(--border); border-radius:11px; background:#0b151e; }
+.transaction-rule-card h4 { margin:0; font-size:.82rem; }
+.transaction-rule-card p { margin:0; color:var(--muted); font-size:.64rem; line-height:1.35; }
+.transaction-rule-card label { display:grid; gap:5px; color:var(--muted); font-size:.68rem; font-weight:700; }
+.transaction-rule-card input, .transaction-rule-card select { min-height:38px; padding:7px 9px; }
+.transaction-rule-value-wrap.hidden { display:none !important; }
+.transaction-rules-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+.transaction-rules-footer span { color:var(--muted); font-size:.64rem; line-height:1.35; }
+.transaction-rules-footer .btn { flex:0 0 auto; }
+@media (max-width:720px) {
+  .transaction-salary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .transaction-rule-settings { grid-template-columns:1fr; }
+  .transaction-rules-footer { align-items:flex-start; flex-direction:column; }
+  .transaction-rules-footer .btn { width:100%; }
+}
+
+
+
+/* V2.23 unified Dead Cap + transaction correction controls */
+.transaction-card-actions { display:flex; align-items:center; gap:6px; margin-top:9px; }
+.transaction-card-actions .btn { min-height:30px; padding:5px 9px; font-size:.66rem; }
+.transaction-edit-note {
+  padding:9px 10px; border:1px solid rgba(242,198,109,.28); border-radius:10px;
+  background:rgba(242,198,109,.06); color:#d7c28d; font-size:.66rem; line-height:1.4;
+}
+.transaction-edit-note.hidden { display:none !important; }
+.transaction-dead-cap-label { color:var(--warning); font-weight:850; }
+@media (max-width:720px) {
+  .transaction-card-actions { justify-content:flex-end; }
+  .transaction-card-actions .btn { min-height:29px; font-size:.64rem; }
+}
+
+
+/* V2.25 structured trade execution */
+.trade-structured-section { display:grid; gap:10px; padding:11px; border:1px solid var(--border); border-radius:12px; background:rgba(7,17,26,.34); }
+.trade-structured-section.hidden { display:none !important; }
+.trade-side-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.trade-side { min-width:0; display:grid; gap:8px; padding:10px; border:1px solid var(--border-soft); border-radius:11px; background:#0b151e; }
+.trade-side-head { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.trade-side-head h4 { margin:0; font-size:.84rem; }
+.trade-side-head p { margin:2px 0 0; color:var(--muted); font-size:.61rem; line-height:1.3; }
+.trade-choice-list { display:grid; gap:6px; max-height:210px; overflow:auto; }
+.trade-choice { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; min-height:38px; padding:6px 7px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(255,255,255,.012); }
+.trade-choice input { width:auto; margin:0; }
+.trade-choice-main { min-width:0; }
+.trade-choice-main strong,.trade-choice-main small { display:block; }
+.trade-choice-main strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.72rem; }
+.trade-choice-main small { margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:.57rem; }
+.trade-choice-value { color:#cfeaff; font-size:.63rem; font-weight:800; white-space:nowrap; }
+.trade-empty { color:var(--muted); font-size:.64rem; line-height:1.35; padding:5px 1px; }
+.trade-builder-list { display:grid; gap:7px; }
+.trade-builder-card { display:grid; gap:8px; padding:9px; border:1px solid var(--border-soft); border-radius:10px; background:rgba(255,255,255,.012); }
+.trade-builder-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.trade-builder-head strong { font-size:.71rem; }
+.trade-builder-head .btn { min-height:28px; padding:4px 7px; font-size:.61rem; }
+.trade-builder-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.trade-builder-grid label { display:grid; gap:4px; color:var(--muted); font-size:.62rem; font-weight:700; }
+.trade-builder-grid .full { grid-column:1/-1; }
+.trade-builder-grid input,.trade-builder-grid select { min-height:34px; padding:6px 7px; font-size:.68rem; }
+.trade-builder-check { display:flex !important; align-items:center; gap:6px !important; min-height:34px; }
+.trade-builder-check input { width:auto; }
+.trade-contract-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+.trade-contract-cell { display:grid; gap:3px; }
+.trade-contract-cell span { color:var(--muted); font-size:.54rem; }
+.trade-contract-cell input { min-height:31px; padding:5px 6px; font-size:.64rem; }
+.trade-add-actions { display:flex; gap:6px; flex-wrap:wrap; }
+.trade-add-actions .btn { min-height:31px; padding:5px 8px; font-size:.64rem; }
+.trade-edit-lock { padding:9px 10px; border:1px solid rgba(242,198,109,.28); border-radius:10px; background:rgba(242,198,109,.055); color:#d7c28d; font-size:.64rem; line-height:1.35; }
+@media(max-width:720px){
+  .trade-side-grid { grid-template-columns:1fr; }
+  .trade-choice-list { max-height:180px; }
+  .trade-builder-grid { grid-template-columns:1fr 1fr; }
+  .trade-structured-section { padding:9px; }
+}
+@media(max-width:390px){ .trade-builder-grid { grid-template-columns:1fr; } .trade-builder-grid .full { grid-column:auto; } }
