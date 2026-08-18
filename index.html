@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.20" />
+  <meta name="application-name" content="Fantasy Front Office v2.21" />
   <style>
 :root {
   color-scheme: dark;
@@ -2534,6 +2534,19 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .commitments-table-v220 { min-width:680px; }
 }
 
+
+/* V2.21 Cap-page terminology aligned with Overview */
+.cap-visual-grid-v221 { grid-template-columns:1fr; gap:7px; }
+.cap-page-v221 { display:grid; gap:8px; }
+.cap-page-v221 .page-heading-row { margin-bottom:0; }
+.cap-detail-table-v221 { min-width:840px; }
+.cap-detail-table-v221 th:not(:first-child),
+.cap-detail-table-v221 td:not(:first-child) { text-align:right; }
+@media (max-width:720px) {
+  .cap-page-v221 { gap:6px; }
+  .cap-detail-table-v221 { min-width:790px; }
+}
+
 </style>
 </head>
 <body>
@@ -3194,14 +3207,21 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       .reduce((sum, adjustment) => sum + Number(adjustment.amount || 0), 0);
   }
 
+
   function renderCapVisuals() {
     const season = currentSeason();
     const calc = calculateSeason(season.id);
     const tone = capTone(calc);
-    const rawPct = calc.salaryCap && calc.salaryCap > 0 ? (calc.knownCapUsed / calc.salaryCap) * 100 : 0;
+    const salaryCap = calc.salaryCap;
+    const deadCap = deadCapForSeason(season.id);
+    const otherAdjustments = otherAdjustmentsForSeason(season.id);
+    const capUsed = calc.complete ? calc.capUsed : calc.knownCapUsed;
+    const capRemaining = calc.complete && salaryCap !== null ? calc.capSpace : null;
+    const rawPct = salaryCap && salaryCap > 0 ? (calc.knownCapUsed / salaryCap) * 100 : 0;
     const displayPct = Math.max(0, Math.min(100, rawPct));
-    const usedLabel = calc.complete ? formatMoney(calc.knownCapUsed) : `${formatMoney(calc.knownCapUsed)} known`;
-    const spaceLabel = calc.complete && calc.salaryCap !== null ? formatMoney(calc.capSpace) : 'Incomplete';
+    const currentStatus = calc.complete
+      ? (calc.capSpace < 0 ? `<span class="danger">${formatMoney(Math.abs(calc.capSpace))} over cap</span>` : `<span class="good">${formatMoney(calc.capSpace)} cap remaining</span>`)
+      : '<span class="warning">Cap total incomplete</span>';
 
     const horizon = contractHorizonSeasons();
     const points = horizon.map((s) => ({ season:s, calc:calculateSeason(s.id) }));
@@ -3218,17 +3238,27 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       </div>`;
     }).join('');
 
-    return `<div class="cap-visual-grid">
-      <div class="subpanel cap-utilization-panel tone-${tone}">
-        <p class="eyebrow">Current cap</p>
-        <div class="cap-util-head"><strong class="semantic-value">${usedLabel}</strong><span>${calc.salaryCap === null ? 'Cap not set' : `${Math.round(rawPct)}% used`}</span></div>
-        <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
-        <div class="cap-bar-meta"><span>Used <strong>${usedLabel}</strong></span><span>Space <strong>${spaceLabel}</strong></span></div>
-      </div>
-      <div class="subpanel cap-trend-panel tone-neutral">
-        <p class="eyebrow">Seven-season trend</p>
-        <div class="trend-chart" aria-label="Known cap commitments by season">${trend}</div>
-      </div>
+    return `<div class="cap-visual-grid cap-visual-grid-v221">
+      <section class="overview-cap-card tone-${tone}">
+        <div class="overview-cap-head">
+          <div><p class="eyebrow">${seasonLabel(season.startYear)} cap summary</p><h3>${currentStatus}</h3></div>
+          <span class="cap-limit">Salary Cap <strong>${salaryCap === null ? 'Not set' : formatMoney(salaryCap)}</strong></span>
+        </div>
+        <div class="overview-metrics">
+          <div class="overview-metric primary"><span>Cap Used</span><strong>${calc.complete ? formatMoney(capUsed) : `${formatMoney(capUsed)} known`}</strong></div>
+          <div class="overview-metric"><span>Cap Remaining</span><strong>${capRemaining === null ? 'Incomplete' : formatMoney(capRemaining)}</strong></div>
+          <div class="overview-metric"><span>Roster Cap</span><strong>${formatMoney(calc.knownRosterCap)}</strong></div>
+          <div class="overview-metric"><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong></div>
+        </div>
+        <div class="overview-cap-progress">
+          <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
+          <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${otherAdjustments !== 0 ? `Other adjustments ${formatMoney(otherAdjustments)}` : 'No other cap adjustments'}</span></div>
+        </div>
+      </section>
+      <section class="subpanel overview-trend-compact tone-neutral">
+        <div class="overview-commitments-head"><div><p class="eyebrow">Cap outlook</p><h3>Seven-season commitments</h3></div><p>Known cap used by season</p></div>
+        <div class="trend-chart" aria-label="Known cap used by season">${trend}</div>
+      </section>
     </div>`;
   }
 
@@ -3927,22 +3957,34 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     return `<div class="cap-detail-card transaction-cap-card"><div class="section-title-row"><div><p class="eyebrow">Transaction impacts</p><h3>Dead cap, retention & credits</h3></div><button id="capRecordTransactionBtn" class="btn btn-secondary btn-small" type="button">+ Transaction</button></div>${rows ? `<div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Source</th></tr></thead><tbody>${rows}</tbody></table></div></div>` : `<div class="empty-state compact"><h4>No transaction cap impacts</h4><p>Buyout penalties, retained salary and other financial consequences will appear here when recorded through Transactions.</p></div>`}</div>`;
   }
 
+
   function renderCap() {
     const rows = contractHorizonSeasons().map((s) => {
       const c = calculateSeason(s.id);
-      const space = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : 'Incomplete';
-      return `<tr><td>${seasonLabel(s.startYear)}</td><td class="money">${c.salaryCap === null ? '—' : formatMoney(c.salaryCap)}</td><td class="money">${formatMoney(c.knownRosterCap)}</td><td class="money">${formatMoney(c.adjustmentsTotal)}</td><td class="money">${formatMoney(c.knownCapUsed)}</td><td class="money">${space}</td></tr>`;
+      const deadCap = deadCapForSeason(s.id);
+      const otherAdjustments = otherAdjustmentsForSeason(s.id);
+      const capUsed = c.complete ? c.capUsed : c.knownCapUsed;
+      const capRemaining = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
+      return `<tr>
+        <td>${seasonLabel(s.startYear)}</td>
+        <td class="money">${c.salaryCap === null ? '—' : formatMoney(c.salaryCap)}</td>
+        <td class="money">${formatMoney(c.knownRosterCap)}</td>
+        <td class="money">${formatMoney(deadCap)}</td>
+        <td class="money">${formatMoney(otherAdjustments)}</td>
+        <td class="money">${formatMoney(capUsed)}</td>
+        <td class="money">${capRemaining}</td>
+      </tr>`;
     }).join('');
     const activeSeason = currentSeason();
     const historicalSeasons = [...state.seasons].filter((season) => activeSeason && season.startYear < activeSeason.startYear).sort((a,b) => b.startYear - a.startYear);
     const historyRows = historicalSeasons.map((season) => `<tr><td>${seasonLabel(season.startYear)}</td><td class="money">${season.salaryCap === null ? '—' : formatMoney(season.salaryCap)}</td></tr>`).join('');
 
-    el('capView').innerHTML = `<div class="cap-page">
-      <div class="page-heading-row"><div><p class="eyebrow">Financials</p><h3>${seasonLabel(activeSeason.startYear)} cap position</h3></div></div>
+    el('capView').innerHTML = `<div class="cap-page cap-page-v221">
+      <div class="page-heading-row"><div><p class="eyebrow">Cap management</p><h3>${seasonLabel(activeSeason.startYear)} financial position</h3></div></div>
       ${renderCapVisuals()}
-      <div class="cap-detail-card"><p class="eyebrow">Details</p><h3>Seven-season cap table</h3><div class="cap-scroll-hint" aria-hidden="true">Swipe for full financial detail <span class="scroll-arrow">→</span></div><div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll" role="region" aria-label="Seven-season cap table. Swipe horizontally to view all financial columns." tabindex="0"><table class="cap-detail-table cap-detail-table-v25"><thead><tr><th>Season</th><th>Cap</th><th>Players</th><th>Adjustments</th><th>Used</th><th>Space</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>
+      <div class="cap-detail-card"><div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster + dead cap + other adjustments</p></div><div class="cap-scroll-hint" aria-hidden="true">Swipe for full financial detail <span class="scroll-arrow">→</span></div><div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll" role="region" aria-label="Seven-season cap table. Swipe horizontally to view all financial columns." tabindex="0"><table class="cap-detail-table cap-detail-table-v25 cap-detail-table-v221"><thead><tr><th>Season</th><th>Salary Cap</th><th>Roster Cap</th><th>Dead Cap</th><th>Other Adj.</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>
       ${renderCapAdjustments()}
-      <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="cap-history-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Season</th><th>Recorded salary cap</th></tr></thead><tbody>${historyRows}</tbody></table></div></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
+      <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="cap-history-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Season</th><th>Recorded Salary Cap</th></tr></thead><tbody>${historyRows}</tbody></table></div></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
     </div>`;
     if (el('capRecordTransactionBtn')) el('capRecordTransactionBtn').addEventListener('click', () => openTransactionDialog());
   }
