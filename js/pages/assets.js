@@ -37,33 +37,77 @@ function renderAssetCard(asset) {
 }
 
 function renderAssets() {
-  const currentAssets = [...(state.assets || [])].filter((a) => !a.archivedAt);
-  const draftPicks = currentAssets.filter((a) => a.type === 'DRAFT_PICK').sort((a,b) => (a.draftYear-b.draftYear) || (a.draftRound-b.draftRound) || String(a.originalTeam).localeCompare(String(b.originalTeam)));
-  const rights = currentAssets.filter((a) => ['PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(a.type));
-  const other = currentAssets.filter((a) => !['DRAFT_PICK','PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(a.type));
-  const owned = currentAssets.filter((a) => a.status === 'OWNED').length;
+  const currentAssets = [...(state.assets || [])].filter((asset) => !asset.archivedAt);
+  const draftPicks = currentAssets
+    .filter((asset) => asset.type === 'DRAFT_PICK')
+    .sort((a,b) => (a.draftYear-b.draftYear) || (a.draftRound-b.draftRound) || String(a.originalTeam).localeCompare(String(b.originalTeam)));
+  const rights = currentAssets.filter((asset) => ['PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(asset.type));
+  const other = currentAssets.filter((asset) => !['DRAFT_PICK','PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(asset.type));
+  const owned = currentAssets.filter((asset) => asset.status === 'OWNED').length;
+  const conditional = currentAssets.filter((asset) => asset.status === 'CONDITIONAL').length;
+
   const tabs = [
     ['ALL','All'],['DRAFT','Draft Picks'],['RIGHTS','Rights'],['OTHER','Other']
-  ].map(([key,label]) => `<button class="asset-tab ${assetFilter === key ? 'active' : ''}" data-asset-filter="${key}" type="button">${label}</button>`).join('');
+  ].map(([key,label]) =>
+    `<button class="asset-tab ${assetFilter === key ? 'active' : ''}" data-asset-filter="${key}" type="button">${label}</button>`
+  ).join('');
 
-  const draftYears = [...new Set(draftPicks.map((a) => a.draftYear))];
+  const draftYears = [...new Set(draftPicks.map((asset) => asset.draftYear))];
   const draftHtml = draftYears.map((year) => {
-    const rows = draftPicks.filter((a) => a.draftYear === year).map(renderAssetCard).join('');
-    return `<div class="asset-year-group"><div class="asset-year-label">${escapeHtml(year)}</div><div class="asset-grid">${rows}</div></div>`;
+    const yearPicks = draftPicks.filter((asset) => asset.draftYear === year);
+    return `<div class="asset-year-group asset-year-group-v228">
+      <div class="asset-year-label-v228"><strong>${escapeHtml(year)}</strong><span>${yearPicks.length} ${yearPicks.length === 1 ? 'pick' : 'picks'}</span></div>
+      <div class="asset-grid">${yearPicks.map(renderAssetCard).join('')}</div>
+    </div>`;
   }).join('');
 
   const sections = [];
-  if ((assetFilter === 'ALL' || assetFilter === 'DRAFT') && draftPicks.length) sections.push(`<section class="asset-section"><div class="asset-section-head"><h4>Draft Picks</h4><span>${draftPicks.length} tracked</span></div>${draftHtml}</section>`);
-  if ((assetFilter === 'ALL' || assetFilter === 'RIGHTS') && rights.length) sections.push(`<section class="asset-section"><div class="asset-section-head"><h4>Rights</h4><span>${rights.length} tracked</span></div><div class="asset-grid">${rights.map(renderAssetCard).join('')}</div></section>`);
-  if ((assetFilter === 'ALL' || assetFilter === 'OTHER') && other.length) sections.push(`<section class="asset-section"><div class="asset-section-head"><h4>Other Assets</h4><span>${other.length} tracked</span></div><div class="asset-grid">${other.map(renderAssetCard).join('')}</div></section>`);
+  if ((assetFilter === 'ALL' || assetFilter === 'DRAFT') && draftPicks.length) {
+    sections.push(`<section class="asset-portfolio-panel-v228"><div class="asset-section-head"><div><p class="eyebrow">Draft capital</p><h4>Draft Picks</h4></div><span>${draftPicks.length} tracked</span></div>${draftHtml}</section>`);
+  }
+  if ((assetFilter === 'ALL' || assetFilter === 'RIGHTS') && rights.length) {
+    sections.push(`<section class="asset-portfolio-panel-v228"><div class="asset-section-head"><div><p class="eyebrow">Rights</p><h4>Player & Prospect Rights</h4></div><span>${rights.length} tracked</span></div><div class="asset-grid">${rights.map(renderAssetCard).join('')}</div></section>`);
+  }
+  if ((assetFilter === 'ALL' || assetFilter === 'OTHER') && other.length) {
+    sections.push(`<section class="asset-portfolio-panel-v228"><div class="asset-section-head"><div><p class="eyebrow">Other</p><h4>Other Assets</h4></div><span>${other.length} tracked</span></div><div class="asset-grid">${other.map(renderAssetCard).join('')}</div></section>`);
+  }
 
-  const filteredCount = assetFilter === 'ALL' ? currentAssets.length : assetFilter === 'DRAFT' ? draftPicks.length : assetFilter === 'RIGHTS' ? rights.length : other.length;
-  const emptyCopy = currentAssets.length ? 'No assets match this view.' : 'Add draft picks, rights or other future assets owned by this Front Office.';
-  el('assetsView').innerHTML = `<div class="assets-page"><div class="page-heading-row"><div><p class="eyebrow">Inventory</p><h3>Assets</h3><p class="page-copy">Track draft picks, rights and other non-roster assets. Draft-pick identity stays tied to the original team.</p></div><button id="addAssetBtn" class="btn btn-primary" type="button">+ Add Asset</button></div><div class="asset-summary-strip"><span class="asset-summary-pill"><strong>${owned}</strong> owned</span><span class="asset-summary-pill"><strong>${draftPicks.length}</strong> draft picks</span><span class="asset-summary-pill"><strong>${rights.length}</strong> rights</span></div><div class="asset-tabs" aria-label="Asset views">${tabs}</div>${filteredCount ? sections.join('') : `<div class="empty-state"><h4>${currentAssets.length ? 'Nothing in this category' : 'No assets yet'}</h4><p>${escapeHtml(emptyCopy)}</p></div>`}</div>`;
+  const filteredCount = assetFilter === 'ALL'
+    ? currentAssets.length
+    : assetFilter === 'DRAFT'
+      ? draftPicks.length
+      : assetFilter === 'RIGHTS'
+        ? rights.length
+        : other.length;
+
+  const emptyCopy = currentAssets.length
+    ? 'No assets match this view.'
+    : 'Add draft picks, rights or other future assets owned by this Front Office.';
+
+  el('assetsView').innerHTML = `<div class="assets-page assets-page-v228">
+    <div class="page-heading-row asset-page-heading-v228">
+      <div><p class="eyebrow">Portfolio</p><h3>Assets</h3><p class="page-copy">Draft capital, rights and other non-roster resources owned by this Front Office.</p></div>
+      <button id="addAssetBtn" class="btn btn-primary" type="button">+ Add Asset</button>
+    </div>
+
+    <div class="asset-summary-grid-v228">
+      <div><span>Owned</span><strong>${owned}</strong><small>current assets</small></div>
+      <div><span>Draft Picks</span><strong>${draftPicks.length}</strong><small>tracked selections</small></div>
+      <div><span>Rights</span><strong>${rights.length}</strong><small>player/prospect</small></div>
+      <div><span>Conditional</span><strong>${conditional}</strong><small>pending assets</small></div>
+    </div>
+
+    <div class="asset-tabs asset-tabs-v228" aria-label="Asset views">${tabs}</div>
+    ${filteredCount ? sections.join('') : `<div class="empty-state"><h4>${currentAssets.length ? 'Nothing in this category' : 'No assets yet'}</h4><p>${escapeHtml(emptyCopy)}</p></div>`}
+  </div>`;
 
   el('addAssetBtn').addEventListener('click', () => openAssetDialog());
-  document.querySelectorAll('[data-asset-filter]').forEach((button) => button.addEventListener('click', () => { assetFilter = button.dataset.assetFilter; renderAssets(); }));
-  document.querySelectorAll('[data-edit-asset]').forEach((button) => button.addEventListener('click', () => openAssetDialog(button.dataset.editAsset)));
+  document.querySelectorAll('[data-asset-filter]').forEach((button) =>
+    button.addEventListener('click', () => { assetFilter = button.dataset.assetFilter; renderAssets(); })
+  );
+  document.querySelectorAll('[data-edit-asset]').forEach((button) =>
+    button.addEventListener('click', () => openAssetDialog(button.dataset.editAsset))
+  );
 }
 
 function syncAssetTypeFields() {
