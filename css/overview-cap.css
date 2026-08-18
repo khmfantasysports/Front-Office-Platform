@@ -455,3 +455,105 @@
   .overview-snapshot-item small { display:none; }
   .overview-snapshot-item { padding:8px 6px; }
 }
+
+
+/* V2.28 — Cap workspace refresh */
+.cap-page-v228 { display:grid; gap:9px; }
+.cap-page-heading-v228 { margin-bottom:0; }
+.cap-hero-v228,
+.cap-panel-v228,
+.cap-detail-disclosure-v228 {
+  min-width:0;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(13,24,34,.88);
+}
+.cap-hero-v228 {
+  padding:16px;
+  overflow:hidden;
+  background:radial-gradient(circle at 0 0,rgba(50,173,255,.09),transparent 42%),rgba(13,24,34,.94);
+}
+.cap-hero-v228.tone-good { border-color:rgba(82,215,194,.38); }
+.cap-hero-v228.tone-warning { border-color:rgba(242,198,109,.42); }
+.cap-hero-v228.tone-danger { border-color:rgba(246,123,123,.48); }
+.cap-hero-top-v228 { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+.cap-hero-primary-v228 { font-size:clamp(2rem,5vw,3rem); line-height:.95; font-weight:900; letter-spacing:-.05em; font-variant-numeric:tabular-nums; }
+.cap-hero-primary-v228.good { color:var(--healthy); }
+.cap-hero-primary-v228.warning { color:var(--warning); }
+.cap-hero-primary-v228.danger { color:var(--danger); }
+.cap-hero-primary-label-v228 { margin-top:5px; color:#d7e1e9; font-size:.76rem; font-weight:800; }
+.cap-hero-limit-v228 { min-width:118px; padding:8px 10px; border:1px solid var(--border-soft); border-radius:10px; background:rgba(7,17,26,.38); text-align:right; }
+.cap-hero-limit-v228 span,.cap-hero-strip-v228 span { display:block; color:var(--muted); font-size:.58rem; font-weight:850; letter-spacing:.055em; text-transform:uppercase; }
+.cap-hero-limit-v228 strong { display:block; margin-top:3px; font-size:.9rem; }
+.cap-hero-progress-v228 { margin-top:14px; }
+.cap-hero-progress-v228 .cap-bar { height:9px; margin:0; }
+.cap-hero-progress-v228 > div:last-child { display:flex; justify-content:space-between; gap:12px; margin-top:6px; color:var(--muted); font-size:.66rem; }
+.cap-hero-progress-v228 strong { color:var(--text); }
+.cap-hero-strip-v228 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:13px; border-top:1px solid var(--border-soft); }
+.cap-hero-strip-v228 > div { min-width:0; padding:11px 10px 0; }
+.cap-hero-strip-v228 > div:first-child { padding-left:0; }
+.cap-hero-strip-v228 > div + div { border-left:1px solid var(--border-soft); }
+.cap-hero-strip-v228 strong { display:block; margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.94rem; }
+
+.cap-panel-v228 { padding:12px 13px; }
+.cap-section-head-v228 { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.cap-section-head-v228 h3 { margin:0; font-size:.98rem; }
+.cap-section-head-v228 p:last-child { margin:3px 0 0; color:var(--muted); font-size:.64rem; }
+.cap-outlook-scroll-v228 { width:100%; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:rgba(119,201,255,.3) transparent; padding-bottom:2px; }
+.cap-outlook-grid-v228 { display:grid; grid-template-columns:repeat(7,minmax(138px,1fr)); gap:7px; min-width:1010px; }
+.cap-season-card-v228 { min-width:0; padding:10px; border:1px solid var(--border-soft); border-radius:11px; background:#0b151e; }
+.cap-season-card-v228.current { border-color:rgba(119,201,255,.38); background:linear-gradient(180deg,rgba(50,173,255,.07),#0b151e 74%); }
+.cap-season-top-v228 { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.cap-season-top-v228 strong { font-size:.69rem; }
+.cap-season-top-v228 span { padding:2px 5px; border-radius:999px; background:rgba(50,173,255,.1); color:var(--accent); font-size:.47rem; font-weight:900; text-transform:uppercase; }
+.cap-season-used-v228 { margin-top:9px; font-size:.96rem; font-weight:900; }
+.cap-season-label-v228 { margin-top:2px; color:var(--muted); font-size:.52rem; text-transform:uppercase; letter-spacing:.05em; }
+.cap-season-track-v228 { height:4px; margin-top:8px; overflow:hidden; border-radius:999px; background:rgba(255,255,255,.06); }
+.cap-season-track-v228 span { display:block; height:100%; border-radius:999px; background:var(--accent); }
+.cap-season-card-v228.current .cap-season-track-v228 span { background:var(--healthy); }
+.cap-season-metrics-v228 { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:9px; }
+.cap-season-metrics-v228 > span { min-width:0; padding:6px; border:1px solid var(--border-soft); border-radius:7px; background:rgba(255,255,255,.012); }
+.cap-season-metrics-v228 small,.cap-season-metrics-v228 strong { display:block; }
+.cap-season-metrics-v228 small { color:var(--muted); font-size:.46rem; text-transform:uppercase; }
+.cap-season-metrics-v228 strong { margin-top:2px; font-size:.63rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cap-season-footer-v228 { display:flex; justify-content:space-between; gap:6px; margin-top:7px; color:#8193a2; font-size:.48rem; white-space:nowrap; }
+
+.cap-dead-list-v228 { display:grid; gap:7px; }
+.cap-dead-entry-v228 { padding:10px; border:1px solid var(--border-soft); border-radius:10px; background:#0b151e; }
+.cap-dead-entry-head strong,.cap-dead-entry-head span { display:block; }
+.cap-dead-entry-head strong { font-size:.75rem; }
+.cap-dead-entry-head span { margin-top:2px; color:var(--muted); font-size:.56rem; }
+.cap-dead-season-list { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }
+.cap-dead-season-chip { display:inline-flex; align-items:center; gap:6px; min-height:27px; padding:4px 7px; border:1px solid rgba(242,198,109,.22); border-radius:8px; background:rgba(242,198,109,.04); }
+.cap-dead-season-chip span { color:var(--muted); font-size:.52rem; }
+.cap-dead-season-chip strong { color:var(--warning); font-size:.62rem; }
+.cap-empty-v228 { display:grid; grid-template-columns:30px minmax(0,1fr); gap:9px; align-items:center; padding:10px; border:1px solid var(--border-soft); border-radius:10px; background:#0b151e; }
+.cap-empty-icon { width:30px; height:30px; display:grid; place-items:center; border-radius:8px; background:rgba(82,215,194,.09); color:var(--healthy); font-weight:900; }
+.cap-empty-v228 strong,.cap-empty-v228 small { display:block; }
+.cap-empty-v228 strong { font-size:.73rem; }
+.cap-empty-v228 small { margin-top:2px; color:var(--muted); font-size:.58rem; }
+
+.cap-detail-disclosure-v228 { overflow:hidden; }
+.cap-detail-disclosure-v228 > summary { list-style:none; display:flex; align-items:center; justify-content:space-between; padding:12px 13px; cursor:pointer; }
+.cap-detail-disclosure-v228 > summary::-webkit-details-marker { display:none; }
+.cap-detail-disclosure-v228 > summary::after { content:'+'; color:var(--accent); font-size:1rem; }
+.cap-detail-disclosure-v228[open] > summary::after { content:'−'; }
+.cap-detail-disclosure-v228 summary strong,.cap-detail-disclosure-v228 summary small { display:block; }
+.cap-detail-disclosure-v228 summary strong { font-size:.86rem; }
+.cap-detail-disclosure-v228 summary small { margin-top:2px; color:var(--muted); font-size:.59rem; }
+.cap-detail-body-v228 { padding:0 13px 13px; border-top:1px solid var(--border-soft); }
+
+@media(max-width:720px){
+  .cap-page-v228 { gap:7px; }
+  .cap-hero-v228 { padding:12px; border-radius:12px; }
+  .cap-hero-primary-v228 { font-size:2rem; }
+  .cap-hero-limit-v228 { min-width:104px; padding:7px 8px; }
+  .cap-hero-limit-v228 span { font-size:.5rem; }
+  .cap-hero-limit-v228 strong { font-size:.78rem; }
+  .cap-hero-strip-v228 > div { padding:9px 7px 0; }
+  .cap-hero-strip-v228 span { font-size:.49rem; }
+  .cap-hero-strip-v228 strong { font-size:.78rem; }
+  .cap-panel-v228 { padding:10px; border-radius:12px; }
+  .cap-outlook-grid-v228 { grid-template-columns:repeat(7,126px); min-width:max-content; gap:6px; }
+  .cap-section-head-v228 h3 { font-size:.88rem; }
+}
