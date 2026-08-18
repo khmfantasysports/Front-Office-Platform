@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.21" />
+  <meta name="application-name" content="Fantasy Front Office v2.24" />
   <style>
 :root {
   color-scheme: dark;
@@ -3049,7 +3049,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  const APP_VERSION = '2.22';
+  const APP_VERSION = '2.24';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
@@ -3762,7 +3762,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const player = state.players.find((p) => p.id === playerId);
     if (!player) return;
     const success = await runCloudAction(async () => {
-      const { error } = await db.rpc('record_front_office_transaction_v1', {
+      const { error } = await db.rpc('record_front_office_transaction_v2', {
         p_front_office_id: state.frontOffice.id,
         p_transaction_type: 'Call Up',
         p_transaction_date: todayIsoDate(),
@@ -3773,7 +3773,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         p_front_office_player_id: player.id,
         p_roster_action: 'CALL_UP',
         p_roster_status_id: defaultActiveStatusId(),
-        p_adjustment_type: null,
         p_adjustment_description: null,
         p_adjustment_rows: []
       });
@@ -4695,7 +4694,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         if (!playerId) throw new Error('Player save did not return a player ID.');
 
         if (previousGroup === 'FARM' && desiredGroup === 'ACTIVE') {
-          const { error: moveError } = await db.rpc('record_front_office_transaction_v1', {
+          const { error: moveError } = await db.rpc('record_front_office_transaction_v2', {
             p_front_office_id: frontOfficeId,
             p_transaction_type: 'Call Up',
             p_transaction_date: todayIsoDate(),
@@ -4706,8 +4705,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
             p_front_office_player_id: playerId,
             p_roster_action: 'CALL_UP',
             p_roster_status_id: el('rosterStatus').value || null,
-            p_adjustment_type: null,
-            p_adjustment_description: null,
+                p_adjustment_description: null,
             p_adjustment_rows: []
           });
           if (moveError) throw moveError;
@@ -4721,7 +4719,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         if (prospectError) throw prospectError;
 
         if (desiredGroup === 'FARM' && previousGroup !== 'FARM') {
-          const { error: moveError } = await db.rpc('record_front_office_transaction_v1', {
+          const { error: moveError } = await db.rpc('record_front_office_transaction_v2', {
             p_front_office_id: frontOfficeId,
             p_transaction_type: 'Send Down',
             p_transaction_date: todayIsoDate(),
@@ -4732,8 +4730,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
             p_front_office_player_id: playerId,
             p_roster_action: 'SEND_TO_FARM',
             p_roster_status_id: el('rosterStatus').value || null,
-            p_adjustment_type: null,
-            p_adjustment_description: null,
+                p_adjustment_description: null,
             p_adjustment_rows: []
           });
           if (moveError) throw moveError;
