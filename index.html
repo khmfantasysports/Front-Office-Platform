@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.24" />
+  <meta name="application-name" content="Fantasy Front Office v2.25" />
   <style>
 :root {
   color-scheme: dark;
@@ -2609,6 +2609,50 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .transaction-card-actions .btn { min-height:29px; font-size:.64rem; }
 }
 
+
+/* V2.25 structured trade execution */
+.trade-structured-section { display:grid; gap:10px; padding:11px; border:1px solid var(--border); border-radius:12px; background:rgba(7,17,26,.34); }
+.trade-structured-section.hidden { display:none !important; }
+.trade-side-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.trade-side { min-width:0; display:grid; gap:8px; padding:10px; border:1px solid var(--border-soft); border-radius:11px; background:#0b151e; }
+.trade-side-head { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.trade-side-head h4 { margin:0; font-size:.84rem; }
+.trade-side-head p { margin:2px 0 0; color:var(--muted); font-size:.61rem; line-height:1.3; }
+.trade-choice-list { display:grid; gap:6px; max-height:210px; overflow:auto; }
+.trade-choice { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:8px; align-items:center; min-height:38px; padding:6px 7px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(255,255,255,.012); }
+.trade-choice input { width:auto; margin:0; }
+.trade-choice-main { min-width:0; }
+.trade-choice-main strong,.trade-choice-main small { display:block; }
+.trade-choice-main strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.72rem; }
+.trade-choice-main small { margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:.57rem; }
+.trade-choice-value { color:#cfeaff; font-size:.63rem; font-weight:800; white-space:nowrap; }
+.trade-empty { color:var(--muted); font-size:.64rem; line-height:1.35; padding:5px 1px; }
+.trade-builder-list { display:grid; gap:7px; }
+.trade-builder-card { display:grid; gap:8px; padding:9px; border:1px solid var(--border-soft); border-radius:10px; background:rgba(255,255,255,.012); }
+.trade-builder-head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.trade-builder-head strong { font-size:.71rem; }
+.trade-builder-head .btn { min-height:28px; padding:4px 7px; font-size:.61rem; }
+.trade-builder-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.trade-builder-grid label { display:grid; gap:4px; color:var(--muted); font-size:.62rem; font-weight:700; }
+.trade-builder-grid .full { grid-column:1/-1; }
+.trade-builder-grid input,.trade-builder-grid select { min-height:34px; padding:6px 7px; font-size:.68rem; }
+.trade-builder-check { display:flex !important; align-items:center; gap:6px !important; min-height:34px; }
+.trade-builder-check input { width:auto; }
+.trade-contract-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px; }
+.trade-contract-cell { display:grid; gap:3px; }
+.trade-contract-cell span { color:var(--muted); font-size:.54rem; }
+.trade-contract-cell input { min-height:31px; padding:5px 6px; font-size:.64rem; }
+.trade-add-actions { display:flex; gap:6px; flex-wrap:wrap; }
+.trade-add-actions .btn { min-height:31px; padding:5px 8px; font-size:.64rem; }
+.trade-edit-lock { padding:9px 10px; border:1px solid rgba(242,198,109,.28); border-radius:10px; background:rgba(242,198,109,.055); color:#d7c28d; font-size:.64rem; line-height:1.35; }
+@media(max-width:720px){
+  .trade-side-grid { grid-template-columns:1fr; }
+  .trade-choice-list { max-height:180px; }
+  .trade-builder-grid { grid-template-columns:1fr 1fr; }
+  .trade-structured-section { padding:9px; }
+}
+@media(max-width:390px){ .trade-builder-grid { grid-template-columns:1fr; } .trade-builder-grid .full { grid-column:auto; } }
+
 </style>
 </head>
 <body>
@@ -3007,6 +3051,24 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           <label class="full-width">Notes<textarea id="transactionNotes" rows="2" placeholder="Optional transaction notes"></textarea></label>
         </div>
 
+        <section id="transactionTradeStructuredSection" class="trade-structured-section hidden">
+          <div class="trade-side-grid">
+            <div class="trade-side">
+              <div class="trade-side-head"><div><h4>Outgoing</h4><p>Select records currently owned by this Front Office.</p></div></div>
+              <div><p class="eyebrow">Players</p><div id="tradeOutgoingPlayers" class="trade-choice-list"></div></div>
+              <div><p class="eyebrow">Assets</p><div id="tradeOutgoingAssets" class="trade-choice-list"></div></div>
+            </div>
+            <div class="trade-side">
+              <div class="trade-side-head"><div><h4>Incoming</h4><p>Create acquired players/assets or reacquire a previously traded asset.</p></div></div>
+              <div><p class="eyebrow">Tracked assets available to reacquire</p><div id="tradeIncomingExistingAssets" class="trade-choice-list"></div></div>
+              <div id="tradeIncomingPlayers" class="trade-builder-list"></div>
+              <div id="tradeIncomingAssets" class="trade-builder-list"></div>
+              <div class="trade-add-actions"><button id="addTradeIncomingPlayerBtn" class="btn btn-secondary" type="button">+ Incoming Player</button><button id="addTradeIncomingAssetBtn" class="btn btn-secondary" type="button">+ Incoming Asset</button></div>
+            </div>
+          </div>
+          <div id="tradeEditLock" class="trade-edit-lock hidden">Structured trade items are locked while editing because they already changed roster and asset ownership. Delete and recreate the trade to change those items.</div>
+        </section>
+
         <section id="transactionPlayerSnapshot" class="transaction-player-snapshot hidden" aria-live="polite">
           <div class="transaction-player-snapshot-head">
             <div><strong id="transactionPlayerSnapshotName"></strong><span id="transactionPlayerSnapshotMeta"></span></div>
@@ -3049,7 +3111,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
   });
 
-  const APP_VERSION = '2.24';
+  const APP_VERSION = '2.25';
   const DEFAULT_STATUSES = [];
   let state = emptyState();
   let session = null;
@@ -3068,6 +3130,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   let depthSaving = false;
   let transactionSummaryTouched = false;
   let editingTransactionId = null;
+  let tradeBuilderSequence = 0;
 
   const el = (id) => document.getElementById(id);
   const authGate = el('authGate');
@@ -3161,6 +3224,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionPlayer').addEventListener('change', handleTransactionPlayerChange);
     el('transactionRosterAction').addEventListener('change', updateTransactionRosterStatusVisibility);
     el('transactionSummary').addEventListener('input', () => { transactionSummaryTouched = true; });
+    el('transactionCounterparty').addEventListener('input', () => { if (el('transactionType').value === 'Trade') autoTransactionSummary(); });
     el('recalculateTransactionPenaltyBtn').addEventListener('click', applyAutomaticTransactionPenalty);
 
     el('closeAssetDialog').addEventListener('click', () => assetDialog.close());
@@ -3955,12 +4019,141 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     };
   }
 
+  function tradeCurrentCharge(player) {
+    const season = currentSeason();
+    return season ? effectivePlayerCharge(player, season.id) : null;
+  }
+
+  function structuredTradeItemLabel(item) {
+    const kind = item.kind === 'PLAYER' ? 'Player' : item.kind === 'ASSET' ? 'Asset' : 'Item';
+    return `<div class="trade-choice"><span></span><span class="trade-choice-main"><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(kind)}</small></span><span class="trade-choice-value">${escapeHtml(item.direction)}</span></div>`;
+  }
+
+  function renderStructuredTradeSelectors() {
+    const outPlayers = state.players.map((player) => {
+      const charge = tradeCurrentCharge(player);
+      const status = statusById(player.statusId);
+      return `<label class="trade-choice"><input type="checkbox" data-trade-out-player="${player.id}" /><span class="trade-choice-main"><strong>${escapeHtml(player.name)}</strong><small>${escapeHtml(player.position)} · ${escapeHtml(player.realTeam || '—')} · ${player.rosterGroup === 'FARM' ? 'Minors' : 'Active'} · ${escapeHtml(status?.name || 'Other')}</small></span><span class="trade-choice-value">${charge === null ? '—' : formatMoney(charge)}</span></label>`;
+    }).join('');
+    el('tradeOutgoingPlayers').innerHTML = outPlayers || '<div class="trade-empty">No current roster or Minors players are available.</div>';
+
+    const outgoingAssets = (state.assets || []).filter((asset) => !asset.archivedAt && ['OWNED','CONDITIONAL'].includes(asset.status));
+    el('tradeOutgoingAssets').innerHTML = outgoingAssets.length ? outgoingAssets.map((asset) => `<label class="trade-choice"><input type="checkbox" data-trade-out-asset="${asset.id}" /><span class="trade-choice-main"><strong>${escapeHtml(asset.label)}</strong><small>${escapeHtml(assetTypeLabel(asset.type))} · ${escapeHtml(assetStatusLabel(asset.status))}</small></span><span class="trade-choice-value">OUT</span></label>`).join('') : '<div class="trade-empty">No owned assets are available.</div>';
+
+    const reacquireAssets = (state.assets || []).filter((asset) => !asset.archivedAt && asset.status === 'TRADED_AWAY');
+    el('tradeIncomingExistingAssets').innerHTML = reacquireAssets.length ? reacquireAssets.map((asset) => `<label class="trade-choice"><input type="checkbox" data-trade-in-existing-asset="${asset.id}" /><span class="trade-choice-main"><strong>${escapeHtml(asset.label)}</strong><small>${escapeHtml(assetTypeLabel(asset.type))} · currently Traded Away</small></span><span class="trade-choice-value">IN</span></label>`).join('') : '<div class="trade-empty">No previously traded assets to reacquire.</div>';
+  }
+
+  function tradeSalaryInputs(index) {
+    return contractHorizonSeasons().map((season) => `<label class="trade-contract-cell"><span>${seasonLabel(season.startYear)}</span><input data-trade-player-salary="${index}" data-season-id="${season.id}" type="number" min="0" step="1" placeholder="Salary" /></label>`).join('');
+  }
+
+  function addTradeIncomingPlayer() {
+    const index = ++tradeBuilderSequence;
+    const wrap = document.createElement('div');
+    wrap.className = 'trade-builder-card';
+    wrap.dataset.tradeIncomingPlayerCard = String(index);
+    wrap.innerHTML = `<div class="trade-builder-head"><strong>Incoming Player</strong><button class="btn btn-ghost" data-remove-trade-builder type="button">Remove</button></div><div class="trade-builder-grid">
+      <label class="full">Player name<input data-trade-player-name="${index}" autocomplete="off" placeholder="Player name" /></label>
+      <label>Position<select data-trade-player-position="${index}"><option>C</option><option>LW</option><option>RW</option><option>F</option><option>D</option><option>G</option></select></label>
+      <label>Eligible<input data-trade-player-eligible="${index}" placeholder="C,LW" /></label>
+      <label>NHL team<input data-trade-player-team="${index}" maxlength="8" placeholder="EDM" /></label>
+      <label>Age<input data-trade-player-age="${index}" type="number" min="0" max="100" step="1" /></label>
+      <label>Roster status<select data-trade-player-status="${index}">${state.statuses.map((status) => `<option value="${status.id}">${escapeHtml(status.name)}</option>`).join('')}</select></label>
+      <label>Location<select data-trade-player-group="${index}"><option value="ACTIVE">Active roster</option><option value="FARM">Minors</option></select></label>
+      <label class="trade-builder-check"><input data-trade-player-prospect="${index}" type="checkbox" /> Prospect</label>
+      <label>Contract through<select data-trade-player-end="${index}"><option value="">Not set</option>${contractHorizonSeasons().map((season) => `<option value="${season.id}">${seasonLabel(season.startYear)}</option>`).join('')}</select></label>
+      <div class="full"><span class="muted" style="font-size:.61rem">Salary by season</span><div class="trade-contract-grid" style="margin-top:5px">${tradeSalaryInputs(index)}</div></div>
+    </div>`;
+    wrap.querySelector('[data-remove-trade-builder]').addEventListener('click', () => wrap.remove());
+    const group = wrap.querySelector(`[data-trade-player-group="${index}"]`);
+    const prospect = wrap.querySelector(`[data-trade-player-prospect="${index}"]`);
+    group.addEventListener('change', () => { if (group.value === 'FARM') prospect.checked = true; });
+    el('tradeIncomingPlayers').appendChild(wrap);
+  }
+
+  function addTradeIncomingAsset() {
+    const index = ++tradeBuilderSequence;
+    const wrap = document.createElement('div');
+    wrap.className = 'trade-builder-card';
+    wrap.dataset.tradeIncomingAssetCard = String(index);
+    wrap.innerHTML = `<div class="trade-builder-head"><strong>Incoming Asset</strong><button class="btn btn-ghost" data-remove-trade-builder type="button">Remove</button></div><div class="trade-builder-grid">
+      <label>Type<select data-trade-asset-type="${index}"><option value="DRAFT_PICK">Draft Pick</option><option value="PROSPECT_RIGHTS">Prospect Rights</option><option value="PLAYER_RIGHTS">Player Rights</option><option value="CONDITIONAL_ASSET">Conditional Asset</option><option value="FUTURE_CONSIDERATIONS">Future Considerations</option><option value="OTHER">Other</option></select></label>
+      <label>Name<input data-trade-asset-label="${index}" placeholder="Optional for draft pick" /></label>
+      <label data-trade-draft-field="${index}">Draft year<input data-trade-asset-year="${index}" type="number" min="1900" max="2200" placeholder="2028" /></label>
+      <label data-trade-draft-field="${index}">Round<input data-trade-asset-round="${index}" type="number" min="1" max="99" placeholder="1" /></label>
+      <label class="full" data-trade-draft-field="${index}">Original team<input data-trade-asset-team="${index}" placeholder="Original team" /></label>
+      <label class="full">Notes<input data-trade-asset-notes="${index}" placeholder="Optional conditions or notes" /></label>
+    </div>`;
+    wrap.querySelector('[data-remove-trade-builder]').addEventListener('click', () => wrap.remove());
+    const type = wrap.querySelector(`[data-trade-asset-type="${index}"]`);
+    const sync = () => wrap.querySelectorAll(`[data-trade-draft-field="${index}"]`).forEach((field) => field.classList.toggle('hidden', type.value !== 'DRAFT_PICK'));
+    type.addEventListener('change', sync); sync();
+    el('tradeIncomingAssets').appendChild(wrap);
+  }
+
+  function resetStructuredTradeControls() {
+    tradeBuilderSequence = 0;
+    el('tradeIncomingPlayers').innerHTML = '';
+    el('tradeIncomingAssets').innerHTML = '';
+    el('tradeEditLock').classList.add('hidden');
+    el('addTradeIncomingPlayerBtn').classList.remove('hidden');
+    el('addTradeIncomingAssetBtn').classList.remove('hidden');
+    renderStructuredTradeSelectors();
+  }
+
+  function renderStructuredTradeEditSummary(transactionId) {
+    const items = transactionItemsFor(transactionId).filter((item) => item.kind !== 'FINANCIAL');
+    const outgoing = items.filter((item) => item.direction === 'OUT');
+    const incoming = items.filter((item) => item.direction === 'IN');
+    el('tradeOutgoingPlayers').innerHTML = outgoing.filter((item) => item.kind === 'PLAYER').map(structuredTradeItemLabel).join('') || '<div class="trade-empty">No outgoing players.</div>';
+    el('tradeOutgoingAssets').innerHTML = outgoing.filter((item) => item.kind === 'ASSET').map(structuredTradeItemLabel).join('') || '<div class="trade-empty">No outgoing assets.</div>';
+    el('tradeIncomingExistingAssets').innerHTML = incoming.filter((item) => item.kind === 'ASSET').map(structuredTradeItemLabel).join('') || '<div class="trade-empty">No incoming assets.</div>';
+    el('tradeIncomingPlayers').innerHTML = incoming.filter((item) => item.kind === 'PLAYER').map(structuredTradeItemLabel).join('');
+    el('tradeIncomingAssets').innerHTML = '';
+    el('tradeEditLock').classList.remove('hidden');
+    el('addTradeIncomingPlayerBtn').classList.add('hidden');
+    el('addTradeIncomingAssetBtn').classList.add('hidden');
+  }
+
+  function collectStructuredTradePayload() {
+    const outPlayerIds = [...document.querySelectorAll('[data-trade-out-player]:checked')].map((input) => input.dataset.tradeOutPlayer);
+    const outAssetIds = [...document.querySelectorAll('[data-trade-out-asset]:checked')].map((input) => input.dataset.tradeOutAsset);
+    const inExistingAssetIds = [...document.querySelectorAll('[data-trade-in-existing-asset]:checked')].map((input) => input.dataset.tradeInExistingAsset);
+    const inPlayers = [...document.querySelectorAll('[data-trade-incoming-player-card]')].map((card) => {
+      const index = card.dataset.tradeIncomingPlayerCard;
+      const name = card.querySelector(`[data-trade-player-name="${index}"]`).value.trim();
+      const position = card.querySelector(`[data-trade-player-position="${index}"]`).value;
+      const eligible = normalizeEligibility(card.querySelector(`[data-trade-player-eligible="${index}"]`).value) || position;
+      const group = card.querySelector(`[data-trade-player-group="${index}"]`).value;
+      const prospect = card.querySelector(`[data-trade-player-prospect="${index}"]`).checked || group === 'FARM';
+      const salaryRows = [...card.querySelectorAll(`[data-trade-player-salary="${index}"]`)].map((input) => ({ season_id:input.dataset.seasonId, salary:nullableNumber(input.value), cap_override:null })).filter((row) => row.salary !== null);
+      return { player_name:name, position, eligible_positions:eligible, real_team:normalizeNhlTeam(card.querySelector(`[data-trade-player-team="${index}"]`).value), age_snapshot:nullableInteger(card.querySelector(`[data-trade-player-age="${index}"]`).value), roster_status_id:card.querySelector(`[data-trade-player-status="${index}"]`).value, roster_group:group, is_prospect:prospect, contract_end_season_id:card.querySelector(`[data-trade-player-end="${index}"]`).value || null, salary_rows:salaryRows };
+    });
+    for (const player of inPlayers) if (!player.player_name) throw new Error('Each incoming player needs a player name.');
+
+    const inAssets = [...document.querySelectorAll('[data-trade-incoming-asset-card]')].map((card) => {
+      const index = card.dataset.tradeIncomingAssetCard;
+      const type = card.querySelector(`[data-trade-asset-type="${index}"]`).value;
+      const year = nullableInteger(card.querySelector(`[data-trade-asset-year="${index}"]`).value);
+      const round = nullableInteger(card.querySelector(`[data-trade-asset-round="${index}"]`).value);
+      const team = card.querySelector(`[data-trade-asset-team="${index}"]`).value.trim();
+      const label = card.querySelector(`[data-trade-asset-label="${index}"]`).value.trim();
+      const notes = card.querySelector(`[data-trade-asset-notes="${index}"]`).value.trim();
+      if (type === 'DRAFT_PICK' && (!year || !round || !team)) throw new Error('Each incoming draft pick needs a year, round and original team.');
+      if (type !== 'DRAFT_PICK' && !label) throw new Error('Each incoming non-draft asset needs a name.');
+      return { asset_type:type, asset_label:label || null, draft_year:type === 'DRAFT_PICK' ? year : null, draft_round:type === 'DRAFT_PICK' ? round : null, original_team:type === 'DRAFT_PICK' ? team : null, notes:notes || null };
+    });
+    if (!(outPlayerIds.length || outAssetIds.length || inExistingAssetIds.length || inPlayers.length || inAssets.length)) throw new Error('Add at least one incoming or outgoing player/asset to the trade.');
+    return { outPlayerIds, outAssetIds, inExistingAssetIds, inPlayers, inAssets };
+  }
+
   function renderTransactions() {
     const txRows = [...state.transactions].sort((a,b) => `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`)).map((tx) => {
       const allItems = transactionItemsFor(tx.id);
-      const incoming = allItems.filter((item) => item.direction === 'IN' && item.kind !== 'PLAYER');
-      const outgoing = allItems.filter((item) => item.direction === 'OUT' && item.kind !== 'PLAYER');
-      const playerItems = allItems.filter((item) => item.kind === 'PLAYER');
+      const incoming = allItems.filter((item) => item.direction === 'IN' && item.kind !== 'FINANCIAL');
+      const outgoing = allItems.filter((item) => item.direction === 'OUT' && item.kind !== 'FINANCIAL');
+      const playerItems = allItems.filter((item) => item.kind === 'PLAYER' && item.direction === 'NONE');
       const deadCap = transactionDeadCapFor(tx.id);
       const chips = [
         incoming.length ? `<span class="tx-chip in">IN ${incoming.length}</span>` : '',
@@ -3969,7 +4162,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       ].filter(Boolean).join('');
       return `<article class="transaction-card"><div class="transaction-card-head"><div><span class="transaction-type">${escapeHtml(tx.type)}</span><h4>${escapeHtml(tx.summary)}</h4></div><time>${escapeHtml(tx.date)}</time></div>${tx.counterparty ? `<p class="transaction-counterparty">With ${escapeHtml(tx.counterparty)}</p>` : ''}${chips ? `<div class="transaction-chips">${chips}</div>` : ''}${incoming.length ? `<div class="transaction-flow in"><strong>IN</strong><span>${incoming.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${outgoing.length ? `<div class="transaction-flow out"><strong>OUT</strong><span>${outgoing.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${playerItems.length ? `<div class="transaction-flow"><strong>PLAYER</strong><span>${playerItems.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${deadCap ? `<div class="transaction-flow financial"><strong>DEAD CAP</strong><span>${escapeHtml(deadCap.description)} · ${formatMoney(deadCap.total)}</span></div>` : ''}${tx.notes ? `<p class="transaction-notes">${escapeHtml(tx.notes)}</p>` : ''}<div class="transaction-card-actions"><button class="btn btn-ghost btn-small" data-edit-transaction="${tx.id}" type="button">Edit</button><button class="btn btn-danger btn-small" data-delete-transaction="${tx.id}" type="button">Delete</button></div></article>`;
     }).join('');
-    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades, waivers, buyouts, signings, call-ups and other front-office moves are recorded here. Any financial consequence is tracked as Dead Cap on the Cap page.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Use Record Transaction above to add your first trade, signing, waiver move or buyout.</p></div>`}</div>`;
+    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades now move real roster and asset records. Waivers, buyouts, signings, call-ups and other front-office moves remain in the same ledger, with any financial consequence tracked as Dead Cap.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Use Record Transaction above to add your first trade, signing, waiver move or buyout.</p></div>`}</div>`;
     el('recordTransactionBtn').addEventListener('click', () => openTransactionDialog());
     document.querySelectorAll('[data-edit-transaction]').forEach((button) => button.addEventListener('click', () => openEditTransactionDialog(button.dataset.editTransaction)));
     document.querySelectorAll('[data-delete-transaction]').forEach((button) => button.addEventListener('click', () => deleteTransaction(button.dataset.deleteTransaction)));
@@ -3977,7 +4170,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
   function transactionTypeConfig(type) {
     const configs = {
-      'Trade': { help:'Record the counterparty, assets moving in/out and any retained salary that remains as Dead Cap.', player:'optional', counterparty:true, flow:true, rosterAction:true, summary:true, financial:'manual' },
+      'Trade': { help:'Select the actual players and assets moving in/out. Incoming players and picks become real Front Office records when the trade is saved.', counterparty:true, structuredTrade:true, autoSummary:true, financial:'manual' },
       'Signing': { help:'Record a signing. Salary and contract terms should be maintained on the player record.', player:'optional', summary:true },
       'Extension': { help:'Choose the player being extended. Their current contract salary appears below for reference.', player:'required', autoSummary:true },
       'Call Up': { help:'Choose a prospect currently in Minors. The roster move is handled automatically.', player:'required', rosterStatus:true, autoSummary:true, action:'CALL_UP' },
@@ -4063,6 +4256,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function autoTransactionSummary() {
     if (editingTransactionId || transactionSummaryTouched) return;
     const type = el('transactionType').value;
+    if (type === 'Trade') {
+      const counterparty = el('transactionCounterparty').value.trim();
+      el('transactionSummary').value = counterparty ? `Trade with ${counterparty}` : 'Trade';
+      return;
+    }
     const player = state.players.find((item) => item.id === el('transactionPlayer').value);
     if (!player) return;
     const summaries = {
@@ -4164,6 +4362,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionSummaryField').classList.toggle('hidden', Boolean(config.autoSummary) && !editingTransactionId);
     el('transactionIncomingField').classList.toggle('hidden', !config.flow);
     el('transactionOutgoingField').classList.toggle('hidden', !config.flow);
+    el('transactionTradeStructuredSection').classList.toggle('hidden', !config.structuredTrade);
+    if (config.structuredTrade && !editingTransactionId) resetStructuredTradeControls();
     el('transactionRosterAction').value = config.action || 'NONE';
 
     const currentPlayerId = el('transactionPlayer').value;
@@ -4188,6 +4388,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionEditNotice').textContent = '';
     el('transactionDialogTitle').textContent = 'Record transaction';
     el('saveTransactionBtn').textContent = 'Save Transaction';
+    el('tradeEditLock').classList.add('hidden');
   }
 
   function openTransactionDialog(options = {}) {
@@ -4204,6 +4405,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionAdjustmentDescription').value = options.adjustmentDescription || '';
     el('transactionRosterStatus').innerHTML = `<option value="">Keep current status</option>${state.statuses.map((status) => `<option value="${status.id}">${escapeHtml(status.name)}</option>`).join('')}`;
     el('transactionFinancialGrid').innerHTML = contractHorizonSeasons().map((season) => `<label><span>${seasonLabel(season.startYear)}</span><input data-transaction-adjustment-season="${season.id}" type="number" min="0" step="1" placeholder="0" /></label>`).join('');
+    el('addTradeIncomingPlayerBtn').onclick = addTradeIncomingPlayer;
+    el('addTradeIncomingAssetBtn').onclick = addTradeIncomingAsset;
     handleTransactionTypeChange();
     if (options.playerId) {
       el('transactionPlayer').value = options.playerId;
@@ -4229,7 +4432,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       incoming,
       outgoing,
       notes: tx.notes,
-      playerId: playerItem?.playerId || null,
+      playerId: tx.type === 'Trade' ? null : (playerItem?.playerId || null),
       adjustmentDescription: deadCap?.description || ''
     });
 
@@ -4246,6 +4449,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       ? `Linked player: ${playerItem.label}. Transaction type, linked player and roster movement are locked because they may already have changed roster state. Delete and recreate the transaction if one of those is wrong.`
       : 'Transaction type is locked while editing. Delete and recreate the transaction if the transaction type itself was entered incorrectly.';
     el('transactionEditNotice').classList.remove('hidden');
+    if (tx.type === 'Trade') {
+      el('transactionTradeStructuredSection').classList.remove('hidden');
+      renderStructuredTradeEditSummary(transactionId);
+      el('transactionEditNotice').textContent = 'Players and assets in this structured trade are locked while editing because ownership/roster state has already changed. Delete and recreate the trade if a structured item is wrong.';
+    }
 
     if (deadCap) {
       el('transactionFinancialSection').classList.remove('hidden');
@@ -4260,10 +4468,10 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   async function deleteTransaction(transactionId) {
     const tx = state.transactions.find((item) => item.id === transactionId);
     if (!tx) return;
-    const confirmed = confirm(`Delete “${tx.summary}”?\n\nIts Dead Cap will be removed. If this transaction moved or removed a player, that direct roster action will be reversed when it is safe to do so.`);
+    const confirmed = confirm(`Delete “${tx.summary}”?\n\nIts Dead Cap will be removed. Structured player and asset movements will also be reversed when no later transaction makes that reversal unsafe.`);
     if (!confirmed) return;
     await runCloudAction(async () => {
-      const { error } = await db.rpc('delete_front_office_transaction_v1', {
+      const { error } = await db.rpc('delete_front_office_transaction_v2', {
         p_front_office_id: state.frontOffice.id,
         p_transaction_id: transactionId
       });
@@ -4280,6 +4488,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const config = transactionTypeConfig(type);
     const playerId = el('transactionPlayer').value || null;
     if (!editingTransactionId && config.player === 'required' && !playerId) { alert('Choose a player for this transaction.'); return; }
+    let structuredTrade = null;
+    if (!editingTransactionId && type === 'Trade') {
+      if (!el('transactionCounterparty').value.trim()) { alert('Enter the other team for this trade.'); return; }
+      try { structuredTrade = collectStructuredTradePayload(); } catch (error) { alert(error.message); return; }
+    }
     autoTransactionSummary();
     const summary = el('transactionSummary').value.trim();
     if (!summary) { alert('A transaction summary is required.'); return; }
@@ -4303,6 +4516,22 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
             p_in_items: incoming,
             p_out_items: outgoing,
             p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${type} Dead Cap`) : null,
+            p_adjustment_rows: rows
+          });
+          if (error) throw error;
+        } else if (type === 'Trade') {
+          const { error } = await db.rpc('record_structured_trade_v1', {
+            p_front_office_id: state.frontOffice.id,
+            p_transaction_date: el('transactionDate').value || todayIsoDate(),
+            p_counterparty: el('transactionCounterparty').value.trim(),
+            p_summary: summary,
+            p_notes: el('transactionNotes').value.trim() || null,
+            p_out_player_ids: structuredTrade.outPlayerIds,
+            p_out_asset_ids: structuredTrade.outAssetIds,
+            p_in_existing_asset_ids: structuredTrade.inExistingAssetIds,
+            p_in_players: structuredTrade.inPlayers,
+            p_in_assets: structuredTrade.inAssets,
+            p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || 'Retained salary') : null,
             p_adjustment_rows: rows
           });
           if (error) throw error;
