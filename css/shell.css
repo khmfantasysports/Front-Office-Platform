@@ -500,3 +500,28 @@ html, body { max-width: 100%; overflow-x: hidden; }
   .summary-card .label { font-size: .40rem; }
   .summary-card .value { font-size: .62rem; }
 }
+
+
+/* V2.29 — workspace utility menu */
+.utility-menu-section-label {
+  display:block;
+  padding:3px 4px 1px;
+  color:#718493;
+  font-size:.52rem;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+.utility-menu-divider {
+  height:1px;
+  margin:2px 0;
+  background:var(--border-soft);
+}
+.utility-menu-popover #deleteFrontOfficeBtn {
+  color:#ffaaaa;
+  border-color:rgba(246,123,123,.30);
+  background:rgba(246,123,123,.06);
+}
+.utility-menu-popover #deleteFrontOfficeBtn:hover {
+  background:rgba(246,123,123,.11);
+}
