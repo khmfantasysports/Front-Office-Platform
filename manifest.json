@@ -1,0 +1,30 @@
+{
+  "version": "2.26",
+  "backendBaseline": "2.25",
+  "css": [
+    "css/base.css",
+    "css/shell.css",
+    "css/workspace.css",
+    "css/depth-chart.css",
+    "css/assets-landing.css",
+    "css/overview-cap.css",
+    "css/transactions.css"
+  ],
+  "js": [
+    "js/core.js",
+    "js/utils.js",
+    "js/domain.js",
+    "js/data.js",
+    "js/pages/overview.js",
+    "js/features/depth-chart.js",
+    "js/pages/roster.js",
+    "js/features/player-editor.js",
+    "js/features/import.js",
+    "js/pages/minors.js",
+    "js/pages/assets.js",
+    "js/pages/transactions.js",
+    "js/pages/cap.js",
+    "js/pages/settings.js",
+    "js/app.js"
+  ]
+}
