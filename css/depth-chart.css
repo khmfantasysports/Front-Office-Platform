@@ -971,3 +971,37 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     width: 26px;
   }
 }
+
+
+/* V2.28 — Minors workspace visual refresh */
+.farm-page-v228 { gap:9px; }
+.farm-summary-grid-v228 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; overflow:hidden; border:1px solid var(--border-soft); border-radius:12px; background:var(--border-soft); }
+.farm-summary-grid-v228 > div { min-width:0; padding:10px 11px; background:#0b151e; }
+.farm-summary-grid-v228 span,.farm-summary-grid-v228 strong,.farm-summary-grid-v228 small { display:block; }
+.farm-summary-grid-v228 span { color:var(--muted); font-size:.54rem; font-weight:850; text-transform:uppercase; letter-spacing:.05em; }
+.farm-summary-grid-v228 strong { margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.98rem; }
+.farm-summary-grid-v228 small { margin-top:3px; color:var(--muted); font-size:.54rem; }
+.farm-panel-v228 { display:grid; gap:8px; padding:11px 12px; border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.82); }
+.farm-section-head-v228 { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; }
+.farm-section-head-v228 h3 { margin:0; font-size:.9rem; }
+.farm-section-head-v228 > span { color:var(--muted); font-size:.59rem; }
+.farm-player-list-v228 { gap:6px; }
+.farm-player-card-v228 { padding:7px 8px; border-radius:11px; }
+.farm-player-copy-v228 { min-width:0; }
+.farm-player-copy-v228 em { display:block; margin-top:2px; color:#758796; font-size:.56rem; font-style:normal; }
+.farm-player-card-v228 .farm-player-cap strong { font-size:.74rem; }
+.farm-player-card-v228 .farm-player-cap small { font-size:.54rem; }
+.farm-active-grid-v228 { margin-top:0; }
+.farm-active-prospect-v228 { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; }
+.farm-active-prospect-v228 > span:last-child { text-align:right; }
+.farm-active-prospect-v228 strong,.farm-active-prospect-v228 small { display:block; }
+.farm-active-prospect-v228 small { margin-top:2px; color:var(--muted); font-size:.56rem; }
+
+@media(max-width:720px){
+  .farm-summary-grid-v228 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .farm-summary-grid-v228 > div { padding:8px 7px; }
+  .farm-summary-grid-v228 span { font-size:.45rem; }
+  .farm-summary-grid-v228 strong { font-size:.8rem; }
+  .farm-summary-grid-v228 small { display:none; }
+  .farm-panel-v228 { padding:9px; border-radius:12px; }
+}
