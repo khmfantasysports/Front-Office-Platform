@@ -2191,10 +2191,36 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
 
 
-/* V2.15 depth-card hierarchy cleanup */
-/* Defense/goalie rows no longer reserve a side column: pair/rank lives inside each D card. */
+/* V2.16 All-view defense pair labels */
+/* Match forward-line wayfinding: Pair 1/2/3 sits in a slim side rail on the All depth view. */
 .depth-defense-goalie-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 54px repeat(3, minmax(0, 1fr));
+}
+.depth-pair-label-all {
+  min-width:0;
+  height:84px;
+  min-height:84px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#101b25;
+  color:var(--muted);
+  text-align:center;
+}
+.depth-pair-label-all span {
+  font-size:.47rem;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.depth-pair-label-all strong {
+  color:#cbd8e3;
+  font-size:.76rem;
+  line-height:1;
 }
 /* Place the player name in the visual middle between role/status and team/age. */
 .depth-slot {
@@ -2221,16 +2247,22 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 }
 
 @media (max-width: 720px) {
-  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 322px; }
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 370px; }
   .depth-defense-goalie-row {
-    grid-template-columns: repeat(3, 104px);
+    grid-template-columns: 46px repeat(3, 104px);
     gap: 4px;
+  }
+  .depth-pair-label-all {
+    width:46px;
+    height:84px;
+    min-height:84px;
+    border-radius:11px;
   }
 }
 @media (max-width: 390px) {
-  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 316px; }
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 364px; }
   .depth-defense-goalie-row {
-    grid-template-columns: repeat(3, 102px);
+    grid-template-columns: 46px repeat(3, 102px);
     gap: 4px;
   }
 }
@@ -3004,10 +3036,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       const leftD = defense[index * 2];
       const rightD = defense[index * 2 + 1];
       const goalie = goalies[index];
-      const leftLabel = leftD ? (index < 3 ? `D${index * 2 + 1} · Pair ${index + 1}` : `D · Depth ${index * 2 + 1}`) : (index < 3 ? `D${index * 2 + 1} · Pair ${index + 1}` : `D · Depth ${index * 2 + 1}`);
-      const rightLabel = rightD ? (index < 3 ? `D${index * 2 + 2} · Pair ${index + 1}` : `D · Depth ${index * 2 + 2}`) : (index < 3 ? `D${index * 2 + 2} · Pair ${index + 1}` : `D · Depth ${index * 2 + 2}`);
+      const leftLabel = index < 3 ? `D${index * 2 + 1}` : `D · Depth ${index * 2 + 1}`;
+      const rightLabel = index < 3 ? `D${index * 2 + 2}` : `D · Depth ${index * 2 + 2}`;
       const goalieLabel = index === 0 ? 'G · Starter' : index === 1 ? 'G · Backup' : `G${index + 1} · Depth`;
-      return `<div class="depth-defense-goalie-row">${depthSlot(leftD, leftLabel, current)}${depthSlot(rightD, rightLabel, current)}<div class="depth-goalie-card">${depthSlot(goalie, goalieLabel, current)}</div></div>`;
+      const pairLabel = index < 3 ? `<div class="depth-pair-label depth-pair-label-all"><span>Pair</span><strong>${index + 1}</strong></div>` : `<div class="depth-pair-label depth-pair-label-all"><span>Depth</span><strong>${index + 1}</strong></div>`;
+      return `<div class="depth-defense-goalie-row">${pairLabel}${depthSlot(leftD, leftLabel, current)}${depthSlot(rightD, rightLabel, current)}<div class="depth-goalie-card">${depthSlot(goalie, goalieLabel, current)}</div></div>`;
     }).join('');
 
     return `<div class="depth-lineup-shell depth-lineup-all">
