@@ -43,11 +43,13 @@ function renderAssets() {
     .sort((a,b) => (a.draftYear-b.draftYear) || (a.draftRound-b.draftRound) || String(a.originalTeam).localeCompare(String(b.originalTeam)));
   const rights = currentAssets.filter((asset) => ['PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(asset.type));
   const other = currentAssets.filter((asset) => !['DRAFT_PICK','PROSPECT_RIGHTS','PLAYER_RIGHTS'].includes(asset.type));
-  const owned = currentAssets.filter((asset) => asset.status === 'OWNED').length;
   const conditional = currentAssets.filter((asset) => asset.status === 'CONDITIONAL').length;
 
   const tabs = [
-    ['ALL','All'],['DRAFT','Draft Picks'],['RIGHTS','Rights'],['OTHER','Other']
+    ['ALL','All'],
+    ['DRAFT','Picks'],
+    ['RIGHTS','Rights'],
+    ['OTHER','Other']
   ].map(([key,label]) =>
     `<button class="asset-tab ${assetFilter === key ? 'active' : ''}" data-asset-filter="${key}" type="button">${label}</button>`
   ).join('');
@@ -55,21 +57,41 @@ function renderAssets() {
   const draftYears = [...new Set(draftPicks.map((asset) => asset.draftYear))];
   const draftHtml = draftYears.map((year) => {
     const yearPicks = draftPicks.filter((asset) => asset.draftYear === year);
-    return `<div class="asset-year-group asset-year-group-v228">
-      <div class="asset-year-label-v228"><strong>${escapeHtml(year)}</strong><span>${yearPicks.length} ${yearPicks.length === 1 ? 'pick' : 'picks'}</span></div>
+    return `<div class="asset-year-group asset-year-group-v230">
+      <div class="asset-year-label-v230">
+        <strong>${escapeHtml(year)}</strong>
+        <span>${yearPicks.length} ${yearPicks.length === 1 ? 'pick' : 'picks'}</span>
+      </div>
       <div class="asset-grid">${yearPicks.map(renderAssetCard).join('')}</div>
     </div>`;
   }).join('');
 
   const sections = [];
   if ((assetFilter === 'ALL' || assetFilter === 'DRAFT') && draftPicks.length) {
-    sections.push(`<section class="asset-portfolio-panel-v228"><div class="asset-section-head"><div><p class="eyebrow">Draft capital</p><h4>Draft Picks</h4></div><span>${draftPicks.length} tracked</span></div>${draftHtml}</section>`);
+    sections.push(`<section class="asset-portfolio-panel-v230">
+      <div class="asset-section-head asset-section-head-v230">
+        <h4>Draft Picks</h4><span>${draftPicks.length}</span>
+      </div>
+      ${draftHtml}
+    </section>`);
   }
+
   if ((assetFilter === 'ALL' || assetFilter === 'RIGHTS') && rights.length) {
-    sections.push(`<section class="asset-portfolio-panel-v228"><div class="asset-section-head"><div><p class="eyebrow">Rights</p><h4>Player & Prospect Rights</h4></div><span>${rights.length} tracked</span></div><div class="asset-grid">${rights.map(renderAssetCard).join('')}</div></section>`);
+    sections.push(`<section class="asset-portfolio-panel-v230">
+      <div class="asset-section-head asset-section-head-v230">
+        <h4>Rights</h4><span>${rights.length}</span>
+      </div>
+      <div class="asset-grid">${rights.map(renderAssetCard).join('')}</div>
+    </section>`);
   }
+
   if ((assetFilter === 'ALL' || assetFilter === 'OTHER') && other.length) {
-    sections.push(`<section class="asset-portfolio-panel-v228"><div class="asset-section-head"><div><p class="eyebrow">Other</p><h4>Other Assets</h4></div><span>${other.length} tracked</span></div><div class="asset-grid">${other.map(renderAssetCard).join('')}</div></section>`);
+    sections.push(`<section class="asset-portfolio-panel-v230">
+      <div class="asset-section-head asset-section-head-v230">
+        <h4>Other Assets</h4><span>${other.length}</span>
+      </div>
+      <div class="asset-grid">${other.map(renderAssetCard).join('')}</div>
+    </section>`);
   }
 
   const filteredCount = assetFilter === 'ALL'
@@ -80,30 +102,44 @@ function renderAssets() {
         ? rights.length
         : other.length;
 
-  const emptyCopy = currentAssets.length
-    ? 'No assets match this view.'
-    : 'Add draft picks, rights or other future assets owned by this Front Office.';
+  let emptyTitle = 'No assets tracked';
+  let emptyCopy = 'Draft picks, rights and other future assets will appear here.';
+  if (currentAssets.length) {
+    emptyTitle = 'Nothing in this category';
+    emptyCopy = 'Choose another category or add a new asset.';
+  }
 
-  el('assetsView').innerHTML = `<div class="assets-page assets-page-v228">
-    <div class="page-heading-row asset-page-heading-v228">
-      <div><p class="eyebrow">Portfolio</p><h3>Assets</h3><p class="page-copy">Draft capital, rights and other non-roster resources owned by this Front Office.</p></div>
-      <button id="addAssetBtn" class="btn btn-primary" type="button">+ Add Asset</button>
+  el('assetsView').innerHTML = `<div class="assets-page assets-page-v230">
+    <header class="asset-hero-v230">
+      <div class="asset-hero-copy-v230">
+        <p class="eyebrow">Assets</p>
+        <h3>Future resources</h3>
+        <p>Draft picks, rights and conditional assets.</p>
+      </div>
+      <button id="addAssetBtn" class="btn btn-primary asset-add-btn-v230" type="button">+ Add Asset</button>
+    </header>
+
+    <div class="asset-summary-grid-v230" aria-label="Asset summary">
+      <div><span>Total</span><strong>${currentAssets.length}</strong></div>
+      <div><span>Picks</span><strong>${draftPicks.length}</strong></div>
+      <div><span>Rights</span><strong>${rights.length}</strong></div>
+      <div><span>Conditional</span><strong>${conditional}</strong></div>
     </div>
 
-    <div class="asset-summary-grid-v228">
-      <div><span>Owned</span><strong>${owned}</strong><small>current assets</small></div>
-      <div><span>Draft Picks</span><strong>${draftPicks.length}</strong><small>tracked selections</small></div>
-      <div><span>Rights</span><strong>${rights.length}</strong><small>player/prospect</small></div>
-      <div><span>Conditional</span><strong>${conditional}</strong><small>pending assets</small></div>
-    </div>
+    <div class="asset-tabs asset-tabs-v230" aria-label="Asset views">${tabs}</div>
 
-    <div class="asset-tabs asset-tabs-v228" aria-label="Asset views">${tabs}</div>
-    ${filteredCount ? sections.join('') : `<div class="empty-state"><h4>${currentAssets.length ? 'Nothing in this category' : 'No assets yet'}</h4><p>${escapeHtml(emptyCopy)}</p></div>`}
+    ${filteredCount
+      ? `<div class="asset-sections-v230">${sections.join('')}</div>`
+      : `<div class="asset-empty-v230"><strong>${escapeHtml(emptyTitle)}</strong><span>${escapeHtml(emptyCopy)}</span></div>`
+    }
   </div>`;
 
   el('addAssetBtn').addEventListener('click', () => openAssetDialog());
   document.querySelectorAll('[data-asset-filter]').forEach((button) =>
-    button.addEventListener('click', () => { assetFilter = button.dataset.assetFilter; renderAssets(); })
+    button.addEventListener('click', () => {
+      assetFilter = button.dataset.assetFilter;
+      renderAssets();
+    })
   );
   document.querySelectorAll('[data-edit-asset]').forEach((button) =>
     button.addEventListener('click', () => openAssetDialog(button.dataset.editAsset))
