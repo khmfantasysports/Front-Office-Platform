@@ -146,23 +146,75 @@ function collectStructuredTradePayload() {
 }
 
 function renderTransactions() {
-  const txRows = [...state.transactions].sort((a,b) => `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`)).map((tx) => {
+  const sortedTransactions = [...state.transactions].sort((a,b) =>
+    `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`)
+  );
+
+  const tradeCount = sortedTransactions.filter((tx) => tx.type === 'Trade').length;
+  const deadCapTransactions = sortedTransactions.filter((tx) => Boolean(transactionDeadCapFor(tx.id)));
+  const totalDeadCap = deadCapTransactions.reduce((sum, tx) => sum + Number(transactionDeadCapFor(tx.id)?.total || 0), 0);
+
+  const txRows = sortedTransactions.map((tx) => {
     const allItems = transactionItemsFor(tx.id);
     const incoming = allItems.filter((item) => item.direction === 'IN' && item.kind !== 'FINANCIAL');
     const outgoing = allItems.filter((item) => item.direction === 'OUT' && item.kind !== 'FINANCIAL');
     const playerItems = allItems.filter((item) => item.kind === 'PLAYER' && item.direction === 'NONE');
     const deadCap = transactionDeadCapFor(tx.id);
-    const chips = [
-      incoming.length ? `<span class="tx-chip in">IN ${incoming.length}</span>` : '',
-      outgoing.length ? `<span class="tx-chip out">OUT ${outgoing.length}</span>` : '',
-      deadCap ? `<span class="tx-chip financial">DEAD CAP</span>` : ''
-    ].filter(Boolean).join('');
-    return `<article class="transaction-card"><div class="transaction-card-head"><div><span class="transaction-type">${escapeHtml(tx.type)}</span><h4>${escapeHtml(tx.summary)}</h4></div><time>${escapeHtml(tx.date)}</time></div>${tx.counterparty ? `<p class="transaction-counterparty">With ${escapeHtml(tx.counterparty)}</p>` : ''}${chips ? `<div class="transaction-chips">${chips}</div>` : ''}${incoming.length ? `<div class="transaction-flow in"><strong>IN</strong><span>${incoming.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${outgoing.length ? `<div class="transaction-flow out"><strong>OUT</strong><span>${outgoing.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${playerItems.length ? `<div class="transaction-flow"><strong>PLAYER</strong><span>${playerItems.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${deadCap ? `<div class="transaction-flow financial"><strong>DEAD CAP</strong><span>${escapeHtml(deadCap.description)} · ${formatMoney(deadCap.total)}</span></div>` : ''}${tx.notes ? `<p class="transaction-notes">${escapeHtml(tx.notes)}</p>` : ''}<div class="transaction-card-actions"><button class="btn btn-ghost btn-small" data-edit-transaction="${tx.id}" type="button">Edit</button><button class="btn btn-danger btn-small" data-delete-transaction="${tx.id}" type="button">Delete</button></div></article>`;
+
+    const inRow = incoming.length
+      ? `<div class="tx-ledger-flow-v228 in"><span class="tx-ledger-direction-v228">IN</span><span>${incoming.map((item) => `<em>${escapeHtml(item.label)}</em>`).join('')}</span></div>`
+      : '';
+    const outRow = outgoing.length
+      ? `<div class="tx-ledger-flow-v228 out"><span class="tx-ledger-direction-v228">OUT</span><span>${outgoing.map((item) => `<em>${escapeHtml(item.label)}</em>`).join('')}</span></div>`
+      : '';
+    const playerRow = playerItems.length
+      ? `<div class="tx-ledger-flow-v228"><span class="tx-ledger-direction-v228">PLAYER</span><span>${playerItems.map((item) => `<em>${escapeHtml(item.label)}</em>`).join('')}</span></div>`
+      : '';
+    const deadCapRow = deadCap
+      ? `<div class="tx-ledger-flow-v228 financial"><span class="tx-ledger-direction-v228">DEAD CAP</span><span><em>${escapeHtml(deadCap.description)}</em><strong>${formatMoney(deadCap.total)}</strong></span></div>`
+      : '';
+
+    return `<article class="transaction-card transaction-card-v228">
+      <div class="tx-ledger-head-v228">
+        <div class="tx-ledger-title-v228">
+          <span class="transaction-type">${escapeHtml(tx.type)}</span>
+          <h4>${escapeHtml(tx.summary)}</h4>
+          ${tx.counterparty ? `<p>With ${escapeHtml(tx.counterparty)}</p>` : ''}
+        </div>
+        <time>${escapeHtml(tx.date)}</time>
+      </div>
+      ${(inRow || outRow || playerRow || deadCapRow) ? `<div class="tx-ledger-body-v228">${inRow}${outRow}${playerRow}${deadCapRow}</div>` : ''}
+      ${tx.notes ? `<p class="tx-ledger-notes-v228">${escapeHtml(tx.notes)}</p>` : ''}
+      <div class="transaction-card-actions tx-ledger-actions-v228">
+        <button class="btn btn-ghost btn-small" data-edit-transaction="${tx.id}" type="button">Edit</button>
+        <button class="btn btn-danger btn-small" data-delete-transaction="${tx.id}" type="button">Delete</button>
+      </div>
+    </article>`;
   }).join('');
-  el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades now move real roster and asset records. Waivers, buyouts, signings, call-ups and other front-office moves remain in the same ledger, with any financial consequence tracked as Dead Cap.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Use Record Transaction above to add your first trade, signing, waiver move or buyout.</p></div>`}</div>`;
+
+  el('transactionsView').innerHTML = `<div class="transactions-page transactions-page-v228">
+    <div class="page-heading-row tx-page-heading-v228">
+      <div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Every roster move, structured trade and Dead Cap event in one chronological ledger.</p></div>
+      <button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button>
+    </div>
+
+    <div class="tx-summary-grid-v228">
+      <div><span>Transactions</span><strong>${sortedTransactions.length}</strong><small>all recorded moves</small></div>
+      <div><span>Trades</span><strong>${tradeCount}</strong><small>structured exchanges</small></div>
+      <div><span>Dead Cap Events</span><strong>${deadCapTransactions.length}</strong><small>with cap cost</small></div>
+      <div><span>Dead Cap Total</span><strong>${formatMoney(totalDeadCap)}</strong><small>all recorded seasons</small></div>
+    </div>
+
+    ${txRows ? `<div class="transaction-list transaction-list-v228">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Record a trade, signing, waiver, buyout, call-up or other move to begin the ledger.</p></div>`}
+  </div>`;
+
   el('recordTransactionBtn').addEventListener('click', () => openTransactionDialog());
-  document.querySelectorAll('[data-edit-transaction]').forEach((button) => button.addEventListener('click', () => openEditTransactionDialog(button.dataset.editTransaction)));
-  document.querySelectorAll('[data-delete-transaction]').forEach((button) => button.addEventListener('click', () => deleteTransaction(button.dataset.deleteTransaction)));
+  document.querySelectorAll('[data-edit-transaction]').forEach((button) =>
+    button.addEventListener('click', () => openEditTransactionDialog(button.dataset.editTransaction))
+  );
+  document.querySelectorAll('[data-delete-transaction]').forEach((button) =>
+    button.addEventListener('click', () => deleteTransaction(button.dataset.deleteTransaction))
+  );
 }
 
 function transactionTypeConfig(type) {
