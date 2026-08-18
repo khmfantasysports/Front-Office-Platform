@@ -1005,3 +1005,36 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .farm-summary-grid-v228 small { display:none; }
   .farm-panel-v228 { padding:9px; border-radius:12px; }
 }
+
+
+/* V2.29 — Minors roster-limit tracking */
+.farm-summary-grid-v228 > div.limit-warning {
+  background:rgba(242,198,109,.055);
+}
+.farm-summary-grid-v228 > div.limit-warning strong {
+  color:var(--warning);
+}
+.farm-limit-warning-v229 {
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  gap:9px;
+  align-items:center;
+  padding:9px 10px;
+  border:1px solid rgba(242,198,109,.30);
+  border-radius:10px;
+  background:rgba(242,198,109,.055);
+}
+.farm-limit-warning-v229 > span {
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:rgba(242,198,109,.10);
+  color:var(--warning);
+  font-weight:950;
+}
+.farm-limit-warning-v229 strong,
+.farm-limit-warning-v229 small { display:block; }
+.farm-limit-warning-v229 strong { color:var(--warning); font-size:.72rem; }
+.farm-limit-warning-v229 small { margin-top:2px; color:#b7aa83; font-size:.57rem; line-height:1.35; }
