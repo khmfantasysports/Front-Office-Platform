@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fantasy Front Office</title>
+  <meta name="application-name" content="Fantasy Front Office v2.26" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/shell.css" />
+  <link rel="stylesheet" href="./css/workspace.css" />
+  <link rel="stylesheet" href="./css/depth-chart.css" />
+  <link rel="stylesheet" href="./css/assets-landing.css" />
+  <link rel="stylesheet" href="./css/overview-cap.css" />
+  <link rel="stylesheet" href="./css/transactions.css" />
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <header class="topbar app-menu-bar">
+      <div class="brand-lockup" aria-label="Fantasy Front Office">
+        <button id="workspaceBackBtn" class="workspace-back-btn hidden" type="button" aria-label="Back to My Front Offices" title="My Front Offices">←</button>
+        <div class="brand-mark" aria-hidden="true"><span>FO</span></div>
+        <div class="brand-copy">
+          <h1>Fantasy Front Office</h1>
+        </div>
+      </div>
+
+      <nav id="workspaceNav" class="workspace-nav hidden" aria-label="Front office navigation">
+        <button class="nav-tab active" data-view="overview" type="button">Overview</button>
+        <button class="nav-tab" data-view="roster" type="button">Roster</button>
+        <button class="nav-tab" data-view="farm" type="button">Minors</button>
+        <button class="nav-tab" data-view="assets" type="button">Assets</button>
+        <button class="nav-tab" data-view="cap" type="button">Cap</button>
+        <button class="nav-tab" data-view="transactions" type="button">Transactions</button>
+        <button class="nav-tab" data-view="settings" type="button">Settings</button>
+      </nav>
+
+      <div id="topbarActions" class="topbar-actions hidden">
+        <span id="cloudStatus" class="cloud-pill">Cloud</span>
+        <details class="utility-menu">
+          <summary aria-label="Workspace menu" title="Workspace menu">•••</summary>
+          <div class="utility-menu-popover">
+            <span id="userEmail" class="user-email"></span>
+            <button id="backToOfficesBtn" class="btn btn-ghost" type="button">My Front Offices</button>
+            <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
+            <button id="signOutBtn" class="btn btn-ghost" type="button">Sign out</button>
+          </div>
+        </details>
+      </div>
+    </header>
+
+    <main>
+      <section id="authGate" class="landing-shell">
+        <div class="landing-hero">
+          <div class="landing-brand-mark" aria-hidden="true"><span>FO</span></div>
+          <div class="landing-kicker">Fantasy roster management</div>
+          <h2>Run your fantasy team like a front office.</h2>
+          <p class="landing-lead">One private workspace for your roster, contracts, cap, minors, assets and transaction history.</p>
+
+          <div class="landing-feature-grid" aria-label="Platform features">
+            <div class="landing-feature"><span class="landing-feature-icon">R</span><span><strong>Roster & Depth</strong><small>Lines, pairs, goalies and custom ordering.</small></span></div>
+            <div class="landing-feature"><span class="landing-feature-icon">$</span><span><strong>Contracts & Cap</strong><small>Seven-season commitments and cap planning.</small></span></div>
+            <div class="landing-feature"><span class="landing-feature-icon">M</span><span><strong>Minors & Assets</strong><small>Prospects, picks and future resources.</small></span></div>
+            <div class="landing-feature"><span class="landing-feature-icon">↔</span><span><strong>Transactions</strong><small>Trades, signings, waivers and buyouts.</small></span></div>
+          </div>
+        </div>
+
+        <div class="landing-signin-card">
+          <p class="eyebrow">Private workspace</p>
+          <h3>Your front office, wherever you are.</h3>
+          <p>Sign in to open your teams and keep every roster move synced across devices.</p>
+          <button id="googleSignInBtn" class="btn btn-primary google-btn landing-google-btn" type="button"><span class="google-g">G</span> Continue with Google</button>
+          <div class="landing-security"><span class="security-dot"></span><span>Your league data stays inside your authenticated workspace.</span></div>
+          <div id="authError" class="auth-error hidden"></div>
+        </div>
+      </section>
+
+      <section id="officePicker" class="office-picker-shell hidden">
+        <div class="office-picker-hero">
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h2>My Front Offices</h2>
+            <p>Jump back into a team or start another private workspace.</p>
+          </div>
+          <button id="newOfficeBtn" class="btn btn-primary office-create-btn" type="button">+ New Front Office</button>
+        </div>
+        <div class="office-picker-summary">
+          <span><strong id="officeCountLabel">0</strong> front offices</span>
+          <span class="office-picker-sync"><span class="security-dot"></span> Cloud synced</span>
+        </div>
+        <div id="officeList" class="office-list office-list-v219"></div>
+      </section>
+
+      <section id="onboarding" class="panel onboarding-panel hidden" aria-labelledby="onboardingTitle">
+        <div class="onboarding-intro">
+          <div>
+            <span class="setup-badge">New Front Office</span>
+            <h2 id="onboardingTitle">Set up the team. We’ll handle the structure.</h2>
+            <p class="lead">Add the league essentials now. Roster, contract, cap and management tools will be ready when you open the workspace.</p>
+          </div>
+          <div class="feature-list" aria-label="Front office features">
+            <div class="feature-item"><span class="feature-check">✓</span><span>Seven-season contracts & cap</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Roster, depth chart & minors</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Transactions & asset tracking</span></div>
+          </div>
+        </div>
+
+        <div class="onboarding-form-wrap">
+          <div class="onboarding-form-heading">
+            <h3>Create your Front Office</h3>
+            <p>Only the essentials are required. Everything can be adjusted later.</p>
+          </div>
+
+          <form id="frontOfficeForm">
+            <section class="form-section">
+              <p class="form-section-title">Team</p>
+              <div class="form-grid">
+                <label>
+                  Team name
+                  <input id="teamName" name="teamName" required placeholder="Red Deer Wolves" />
+                </label>
+                <label>
+                  League name
+                  <input id="leagueName" name="leagueName" required placeholder="Ice Throne Dynasty" />
+                </label>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <p class="form-section-title">League setup</p>
+              <div class="form-grid">
+                <label>
+                  Sport
+                  <select id="sport" name="sport">
+                    <option value="NHL">NHL</option>
+                  </select>
+                </label>
+                <label>
+                  Current season
+                  <input id="currentSeason" name="currentSeason" required value="2026-27" pattern="\d{4}-\d{2}" />
+                </label>
+                <label>
+                  Salary cap
+                  <input id="salaryCap" name="salaryCap" type="text" inputmode="numeric" autocomplete="off" value="$119,600,000" aria-label="Salary cap" />
+                </label>
+                <label>
+                  Roster limit
+                  <input id="rosterLimit" name="rosterLimit" type="number" min="0" step="1" value="30" />
+                </label>
+                <label>
+                  Currency
+                  <select id="currency" name="currency">
+                    <option value="USD">USD</option>
+                    <option value="CAD">CAD</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit">Create Front Office</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="workspace" class="hidden">
+        <section class="workspace-heading">
+          <div>
+            <p id="leagueLabel" class="eyebrow"></p>
+            <h2 id="teamLabel"></h2>
+          </div>
+          <label class="season-picker">
+            Season
+            <select id="seasonSelect"></select>
+          </label>
+        </section>
+
+        <section id="summaryCards" class="summary-grid" aria-label="Front office summary"></section>
+
+        <section id="overviewView" class="view-panel"></section>
+        <section id="rosterView" class="view-panel hidden"></section>
+        <section id="farmView" class="view-panel hidden"></section>
+        <section id="assetsView" class="view-panel hidden"></section>
+        <section id="capView" class="view-panel hidden"></section>
+        <section id="transactionsView" class="view-panel hidden"></section>
+        <section id="settingsView" class="view-panel hidden"></section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="playerDialog" class="drawer-dialog">
+    <form id="playerForm" method="dialog" class="drawer-card">
+      <header class="drawer-header">
+        <div class="drawer-header-copy">
+          <p class="eyebrow">Roster player</p>
+          <h3 id="playerDialogTitle">Add Player</h3>
+        </div>
+        <button id="closePlayerDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+
+      <div class="drawer-body">
+        <p id="playerDialogIntro" class="player-intro">Add the player first, then use the quick contract fields for the common salary setup. Advanced year-by-year overrides are optional.</p>
+
+        <div class="player-basics-v18">
+          <label class="player-name-field">
+            Player name
+            <input id="playerName" autocomplete="off" required />
+          </label>
+          <label>
+            Position
+            <select id="playerPosition">
+              <option value="C">C</option>
+              <option value="LW">LW</option>
+              <option value="RW">RW</option>
+              <option value="F">F</option>
+              <option value="D">D</option>
+              <option value="G">G</option>
+            </select>
+          </label>
+          <label>
+            Eligible
+            <input id="playerEligible" maxlength="40" placeholder="C,LW" autocomplete="off" />
+          </label>
+          <label>
+            NHL team
+            <input id="realTeam" maxlength="8" placeholder="EDM" autocomplete="off" />
+          </label>
+          <label>
+            Age
+            <input id="playerAge" type="number" inputmode="numeric" min="0" max="100" step="1" placeholder="26" />
+          </label>
+          <label class="status-field">
+            Roster status
+            <select id="rosterStatus"></select>
+          </label>
+          <label class="prospect-check-field">
+            <span>Player type</span>
+            <span class="prospect-check"><input id="playerIsProspect" type="checkbox" /> Prospect</span>
+          </label>
+          <label>
+            Roster location
+            <select id="playerRosterGroup">
+              <option value="ACTIVE">Active roster</option>
+              <option value="FARM">Minors</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="quick-contract" aria-labelledby="quickContractTitle">
+          <div class="quick-contract-head">
+            <div>
+              <p class="eyebrow">Contract</p>
+              <h4 id="quickContractTitle">Quick contract</h4>
+              <p>Best for flat fantasy salaries. You can customize individual years below.</p>
+            </div>
+          </div>
+          <div class="quick-contract-grid quick-contract-grid-v19">
+            <label>
+              Starting salary
+              <input id="quickSalary" type="text" inputmode="numeric" placeholder="$6,000,000" />
+            </label>
+            <label>
+              Years remaining
+              <input id="contractYearsRemaining" type="number" inputmode="numeric" min="1" step="1" placeholder="3" />
+            </label>
+            <label>
+              Annual salary change
+              <select id="salaryChangeMode">
+                <option value="same">Same salary</option>
+                <option value="increase">Increase each year</option>
+                <option value="decrease">Decrease each year</option>
+              </select>
+            </label>
+            <label id="salaryChangePctLabel">
+              Change %
+              <input id="salaryChangePct" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="0" />
+            </label>
+            <label class="contract-through-field">
+              Contract through
+              <select id="contractEnd"></select>
+            </label>
+            <div class="quick-contract-action">
+              <button id="applyQuickContractBtn" class="btn btn-secondary" type="button">Generate contract years</button>
+              <small>Years remaining includes the current season. Percentage changes compound from the starting salary.</small>
+            </div>
+          </div>
+
+          <details id="advancedContract" class="advanced-contract">
+            <summary>Advanced yearly salaries &amp; cap overrides</summary>
+            <p class="advanced-contract-copy">Use this only when salary changes by season or the cap charge differs from salary.</p>
+            <div id="contractGrid" class="contract-grid"></div>
+          </details>
+        </section>
+
+        <section class="player-notes-section">
+          <label>
+            Notes
+            <textarea id="playerNotes" rows="3" placeholder="Optional personal notes"></textarea>
+          </label>
+        </section>
+
+        <section id="playerWarnings" class="warning-box hidden" aria-live="polite"></section>
+      </div>
+
+      <footer class="drawer-footer">
+        <button id="deletePlayerBtn" class="btn btn-danger hidden" type="button">Remove</button>
+        <div class="drawer-footer-right">
+          <span id="playerSaveStatus" class="save-status" aria-live="polite"></span>
+          <button id="cancelPlayerBtn" class="btn btn-ghost" type="button">Cancel</button>
+          <button id="savePlayerBtn" class="btn btn-primary" type="submit">Save Player</button>
+        </div>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="importDialog" class="modal-dialog">
+    <form method="dialog" class="modal-card">
+      <header class="drawer-header">
+        <div>
+          <p class="eyebrow">Roster import</p>
+          <h3>Import CSV</h3>
+        </div>
+        <button id="closeImportDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="modal-body">
+        <p class="muted">Fantrax Team Roster exports are detected automatically, including separate Skaters and Goalies sections. Rows marked Min, Minor or Minors are routed to Minors automatically. Generic CSV import remains supported.</p>
+        <label class="file-drop">
+          <span>Select CSV file</span>
+          <input id="csvFile" type="file" accept=".csv,text/csv" />
+        </label>
+        <label class="import-options">
+          <input id="importSalaryToggle" type="checkbox" checked />
+          <span>Update current-season salary from the import<small>Future salaries, cap overrides, contract end, notes and adjustments are never overwritten by a Fantrax roster import.</small></span>
+        </label>
+        <div id="importPreview" class="import-preview hidden"></div>
+      </div>
+      <footer class="drawer-footer">
+        <button id="cancelImportBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="applyImportBtn" class="btn btn-primary" type="button" disabled>Apply Import</button>
+      </footer>
+    </form>
+  </dialog>
+
+
+  <dialog id="assetDialog" class="modal-dialog asset-dialog">
+    <form id="assetForm" method="dialog" class="modal-card">
+      <header class="drawer-header">
+        <div><p class="eyebrow">Front office asset</p><h3 id="assetDialogTitle">Add Asset</h3></div>
+        <button id="closeAssetDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="form-grid compact">
+          <label>Asset type
+            <select id="assetType">
+              <option value="DRAFT_PICK">Draft Pick</option>
+              <option value="PROSPECT_RIGHTS">Prospect Rights</option>
+              <option value="PLAYER_RIGHTS">Player Rights</option>
+              <option value="CONDITIONAL_ASSET">Conditional Asset</option>
+              <option value="FUTURE_CONSIDERATIONS">Future Considerations</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </label>
+          <label>Status
+            <select id="assetStatus">
+              <option value="OWNED">Owned</option>
+              <option value="CONDITIONAL">Conditional</option>
+              <option value="TRADED_AWAY">Traded Away</option>
+              <option value="EXPIRED">Expired</option>
+            </select>
+          </label>
+          <label class="full-width">Asset name
+            <input id="assetLabel" placeholder="Optional for draft picks" />
+          </label>
+        </div>
+        <div id="assetDraftFields" class="asset-draft-fields" style="margin-top:12px">
+          <label>Draft year<input id="assetDraftYear" type="number" min="1900" max="2200" step="1" placeholder="2028" /></label>
+          <label>Round<input id="assetDraftRound" type="number" min="1" max="99" step="1" placeholder="1" /></label>
+          <label>Original team<input id="assetOriginalTeam" placeholder="Fraser Valley" /></label>
+        </div>
+        <p id="assetFormNote" class="asset-form-note">Draft-pick identity is based on year, round and original team. The original team should never change when the pick is traded.</p>
+        <label style="display:grid;gap:6px;margin-top:14px;color:var(--muted);font-size:.82rem;font-weight:700">Notes<textarea id="assetNotes" rows="3" placeholder="Optional conditions, rights expiry or other details"></textarea></label>
+      </div>
+      <footer class="drawer-footer">
+        <button id="archiveAssetBtn" class="btn btn-danger asset-archive-btn hidden" type="button">Remove Asset</button>
+        <button id="cancelAssetBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="saveAssetBtn" class="btn btn-primary" type="submit">Save Asset</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog id="transactionDialog" class="modal-dialog transaction-dialog">
+    <form id="transactionForm" method="dialog" class="modal-card">
+      <header class="drawer-header">
+        <div><p class="eyebrow">Front office ledger</p><h3 id="transactionDialogTitle">Record transaction</h3></div>
+        <button id="closeTransactionDialog" class="icon-btn" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="modal-body transaction-form-body">
+        <div class="form-grid compact">
+          <label>Type<select id="transactionType"><option>Trade</option><option>Signing</option><option>Extension</option><option>Call Up</option><option>Send Down</option><option>Waiver</option><option>Buyout</option><option>Release</option><option>Add</option><option>Drop</option><option>Other</option></select></label>
+          <label>Date<input id="transactionDate" type="date" /></label>
+          <div id="transactionTypeHelp" class="transaction-smart-note full-width"></div><div id="transactionEditNotice" class="transaction-edit-note full-width hidden"></div>
+          <label id="transactionCounterpartyField" class="full-width">Counterparty / team<input id="transactionCounterparty" placeholder="Optional" /></label>
+          <label id="transactionPlayerField">Player<select id="transactionPlayer"><option value="">None</option></select></label>
+          <label id="transactionRosterActionField">Selected player action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to minors</option><option value="REMOVE">Remove from roster</option></select></label>
+          <label id="transactionRosterStatusField">Roster status after move<select id="transactionRosterStatus"><option value="">Keep current status</option></select></label>
+          <label id="transactionSummaryField" class="full-width">Summary<input id="transactionSummary" required placeholder="Transaction summary" /></label>
+          <label id="transactionIncomingField" class="full-width">Incoming items<textarea id="transactionIncoming" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
+          <label id="transactionOutgoingField" class="full-width">Outgoing items<textarea id="transactionOutgoing" rows="2" placeholder="One player, pick or asset per line"></textarea></label>
+          <label class="full-width">Notes<textarea id="transactionNotes" rows="2" placeholder="Optional transaction notes"></textarea></label>
+        </div>
+
+        <section id="transactionTradeStructuredSection" class="trade-structured-section hidden">
+          <div class="trade-side-grid">
+            <div class="trade-side">
+              <div class="trade-side-head"><div><h4>Outgoing</h4><p>Select records currently owned by this Front Office.</p></div></div>
+              <div><p class="eyebrow">Players</p><div id="tradeOutgoingPlayers" class="trade-choice-list"></div></div>
+              <div><p class="eyebrow">Assets</p><div id="tradeOutgoingAssets" class="trade-choice-list"></div></div>
+            </div>
+            <div class="trade-side">
+              <div class="trade-side-head"><div><h4>Incoming</h4><p>Create acquired players/assets or reacquire a previously traded asset.</p></div></div>
+              <div><p class="eyebrow">Tracked assets available to reacquire</p><div id="tradeIncomingExistingAssets" class="trade-choice-list"></div></div>
+              <div id="tradeIncomingPlayers" class="trade-builder-list"></div>
+              <div id="tradeIncomingAssets" class="trade-builder-list"></div>
+              <div class="trade-add-actions"><button id="addTradeIncomingPlayerBtn" class="btn btn-secondary" type="button">+ Incoming Player</button><button id="addTradeIncomingAssetBtn" class="btn btn-secondary" type="button">+ Incoming Asset</button></div>
+            </div>
+          </div>
+          <div id="tradeEditLock" class="trade-edit-lock hidden">Structured trade items are locked while editing because they already changed roster and asset ownership. Delete and recreate the trade to change those items.</div>
+        </section>
+
+        <section id="transactionPlayerSnapshot" class="transaction-player-snapshot hidden" aria-live="polite">
+          <div class="transaction-player-snapshot-head">
+            <div><strong id="transactionPlayerSnapshotName"></strong><span id="transactionPlayerSnapshotMeta"></span></div>
+            <span id="transactionPlayerSnapshotEnd" class="transaction-player-snapshot-badge"></span>
+          </div>
+          <div id="transactionSalaryGrid" class="transaction-salary-grid"></div>
+        </section>
+
+        <section id="transactionFinancialSection" class="transaction-financial-section hidden">
+          <div><p class="eyebrow">Cap consequence</p><h4 id="transactionFinancialTitle">Financial impact</h4><p id="transactionFinancialCopy" class="muted"></p></div>
+          <div id="transactionRulePreview" class="transaction-rule-preview hidden">
+            <div class="transaction-rule-preview-head">
+              <div><strong id="transactionRulePreviewTitle">Calculated from Settings</strong><span id="transactionRulePreviewCopy"></span></div>
+              <button id="recalculateTransactionPenaltyBtn" class="btn btn-secondary btn-small" type="button">Recalculate</button>
+            </div>
+          </div>
+          <div id="transactionManualFinancialFields" class="form-grid compact transaction-manual-financial-fields">
+            <label class="full-width"><span class="transaction-dead-cap-label">Dead Cap description</span><input id="transactionAdjustmentDescription" placeholder="Retained salary, buyout penalty, waiver penalty…" /></label>
+          </div>
+          <div id="transactionFinancialGrid" class="transaction-financial-grid"></div>
+        </section>
+      </div>
+      <footer class="drawer-footer">
+        <button id="cancelTransactionBtn" class="btn btn-ghost" type="button">Cancel</button>
+        <button id="saveTransactionBtn" class="btn btn-primary" type="submit">Save Transaction</button>
+      </footer>
+    </form>
+  </dialog>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/core.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/domain.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/pages/overview.js"></script>
+  <script src="./js/features/depth-chart.js"></script>
+  <script src="./js/pages/roster.js"></script>
+  <script src="./js/features/player-editor.js"></script>
+  <script src="./js/features/import.js"></script>
+  <script src="./js/pages/minors.js"></script>
+  <script src="./js/pages/assets.js"></script>
+  <script src="./js/pages/transactions.js"></script>
+  <script src="./js/pages/cap.js"></script>
+  <script src="./js/pages/settings.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
