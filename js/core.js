@@ -1,6 +1,6 @@
 'use strict';
 
-// Fantasy Front Office v2.28 — shared application state and DOM handles.
+// Fantasy Front Office v2.29 — shared application state and DOM handles.
 function emptyState() {
   return {
     frontOffice: null,
@@ -23,10 +23,13 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, 
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
-const APP_VERSION = '2.28';
+const APP_VERSION = '2.29';
 const DEFAULT_STATUSES = [];
+const WORKSPACE_RESUME_KEY = 'fantasy-front-office-workspace-v1';
+const WORKSPACE_VIEWS = ['overview','roster','farm','assets','cap','transactions','settings'];
 let state = emptyState();
 let session = null;
+let activeView = 'overview';
 let editingPlayerId = null;
 let editingAssetId = null;
 let assetFilter = 'ALL';
