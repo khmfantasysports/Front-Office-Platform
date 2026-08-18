@@ -101,3 +101,39 @@
   .trade-structured-section { padding:9px; }
 }
 @media(max-width:390px){ .trade-builder-grid { grid-template-columns:1fr; } .trade-builder-grid .full { grid-column:auto; } }
+
+
+/* V2.28 — Transaction ledger visual refresh */
+.transactions-page-v228 { gap:9px; }
+.tx-summary-grid-v228 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; overflow:hidden; border:1px solid var(--border-soft); border-radius:12px; background:var(--border-soft); }
+.tx-summary-grid-v228 > div { min-width:0; padding:10px 11px; background:#0b151e; }
+.tx-summary-grid-v228 span,.tx-summary-grid-v228 strong,.tx-summary-grid-v228 small { display:block; }
+.tx-summary-grid-v228 span { color:var(--muted); font-size:.54rem; font-weight:850; letter-spacing:.05em; text-transform:uppercase; }
+.tx-summary-grid-v228 strong { margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.98rem; }
+.tx-summary-grid-v228 small { margin-top:3px; color:var(--muted); font-size:.54rem; }
+.transaction-list-v228 { gap:7px; }
+.transaction-card-v228 { padding:12px 13px; border-radius:13px; background:rgba(11,21,30,.92); }
+.tx-ledger-head-v228 { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.tx-ledger-title-v228 { min-width:0; }
+.tx-ledger-title-v228 h4 { margin:4px 0 0; font-size:.9rem; letter-spacing:-.01em; }
+.tx-ledger-title-v228 p { margin:4px 0 0; color:var(--muted); font-size:.62rem; }
+.tx-ledger-head-v228 time { flex:0 0 auto; color:var(--muted); font-size:.61rem; }
+.tx-ledger-body-v228 { display:grid; gap:5px; margin-top:9px; padding-top:9px; border-top:1px solid var(--border-soft); }
+.tx-ledger-flow-v228 { display:grid; grid-template-columns:54px minmax(0,1fr); gap:7px; align-items:start; }
+.tx-ledger-direction-v228 { color:var(--muted); font-size:.52rem; font-weight:900; letter-spacing:.06em; }
+.tx-ledger-flow-v228.in .tx-ledger-direction-v228 { color:var(--good); }
+.tx-ledger-flow-v228.out .tx-ledger-direction-v228 { color:var(--danger); }
+.tx-ledger-flow-v228.financial .tx-ledger-direction-v228 { color:var(--warning); }
+.tx-ledger-flow-v228 > span:last-child { display:flex; gap:5px; flex-wrap:wrap; align-items:center; min-width:0; }
+.tx-ledger-flow-v228 em { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:3px 6px; border:1px solid var(--border-soft); border-radius:7px; background:rgba(255,255,255,.012); color:#d8e2ea; font-size:.59rem; font-style:normal; }
+.tx-ledger-flow-v228.financial strong { color:var(--warning); font-size:.64rem; margin-left:auto; }
+.tx-ledger-notes-v228 { margin:8px 0 0; color:var(--muted); font-size:.61rem; line-height:1.35; }
+.tx-ledger-actions-v228 { justify-content:flex-end; padding-top:8px; margin-top:8px; border-top:1px solid var(--border-soft); }
+
+@media(max-width:720px){
+  .tx-summary-grid-v228 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .tx-summary-grid-v228 > div { padding:8px 9px; }
+  .tx-summary-grid-v228 strong { font-size:.84rem; }
+  .tx-ledger-flow-v228 { grid-template-columns:48px minmax(0,1fr); }
+  .transaction-card-v228 { padding:10px; }
+}
