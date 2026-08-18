@@ -19,60 +19,144 @@ async function signOut() {
   setCloudStatus('Signing out…', 'busy');
   const { error } = await db.auth.signOut();
   if (error) return showAuthError(error.message);
+  clearWorkspaceResumeState();
   session = null;
   state = emptyState();
   frontOfficeList = [];
+  activeView = 'overview';
   render();
 }
 
-async function handleSessionChange(nextSession) {
+
+function readWorkspaceResumeState(userId = session?.user?.id) {
+  if (!userId) return null;
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(WORKSPACE_RESUME_KEY) || 'null');
+    if (!parsed || parsed.userId !== userId || !parsed.frontOfficeId) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function persistWorkspaceResumeState() {
+  if (!session?.user || !state.frontOffice) return;
+  try {
+    sessionStorage.setItem(WORKSPACE_RESUME_KEY, JSON.stringify({
+      userId: session.user.id,
+      frontOfficeId: state.frontOffice.id,
+      view: WORKSPACE_VIEWS.includes(activeView) ? activeView : 'overview',
+      rosterMode,
+      depthPosition
+    }));
+  } catch {
+    // Resume state is convenience only; cloud data remains authoritative.
+  }
+}
+
+function clearWorkspaceResumeState() {
+  try {
+    sessionStorage.removeItem(WORKSPACE_RESUME_KEY);
+  } catch {
+    // Ignore unavailable session storage.
+  }
+}
+
+function applyWorkspaceResumeState(resume) {
+  if (!resume) return;
+  activeView = WORKSPACE_VIEWS.includes(resume.view) ? resume.view : 'overview';
+  if (['depth','list','grid'].includes(resume.rosterMode)) rosterMode = resume.rosterMode;
+  if (['ALL','LW','C','RW','D','G'].includes(resume.depthPosition)) depthPosition = resume.depthPosition;
+}
+
+function currentSignedInSurfaceVisible() {
+  return Boolean(
+    state.frontOffice ||
+    !officePicker.classList.contains('hidden') ||
+    !onboarding.classList.contains('hidden')
+  );
+}
+
+async function handleSessionChange(nextSession, authEvent = '') {
+  const previousUserId = session?.user?.id || null;
   session = nextSession || null;
+
   if (!session?.user) {
+    clearWorkspaceResumeState();
     state = emptyState();
     frontOfficeList = [];
+    activeView = 'overview';
     setCloudStatus('Signed out', '');
     render();
     return;
   }
+
+  const sameUser = Boolean(previousUserId && previousUserId === session.user.id);
+  if (sameUser && authEvent !== 'INITIAL_SESSION' && currentSignedInSurfaceVisible()) {
+    setCloudStatus('Synced', '');
+    return;
+  }
+
+  setCloudStatus('Loading…', 'busy');
+  const resume = readWorkspaceResumeState(session.user.id);
+  await loadFrontOffices(false);
+
+  if (resume && frontOfficeList.some((office) => office.front_office_id === resume.frontOfficeId)) {
+    applyWorkspaceResumeState(resume);
+    await loadOffice(resume.frontOfficeId, false);
+    return;
+  }
+
+  if (resume) clearWorkspaceResumeState();
+  showOfficePicker(false, false);
   setCloudStatus('Synced', '');
-  await loadFrontOffices();
 }
 
-async function loadFrontOffices() {
+async function loadFrontOffices(showPicker = true) {
   await runCloudAction(async () => {
     const { data, error } = await db.from('front_offices')
-      .select('front_office_id,team_name,league_name,sport,currency_code,roster_limit,updated_at')
+      .select('front_office_id,team_name,league_name,sport,currency_code,roster_limit,minors_limit,updated_at')
       .eq('is_archived', false)
       .order('updated_at', { ascending: false });
     if (error) throw error;
     frontOfficeList = data || [];
-    state = emptyState();
-    showOfficePicker(false);
+    if (showPicker) {
+      state = emptyState();
+      showOfficePicker(false);
+    }
   }, false);
 }
 
-function showOfficePicker(shouldReload = true) {
+function showOfficePicker(shouldReload = true, clearResume = true) {
   if (!session?.user) return render();
+  if (clearResume) clearWorkspaceResumeState();
   state = emptyState();
+  activeView = 'overview';
+  depthEditMode = false;
+  depthDraftOrder = [];
   authGate.classList.add('hidden');
   onboarding.classList.add('hidden');
   workspace.classList.add('hidden');
   el('workspaceNav').classList.add('hidden');
   el('workspaceBackBtn').classList.add('hidden');
+  el('deleteFrontOfficeBtn').classList.add('hidden');
   el('exportBtn').classList.add('hidden');
   officePicker.classList.remove('hidden');
   el('topbarActions').classList.remove('hidden');
   el('userEmail').textContent = session.user.email || 'Signed in';
   renderOfficeList();
-  if (shouldReload) loadFrontOffices();
+  if (shouldReload) loadFrontOffices(false).then(renderOfficeList);
 }
 
 function showCreateOffice() {
+  clearWorkspaceResumeState();
   state = emptyState();
+  activeView = 'overview';
   officePicker.classList.add('hidden');
   workspace.classList.add('hidden');
   el('workspaceNav').classList.add('hidden');
   el('workspaceBackBtn').classList.add('hidden');
+  el('deleteFrontOfficeBtn').classList.add('hidden');
   el('exportBtn').classList.add('hidden');
   onboarding.classList.remove('hidden');
   el('teamName').value = '';
@@ -94,16 +178,69 @@ function renderOfficeList() {
   list.innerHTML = frontOfficeList.map((office) => {
     const initials = String(office.team_name || 'FO').split(/\s+/).filter(Boolean).slice(0,2).map((part) => part[0]).join('').toUpperCase();
     const updated = office.updated_at ? formatDateTime(office.updated_at) : 'Recently';
+    const rosterText = office.roster_limit === null || office.roster_limit === undefined ? 'Flexible roster' : `${office.roster_limit} active spots`;
+    const minorsText = office.minors_limit === null || office.minors_limit === undefined ? null : `${office.minors_limit} minors spots`;
+    const meta = [rosterText, minorsText, office.currency_code || 'USD'].filter(Boolean).join(' · ');
     return `
     <button class="office-card office-card-v219" type="button" data-open-office="${office.front_office_id}">
       <span class="office-card-mark">${escapeHtml(initials || 'FO')}</span>
-      <span class="office-card-copy"><span class="office-card-topline"><span class="office-sport-chip">${escapeHtml(office.sport || 'NHL')}</span><span class="office-updated">Updated ${escapeHtml(updated)}</span></span><strong>${escapeHtml(office.team_name)}</strong><small>${escapeHtml(office.league_name)}</small><span class="office-card-meta">${office.roster_limit ? `${escapeHtml(office.roster_limit)} roster spots` : 'Flexible roster'} · ${escapeHtml(office.currency_code || 'USD')}</span></span>
+      <span class="office-card-copy"><span class="office-card-topline"><span class="office-sport-chip">${escapeHtml(office.sport || 'NHL')}</span><span class="office-updated">Updated ${escapeHtml(updated)}</span></span><strong>${escapeHtml(office.team_name)}</strong><small>${escapeHtml(office.league_name)}</small><span class="office-card-meta">${escapeHtml(meta)}</span></span>
       <span class="office-open-v219" aria-hidden="true">›</span>
     </button>`;
   }).join('');
   document.querySelectorAll('[data-open-office]').forEach((button) => {
-    button.addEventListener('click', () => loadOffice(button.dataset.openOffice));
+    button.addEventListener('click', () => {
+      activeView = 'overview';
+      rosterMode = 'depth';
+      depthPosition = 'ALL';
+      loadOffice(button.dataset.openOffice);
+    });
   });
+}
+
+
+async function deleteCurrentFrontOffice() {
+  const office = state.frontOffice;
+  if (!office) return;
+
+  const typed = window.prompt(
+    `Delete ${office.teamName} permanently?\n\nThis removes its roster, contracts, assets, transactions and cap history. Type the team name exactly to confirm:`,
+    ''
+  );
+  if (typed === null) return;
+  if (typed.trim() !== office.teamName) {
+    alert('Team name did not match. Nothing was deleted.');
+    return;
+  }
+
+  const deleteButton = el('deleteFrontOfficeBtn');
+  if (deleteButton) {
+    deleteButton.disabled = true;
+    deleteButton.textContent = 'Deleting…';
+  }
+
+  try {
+    const deleted = await runCloudAction(async () => {
+      const { error } = await db.rpc('delete_front_office_v1', {
+        p_front_office_id: office.id
+      });
+      if (error) throw error;
+
+      clearWorkspaceResumeState();
+      state = emptyState();
+      activeView = 'overview';
+      rosterMode = 'depth';
+      depthPosition = 'ALL';
+      await loadFrontOffices(false);
+      showOfficePicker(false, false);
+    });
+    if (deleted) setCloudStatus('Synced', '');
+  } finally {
+    if (deleteButton) {
+      deleteButton.disabled = false;
+      deleteButton.textContent = 'Delete Front Office';
+    }
+  }
 }
 
 async function loadOffice(frontOfficeId, showBusy = true) {
@@ -213,6 +350,7 @@ async function loadOffice(frontOfficeId, showBusy = true) {
       sport: office.sport,
       currency: office.currency_code,
       rosterLimit: office.roster_limit,
+      minorsLimit: office.minors_limit === null || office.minors_limit === undefined ? null : Number(office.minors_limit),
       waiverPenaltyMode: office.waiver_penalty_mode || 'NONE',
       waiverPenaltyValue: office.waiver_penalty_value === null || office.waiver_penalty_value === undefined ? null : Number(office.waiver_penalty_value),
       waiverPenaltyScope: office.waiver_penalty_scope || 'CURRENT_SEASON',
@@ -234,6 +372,7 @@ async function loadOffice(frontOfficeId, showBusy = true) {
   };
   setCloudStatus('Synced', '');
   render();
+  persistWorkspaceResumeState();
 }
 
 async function runCloudAction(action, showAlerts = true) {
