@@ -103,6 +103,9 @@ function renderOverview() {
 
   const activeCount = activeRosterPlayers().length;
   const minorsCount = farmSystemPlayers().length;
+  const minorsLimit = state.frontOffice.minorsLimit;
+  const minorsOver = minorsLimit !== null && minorsLimit !== undefined && minorsCount > minorsLimit;
+  const minorsOpen = minorsLimit === null || minorsLimit === undefined ? null : minorsLimit - minorsCount;
   const rosterLimit = state.frontOffice.rosterLimit;
   const openRosterSpots = rosterLimit === null || rosterLimit === undefined ? null : rosterLimit - activeCount;
   const expiring = state.players.filter((player) => player.contractEndSeasonId === season.id).length;
@@ -146,6 +149,9 @@ function renderOverview() {
   }
   if (rosterLimit !== null && rosterLimit !== undefined && activeCount > rosterLimit) {
     attention.push(`<div class="overview-attention-row warning"><span class="overview-attention-icon">!</span><span><strong>${activeCount - rosterLimit} player${activeCount - rosterLimit === 1 ? '' : 's'} over the roster limit</strong><small>${activeCount} active players against a ${rosterLimit}-player limit.</small></span></div>`);
+  }
+  if (minorsOver) {
+    attention.push(`<div class="overview-attention-row warning"><span class="overview-attention-icon">M</span><span><strong>${minorsCount - minorsLimit} player${minorsCount - minorsLimit === 1 ? '' : 's'} over the Minors limit</strong><small>${minorsCount} assigned against a ${minorsLimit}-player maximum.</small></span></div>`);
   }
   if (missingPlayers.length) {
     const names = missingPlayers.slice(0, 3).map((player) => player.name).join(', ');
@@ -205,7 +211,7 @@ function renderOverview() {
         </div>
         <div class="overview-snapshot-grid-v227">
           <div class="overview-snapshot-item"><span>Active</span><strong>${escapeHtml(rosterMeta)}</strong><small>${escapeHtml(openSpotText)}</small></div>
-          <div class="overview-snapshot-item"><span>Minors</span><strong>${minorsCount}</strong><small>prospects assigned</small></div>
+          <div class="overview-snapshot-item ${minorsOver ? 'warning' : ''}"><span>Minors</span><strong>${minorsLimit === null || minorsLimit === undefined ? minorsCount : `${minorsCount} / ${minorsLimit}`}</strong><small>${minorsLimit === null || minorsLimit === undefined ? 'no limit set' : minorsOver ? `${Math.abs(minorsOpen)} over` : `${minorsOpen} open`}</small></div>
           <div class="overview-snapshot-item"><span>Expiring</span><strong>${expiring}</strong><small>this season</small></div>
           <div class="overview-snapshot-item"><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong><small>${deadCap ? 'on the books' : 'none'}</small></div>
         </div>
