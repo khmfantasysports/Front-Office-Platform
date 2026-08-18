@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.8" />
+  <meta name="application-name" content="Fantasy Front Office v2.17" />
   <style>
 :root {
   color-scheme: dark;
@@ -2264,6 +2264,53 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .depth-defense-goalie-row {
     grid-template-columns: 46px repeat(3, 102px);
     gap: 4px;
+  }
+}
+
+
+
+/* V2.17 — All-view defense/goalie sizing parity with forwards */
+/* Use the exact same side-rail width and row footprint as forward lines. */
+.depth-defense-goalie-row {
+  grid-template-columns: 56px repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.depth-pair-label-all {
+  width: auto;
+  min-width: 0;
+  height: 84px;
+  min-height: 84px;
+}
+
+@media (max-width: 720px) {
+  .depth-rows-scroll .depth-defense-goalie-lines {
+    min-width: 352px;
+  }
+  .depth-defense-goalie-row {
+    grid-template-columns: 28px repeat(3, 104px);
+    gap: 4px;
+  }
+  .depth-pair-label-all {
+    width: 28px;
+    height: 84px;
+    min-height: 84px;
+    padding: 3px 1px;
+    border-radius: 10px;
+  }
+  .depth-pair-label-all span { font-size: .40rem; }
+  .depth-pair-label-all strong { font-size: .70rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-defense-goalie-lines {
+    min-width: 346px;
+  }
+  .depth-defense-goalie-row {
+    grid-template-columns: 26px repeat(3, 102px);
+    gap: 4px;
+  }
+  .depth-pair-label-all {
+    width: 26px;
   }
 }
 
