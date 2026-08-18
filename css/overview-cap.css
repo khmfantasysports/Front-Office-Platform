@@ -1,0 +1,91 @@
+/* V2.20 overview financial terminology + tighter hierarchy */
+.overview-stack-v220 { display:grid; gap:8px; }
+.overview-cap-card {
+  padding:11px 12px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(13,24,34,.94);
+}
+.overview-cap-head {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  margin-bottom:9px;
+}
+.overview-cap-head h3 { margin:0; font-size:1rem; }
+.overview-cap-head .cap-limit { color:var(--muted); font-size:.7rem; white-space:nowrap; }
+.overview-metrics {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  border:1px solid var(--border-soft); border-radius:10px; overflow:hidden;
+  background:rgba(7,17,26,.34);
+}
+.overview-metric { min-width:0; padding:9px 10px; }
+.overview-metric + .overview-metric { border-left:1px solid var(--border-soft); }
+.overview-metric span {
+  display:block; color:var(--muted); font-size:.56rem; font-weight:850;
+  letter-spacing:.055em; text-transform:uppercase; white-space:nowrap;
+}
+.overview-metric strong {
+  display:block; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:.94rem; font-variant-numeric:tabular-nums;
+}
+.overview-metric.primary strong { color:var(--healthy); }
+.tone-warning .overview-metric.primary strong { color:var(--warning); }
+.tone-danger .overview-metric.primary strong { color:var(--danger); }
+.overview-cap-progress { margin-top:9px; }
+.overview-cap-progress .cap-bar { margin-top:0; }
+.overview-cap-progress-meta {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:5px; color:var(--muted); font-size:.64rem;
+}
+.overview-cap-progress-meta strong { color:var(--text); }
+.overview-trend-compact { padding:9px 10px; }
+.overview-trend-compact .trend-chart { margin-top:4px; min-height:64px; }
+.overview-trend-compact .trend-item { grid-template-rows:36px auto auto; }
+.overview-trend-compact .trend-bar-track { height:36px; }
+.overview-commitments-head {
+  display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-bottom:7px;
+}
+.overview-commitments-head h3 { margin:0; font-size:.92rem; }
+.overview-commitments-head p { margin:0; color:var(--muted); font-size:.65rem; }
+.overview-health-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.overview-health-grid .compact-status-panel { padding:9px; }
+.overview-health-grid .activity-panel { grid-column:1 / -1; }
+.commitments-table-v220 { min-width:720px; }
+.commitments-table-v220 th,
+.commitments-table-v220 td { padding:7px 8px; }
+.commitments-table-v220 th:not(:first-child),
+.commitments-table-v220 td:not(:first-child) { text-align:right; }
+
+@media (max-width:720px) {
+  .overview-stack-v220 { gap:6px; }
+  .overview-cap-card { padding:9px; }
+  .overview-cap-head { margin-bottom:7px; }
+  .overview-cap-head h3 { font-size:.9rem; }
+  .overview-cap-head .cap-limit { font-size:.61rem; }
+  .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .overview-metric { padding:8px; }
+  .overview-metric + .overview-metric { border-left:0; }
+  .overview-metric:nth-child(even) { border-left:1px solid var(--border-soft); }
+  .overview-metric:nth-child(n+3) { border-top:1px solid var(--border-soft); }
+  .overview-metric span { font-size:.51rem; }
+  .overview-metric strong { margin-top:4px; font-size:.87rem; }
+  .overview-cap-progress-meta { font-size:.59rem; }
+  .overview-trend-compact { padding:8px; }
+  .overview-trend-compact .trend-chart { min-height:58px; }
+  .overview-trend-compact .trend-item { grid-template-rows:32px auto auto; }
+  .overview-trend-compact .trend-bar-track { height:32px; }
+  .overview-health-grid { gap:6px; }
+  .commitments-table-v220 { min-width:680px; }
+}
+
+
+/* V2.21 Cap-page terminology aligned with Overview */
+.cap-visual-grid-v221 { grid-template-columns:1fr; gap:7px; }
+.cap-page-v221 { display:grid; gap:8px; }
+.cap-page-v221 .page-heading-row { margin-bottom:0; }
+.cap-detail-table-v221 { min-width:840px; }
+.cap-detail-table-v221 th:not(:first-child),
+.cap-detail-table-v221 td:not(:first-child) { text-align:right; }
+@media (max-width:720px) {
+  .cap-page-v221 { gap:6px; }
+  .cap-detail-table-v221 { min-width:790px; }
+}
