@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.18" />
+  <meta name="application-name" content="Fantasy Front Office v2.19" />
   <style>
 :root {
   color-scheme: dark;
@@ -2366,6 +2366,93 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .asset-grid { grid-template-columns:1fr; }
 }
 
+
+
+/* V2.19 landing + workspace opening experience */
+.landing-shell {
+  width:min(1080px,100%); margin:42px auto 28px; display:grid; grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);
+  border:1px solid var(--border); border-radius:22px; overflow:hidden; background:linear-gradient(145deg,rgba(13,25,36,.98),rgba(7,16,24,.98)); box-shadow:var(--shadow);
+}
+.landing-hero { padding:48px 44px 42px; background:radial-gradient(circle at 12% 0%,rgba(50,173,255,.16),transparent 38%); }
+.landing-brand-mark { width:58px; height:58px; display:grid; place-items:center; border-radius:16px; margin-bottom:22px; border:1px solid rgba(119,201,255,.32); background:linear-gradient(145deg,rgba(50,173,255,.22),rgba(50,173,255,.06)); color:#c9eaff; font-size:1.08rem; font-weight:950; letter-spacing:-.04em; }
+.landing-kicker { color:var(--accent); font-size:.72rem; font-weight:900; letter-spacing:.13em; text-transform:uppercase; }
+.landing-hero h2 { max-width:620px; margin:10px 0 14px; font-size:clamp(2.25rem,5vw,4rem); line-height:.98; letter-spacing:-.055em; }
+.landing-lead { max-width:590px; margin:0; color:#a8b7c5; font-size:1rem; line-height:1.6; }
+.landing-feature-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:30px; }
+.landing-feature { min-width:0; display:flex; gap:10px; align-items:flex-start; padding:12px; border:1px solid var(--border-soft); border-radius:13px; background:rgba(8,18,27,.48); }
+.landing-feature-icon { flex:0 0 28px; width:28px; height:28px; display:grid; place-items:center; border-radius:8px; background:rgba(50,173,255,.10); color:var(--accent); font-size:.72rem; font-weight:950; }
+.landing-feature strong,.landing-feature small { display:block; }
+.landing-feature strong { font-size:.8rem; }
+.landing-feature small { margin-top:3px; color:var(--muted); font-size:.68rem; line-height:1.35; }
+.landing-signin-card { padding:42px 34px; display:flex; flex-direction:column; justify-content:center; border-left:1px solid var(--border-soft); background:rgba(8,17,25,.76); }
+.landing-signin-card h3 { margin:0 0 9px; font-size:1.45rem; letter-spacing:-.025em; }
+.landing-signin-card > p:not(.eyebrow) { margin:0 0 22px; color:var(--muted); font-size:.86rem; line-height:1.5; }
+.landing-google-btn { width:100%; min-height:48px; display:flex; align-items:center; justify-content:center; gap:9px; }
+.google-g { width:22px; height:22px; display:grid; place-items:center; border-radius:50%; background:rgba(255,255,255,.9); color:#16202a; font-size:.7rem; font-weight:950; }
+.landing-security { display:flex; gap:8px; align-items:flex-start; margin-top:14px; color:var(--muted); font-size:.67rem; line-height:1.4; }
+.security-dot { flex:0 0 auto; width:7px; height:7px; margin-top:3px; border-radius:50%; background:var(--good); box-shadow:0 0 0 4px rgba(111,213,154,.08); }
+
+.office-picker-shell { width:min(980px,100%); margin:34px auto 28px; }
+.office-picker-hero { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding:8px 2px 20px; border-bottom:1px solid var(--border-soft); }
+.office-picker-hero h2 { margin:2px 0 7px; font-size:clamp(1.8rem,4vw,2.6rem); letter-spacing:-.04em; }
+.office-picker-hero > div > p:last-child { margin:0; color:var(--muted); font-size:.86rem; }
+.office-create-btn { min-width:180px; }
+.office-picker-summary { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 2px 10px; color:var(--muted); font-size:.72rem; }
+.office-picker-summary strong { color:var(--text); }
+.office-picker-sync { display:flex; align-items:center; gap:7px; }
+.office-picker-sync .security-dot { margin-top:0; }
+.office-list-v219 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.office-card-v219 { position:relative; display:grid; grid-template-columns:48px minmax(0,1fr) auto; align-items:center; gap:13px; min-height:126px; padding:15px 16px; border-radius:15px; background:linear-gradient(145deg,rgba(15,28,38,.96),rgba(10,20,29,.96)); box-shadow:none; }
+.office-card-v219:hover { transform:translateY(-1px); border-color:rgba(119,201,255,.42); }
+.office-card-mark { width:48px; height:48px; display:grid; place-items:center; border-radius:13px; border:1px solid rgba(119,201,255,.27); background:rgba(50,173,255,.08); color:#bfe6ff; font-size:.82rem; font-weight:950; }
+.office-card-copy { min-width:0; display:block; }
+.office-card-topline { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:7px; }
+.office-sport-chip { display:inline-flex; align-items:center; min-height:20px; padding:2px 6px; border-radius:999px; background:rgba(50,173,255,.08); color:var(--accent); font-size:.58rem; font-weight:900; letter-spacing:.06em; }
+.office-updated { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#718393; font-size:.58rem; }
+.office-card-copy > strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:1.02rem; letter-spacing:-.015em; }
+.office-card-copy > small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:3px; color:#b0bfcc; font-size:.74rem; }
+.office-card-meta { display:block; margin-top:10px; color:#788b9b; font-size:.64rem; }
+.office-open-v219 { color:var(--accent); font-size:1.6rem; font-weight:500; }
+.office-empty-state { grid-column:1 / -1; min-height:240px; display:grid; place-items:center; align-content:center; text-align:center; padding:28px; border:1px dashed var(--border); border-radius:16px; background:rgba(255,255,255,.012); }
+.office-empty-state h3 { margin:12px 0 5px; }
+.office-empty-state p { max-width:430px; margin:0; color:var(--muted); font-size:.8rem; line-height:1.45; }
+.office-empty-mark { width:46px; height:46px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(119,201,255,.25); color:var(--accent); background:rgba(50,173,255,.07); font-size:.72rem; font-weight:950; }
+
+/* Make new-workspace screen visually consistent with the refreshed entry flow. */
+.onboarding-panel { border-radius:20px; box-shadow:var(--shadow-soft); }
+.onboarding-intro { background:radial-gradient(circle at 10% 0%,rgba(50,173,255,.14),transparent 44%),rgba(10,20,29,.6); }
+
+@media (max-width:760px) {
+  .landing-shell { margin:18px auto 20px; grid-template-columns:1fr; border-radius:17px; }
+  .landing-hero { padding:28px 21px 24px; }
+  .landing-brand-mark { width:48px; height:48px; margin-bottom:16px; border-radius:13px; }
+  .landing-hero h2 { margin:8px 0 11px; font-size:2.25rem; }
+  .landing-lead { font-size:.86rem; line-height:1.5; }
+  .landing-feature-grid { margin-top:20px; gap:7px; }
+  .landing-feature { padding:9px; border-radius:11px; }
+  .landing-feature-icon { width:25px; height:25px; flex-basis:25px; }
+  .landing-feature strong { font-size:.72rem; }
+  .landing-feature small { font-size:.61rem; }
+  .landing-signin-card { padding:24px 21px 25px; border-left:0; border-top:1px solid var(--border-soft); }
+  .landing-signin-card h3 { font-size:1.18rem; }
+  .landing-signin-card > p:not(.eyebrow) { margin-bottom:16px; font-size:.78rem; }
+  .office-picker-shell { margin:15px auto 20px; }
+  .office-picker-hero { align-items:stretch; flex-direction:column; gap:14px; padding:5px 2px 15px; }
+  .office-picker-hero h2 { font-size:1.75rem; }
+  .office-create-btn { width:100%; min-height:43px; }
+  .office-list-v219 { grid-template-columns:1fr; gap:9px; }
+  .office-card-v219 { grid-template-columns:43px minmax(0,1fr) auto; min-height:105px; padding:12px 13px; gap:11px; border-radius:13px; }
+  .office-card-mark { width:43px; height:43px; border-radius:11px; }
+  .office-picker-summary { padding-top:10px; }
+}
+@media (max-width:420px) {
+  .landing-feature-grid { grid-template-columns:1fr; }
+  .landing-feature small { display:none; }
+  .landing-feature { align-items:center; }
+  .landing-hero h2 { font-size:2rem; }
+  .office-updated { display:none; }
+}
+
 </style>
 </head>
 <body>
@@ -2404,46 +2491,65 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     </header>
 
     <main>
-      <section id="authGate" class="panel auth-panel">
-        <span class="setup-badge">Cloud workspace</span>
-        <h2>Sign in to your Front Office</h2>
-        <p class="muted">Your rosters, contracts and cap data will be saved to your private Supabase account instead of only this browser.</p>
-        <div class="auth-actions">
-          <button id="googleSignInBtn" class="btn btn-primary google-btn" type="button">Continue with Google</button>
+      <section id="authGate" class="landing-shell">
+        <div class="landing-hero">
+          <div class="landing-brand-mark" aria-hidden="true"><span>FO</span></div>
+          <div class="landing-kicker">Fantasy roster management</div>
+          <h2>Run your fantasy team like a front office.</h2>
+          <p class="landing-lead">One private workspace for your roster, contracts, cap, minors, assets and transaction history.</p>
+
+          <div class="landing-feature-grid" aria-label="Platform features">
+            <div class="landing-feature"><span class="landing-feature-icon">R</span><span><strong>Roster & Depth</strong><small>Lines, pairs, goalies and custom ordering.</small></span></div>
+            <div class="landing-feature"><span class="landing-feature-icon">$</span><span><strong>Contracts & Cap</strong><small>Seven-season commitments and cap planning.</small></span></div>
+            <div class="landing-feature"><span class="landing-feature-icon">M</span><span><strong>Minors & Assets</strong><small>Prospects, picks and future resources.</small></span></div>
+            <div class="landing-feature"><span class="landing-feature-icon">↔</span><span><strong>Transactions</strong><small>Trades, signings, waivers and buyouts.</small></span></div>
+          </div>
         </div>
-        <div id="authError" class="auth-error hidden"></div>
+
+        <div class="landing-signin-card">
+          <p class="eyebrow">Private workspace</p>
+          <h3>Your front office, wherever you are.</h3>
+          <p>Sign in to open your teams and keep every roster move synced across devices.</p>
+          <button id="googleSignInBtn" class="btn btn-primary google-btn landing-google-btn" type="button"><span class="google-g">G</span> Continue with Google</button>
+          <div class="landing-security"><span class="security-dot"></span><span>Your league data stays inside your authenticated workspace.</span></div>
+          <div id="authError" class="auth-error hidden"></div>
+        </div>
       </section>
 
-      <section id="officePicker" class="panel office-picker-panel hidden">
-        <div class="office-picker-header">
+      <section id="officePicker" class="office-picker-shell hidden">
+        <div class="office-picker-hero">
           <div>
-            <p class="eyebrow">Your workspaces</p>
+            <p class="eyebrow">Workspace</p>
             <h2>My Front Offices</h2>
-            <p class="muted">Choose a team or create another private Front Office.</p>
+            <p>Jump back into a team or start another private workspace.</p>
           </div>
-          <button id="newOfficeBtn" class="btn btn-primary" type="button">+ Create Front Office</button>
+          <button id="newOfficeBtn" class="btn btn-primary office-create-btn" type="button">+ New Front Office</button>
         </div>
-        <div id="officeList" class="office-list"></div>
+        <div class="office-picker-summary">
+          <span><strong id="officeCountLabel">0</strong> front offices</span>
+          <span class="office-picker-sync"><span class="security-dot"></span> Cloud synced</span>
+        </div>
+        <div id="officeList" class="office-list office-list-v219"></div>
       </section>
 
       <section id="onboarding" class="panel onboarding-panel hidden" aria-labelledby="onboardingTitle">
         <div class="onboarding-intro">
           <div>
-            <span class="setup-badge">New workspace</span>
-            <h2 id="onboardingTitle">Run your fantasy team like a front office.</h2>
-            <p class="lead">Keep salaries, contracts, cap space and roster decisions organized in one private workspace.</p>
+            <span class="setup-badge">New Front Office</span>
+            <h2 id="onboardingTitle">Set up the team. We’ll handle the structure.</h2>
+            <p class="lead">Add the league essentials now. Roster, contract, cap and management tools will be ready when you open the workspace.</p>
           </div>
           <div class="feature-list" aria-label="Front office features">
-            <div class="feature-item"><span class="feature-check">✓</span><span>Multi-year salary tracking</span></div>
-            <div class="feature-item"><span class="feature-check">✓</span><span>Automatic cap calculations</span></div>
-            <div class="feature-item"><span class="feature-check">✓</span><span>Flexible roster statuses</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Seven-season contracts & cap</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Roster, depth chart & minors</span></div>
+            <div class="feature-item"><span class="feature-check">✓</span><span>Transactions & asset tracking</span></div>
           </div>
         </div>
 
         <div class="onboarding-form-wrap">
           <div class="onboarding-form-heading">
-            <h3>Set up your Front Office</h3>
-            <p>Start with the essentials. You can change these later.</p>
+            <h3>Create your Front Office</h3>
+            <p>Only the essentials are required. Everything can be adjusted later.</p>
           </div>
 
           <form id="frontOfficeForm">
@@ -4483,15 +4589,22 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function renderOfficeList() {
     if (!officePicker || officePicker.classList.contains('hidden')) return;
     const list = el('officeList');
+    const countLabel = el('officeCountLabel');
+    if (countLabel) countLabel.textContent = frontOfficeList.length;
     if (!frontOfficeList.length) {
-      list.innerHTML = `<div class="issue-item"><p><strong>No Front Offices yet.</strong></p><span class="muted">Create your first workspace to begin.</span></div>`;
+      list.innerHTML = `<div class="office-empty-state"><div class="office-empty-mark">FO</div><h3>No Front Offices yet</h3><p>Create your first private workspace to start managing a roster, contracts and cap.</p></div>`;
       return;
     }
-    list.innerHTML = frontOfficeList.map((office) => `
-      <button class="office-card" type="button" data-open-office="${office.front_office_id}">
-        <span><h3>${escapeHtml(office.team_name)}</h3><p>${escapeHtml(office.league_name)} · ${escapeHtml(office.sport)}</p></span>
-        <span class="office-open">Open →</span>
-      </button>`).join('');
+    list.innerHTML = frontOfficeList.map((office) => {
+      const initials = String(office.team_name || 'FO').split(/\s+/).filter(Boolean).slice(0,2).map((part) => part[0]).join('').toUpperCase();
+      const updated = office.updated_at ? formatDateTime(office.updated_at) : 'Recently';
+      return `
+      <button class="office-card office-card-v219" type="button" data-open-office="${office.front_office_id}">
+        <span class="office-card-mark">${escapeHtml(initials || 'FO')}</span>
+        <span class="office-card-copy"><span class="office-card-topline"><span class="office-sport-chip">${escapeHtml(office.sport || 'NHL')}</span><span class="office-updated">Updated ${escapeHtml(updated)}</span></span><strong>${escapeHtml(office.team_name)}</strong><small>${escapeHtml(office.league_name)}</small><span class="office-card-meta">${office.roster_limit ? `${escapeHtml(office.roster_limit)} roster spots` : 'Flexible roster'} · ${escapeHtml(office.currency_code || 'USD')}</span></span>
+        <span class="office-open-v219" aria-hidden="true">›</span>
+      </button>`;
+    }).join('');
     document.querySelectorAll('[data-open-office]').forEach((button) => {
       button.addEventListener('click', () => loadOffice(button.dataset.openOffice));
     });
