@@ -2163,6 +2163,9 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 .depth-compact-card .depth-slot-meta { font-size:.45rem; }
 .depth-compact-card .depth-slot-finance strong { font-size:.50rem; }
 .depth-compact-card .depth-slot-finance span { font-size:.38rem; }
+.depth-compact-defense {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
 
 @media (max-width:720px) {
   .depth-compact-grid {
@@ -2978,10 +2981,10 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
       return `<div class="depth-order-list">${rows}</div>`;
     }
     if (position === 'D') {
-      const pairs = [];
-      for (let index = 0; index < Math.max(6, Math.min(players.length, 6)); index += 2) pairs.push(`<div class="depth-pair-grid"><div class="depth-pair-label">Pair ${Math.floor(index / 2) + 1}</div>${depthSlot(players[index], `D${index + 1}`, current)}${depthSlot(players[index + 1], `D${index + 2}`, current)}</div>`);
-      const extras = players.slice(6).map((player, offset) => `<div class="depth-position-row"><div class="depth-role-label">Depth ${offset + 7}</div>${depthSlot(player, 'D', current)}</div>`).join('');
-      return `<div class="depth-position-layout">${pairs.join('')}${extras}</div>`;
+      return `<div class="depth-compact-grid depth-compact-defense">${players.map((player, index) => {
+        const role = index < 6 ? `D${index + 1} · Pair ${Math.floor(index / 2) + 1}` : `D · Depth ${index + 1}`;
+        return `<div class="depth-compact-card">${depthSlot(player, role, current)}</div>`;
+      }).join('')}</div>`;
     }
     if (position === 'G') {
       return `<div class="depth-compact-grid depth-compact-goalies">${players.map((player, index) => `<div class="depth-compact-card">${depthSlot(player, `G · ${depthPositionRoleLabel(position, index)}`, current)}</div>`).join('')}</div>`;
