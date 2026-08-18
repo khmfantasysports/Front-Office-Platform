@@ -1,0 +1,973 @@
+/* V2.5 cap scrolling + seven-season roster horizon + positional depth view */
+.cap-detail-scroll-shell,
+.cap-history-scroll-shell,
+.roster-table-scroll-shell {
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.cap-horizontal-scroll,
+.roster-horizontal-scroll {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(119,201,255,.42) rgba(255,255,255,.035);
+}
+.cap-horizontal-scroll::-webkit-scrollbar,
+.roster-horizontal-scroll::-webkit-scrollbar { height: 7px; }
+.cap-horizontal-scroll::-webkit-scrollbar-track,
+.roster-horizontal-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.035); }
+.cap-horizontal-scroll::-webkit-scrollbar-thumb,
+.roster-horizontal-scroll::-webkit-scrollbar-thumb { background: rgba(119,201,255,.42); border-radius:999px; }
+.cap-detail-table-v25 { min-width: 760px; }
+.cap-detail-table-v25 thead th:first-child,
+.cap-detail-table-v25 tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background: #101b25;
+  box-shadow: 1px 0 0 var(--border);
+}
+.cap-detail-table-v25 tbody td:first-child { z-index:3; background:#0d1822; }
+.cap-scroll-hint { display:none; align-items:center; justify-content:flex-end; gap:5px; color:var(--muted); font-size:.64rem; margin-bottom:4px; }
+.cap-scroll-hint .scroll-arrow { color:var(--accent); font-weight:900; }
+
+.view-switch.v25 { grid-template-columns:repeat(3,1fr); }
+.depth-panel { display:grid; gap:10px; }
+.depth-panel.hidden { display:none !important; }
+.depth-summary-strip {
+  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+  padding:8px 10px; border:1px solid var(--border); border-radius:11px; background:rgba(13,24,34,.78);
+}
+.depth-summary-pill {
+  display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border:1px solid var(--border-soft); border-radius:999px;
+  background:rgba(50,173,255,.06); color:#d7e9f6; font-size:.67rem; font-weight:800;
+}
+.depth-summary-pill strong { color:var(--text); }
+.depth-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.depth-card {
+  min-width:0; border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.82); overflow:hidden;
+}
+.depth-card-head {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 10px; border-bottom:1px solid var(--border);
+}
+.depth-card-head strong { font-size:.84rem; }
+.depth-card-count { color:var(--muted); font-size:.66rem; }
+.depth-player-list { display:grid; }
+.depth-player-row {
+  width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center;
+  padding:9px 10px; border:0; border-bottom:1px solid var(--border-soft); background:transparent; color:var(--text); text-align:left;
+}
+.depth-player-row:last-child { border-bottom:0; }
+.depth-player-row[hidden] { display:none !important; }
+.depth-player-row:hover, .depth-player-row:focus-visible { background:rgba(255,255,255,.025); outline:none; }
+.depth-player-main { min-width:0; }
+.depth-player-name { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.79rem; font-weight:800; }
+.depth-player-meta { display:block; margin-top:2px; color:var(--muted); font-size:.62rem; line-height:1.25; }
+.depth-player-finance { text-align:right; white-space:nowrap; }
+.depth-player-finance strong { display:block; font-size:.73rem; font-variant-numeric:tabular-nums; }
+.depth-player-finance span { display:block; margin-top:2px; color:var(--muted); font-size:.57rem; }
+.depth-empty { padding:14px 10px; color:var(--muted); font-size:.7rem; text-align:center; }
+.depth-card[hidden] { display:none !important; }
+
+.roster-horizon-note {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+  padding:7px 9px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(50,173,255,.035); color:var(--muted); font-size:.65rem;
+}
+.roster-horizon-note strong { color:#d8e9f5; }
+.roster-table-seven { min-width:1120px; }
+.roster-table-seven .col-salary { min-width:92px; }
+
+@media (max-width: 980px) {
+  .depth-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 720px) {
+  .cap-scroll-hint { display:flex; }
+  .cap-detail-card { min-width:0; overflow:hidden; }
+  .cap-detail-scroll-shell { width:100%; }
+  .cap-horizontal-scroll { width:100%; max-width:100%; }
+  .cap-detail-table-v25 { min-width:700px; }
+  .view-switch.v25 button { padding:6px 7px; font-size:.65rem; }
+  .depth-grid { grid-template-columns:1fr; gap:8px; }
+  .depth-card-head { padding:8px 9px; }
+  .depth-player-row { padding:8px 9px; }
+  .depth-player-name { font-size:.76rem; }
+  .roster-table-seven { min-width:1080px; }
+  .roster-horizon-note { font-size:.61rem; }
+}
+
+
+
+/* V2.6 hockey depth chart */
+.depth-lineup-shell { display:grid; gap:12px; }
+.depth-position-tabs {
+  display:flex; align-items:center; gap:5px; overflow-x:auto; scrollbar-width:none;
+  padding:3px; border:1px solid var(--border); border-radius:11px; background:rgba(9,20,29,.78);
+}
+.depth-position-tabs::-webkit-scrollbar { display:none; }
+.depth-position-tab {
+  flex:1 0 auto; min-width:54px; min-height:34px; padding:7px 12px; border:0; border-radius:8px;
+  background:transparent; color:var(--muted); font-weight:850; font-size:.75rem;
+}
+.depth-position-tab.active { background:rgba(50,173,255,.12); color:var(--text); }
+.depth-chart-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.depth-chart-toolbar-copy h4 { margin:0; font-size:1rem; }
+.depth-chart-toolbar-copy p { margin:3px 0 0; color:var(--muted); font-size:.72rem; }
+.depth-chart-actions { display:flex; align-items:center; gap:7px; }
+.depth-chart-actions .btn { min-height:34px; padding:7px 10px; }
+.depth-section { display:grid; gap:8px; }
+.depth-section-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.depth-section-head h4 { margin:0; font-size:.78rem; color:#cdd9e3; letter-spacing:.06em; text-transform:uppercase; }
+.depth-section-head span { color:var(--muted); font-size:.66rem; }
+.depth-forward-lines { display:grid; gap:8px; }
+.depth-forward-line {
+  display:grid; grid-template-columns:58px repeat(3,minmax(0,1fr)); gap:7px; align-items:stretch;
+}
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label {
+  display:flex; align-items:center; justify-content:center; min-height:58px; padding:7px;
+  border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.018);
+  color:var(--muted); font-size:.66rem; font-weight:850; text-align:center;
+}
+.depth-slot {
+  min-width:0; display:grid; align-content:center; gap:2px; min-height:58px; padding:8px 9px;
+  border:1px solid var(--border); border-radius:10px; background:#0b151e; color:var(--text); text-align:left;
+}
+button.depth-slot { cursor:pointer; }
+button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24; }
+.depth-slot-position { color:var(--accent); font-size:.56rem; font-weight:900; letter-spacing:.08em; }
+.depth-slot-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.78rem; font-weight:850; }
+.depth-slot-meta { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:.61rem; }
+.depth-slot.empty { border-style:dashed; color:#667989; background:rgba(255,255,255,.01); }
+.depth-pair-grid { display:grid; grid-template-columns:58px repeat(2,minmax(0,1fr)); gap:7px; }
+.depth-pair-grid + .depth-pair-grid { margin-top:7px; }
+.depth-goalie-grid { display:grid; grid-template-columns:90px minmax(0,1fr); gap:7px; }
+.depth-goalie-grid + .depth-goalie-grid { margin-top:7px; }
+.depth-extra-list { display:grid; gap:6px; }
+.depth-extra-row { display:grid; grid-template-columns:70px minmax(0,1fr); gap:7px; }
+.depth-order-list { display:grid; gap:6px; }
+.depth-order-row {
+  display:grid; grid-template-columns:42px minmax(0,1fr) auto; gap:8px; align-items:center;
+  min-height:54px; padding:7px 8px; border:1px solid var(--border); border-radius:10px; background:#0b151e;
+}
+.depth-order-rank { color:var(--accent); font-weight:900; font-size:.73rem; text-align:center; }
+.depth-order-player { min-width:0; }
+.depth-order-player strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:.8rem; }
+.depth-order-player span { display:block; margin-top:2px; color:var(--muted); font-size:.62rem; }
+.depth-order-controls { display:flex; gap:5px; }
+.depth-move-btn {
+  width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--border); border-radius:8px;
+  background:var(--panel-2); color:var(--text); font-weight:900;
+}
+.depth-move-btn:disabled { opacity:.28; cursor:default; }
+.depth-position-layout { display:grid; gap:8px; }
+.depth-position-row {
+  display:grid; grid-template-columns:84px minmax(0,1fr); gap:8px; align-items:stretch;
+}
+.depth-position-row .depth-slot { min-height:54px; }
+.depth-edit-note { margin:0; color:var(--muted); font-size:.68rem; line-height:1.35; }
+.depth-saving { color:var(--warning); font-size:.68rem; font-weight:800; }
+
+@media (max-width:720px) {
+  .depth-lineup-shell { gap:9px; }
+  .depth-position-tabs { gap:3px; }
+  .depth-position-tab { min-width:48px; min-height:31px; padding:6px 9px; font-size:.68rem; }
+  .depth-forward-line { grid-template-columns:44px repeat(3,minmax(0,1fr)); gap:5px; }
+  .depth-pair-grid { grid-template-columns:52px repeat(2,minmax(0,1fr)); gap:5px; }
+  .depth-goalie-grid { grid-template-columns:70px minmax(0,1fr); gap:5px; }
+  .depth-line-label, .depth-pair-label, .depth-role-label { min-height:54px; padding:5px; font-size:.58rem; }
+  .depth-slot { min-height:54px; padding:7px 6px; }
+  .depth-slot-position { font-size:.50rem; }
+  .depth-slot-name { font-size:.69rem; }
+  .depth-slot-meta { font-size:.54rem; }
+  .depth-position-row { grid-template-columns:68px minmax(0,1fr); gap:6px; }
+  .depth-chart-toolbar { align-items:flex-start; }
+  .depth-chart-actions { margin-left:auto; }
+}
+@media (max-width:390px) {
+  .depth-forward-line { grid-template-columns:38px repeat(3,minmax(0,1fr)); gap:4px; }
+  .depth-line-label { font-size:.52rem; }
+  .depth-slot-name { font-size:.64rem; }
+  .depth-slot-meta { font-size:.50rem; }
+}
+
+
+
+/* V2.8 Minors terminology + Fantrax minors routing */
+.app-menu-bar .workspace-nav { overflow-x:auto; scrollbar-width:none; }
+.app-menu-bar .workspace-nav::-webkit-scrollbar { display:none; }
+.app-menu-bar .nav-tab { flex:0 0 auto; min-width:max-content; }
+.prospect-check-field { align-content:end; }
+.prospect-check { min-height:43px; display:flex; align-items:center; gap:8px; padding:9px 11px; border:1px solid #2a4052; border-radius:11px; background:rgba(7,17,26,.78); color:var(--text); }
+.prospect-check input { width:auto; margin:0; }
+.page-copy { max-width:620px; margin:4px 0 0; color:var(--muted); font-size:.78rem; line-height:1.4; }
+.farm-page,.transactions-page { display:grid; gap:12px; }
+.farm-summary { display:flex; gap:8px; flex-wrap:wrap; }
+.farm-summary span { padding:7px 10px; border:1px solid var(--border); border-radius:999px; background:#0b151e; color:var(--muted); font-size:.72rem; }
+.farm-summary strong { color:var(--text); }
+.farm-player-list { display:grid; gap:7px; }
+.farm-player-card { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; border:1px solid var(--border); border-radius:12px; padding:8px; background:#0b151e; }
+.farm-player-main { min-width:0; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:4px; border:0; background:transparent; color:var(--text); text-align:left; }
+.farm-player-main span:first-child { min-width:0; }
+.farm-player-main strong,.farm-player-main small { display:block; }
+.farm-player-main strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.farm-player-main small { margin-top:3px; color:var(--muted); font-size:.68rem; }
+.farm-player-cap { text-align:right; white-space:nowrap; }
+.farm-active-section { margin-top:2px; }
+.farm-active-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:8px; }
+.farm-active-prospect { padding:9px 10px; border:1px solid var(--border); border-radius:10px; background:#0b141d; color:var(--text); text-align:left; }
+.farm-active-prospect strong,.farm-active-prospect span { display:block; }
+.farm-active-prospect span { margin-top:2px; color:var(--muted); font-size:.66rem; }
+.transaction-list { display:grid; gap:8px; }
+.transaction-card { border:1px solid var(--border); border-radius:12px; padding:11px 12px; background:#0b151e; }
+.transaction-card-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.transaction-card-head h4 { margin:3px 0 0; font-size:.9rem; }
+.transaction-card-head time { color:var(--muted); font-size:.68rem; white-space:nowrap; }
+.transaction-type { color:var(--accent); font-size:.62rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.transaction-counterparty,.transaction-notes { margin:6px 0 0; color:var(--muted); font-size:.7rem; }
+.transaction-chips { display:flex; gap:5px; margin-top:8px; }
+.tx-chip { padding:3px 6px; border-radius:999px; border:1px solid var(--border); font-size:.58rem; font-weight:900; }
+.tx-chip.in { color:var(--good); }.tx-chip.out { color:var(--danger); }.tx-chip.financial { color:var(--warning); }
+.transaction-flow { display:grid; grid-template-columns:42px minmax(0,1fr); gap:7px; margin-top:7px; font-size:.7rem; }
+.transaction-flow strong { color:var(--muted); font-size:.61rem; letter-spacing:.06em; }
+.transaction-flow.in strong { color:var(--good); }.transaction-flow.out strong { color:var(--danger); }.transaction-flow.financial strong { color:var(--warning); }
+.transaction-form-body { display:grid; gap:16px; max-height:70vh; overflow-y:auto; }
+.transaction-financial-section { border-top:1px solid var(--border); padding-top:14px; }
+.transaction-financial-section h4 { margin:0; }
+.transaction-financial-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+.transaction-financial-grid label { display:grid; grid-template-columns:80px minmax(0,1fr); align-items:center; gap:8px; color:var(--muted); font-size:.72rem; }
+.transaction-financial-grid input { min-height:38px; }
+.transaction-cap-card .section-title-row { margin-bottom:8px; }
+@media(max-width:720px){
+  .app-menu-bar .workspace-nav { justify-content:flex-start; }
+  .app-menu-bar .nav-tab { padding-left:8px; padding-right:8px; }
+  .farm-active-grid { grid-template-columns:1fr; }
+  .farm-player-card { grid-template-columns:minmax(0,1fr) auto; }
+  .farm-player-main { gap:7px; }
+  .transaction-financial-grid { grid-template-columns:1fr; }
+  .transaction-dialog { width:min(760px,calc(100vw - 12px)); }
+}
+
+
+
+/* V2.9 depth-first roster + normalized hockey lineup */
+.view-switch.v29 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(390px, 100%);
+}
+.view-switch.v29 button { min-width: 0; white-space: nowrap; }
+.depth-panel {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(13,24,34,.78);
+}
+.depth-panel .depth-lineup-shell { gap: 12px; }
+.depth-panel .depth-position-tabs {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0,1fr));
+  overflow: visible;
+}
+.depth-panel .depth-position-tab {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 6px;
+}
+.depth-chart-toolbar {
+  min-height: 48px;
+  padding: 2px 2px 0;
+}
+.depth-chart-toolbar-copy h4 { font-size: 1.05rem; letter-spacing: -.015em; }
+.depth-chart-toolbar-copy p { max-width: 620px; font-size: .73rem; }
+.depth-section-card {
+  gap: 10px;
+  padding: 11px;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: rgba(7,17,26,.38);
+}
+.depth-section-head {
+  min-height: 25px;
+  padding: 0 1px;
+}
+.depth-section-head h4 { font-size: .76rem; letter-spacing: .075em; }
+.depth-section-head span { font-size: .65rem; }
+.depth-forward-lines { gap: 7px; }
+.depth-forward-line,
+.depth-pair-grid {
+  grid-template-columns: 56px repeat(3, minmax(0,1fr));
+  gap: 7px;
+}
+.depth-pair-grid { grid-template-columns: 56px repeat(2, minmax(0,1fr)); }
+.depth-pair-grid + .depth-pair-grid { margin-top: 0; }
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label,
+.depth-slot {
+  height: 72px;
+  min-height: 72px;
+  border-radius: 11px;
+}
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label {
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 4px;
+  line-height: 1.05;
+}
+.depth-line-label span,
+.depth-pair-label span {
+  color: var(--muted);
+  font-size: .58rem;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.depth-line-label strong,
+.depth-pair-label strong {
+  color: #d8e6f1;
+  font-size: .85rem;
+  font-weight: 900;
+}
+.depth-slot {
+  align-content: center;
+  gap: 3px;
+  padding: 8px 10px;
+  overflow: hidden;
+}
+.depth-slot-position { font-size: .56rem; }
+.depth-slot-name {
+  display: -webkit-box;
+  min-height: 2.15em;
+  overflow: hidden;
+  white-space: normal;
+  text-overflow: clip;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: .79rem;
+  line-height: 1.08;
+}
+.depth-slot-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .60rem;
+}
+.depth-slot.empty .depth-slot-name { min-height: auto; }
+.depth-goalie-pair,
+.depth-extra-goalies {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 7px;
+}
+.depth-goalie-unit {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 72px minmax(0,1fr);
+  gap: 7px;
+  align-items: stretch;
+}
+.depth-extra-goalies { margin-top: 7px; }
+.depth-extra-row { grid-template-columns: 56px minmax(0,1fr); gap: 7px; }
+.depth-position-row { grid-template-columns: 72px minmax(0,1fr); }
+.depth-position-row .depth-slot { min-height:72px; height:72px; }
+.depth-order-row { min-height: 58px; }
+
+@media (max-width: 720px) {
+  .roster-page > .page-heading-row:first-child {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .view-switch.v29 { width: 100%; }
+  .view-switch.v29 button { min-height: 34px; font-size: .69rem; }
+  .depth-panel { padding: 8px; border-radius: 12px; }
+  .depth-panel .depth-lineup-shell { gap: 9px; }
+  .depth-panel .depth-position-tabs { gap: 2px; padding: 2px; }
+  .depth-panel .depth-position-tab { min-height: 32px; padding: 5px 2px; font-size: .66rem; }
+  .depth-chart-toolbar { min-height: 44px; }
+  .depth-chart-toolbar-copy h4 { font-size: .96rem; }
+  .depth-chart-toolbar-copy p { font-size: .67rem; }
+  .depth-section-card { gap: 8px; padding: 8px; border-radius: 10px; }
+  .depth-forward-lines { gap: 6px; }
+  .depth-forward-line { grid-template-columns: 42px repeat(3,minmax(0,1fr)); gap: 5px; }
+  .depth-pair-grid { grid-template-columns: 42px repeat(2,minmax(0,1fr)); gap: 5px; }
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-slot,
+  .depth-position-row .depth-slot {
+    height: 66px;
+    min-height: 66px;
+  }
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label { padding: 5px 2px; font-size: .54rem; }
+  .depth-line-label span,
+  .depth-pair-label span { font-size: .48rem; }
+  .depth-line-label strong,
+  .depth-pair-label strong { font-size: .72rem; }
+  .depth-slot { padding: 6px 6px; gap: 2px; }
+  .depth-slot-position { font-size: .49rem; }
+  .depth-slot-name { min-height: 2.1em; font-size: .66rem; line-height: 1.05; }
+  .depth-slot-meta { font-size: .50rem; }
+  .depth-goalie-pair,
+  .depth-extra-goalies { gap: 5px; }
+  .depth-goalie-unit { grid-template-columns: 58px minmax(0,1fr); gap: 5px; }
+  .depth-extra-row { grid-template-columns: 42px minmax(0,1fr); gap: 5px; }
+  .depth-position-row { grid-template-columns: 62px minmax(0,1fr); gap: 5px; }
+}
+
+@media (max-width: 390px) {
+  .depth-forward-line { grid-template-columns: 38px repeat(3,minmax(0,1fr)); gap: 4px; }
+  .depth-pair-grid { grid-template-columns: 38px repeat(2,minmax(0,1fr)); gap: 4px; }
+  .depth-goalie-pair,
+  .depth-extra-goalies { grid-template-columns: 1fr; }
+  .depth-goalie-unit { grid-template-columns: 58px minmax(0,1fr); }
+  .depth-slot-name { font-size: .63rem; }
+}
+
+
+/* V2.10 information-rich depth chart + single-primary-CTA empty states */
+.depth-panel { overflow: hidden; }
+.depth-section-card { overflow: hidden; }
+.depth-rows-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(119,201,255,.34) transparent;
+  padding-bottom: 2px;
+}
+.depth-rows-scroll::-webkit-scrollbar { height: 5px; }
+.depth-rows-scroll::-webkit-scrollbar-thumb { background: rgba(119,201,255,.30); border-radius: 999px; }
+.depth-defense-lines,
+.depth-goalie-lines { display: grid; gap: 7px; }
+.depth-slot {
+  height: 100px;
+  min-height: 100px;
+  padding: 8px 9px;
+  align-content: start;
+  grid-template-rows: auto minmax(2.15em, auto) auto auto;
+  gap: 3px;
+}
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label {
+  height: 100px;
+  min-height: 100px;
+}
+.depth-slot-header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+.depth-slot-position {
+  flex: 0 0 auto;
+  font-size: .54rem;
+  line-height: 1;
+}
+.depth-slot-status {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #a9bac8;
+  font-size: .50rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.depth-slot-name {
+  min-height: 2.15em;
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: .76rem;
+  line-height: 1.08;
+  font-weight: 875;
+}
+.depth-slot-meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: .55rem;
+  line-height: 1.15;
+}
+.depth-slot-finance {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: auto;
+  padding-top: 3px;
+  border-top: 1px solid rgba(148,166,183,.10);
+  font-variant-numeric: tabular-nums;
+}
+.depth-slot-finance strong {
+  flex: 0 0 auto;
+  color: #eaf7ff;
+  font-size: .60rem;
+  line-height: 1;
+}
+.depth-slot-finance span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: .48rem;
+  line-height: 1;
+  text-align: right;
+}
+.depth-slot.empty {
+  grid-template-rows: auto auto auto;
+  align-content: center;
+}
+.depth-slot.empty .depth-slot-meta { color: #667989; }
+.depth-goalie-pair,
+.depth-extra-goalies { align-items: stretch; }
+.depth-goalie-unit { min-width: 0; }
+.depth-position-row .depth-slot { height: 100px; min-height: 100px; }
+.depth-position-row .depth-role-label { height: 100px; min-height: 100px; }
+
+@media (max-width: 720px) {
+  .depth-section-card { padding: 8px 7px 8px; }
+  .depth-section-head { padding: 0 2px; }
+  .depth-section-head::after {
+    content: 'swipe →';
+    margin-left: auto;
+    color: #6f8394;
+    font-size: .49rem;
+    font-weight: 750;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .depth-section-head > span { margin-left: 4px; }
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-lines,
+  .depth-rows-scroll .depth-goalie-lines { min-width: 470px; }
+  .depth-rows-scroll .depth-forward-line {
+    grid-template-columns: 40px repeat(3, 136px);
+    gap: 5px;
+  }
+  .depth-rows-scroll .depth-pair-grid {
+    grid-template-columns: 40px repeat(2, 210px);
+    gap: 5px;
+  }
+  .depth-goalie-pair,
+  .depth-extra-goalies {
+    grid-template-columns: repeat(2, 230px);
+    gap: 6px;
+  }
+  .depth-goalie-unit {
+    grid-template-columns: 54px 170px;
+    gap: 6px;
+  }
+  .depth-extra-row { grid-template-columns: 40px 425px; gap: 5px; }
+  .depth-slot,
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-position-row .depth-slot,
+  .depth-position-row .depth-role-label {
+    height: 100px;
+    min-height: 100px;
+  }
+  .depth-slot { padding: 7px 7px 6px; gap: 3px; }
+  .depth-slot-name { min-height:2.15em; font-size: .68rem; }
+  .depth-slot-meta { font-size: .51rem; }
+  .depth-slot-position { font-size: .50rem; }
+  .depth-slot-status { font-size: .47rem; }
+  .depth-slot-finance strong { font-size: .56rem; }
+  .depth-slot-finance span { font-size: .45rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-lines,
+  .depth-rows-scroll .depth-goalie-lines { min-width: 466px; }
+  .depth-rows-scroll .depth-forward-line { grid-template-columns: 38px repeat(3, 136px); gap: 4px; }
+  .depth-rows-scroll .depth-pair-grid { grid-template-columns: 38px repeat(2, 210px); gap: 4px; }
+  .depth-goalie-pair,
+  .depth-extra-goalies { grid-template-columns: repeat(2, 228px); gap: 5px; }
+  .depth-goalie-unit { grid-template-columns: 52px 171px; gap: 5px; }
+  .depth-slot-name { font-size: .66rem; }
+}
+
+
+
+/* V2.11 compact lineup + combined defense/goalie rows */
+.depth-lineup-all { gap: 9px; }
+.depth-section-card { padding: 8px; gap: 7px; }
+.depth-section-head { min-height: 24px; }
+.depth-section-head h4 { font-size: .73rem; }
+.depth-section-head span { font-size: .61rem; }
+.depth-slot,
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label,
+.depth-position-row .depth-slot,
+.depth-position-row .depth-role-label {
+  height: 88px;
+  min-height: 88px;
+}
+.depth-slot {
+  padding: 6px 7px;
+  grid-template-rows: auto minmax(1.95em, auto) auto auto;
+  gap: 2px;
+}
+.depth-slot-name {
+  min-height: 1.95em;
+  font-size: .70rem;
+  line-height: 1.04;
+}
+.depth-slot-position { font-size: .48rem; }
+.depth-slot-status { font-size: .45rem; }
+.depth-slot-meta { font-size: .49rem; }
+.depth-slot-finance { padding-top: 2px; }
+.depth-slot-finance strong { font-size: .54rem; }
+.depth-slot-finance span { font-size: .43rem; }
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label { padding: 4px; font-size: .54rem; }
+.depth-line-label strong,
+.depth-pair-label strong { font-size: .78rem; }
+.depth-defense-goalie-lines { display:grid; gap:6px; }
+.depth-defense-goalie-row {
+  display:grid;
+  grid-template-columns: 50px repeat(3,minmax(0,1fr));
+  gap:6px;
+  align-items:stretch;
+}
+.depth-defense-goalie-row .depth-pair-label {
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:2px;
+  text-align:center;
+}
+.depth-defense-goalie-row .depth-pair-label span { font-size:.48rem; text-transform:uppercase; letter-spacing:.07em; }
+.depth-defense-goalie-row .depth-pair-label strong { font-size:.78rem; }
+.depth-goalie-card .depth-slot-position { color:#8ed8ff; }
+
+@media (max-width: 720px) {
+  .depth-section-card { padding: 7px 6px; }
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 458px; }
+  .depth-rows-scroll .depth-forward-line {
+    grid-template-columns: 36px repeat(3, 132px);
+    gap: 5px;
+  }
+  .depth-defense-goalie-row {
+    grid-template-columns: 36px repeat(3, 132px);
+    gap:5px;
+  }
+  .depth-slot,
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-position-row .depth-slot,
+  .depth-position-row .depth-role-label {
+    height: 88px;
+    min-height: 88px;
+  }
+  .depth-slot { padding: 6px 6px 5px; }
+  .depth-slot-name { font-size: .66rem; }
+  .depth-slot-meta { font-size: .47rem; }
+  .depth-slot-finance strong { font-size: .52rem; }
+  .depth-slot-finance span { font-size: .41rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 446px; }
+  .depth-rows-scroll .depth-forward-line,
+  .depth-defense-goalie-row { grid-template-columns: 34px repeat(3, 132px); gap:4px; }
+}
+
+
+
+/* V2.12 uniform compact depth cards — Samuel Ersson footprint */
+.depth-slot,
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label,
+.depth-position-row .depth-slot,
+.depth-position-row .depth-role-label {
+  height: 84px;
+  min-height: 84px;
+}
+.depth-slot {
+  width: 100%;
+  padding: 5px 6px;
+  gap: 2px;
+  grid-template-rows: auto minmax(1.9em, auto) auto auto;
+}
+.depth-slot-name {
+  min-height: 1.9em;
+  font-size: .67rem;
+  line-height: 1.03;
+}
+.depth-slot-position { font-size: .46rem; }
+.depth-slot-status { font-size: .43rem; }
+.depth-slot-meta { font-size: .46rem; }
+.depth-slot-finance { gap: 3px; padding-top: 2px; }
+.depth-slot-finance strong { font-size: .51rem; }
+.depth-slot-finance span { font-size: .40rem; }
+.depth-line-label,
+.depth-pair-label,
+.depth-role-label { padding: 3px; font-size: .50rem; }
+.depth-line-label span,
+.depth-pair-label span { font-size: .43rem; }
+.depth-line-label strong,
+.depth-pair-label strong { font-size: .72rem; }
+
+@media (max-width: 720px) {
+  .depth-section-card { padding: 7px 5px; }
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines {
+    min-width: 352px;
+  }
+  .depth-rows-scroll .depth-forward-line,
+  .depth-defense-goalie-row {
+    grid-template-columns: 28px repeat(3, 104px);
+    gap: 4px;
+  }
+  .depth-slot,
+  .depth-line-label,
+  .depth-pair-label,
+  .depth-role-label,
+  .depth-position-row .depth-slot,
+  .depth-position-row .depth-role-label {
+    height: 84px;
+    min-height: 84px;
+  }
+  .depth-slot { padding: 5px 5px 4px; }
+  .depth-slot-name { font-size: .64rem; }
+  .depth-slot-position { font-size: .44rem; }
+  .depth-slot-status { font-size: .41rem; }
+  .depth-slot-meta { font-size: .44rem; }
+  .depth-slot-finance strong { font-size: .49rem; }
+  .depth-slot-finance span { font-size: .38rem; }
+  .depth-section-head::after { font-size: .45rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-forward-lines,
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 346px; }
+  .depth-rows-scroll .depth-forward-line,
+  .depth-defense-goalie-row {
+    grid-template-columns: 26px repeat(3, 102px);
+    gap: 4px;
+  }
+  .depth-slot-name { font-size: .62rem; }
+  .depth-slot-meta { font-size: .42rem; }
+  .depth-slot-finance strong { font-size: .47rem; }
+  .depth-slot-finance span { font-size: .37rem; }
+}
+
+
+
+/* V2.13 compact single-position depth views */
+.depth-compact-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:7px;
+}
+.depth-compact-card { min-width:0; }
+.depth-compact-card .depth-slot {
+  width:100%;
+  height:78px;
+  min-height:78px;
+  padding:5px 7px;
+}
+.depth-compact-card .depth-slot-position {
+  max-width:72%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.depth-compact-card .depth-slot-name {
+  min-height:1.65em;
+  font-size:.68rem;
+}
+.depth-compact-card .depth-slot-meta { font-size:.45rem; }
+.depth-compact-card .depth-slot-finance strong { font-size:.50rem; }
+.depth-compact-card .depth-slot-finance span { font-size:.38rem; }
+.depth-compact-defense {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+
+@media (max-width:720px) {
+  .depth-compact-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .depth-compact-card .depth-slot {
+    height:76px;
+    min-height:76px;
+    padding:5px 6px;
+  }
+  .depth-compact-card .depth-slot-name { font-size:.64rem; }
+  .depth-compact-card .depth-slot-position { font-size:.42rem; }
+  .depth-compact-card .depth-slot-status { font-size:.39rem; }
+  .depth-compact-card .depth-slot-meta { font-size:.42rem; }
+  .depth-compact-card .depth-slot-finance strong { font-size:.47rem; }
+  .depth-compact-card .depth-slot-finance span { font-size:.36rem; }
+}
+
+@media (max-width:350px) {
+  .depth-compact-grid { grid-template-columns:1fr; }
+}
+
+
+
+/* V2.16 All-view defense pair labels */
+/* Match forward-line wayfinding: Pair 1/2/3 sits in a slim side rail on the All depth view. */
+.depth-defense-goalie-row {
+  grid-template-columns: 54px repeat(3, minmax(0, 1fr));
+}
+.depth-pair-label-all {
+  min-width:0;
+  height:84px;
+  min-height:84px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:#101b25;
+  color:var(--muted);
+  text-align:center;
+}
+.depth-pair-label-all span {
+  font-size:.47rem;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.depth-pair-label-all strong {
+  color:#cbd8e3;
+  font-size:.76rem;
+  line-height:1;
+}
+/* Place the player name in the visual middle between role/status and team/age. */
+.depth-slot {
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+.depth-slot-name {
+  min-height: 0;
+  align-self: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.depth-slot.empty {
+  grid-template-rows: auto minmax(0,1fr) auto;
+  align-content: stretch;
+}
+.depth-slot.empty .depth-slot-name { align-self:center; }
+.depth-compact-card .depth-slot {
+  grid-template-rows: auto minmax(0,1fr) auto auto;
+}
+.depth-compact-card .depth-slot-name {
+  min-height:0;
+  align-self:center;
+}
+
+@media (max-width: 720px) {
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 370px; }
+  .depth-defense-goalie-row {
+    grid-template-columns: 46px repeat(3, 104px);
+    gap: 4px;
+  }
+  .depth-pair-label-all {
+    width:46px;
+    height:84px;
+    min-height:84px;
+    border-radius:11px;
+  }
+}
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-defense-goalie-lines { min-width: 364px; }
+  .depth-defense-goalie-row {
+    grid-template-columns: 46px repeat(3, 102px);
+    gap: 4px;
+  }
+}
+
+
+
+/* V2.17 — All-view defense/goalie sizing parity with forwards */
+/* Use the exact same side-rail width and row footprint as forward lines. */
+.depth-defense-goalie-row {
+  grid-template-columns: 56px repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.depth-pair-label-all {
+  width: auto;
+  min-width: 0;
+  height: 84px;
+  min-height: 84px;
+}
+
+@media (max-width: 720px) {
+  .depth-rows-scroll .depth-defense-goalie-lines {
+    min-width: 352px;
+  }
+  .depth-defense-goalie-row {
+    grid-template-columns: 28px repeat(3, 104px);
+    gap: 4px;
+  }
+  .depth-pair-label-all {
+    width: 28px;
+    height: 84px;
+    min-height: 84px;
+    padding: 3px 1px;
+    border-radius: 10px;
+  }
+  .depth-pair-label-all span { font-size: .40rem; }
+  .depth-pair-label-all strong { font-size: .70rem; }
+}
+
+@media (max-width: 390px) {
+  .depth-rows-scroll .depth-defense-goalie-lines {
+    min-width: 346px;
+  }
+  .depth-defense-goalie-row {
+    grid-template-columns: 26px repeat(3, 102px);
+    gap: 4px;
+  }
+  .depth-pair-label-all {
+    width: 26px;
+  }
+}
