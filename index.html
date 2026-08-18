@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.19" />
+  <meta name="application-name" content="Fantasy Front Office v2.20" />
   <style>
 :root {
   color-scheme: dark;
@@ -2453,6 +2453,87 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .office-updated { display:none; }
 }
 
+
+
+/* V2.20 overview financial terminology + tighter hierarchy */
+.overview-stack-v220 { display:grid; gap:8px; }
+.overview-cap-card {
+  padding:11px 12px;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(13,24,34,.94);
+}
+.overview-cap-head {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  margin-bottom:9px;
+}
+.overview-cap-head h3 { margin:0; font-size:1rem; }
+.overview-cap-head .cap-limit { color:var(--muted); font-size:.7rem; white-space:nowrap; }
+.overview-metrics {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  border:1px solid var(--border-soft); border-radius:10px; overflow:hidden;
+  background:rgba(7,17,26,.34);
+}
+.overview-metric { min-width:0; padding:9px 10px; }
+.overview-metric + .overview-metric { border-left:1px solid var(--border-soft); }
+.overview-metric span {
+  display:block; color:var(--muted); font-size:.56rem; font-weight:850;
+  letter-spacing:.055em; text-transform:uppercase; white-space:nowrap;
+}
+.overview-metric strong {
+  display:block; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-size:.94rem; font-variant-numeric:tabular-nums;
+}
+.overview-metric.primary strong { color:var(--healthy); }
+.tone-warning .overview-metric.primary strong { color:var(--warning); }
+.tone-danger .overview-metric.primary strong { color:var(--danger); }
+.overview-cap-progress { margin-top:9px; }
+.overview-cap-progress .cap-bar { margin-top:0; }
+.overview-cap-progress-meta {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:5px; color:var(--muted); font-size:.64rem;
+}
+.overview-cap-progress-meta strong { color:var(--text); }
+.overview-trend-compact { padding:9px 10px; }
+.overview-trend-compact .trend-chart { margin-top:4px; min-height:64px; }
+.overview-trend-compact .trend-item { grid-template-rows:36px auto auto; }
+.overview-trend-compact .trend-bar-track { height:36px; }
+.overview-commitments-head {
+  display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-bottom:7px;
+}
+.overview-commitments-head h3 { margin:0; font-size:.92rem; }
+.overview-commitments-head p { margin:0; color:var(--muted); font-size:.65rem; }
+.overview-health-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.overview-health-grid .compact-status-panel { padding:9px; }
+.overview-health-grid .activity-panel { grid-column:1 / -1; }
+.commitments-table-v220 { min-width:720px; }
+.commitments-table-v220 th,
+.commitments-table-v220 td { padding:7px 8px; }
+.commitments-table-v220 th:not(:first-child),
+.commitments-table-v220 td:not(:first-child) { text-align:right; }
+
+@media (max-width:720px) {
+  .overview-stack-v220 { gap:6px; }
+  .overview-cap-card { padding:9px; }
+  .overview-cap-head { margin-bottom:7px; }
+  .overview-cap-head h3 { font-size:.9rem; }
+  .overview-cap-head .cap-limit { font-size:.61rem; }
+  .overview-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .overview-metric { padding:8px; }
+  .overview-metric + .overview-metric { border-left:0; }
+  .overview-metric:nth-child(even) { border-left:1px solid var(--border-soft); }
+  .overview-metric:nth-child(n+3) { border-top:1px solid var(--border-soft); }
+  .overview-metric span { font-size:.51rem; }
+  .overview-metric strong { margin-top:4px; font-size:.87rem; }
+  .overview-cap-progress-meta { font-size:.59rem; }
+  .overview-trend-compact { padding:8px; }
+  .overview-trend-compact .trend-chart { min-height:58px; }
+  .overview-trend-compact .trend-item { grid-template-rows:32px auto auto; }
+  .overview-trend-compact .trend-bar-track { height:32px; }
+  .overview-health-grid { gap:6px; }
+  .commitments-table-v220 { min-width:680px; }
+}
+
 </style>
 </head>
 <body>
@@ -3100,6 +3181,19 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     return `<article class="summary-card tone-${tone}"><div class="label">${escapeHtml(label)}</div><div class="value semantic-value">${escapeHtml(value)}</div><div class="subvalue">${escapeHtml(subvalue)}</div></article>`;
   }
 
+
+  function deadCapForSeason(seasonId) {
+    return state.adjustments
+      .filter((adjustment) => adjustment.seasonId === seasonId && String(adjustment.type || '').trim().toLowerCase() === 'dead cap')
+      .reduce((sum, adjustment) => sum + Number(adjustment.amount || 0), 0);
+  }
+
+  function otherAdjustmentsForSeason(seasonId) {
+    return state.adjustments
+      .filter((adjustment) => adjustment.seasonId === seasonId && String(adjustment.type || '').trim().toLowerCase() !== 'dead cap')
+      .reduce((sum, adjustment) => sum + Number(adjustment.amount || 0), 0);
+  }
+
   function renderCapVisuals() {
     const season = currentSeason();
     const calc = calculateSeason(season.id);
@@ -3141,39 +3235,99 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   function renderOverview() {
     const season = currentSeason();
     const calc = calculateSeason(season.id);
+    const tone = capTone(calc);
+    const salaryCap = calc.salaryCap;
+    const deadCap = deadCapForSeason(season.id);
+    const otherAdjustments = otherAdjustmentsForSeason(season.id);
+    const capUsed = calc.complete ? calc.capUsed : calc.knownCapUsed;
+    const capRemaining = calc.complete && salaryCap !== null ? calc.capSpace : null;
+    const rawPct = salaryCap && salaryCap > 0 ? (calc.knownCapUsed / salaryCap) * 100 : 0;
+    const displayPct = Math.max(0, Math.min(100, rawPct));
     const missingPlayers = calc.missingPlayerIds.map((id) => state.players.find((p) => p.id === id)).filter(Boolean);
-    const futureRows = contractHorizonSeasons().map((s) => {
+
+    const horizon = contractHorizonSeasons();
+    const trendPoints = horizon.map((s) => ({ season:s, calc:calculateSeason(s.id) }));
+    const maxUsed = Math.max(1, ...trendPoints.map((point) => Math.max(0, point.calc.knownCapUsed)));
+    const trend = trendPoints.map((point) => {
+      const value = Math.max(0, point.calc.knownCapUsed);
+      const height = value === 0 ? 3 : Math.max(8, Math.round((value / maxUsed) * 100));
+      const pointTone = point.calc.salaryCap === null ? 'neutral' : capTone(point.calc);
+      const shortSeason = String(point.season.startYear).slice(2) + '-' + String((point.season.startYear + 1) % 100).padStart(2,'0');
+      return `<div class="trend-item" title="${escapeAttr(seasonLabel(point.season.startYear))}: ${escapeAttr(formatMoney(value))}">
+        <div class="trend-bar-track"><div class="trend-bar ${pointTone}" style="height:${height}%"></div></div>
+        <div class="trend-season">${shortSeason}</div>
+        <div class="trend-value">${formatMoney(value)}</div>
+      </div>`;
+    }).join('');
+
+    const futureRows = horizon.map((s) => {
       const c = calculateSeason(s.id);
-      const space = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
-      return `<tr><td>${seasonLabel(s.startYear)}</td><td class="money">${formatMoney(c.knownRosterCap)}</td><td class="money">${formatMoney(c.adjustmentsTotal)}</td><td class="money">${formatMoney(c.knownCapUsed)}</td><td class="money">${space}</td></tr>`;
+      const seasonDeadCap = deadCapForSeason(s.id);
+      const seasonOther = otherAdjustmentsForSeason(s.id);
+      const remaining = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
+      const used = c.complete ? c.capUsed : c.knownCapUsed;
+      return `<tr>
+        <td>${seasonLabel(s.startYear)}</td>
+        <td class="money">${formatMoney(c.knownRosterCap)}</td>
+        <td class="money">${formatMoney(seasonDeadCap)}</td>
+        <td class="money">${formatMoney(seasonOther)}</td>
+        <td class="money">${formatMoney(used)}</td>
+        <td class="money">${remaining}</td>
+      </tr>`;
     }).join('');
 
     const issues = [];
-    missingPlayers.forEach((p) => issues.push(`<div class="issue-item"><p><strong>${escapeHtml(p.name)}</strong></p><span class="warning">Missing ${seasonLabel(season.startYear)} salary</span></div>`));
-    if (!issues.length) issues.push('<div class="issue-item"><p class="good"><strong>No current-season salary issues.</strong></p></div>');
+    missingPlayers.forEach((player) => issues.push(`<div class="issue-item"><p><strong>${escapeHtml(player.name)}</strong></p><span class="warning">Missing ${seasonLabel(season.startYear)} salary</span></div>`));
+    if (!issues.length) issues.push('<div class="issue-item"><p class="good"><strong>All current salaries are entered.</strong></p></div>');
 
-    const activities = state.activity.slice(0, 6).map((a) => `<div class="activity-item"><p><strong>${escapeHtml(a.label)}</strong></p><small>${formatDateTime(a.at)}</small></div>`).join('') || '<div class="activity-item"><p class="muted">No activity yet.</p></div>';
+    const activities = state.activity.slice(0, 4).map((item) => `<div class="activity-item"><p><strong>${escapeHtml(item.label)}</strong></p><small>${formatDateTime(item.at)}</small></div>`).join('') || '<div class="activity-item"><p class="muted">No recent activity.</p></div>';
+
+    const currentStatus = calc.complete
+      ? (calc.capSpace < 0 ? `<span class="danger">${formatMoney(Math.abs(calc.capSpace))} over cap</span>` : `<span class="good">${formatMoney(calc.capSpace)} cap remaining</span>`)
+      : '<span class="warning">Cap total incomplete</span>';
 
     el('overviewView').innerHTML = `
-      <div class="overview-stack">
-        ${renderCapVisuals()}
-        <div class="subpanel commitments-panel tone-neutral">
-          <div class="section-title-row"><div><p class="eyebrow">Future commitments</p><h3>Cap by season</h3></div></div>
+      <div class="overview-stack-v220">
+        <section class="overview-cap-card tone-${tone}">
+          <div class="overview-cap-head">
+            <div><p class="eyebrow">${seasonLabel(season.startYear)} cap summary</p><h3>${currentStatus}</h3></div>
+            <span class="cap-limit">Salary Cap <strong>${salaryCap === null ? 'Not set' : formatMoney(salaryCap)}</strong></span>
+          </div>
+          <div class="overview-metrics">
+            <div class="overview-metric primary"><span>Cap Used</span><strong>${calc.complete ? formatMoney(capUsed) : `${formatMoney(capUsed)} known`}</strong></div>
+            <div class="overview-metric"><span>Cap Remaining</span><strong>${capRemaining === null ? 'Incomplete' : formatMoney(capRemaining)}</strong></div>
+            <div class="overview-metric"><span>Roster Cap</span><strong>${formatMoney(calc.knownRosterCap)}</strong></div>
+            <div class="overview-metric"><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong></div>
+          </div>
+          <div class="overview-cap-progress">
+            <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
+            <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${otherAdjustments !== 0 ? `Other adjustments ${formatMoney(otherAdjustments)}` : 'No other cap adjustments'}</span></div>
+          </div>
+        </section>
+
+        <section class="subpanel overview-trend-compact tone-neutral">
+          <div class="overview-commitments-head"><div><p class="eyebrow">Cap outlook</p><h3>Seven-season commitments</h3></div><p>Known cap used by season</p></div>
+          <div class="trend-chart" aria-label="Known cap used by season">${trend}</div>
+        </section>
+
+        <section class="subpanel commitments-panel tone-neutral">
+          <div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster + dead cap + other adjustments</p></div>
           <div class="table-wrap compact-table-wrap">
-            <table class="commitments-table">
-              <thead><tr><th>Season</th><th>Roster</th><th>Adjustments</th><th>Known Used</th><th>Cap Space</th></tr></thead>
+            <table class="commitments-table commitments-table-v220">
+              <thead><tr><th>Season</th><th>Roster Cap</th><th>Dead Cap</th><th>Other Adj.</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead>
               <tbody>${futureRows}</tbody>
             </table>
           </div>
-        </div>
-        <div class="overview-status-grid">
+        </section>
+
+        <div class="overview-health-grid">
           <div class="subpanel compact-status-panel tone-${calc.complete ? 'good' : 'warning'}">
-            <p class="eyebrow">Setup</p>
-            <h3>${calc.complete ? '<span class="good">Front Office Ready</span>' : '<span class="warning">Setup Incomplete</span>'}</h3>
-            <p class="muted compact-copy">${calc.complete ? 'Current-season roster and cap data are complete.' : 'Add a salary for every cap-counting player to complete the current cap.'}</p>
+            <p class="eyebrow">Roster & Cap</p>
+            <h3>${calc.complete ? '<span class="good">Current season complete</span>' : '<span class="warning">Needs attention</span>'}</h3>
+            <p class="muted compact-copy">${calc.complete ? 'Current-season roster salaries and cap totals are complete.' : 'Enter a salary for every cap-counting player to complete the current-season cap.'}</p>
           </div>
-          <div class="subpanel compact-status-panel tone-${issues.length === 1 && !missingPlayers.length ? 'good' : 'warning'}">
-            <p class="eyebrow">Data quality</p>
+          <div class="subpanel compact-status-panel tone-${missingPlayers.length ? 'warning' : 'good'}">
+            <p class="eyebrow">Salary check</p>
             <div class="issue-list compact-list">${issues.join('')}</div>
           </div>
           <div class="subpanel compact-status-panel activity-panel tone-neutral">
@@ -3183,6 +3337,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         </div>
       </div>`;
   }
+
 
 
   function effectivePlayerCharge(player, seasonId) {
