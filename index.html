@@ -2593,6 +2593,22 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   .transaction-rules-footer .btn { width:100%; }
 }
 
+
+
+/* V2.23 unified Dead Cap + transaction correction controls */
+.transaction-card-actions { display:flex; align-items:center; gap:6px; margin-top:9px; }
+.transaction-card-actions .btn { min-height:30px; padding:5px 9px; font-size:.66rem; }
+.transaction-edit-note {
+  padding:9px 10px; border:1px solid rgba(242,198,109,.28); border-radius:10px;
+  background:rgba(242,198,109,.06); color:#d7c28d; font-size:.66rem; line-height:1.4;
+}
+.transaction-edit-note.hidden { display:none !important; }
+.transaction-dead-cap-label { color:var(--warning); font-weight:850; }
+@media (max-width:720px) {
+  .transaction-card-actions { justify-content:flex-end; }
+  .transaction-card-actions .btn { min-height:29px; font-size:.64rem; }
+}
+
 </style>
 </head>
 <body>
@@ -2973,14 +2989,14 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   <dialog id="transactionDialog" class="modal-dialog transaction-dialog">
     <form id="transactionForm" method="dialog" class="modal-card">
       <header class="drawer-header">
-        <div><p class="eyebrow">Front office ledger</p><h3>Record transaction</h3></div>
+        <div><p class="eyebrow">Front office ledger</p><h3 id="transactionDialogTitle">Record transaction</h3></div>
         <button id="closeTransactionDialog" class="icon-btn" type="button" aria-label="Close">×</button>
       </header>
       <div class="modal-body transaction-form-body">
         <div class="form-grid compact">
           <label>Type<select id="transactionType"><option>Trade</option><option>Signing</option><option>Extension</option><option>Call Up</option><option>Send Down</option><option>Waiver</option><option>Buyout</option><option>Release</option><option>Add</option><option>Drop</option><option>Other</option></select></label>
           <label>Date<input id="transactionDate" type="date" /></label>
-          <div id="transactionTypeHelp" class="transaction-smart-note full-width"></div>
+          <div id="transactionTypeHelp" class="transaction-smart-note full-width"></div><div id="transactionEditNotice" class="transaction-edit-note full-width hidden"></div>
           <label id="transactionCounterpartyField" class="full-width">Counterparty / team<input id="transactionCounterparty" placeholder="Optional" /></label>
           <label id="transactionPlayerField">Player<select id="transactionPlayer"><option value="">None</option></select></label>
           <label id="transactionRosterActionField">Selected player action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to minors</option><option value="REMOVE">Remove from roster</option></select></label>
@@ -3008,8 +3024,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
             </div>
           </div>
           <div id="transactionManualFinancialFields" class="form-grid compact transaction-manual-financial-fields">
-            <label>Adjustment type<select id="transactionAdjustmentType"><option value="Dead Cap">Dead Cap</option><option value="Waiver Penalty">Waiver Penalty</option><option value="Retained Salary">Retained Salary</option><option value="Bonus/Penalty">Bonus/Penalty</option><option value="Cap Credit">Cap Credit</option><option value="Other">Other</option></select></label>
-            <label>Description<input id="transactionAdjustmentDescription" placeholder="Financial consequence" /></label>
+            <label class="full-width"><span class="transaction-dead-cap-label">Dead Cap description</span><input id="transactionAdjustmentDescription" placeholder="Retained salary, buyout penalty, waiver penalty…" /></label>
           </div>
           <div id="transactionFinancialGrid" class="transaction-financial-grid"></div>
         </section>
@@ -3052,6 +3067,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   let depthDraftOrder = [];
   let depthSaving = false;
   let transactionSummaryTouched = false;
+  let editingTransactionId = null;
 
   const el = (id) => document.getElementById(id);
   const authGate = el('authGate');
@@ -3138,8 +3154,8 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('csvFile').addEventListener('change', handleCsvFile);
     el('applyImportBtn').addEventListener('click', applyImport);
 
-    el('closeTransactionDialog').addEventListener('click', () => transactionDialog.close());
-    el('cancelTransactionBtn').addEventListener('click', () => transactionDialog.close());
+    el('closeTransactionDialog').addEventListener('click', () => { transactionDialog.close(); resetTransactionEditState(); });
+    el('cancelTransactionBtn').addEventListener('click', () => { transactionDialog.close(); resetTransactionEditState(); });
     el('transactionForm').addEventListener('submit', saveTransactionFromDialog);
     el('transactionType').addEventListener('change', handleTransactionTypeChange);
     el('transactionPlayer').addEventListener('change', handleTransactionPlayerChange);
@@ -3240,7 +3256,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const rosterLimit = state.frontOffice.rosterLimit;
     const expiring = state.players.filter((p) => p.contractEndSeasonId === season.id).length;
     const deadCap = state.adjustments
-      .filter((a) => a.type === 'Dead Cap' && a.seasonId === season.id)
+      .filter((a) => a.seasonId === season.id)
       .reduce((sum, a) => sum + a.amount, 0);
 
     const capSpaceValue = calc.complete && calc.salaryCap !== null ? formatMoney(calc.capSpace) : 'Incomplete';
@@ -3265,13 +3281,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
 
   function deadCapForSeason(seasonId) {
     return state.adjustments
-      .filter((adjustment) => adjustment.seasonId === seasonId && String(adjustment.type || '').trim().toLowerCase() === 'dead cap')
-      .reduce((sum, adjustment) => sum + Number(adjustment.amount || 0), 0);
-  }
-
-  function otherAdjustmentsForSeason(seasonId) {
-    return state.adjustments
-      .filter((adjustment) => adjustment.seasonId === seasonId && String(adjustment.type || '').trim().toLowerCase() !== 'dead cap')
+      .filter((adjustment) => adjustment.seasonId === seasonId)
       .reduce((sum, adjustment) => sum + Number(adjustment.amount || 0), 0);
   }
 
@@ -3282,7 +3292,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const tone = capTone(calc);
     const salaryCap = calc.salaryCap;
     const deadCap = deadCapForSeason(season.id);
-    const otherAdjustments = otherAdjustmentsForSeason(season.id);
     const capUsed = calc.complete ? calc.capUsed : calc.knownCapUsed;
     const capRemaining = calc.complete && salaryCap !== null ? calc.capSpace : null;
     const rawPct = salaryCap && salaryCap > 0 ? (calc.knownCapUsed / salaryCap) * 100 : 0;
@@ -3320,7 +3329,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         </div>
         <div class="overview-cap-progress">
           <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
-          <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${otherAdjustments !== 0 ? `Other adjustments ${formatMoney(otherAdjustments)}` : 'No other cap adjustments'}</span></div>
+          <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${deadCap !== 0 ? `Dead Cap ${formatMoney(deadCap)}` : 'No Dead Cap'}</span></div>
         </div>
       </section>
       <section class="subpanel overview-trend-compact tone-neutral">
@@ -3336,7 +3345,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const tone = capTone(calc);
     const salaryCap = calc.salaryCap;
     const deadCap = deadCapForSeason(season.id);
-    const otherAdjustments = otherAdjustmentsForSeason(season.id);
     const capUsed = calc.complete ? calc.capUsed : calc.knownCapUsed;
     const capRemaining = calc.complete && salaryCap !== null ? calc.capSpace : null;
     const rawPct = salaryCap && salaryCap > 0 ? (calc.knownCapUsed / salaryCap) * 100 : 0;
@@ -3361,14 +3369,12 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const futureRows = horizon.map((s) => {
       const c = calculateSeason(s.id);
       const seasonDeadCap = deadCapForSeason(s.id);
-      const seasonOther = otherAdjustmentsForSeason(s.id);
       const remaining = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
       const used = c.complete ? c.capUsed : c.knownCapUsed;
       return `<tr>
         <td>${seasonLabel(s.startYear)}</td>
         <td class="money">${formatMoney(c.knownRosterCap)}</td>
         <td class="money">${formatMoney(seasonDeadCap)}</td>
-        <td class="money">${formatMoney(seasonOther)}</td>
         <td class="money">${formatMoney(used)}</td>
         <td class="money">${remaining}</td>
       </tr>`;
@@ -3399,7 +3405,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
           </div>
           <div class="overview-cap-progress">
             <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
-            <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${otherAdjustments !== 0 ? `Other adjustments ${formatMoney(otherAdjustments)}` : 'No other cap adjustments'}</span></div>
+            <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${deadCap !== 0 ? `Dead Cap ${formatMoney(deadCap)}` : 'No Dead Cap'}</span></div>
           </div>
         </section>
 
@@ -3409,10 +3415,10 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         </section>
 
         <section class="subpanel commitments-panel tone-neutral">
-          <div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster + dead cap + other adjustments</p></div>
+          <div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster Cap + Dead Cap</p></div>
           <div class="table-wrap compact-table-wrap">
             <table class="commitments-table commitments-table-v220">
-              <thead><tr><th>Season</th><th>Roster Cap</th><th>Dead Cap</th><th>Other Adj.</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead>
+              <thead><tr><th>Season</th><th>Roster Cap</th><th>Dead Cap</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead>
               <tbody>${futureRows}</tbody>
             </table>
           </div>
@@ -3940,27 +3946,39 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     return state.transactionItems.filter((item) => item.transactionId === transactionId && (!direction || item.direction === direction));
   }
 
+  function transactionDeadCapFor(transactionId) {
+    const rows = state.adjustments.filter((item) => item.sourceTransactionId === transactionId);
+    if (!rows.length) return null;
+    return {
+      description: rows[0].description || 'Dead Cap',
+      rows,
+      total: rows.reduce((sum, row) => sum + Number(row.amount || 0), 0)
+    };
+  }
+
   function renderTransactions() {
     const txRows = [...state.transactions].sort((a,b) => `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`)).map((tx) => {
-      const incoming = transactionItemsFor(tx.id, 'IN');
-      const outgoing = transactionItemsFor(tx.id, 'OUT');
-      const neutral = transactionItemsFor(tx.id, 'NONE');
-      const financial = neutral.filter((item) => item.kind === 'FINANCIAL');
-      const playerItems = neutral.filter((item) => item.kind === 'PLAYER');
+      const allItems = transactionItemsFor(tx.id);
+      const incoming = allItems.filter((item) => item.direction === 'IN' && item.kind !== 'PLAYER');
+      const outgoing = allItems.filter((item) => item.direction === 'OUT' && item.kind !== 'PLAYER');
+      const playerItems = allItems.filter((item) => item.kind === 'PLAYER');
+      const deadCap = transactionDeadCapFor(tx.id);
       const chips = [
         incoming.length ? `<span class="tx-chip in">IN ${incoming.length}</span>` : '',
         outgoing.length ? `<span class="tx-chip out">OUT ${outgoing.length}</span>` : '',
-        financial.length ? `<span class="tx-chip financial">CAP</span>` : ''
+        deadCap ? `<span class="tx-chip financial">DEAD CAP</span>` : ''
       ].filter(Boolean).join('');
-      return `<article class="transaction-card"><div class="transaction-card-head"><div><span class="transaction-type">${escapeHtml(tx.type)}</span><h4>${escapeHtml(tx.summary)}</h4></div><time>${escapeHtml(tx.date)}</time></div>${tx.counterparty ? `<p class="transaction-counterparty">With ${escapeHtml(tx.counterparty)}</p>` : ''}${chips ? `<div class="transaction-chips">${chips}</div>` : ''}${incoming.length ? `<div class="transaction-flow in"><strong>IN</strong><span>${incoming.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${outgoing.length ? `<div class="transaction-flow out"><strong>OUT</strong><span>${outgoing.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${playerItems.length ? `<div class="transaction-flow"><strong>PLAYER</strong><span>${playerItems.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${financial.length ? `<div class="transaction-flow financial"><strong>CAP</strong><span>${financial.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${tx.notes ? `<p class="transaction-notes">${escapeHtml(tx.notes)}</p>` : ''}</article>`;
+      return `<article class="transaction-card"><div class="transaction-card-head"><div><span class="transaction-type">${escapeHtml(tx.type)}</span><h4>${escapeHtml(tx.summary)}</h4></div><time>${escapeHtml(tx.date)}</time></div>${tx.counterparty ? `<p class="transaction-counterparty">With ${escapeHtml(tx.counterparty)}</p>` : ''}${chips ? `<div class="transaction-chips">${chips}</div>` : ''}${incoming.length ? `<div class="transaction-flow in"><strong>IN</strong><span>${incoming.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${outgoing.length ? `<div class="transaction-flow out"><strong>OUT</strong><span>${outgoing.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${playerItems.length ? `<div class="transaction-flow"><strong>PLAYER</strong><span>${playerItems.map((i) => escapeHtml(i.label)).join(' · ')}</span></div>` : ''}${deadCap ? `<div class="transaction-flow financial"><strong>DEAD CAP</strong><span>${escapeHtml(deadCap.description)} · ${formatMoney(deadCap.total)}</span></div>` : ''}${tx.notes ? `<p class="transaction-notes">${escapeHtml(tx.notes)}</p>` : ''}<div class="transaction-card-actions"><button class="btn btn-ghost btn-small" data-edit-transaction="${tx.id}" type="button">Edit</button><button class="btn btn-danger btn-small" data-delete-transaction="${tx.id}" type="button">Delete</button></div></article>`;
     }).join('');
-    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades, waivers, buyouts, signings, call-ups and other front-office moves are recorded here. Cap consequences flow through to the Cap page.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Use Record Transaction above to add your first trade, signing, waiver move or buyout.</p></div>`}</div>`;
-    el('recordTransactionBtn').addEventListener('click', openTransactionDialog);
+    el('transactionsView').innerHTML = `<div class="transactions-page"><div class="page-heading-row"><div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Trades, waivers, buyouts, signings, call-ups and other front-office moves are recorded here. Any financial consequence is tracked as Dead Cap on the Cap page.</p></div><button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button></div>${txRows ? `<div class="transaction-list">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Use Record Transaction above to add your first trade, signing, waiver move or buyout.</p></div>`}</div>`;
+    el('recordTransactionBtn').addEventListener('click', () => openTransactionDialog());
+    document.querySelectorAll('[data-edit-transaction]').forEach((button) => button.addEventListener('click', () => openEditTransactionDialog(button.dataset.editTransaction)));
+    document.querySelectorAll('[data-delete-transaction]').forEach((button) => button.addEventListener('click', () => deleteTransaction(button.dataset.deleteTransaction)));
   }
 
   function transactionTypeConfig(type) {
     const configs = {
-      'Trade': { help:'Record the counterparty, assets moving in/out and any retained salary or other cap consequence.', player:'optional', counterparty:true, flow:true, rosterAction:true, summary:true, financial:'manual' },
+      'Trade': { help:'Record the counterparty, assets moving in/out and any retained salary that remains as Dead Cap.', player:'optional', counterparty:true, flow:true, rosterAction:true, summary:true, financial:'manual' },
       'Signing': { help:'Record a signing. Salary and contract terms should be maintained on the player record.', player:'optional', summary:true },
       'Extension': { help:'Choose the player being extended. Their current contract salary appears below for reference.', player:'required', autoSummary:true },
       'Call Up': { help:'Choose a prospect currently in Minors. The roster move is handled automatically.', player:'required', rosterStatus:true, autoSummary:true, action:'CALL_UP' },
@@ -4044,7 +4062,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   }
 
   function autoTransactionSummary() {
-    if (transactionSummaryTouched) return;
+    if (editingTransactionId || transactionSummaryTouched) return;
     const type = el('transactionType').value;
     const player = state.players.find((item) => item.id === el('transactionPlayer').value);
     if (!player) return;
@@ -4082,17 +4100,16 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionManualFinancialFields').classList.toggle('hidden', automatic);
     if (automatic) {
       const rule = transactionRuleForType(type);
-      el('transactionFinancialTitle').textContent = `${type} penalty`;
-      el('transactionFinancialCopy').textContent = 'Calculated from the selected player salary and your Transaction Rules. You can override any season before saving.';
+      el('transactionFinancialTitle').textContent = `${type} Dead Cap`;
+      el('transactionFinancialCopy').textContent = 'Calculated from the selected player salary and your Transaction Rules. The result is recorded as Dead Cap and can be overridden before saving.';
       el('transactionRulePreviewTitle').textContent = `${type} rule from Settings`;
       el('transactionRulePreviewCopy').textContent = `${transactionRuleModeLabel(rule.mode, rule.value)} · ${transactionRuleScopeLabel(rule.scope)}.`;
-      el('transactionAdjustmentType').value = type === 'Buyout' ? 'Dead Cap' : 'Waiver Penalty';
       const player = state.players.find((item) => item.id === el('transactionPlayer').value);
       el('transactionAdjustmentDescription').value = player ? `${player.name} ${type.toLowerCase()} penalty` : `${type} penalty`;
     } else {
-      el('transactionFinancialTitle').textContent = 'Optional financial impact';
-      el('transactionFinancialCopy').textContent = 'Enter retained salary, cap credits or another transaction-generated adjustment when applicable.';
-      if (type === 'Trade') el('transactionAdjustmentType').value = 'Retained Salary';
+      el('transactionFinancialTitle').textContent = 'Optional Dead Cap';
+      el('transactionFinancialCopy').textContent = 'Enter retained salary or another transaction-generated amount that should remain on your cap.';
+      if (type === 'Trade' && !el('transactionAdjustmentDescription').value) el('transactionAdjustmentDescription').value = 'Retained salary';
     }
   }
 
@@ -4114,6 +4131,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
   }
 
   function applyAutomaticTransactionPenalty() {
+    if (editingTransactionId) return;
     const type = el('transactionType').value;
     if (!['Waiver','Buyout'].includes(type)) return;
     const player = state.players.find((item) => item.id === el('transactionPlayer').value);
@@ -4144,7 +4162,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionCounterpartyField').classList.toggle('hidden', !config.counterparty);
     el('transactionPlayerField').classList.toggle('hidden', !config.player);
     el('transactionRosterActionField').classList.toggle('hidden', !config.rosterAction);
-    el('transactionSummaryField').classList.toggle('hidden', Boolean(config.autoSummary));
+    el('transactionSummaryField').classList.toggle('hidden', Boolean(config.autoSummary) && !editingTransactionId);
     el('transactionIncomingField').classList.toggle('hidden', !config.flow);
     el('transactionOutgoingField').classList.toggle('hidden', !config.flow);
     el('transactionRosterAction').value = config.action || 'NONE';
@@ -4161,7 +4179,20 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     applyAutomaticTransactionPenalty();
   }
 
+  function resetTransactionEditState() {
+    editingTransactionId = null;
+    el('transactionType').disabled = false;
+    el('transactionPlayer').disabled = false;
+    el('transactionRosterAction').disabled = false;
+    el('transactionRosterStatus').disabled = false;
+    el('transactionEditNotice').classList.add('hidden');
+    el('transactionEditNotice').textContent = '';
+    el('transactionDialogTitle').textContent = 'Record transaction';
+    el('saveTransactionBtn').textContent = 'Save Transaction';
+  }
+
   function openTransactionDialog(options = {}) {
+    resetTransactionEditState();
     transactionSummaryTouched = Boolean(options.summary);
     el('transactionType').value = options.type || 'Trade';
     el('transactionDate').value = options.date || todayIsoDate();
@@ -4171,16 +4202,75 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('transactionOutgoing').value = options.outgoing || '';
     el('transactionNotes').value = options.notes || '';
     el('transactionRosterAction').value = options.rosterAction || 'NONE';
-    el('transactionAdjustmentType').value = options.adjustmentType || 'Dead Cap';
     el('transactionAdjustmentDescription').value = options.adjustmentDescription || '';
     el('transactionRosterStatus').innerHTML = `<option value="">Keep current status</option>${state.statuses.map((status) => `<option value="${status.id}">${escapeHtml(status.name)}</option>`).join('')}`;
-    el('transactionFinancialGrid').innerHTML = contractHorizonSeasons().map((season) => `<label><span>${seasonLabel(season.startYear)}</span><input data-transaction-adjustment-season="${season.id}" type="number" step="1" placeholder="0" /></label>`).join('');
+    el('transactionFinancialGrid').innerHTML = contractHorizonSeasons().map((season) => `<label><span>${seasonLabel(season.startYear)}</span><input data-transaction-adjustment-season="${season.id}" type="number" min="0" step="1" placeholder="0" /></label>`).join('');
     handleTransactionTypeChange();
     if (options.playerId) {
       el('transactionPlayer').value = options.playerId;
       handleTransactionPlayerChange();
     }
     transactionDialog.showModal();
+  }
+
+  function openEditTransactionDialog(transactionId) {
+    const tx = state.transactions.find((item) => item.id === transactionId);
+    if (!tx) return;
+    const items = transactionItemsFor(transactionId);
+    const playerItem = items.find((item) => item.kind === 'PLAYER') || null;
+    const incoming = items.filter((item) => item.kind === 'OTHER' && item.direction === 'IN').map((item) => item.label).join('\n');
+    const outgoing = items.filter((item) => item.kind === 'OTHER' && item.direction === 'OUT').map((item) => item.label).join('\n');
+    const deadCap = transactionDeadCapFor(transactionId);
+
+    openTransactionDialog({
+      type: tx.type,
+      date: tx.date,
+      counterparty: tx.counterparty,
+      summary: tx.summary,
+      incoming,
+      outgoing,
+      notes: tx.notes,
+      playerId: playerItem?.playerId || null,
+      adjustmentDescription: deadCap?.description || ''
+    });
+
+    editingTransactionId = transactionId;
+    transactionSummaryTouched = true;
+    el('transactionDialogTitle').textContent = 'Edit transaction';
+    el('saveTransactionBtn').textContent = 'Save Changes';
+    el('transactionType').disabled = true;
+    el('transactionPlayer').disabled = true;
+    el('transactionRosterAction').disabled = true;
+    el('transactionRosterStatus').disabled = true;
+    el('transactionSummaryField').classList.remove('hidden');
+    el('transactionEditNotice').textContent = playerItem
+      ? `Linked player: ${playerItem.label}. Transaction type, linked player and roster movement are locked because they may already have changed roster state. Delete and recreate the transaction if one of those is wrong.`
+      : 'Transaction type is locked while editing. Delete and recreate the transaction if the transaction type itself was entered incorrectly.';
+    el('transactionEditNotice').classList.remove('hidden');
+
+    if (deadCap) {
+      el('transactionFinancialSection').classList.remove('hidden');
+      el('transactionManualFinancialFields').classList.remove('hidden');
+      deadCap.rows.forEach((row) => {
+        const input = document.querySelector(`[data-transaction-adjustment-season="${row.seasonId}"]`);
+        if (input) input.value = String(row.amount);
+      });
+    }
+  }
+
+  async function deleteTransaction(transactionId) {
+    const tx = state.transactions.find((item) => item.id === transactionId);
+    if (!tx) return;
+    const confirmed = confirm(`Delete “${tx.summary}”?\n\nIts Dead Cap will be removed. If this transaction moved or removed a player, that direct roster action will be reversed when it is safe to do so.`);
+    if (!confirmed) return;
+    await runCloudAction(async () => {
+      const { error } = await db.rpc('delete_front_office_transaction_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_transaction_id: transactionId
+      });
+      if (error) throw error;
+      await loadOffice(state.frontOffice.id, false);
+    });
   }
 
   async function saveTransactionFromDialog(event) {
@@ -4190,42 +4280,61 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const type = el('transactionType').value;
     const config = transactionTypeConfig(type);
     const playerId = el('transactionPlayer').value || null;
-    if (config.player === 'required' && !playerId) { alert('Choose a player for this transaction.'); return; }
+    if (!editingTransactionId && config.player === 'required' && !playerId) { alert('Choose a player for this transaction.'); return; }
     autoTransactionSummary();
     const summary = el('transactionSummary').value.trim();
     if (!summary) { alert('A transaction summary is required.'); return; }
     const financialVisible = !el('transactionFinancialSection').classList.contains('hidden');
     const rows = financialVisible ? [...document.querySelectorAll('[data-transaction-adjustment-season]')].map((input) => ({ season_id: input.dataset.transactionAdjustmentSeason, amount: nullableNumber(input.value) })).filter((row) => row.amount !== null && row.amount !== 0) : [];
+    if (rows.some((row) => row.amount < 0)) { alert('Dead Cap amounts cannot be negative.'); return; }
     button.disabled = true;
-    button.textContent = 'Saving…';
+    button.textContent = editingTransactionId ? 'Saving…' : 'Saving…';
     try {
       const incoming = config.flow ? el('transactionIncoming').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
       const outgoing = config.flow ? el('transactionOutgoing').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
-      const rosterAction = config.action || (config.rosterAction ? el('transactionRosterAction').value : 'NONE');
       const success = await runCloudAction(async () => {
-        const { error } = await db.rpc('record_front_office_transaction_v1', {
-          p_front_office_id: state.frontOffice.id,
-          p_transaction_type: type,
-          p_transaction_date: el('transactionDate').value || todayIsoDate(),
-          p_counterparty: config.counterparty ? (el('transactionCounterparty').value.trim() || null) : null,
-          p_summary: summary,
-          p_notes: el('transactionNotes').value.trim() || null,
-          p_in_items: incoming,
-          p_out_items: outgoing,
-          p_front_office_player_id: playerId,
-          p_roster_action: rosterAction,
-          p_roster_status_id: !el('transactionRosterStatusField').classList.contains('hidden') ? (el('transactionRosterStatus').value || null) : null,
-          p_adjustment_type: rows.length ? el('transactionAdjustmentType').value : null,
-          p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${type} cap adjustment`) : null,
-          p_adjustment_rows: rows
-        });
-        if (error) throw error;
+        if (editingTransactionId) {
+          const { error } = await db.rpc('update_front_office_transaction_v1', {
+            p_front_office_id: state.frontOffice.id,
+            p_transaction_id: editingTransactionId,
+            p_transaction_date: el('transactionDate').value || todayIsoDate(),
+            p_counterparty: config.counterparty ? (el('transactionCounterparty').value.trim() || null) : null,
+            p_summary: summary,
+            p_notes: el('transactionNotes').value.trim() || null,
+            p_in_items: incoming,
+            p_out_items: outgoing,
+            p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${type} Dead Cap`) : null,
+            p_adjustment_rows: rows
+          });
+          if (error) throw error;
+        } else {
+          const rosterAction = config.action || (config.rosterAction ? el('transactionRosterAction').value : 'NONE');
+          const { error } = await db.rpc('record_front_office_transaction_v2', {
+            p_front_office_id: state.frontOffice.id,
+            p_transaction_type: type,
+            p_transaction_date: el('transactionDate').value || todayIsoDate(),
+            p_counterparty: config.counterparty ? (el('transactionCounterparty').value.trim() || null) : null,
+            p_summary: summary,
+            p_notes: el('transactionNotes').value.trim() || null,
+            p_in_items: incoming,
+            p_out_items: outgoing,
+            p_front_office_player_id: playerId,
+            p_roster_action: rosterAction,
+            p_roster_status_id: !el('transactionRosterStatusField').classList.contains('hidden') ? (el('transactionRosterStatus').value || null) : null,
+            p_adjustment_description: rows.length ? (el('transactionAdjustmentDescription').value.trim() || `${type} Dead Cap`) : null,
+            p_adjustment_rows: rows
+          });
+          if (error) throw error;
+        }
         await loadOffice(state.frontOffice.id, false);
       });
-      if (success) transactionDialog.close();
+      if (success) {
+        transactionDialog.close();
+        resetTransactionEditState();
+      }
     } finally {
       button.disabled = false;
-      button.textContent = 'Save Transaction';
+      button.textContent = editingTransactionId ? 'Save Changes' : 'Save Transaction';
     }
   }
 
@@ -4233,11 +4342,11 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const seasons = contractHorizonSeasons();
     const grouped = new Map();
     state.adjustments.forEach((a) => {
-      if (!grouped.has(a.id)) grouped.set(a.id, { id:a.id, type:a.type, description:a.description, sourceTransactionId:a.sourceTransactionId || null, seasons:{} });
+      if (!grouped.has(a.id)) grouped.set(a.id, { id:a.id, description:a.description, sourceTransactionId:a.sourceTransactionId || null, seasons:{} });
       grouped.get(a.id).seasons[a.seasonId] = a.amount;
     });
-    const rows = [...grouped.values()].map((a) => `<tr><td>${escapeHtml(a.description)}</td><td>${escapeHtml(a.type)}</td>${seasons.map((s) => `<td class="money">${a.seasons[s.id] === undefined ? '—' : formatMoney(a.seasons[s.id])}</td>`).join('')}<td>${a.sourceTransactionId ? 'Transaction' : 'Legacy'}</td></tr>`).join('');
-    return `<div class="cap-detail-card transaction-cap-card"><div class="section-title-row"><div><p class="eyebrow">Transaction impacts</p><h3>Dead cap, retention & credits</h3></div><button id="capRecordTransactionBtn" class="btn btn-secondary btn-small" type="button">+ Transaction</button></div>${rows ? `<div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Description</th><th>Type</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Source</th></tr></thead><tbody>${rows}</tbody></table></div></div>` : `<div class="empty-state compact"><h4>No transaction cap impacts</h4><p>Buyout penalties, retained salary and other financial consequences will appear here when recorded through Transactions.</p></div>`}</div>`;
+    const rows = [...grouped.values()].map((a) => `<tr><td>${escapeHtml(a.description)}</td>${seasons.map((s) => `<td class="money">${a.seasons[s.id] === undefined ? '—' : formatMoney(a.seasons[s.id])}</td>`).join('')}<td>${a.sourceTransactionId ? 'Transaction' : 'Legacy'}</td></tr>`).join('');
+    return `<div class="cap-detail-card transaction-cap-card"><div class="section-title-row"><div><p class="eyebrow">Dead Cap</p><h3>Transaction-generated cap costs</h3></div><button id="capRecordTransactionBtn" class="btn btn-secondary btn-small" type="button">+ Transaction</button></div>${rows ? `<div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Description</th>${seasons.map((s) => `<th>${seasonLabel(s.startYear)}</th>`).join('')}<th>Source</th></tr></thead><tbody>${rows}</tbody></table></div></div>` : `<div class="empty-state compact"><h4>No Dead Cap</h4><p>Buyout penalties, waiver penalties and retained salary will appear here when recorded through Transactions.</p></div>`}</div>`;
   }
 
 
@@ -4245,7 +4354,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     const rows = contractHorizonSeasons().map((s) => {
       const c = calculateSeason(s.id);
       const deadCap = deadCapForSeason(s.id);
-      const otherAdjustments = otherAdjustmentsForSeason(s.id);
       const capUsed = c.complete ? c.capUsed : c.knownCapUsed;
       const capRemaining = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
       return `<tr>
@@ -4253,7 +4361,6 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
         <td class="money">${c.salaryCap === null ? '—' : formatMoney(c.salaryCap)}</td>
         <td class="money">${formatMoney(c.knownRosterCap)}</td>
         <td class="money">${formatMoney(deadCap)}</td>
-        <td class="money">${formatMoney(otherAdjustments)}</td>
         <td class="money">${formatMoney(capUsed)}</td>
         <td class="money">${capRemaining}</td>
       </tr>`;
@@ -4265,7 +4372,7 @@ button.depth-slot:hover { border-color:rgba(119,201,255,.34); background:#0e1a24
     el('capView').innerHTML = `<div class="cap-page cap-page-v221">
       <div class="page-heading-row"><div><p class="eyebrow">Cap management</p><h3>${seasonLabel(activeSeason.startYear)} financial position</h3></div></div>
       ${renderCapVisuals()}
-      <div class="cap-detail-card"><div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster + dead cap + other adjustments</p></div><div class="cap-scroll-hint" aria-hidden="true">Swipe for full financial detail <span class="scroll-arrow">→</span></div><div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll" role="region" aria-label="Seven-season cap table. Swipe horizontally to view all financial columns." tabindex="0"><table class="cap-detail-table cap-detail-table-v25 cap-detail-table-v221"><thead><tr><th>Season</th><th>Salary Cap</th><th>Roster Cap</th><th>Dead Cap</th><th>Other Adj.</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>
+      <div class="cap-detail-card"><div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster Cap + Dead Cap</p></div><div class="cap-scroll-hint" aria-hidden="true">Swipe for full financial detail <span class="scroll-arrow">→</span></div><div class="cap-detail-scroll-shell"><div class="table-wrap cap-horizontal-scroll" role="region" aria-label="Seven-season cap table. Swipe horizontally to view all financial columns." tabindex="0"><table class="cap-detail-table cap-detail-table-v25 cap-detail-table-v221"><thead><tr><th>Season</th><th>Salary Cap</th><th>Roster Cap</th><th>Dead Cap</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead><tbody>${rows}</tbody></table></div></div></div>
       ${renderCapAdjustments()}
       <details class="cap-history-disclosure"><summary><span class="settings-disclosure-title"><strong>Past Seasons</strong><span>Reference prior salary-cap settings</span></span></summary><div class="cap-history-body">${historyRows ? `<div class="cap-history-scroll-shell"><div class="table-wrap cap-horizontal-scroll"><table><thead><tr><th>Season</th><th>Recorded Salary Cap</th></tr></thead><tbody>${historyRows}</tbody></table></div></div>` : '<p class="season-history-empty">No past seasons yet. Historical seasons will appear after the active season advances.</p>'}</div></details>
     </div>`;
