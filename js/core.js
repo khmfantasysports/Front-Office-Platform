@@ -1,6 +1,6 @@
 'use strict';
 
-// Fantasy Front Office v2.26 — shared application state and DOM handles.
+// Fantasy Front Office v2.27 — shared application state and DOM handles.
 function emptyState() {
   return {
     frontOffice: null,
@@ -23,7 +23,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, 
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
 
-const APP_VERSION = '2.26';
+const APP_VERSION = '2.27';
 const DEFAULT_STATUSES = [];
 let state = emptyState();
 let session = null;
