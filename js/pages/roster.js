@@ -74,7 +74,7 @@ function renderRoster() {
   el('rosterView').innerHTML = `
     <div class="roster-page">
       <div class="page-heading-row">
-        <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length} minors</h3></div>
+        <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length}${state.frontOffice.minorsLimit !== null && state.frontOffice.minorsLimit !== undefined ? ` / ${state.frontOffice.minorsLimit}` : ''} minors</h3></div>
         <div class="view-switch v25 v29" aria-label="Roster view"><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterListModeBtn" class="${rosterMode === 'list' ? 'active' : ''}" type="button">Roster</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
       </div>
       <div class="roster-commandbar">
