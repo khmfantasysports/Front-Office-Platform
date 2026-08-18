@@ -100,95 +100,140 @@ function renderOverview() {
   const capRemaining = calc.complete && salaryCap !== null ? calc.capSpace : null;
   const rawPct = salaryCap && salaryCap > 0 ? (calc.knownCapUsed / salaryCap) * 100 : 0;
   const displayPct = Math.max(0, Math.min(100, rawPct));
-  const missingPlayers = calc.missingPlayerIds.map((id) => state.players.find((p) => p.id === id)).filter(Boolean);
+
+  const activeCount = activeRosterPlayers().length;
+  const minorsCount = farmSystemPlayers().length;
+  const rosterLimit = state.frontOffice.rosterLimit;
+  const openRosterSpots = rosterLimit === null || rosterLimit === undefined ? null : rosterLimit - activeCount;
+  const expiring = state.players.filter((player) => player.contractEndSeasonId === season.id).length;
+  const missingPlayers = calc.missingPlayerIds
+    .map((id) => state.players.find((player) => player.id === id))
+    .filter(Boolean);
+
+  const isOverCap = calc.complete && capRemaining !== null && capRemaining < 0;
+  const primaryValue = !calc.complete
+    ? 'Incomplete'
+    : isOverCap
+      ? formatMoney(Math.abs(capRemaining))
+      : formatMoney(capRemaining);
+  const primaryLabel = !calc.complete ? 'Cap Status' : (isOverCap ? 'Over Cap' : 'Cap Remaining');
+  const primaryClass = !calc.complete ? 'warning' : (isOverCap ? 'danger' : 'good');
 
   const horizon = contractHorizonSeasons();
-  const trendPoints = horizon.map((s) => ({ season:s, calc:calculateSeason(s.id) }));
-  const maxUsed = Math.max(1, ...trendPoints.map((point) => Math.max(0, point.calc.knownCapUsed)));
-  const trend = trendPoints.map((point) => {
-    const value = Math.max(0, point.calc.knownCapUsed);
-    const height = value === 0 ? 3 : Math.max(8, Math.round((value / maxUsed) * 100));
-    const pointTone = point.calc.salaryCap === null ? 'neutral' : capTone(point.calc);
-    const shortSeason = String(point.season.startYear).slice(2) + '-' + String((point.season.startYear + 1) % 100).padStart(2,'0');
-    return `<div class="trend-item" title="${escapeAttr(seasonLabel(point.season.startYear))}: ${escapeAttr(formatMoney(value))}">
-      <div class="trend-bar-track"><div class="trend-bar ${pointTone}" style="height:${height}%"></div></div>
-      <div class="trend-season">${shortSeason}</div>
-      <div class="trend-value">${formatMoney(value)}</div>
-    </div>`;
+  const maxCommitment = Math.max(1, ...horizon.map((item) => Math.max(0, calculateSeason(item.id).knownCapUsed)));
+  const outlookCards = horizon.map((item) => {
+    const seasonCalc = calculateSeason(item.id);
+    const seasonDeadCap = deadCapForSeason(item.id);
+    const commitment = Math.max(0, seasonCalc.knownCapUsed);
+    const barWidth = commitment === 0 ? 3 : Math.max(7, Math.round((commitment / maxCommitment) * 100));
+    const remaining = seasonCalc.complete && seasonCalc.salaryCap !== null ? seasonCalc.capSpace : null;
+    const isCurrent = item.id === season.id;
+    return `<article class="overview-outlook-card ${isCurrent ? 'current' : ''}">
+      <div class="overview-outlook-season"><strong>${seasonLabel(item.startYear)}</strong>${isCurrent ? '<span>Current</span>' : ''}</div>
+      <div class="overview-outlook-value">${formatMoney(commitment)}</div>
+      <div class="overview-outlook-caption">Cap Used</div>
+      <div class="overview-outlook-track"><span style="width:${barWidth}%"></span></div>
+      <div class="overview-outlook-footer">
+        <span>${seasonDeadCap ? `Dead ${formatMoney(seasonDeadCap)}` : 'No Dead Cap'}</span>
+        <span>${remaining === null ? 'Cap TBD' : `${formatMoney(remaining)} left`}</span>
+      </div>
+    </article>`;
   }).join('');
 
-  const futureRows = horizon.map((s) => {
-    const c = calculateSeason(s.id);
-    const seasonDeadCap = deadCapForSeason(s.id);
-    const remaining = c.complete && c.salaryCap !== null ? formatMoney(c.capSpace) : '—';
-    const used = c.complete ? c.capUsed : c.knownCapUsed;
-    return `<tr>
-      <td>${seasonLabel(s.startYear)}</td>
-      <td class="money">${formatMoney(c.knownRosterCap)}</td>
-      <td class="money">${formatMoney(seasonDeadCap)}</td>
-      <td class="money">${formatMoney(used)}</td>
-      <td class="money">${remaining}</td>
-    </tr>`;
-  }).join('');
+  const attention = [];
+  if (isOverCap) {
+    attention.push(`<div class="overview-attention-row danger"><span class="overview-attention-icon">!</span><span><strong>${formatMoney(Math.abs(capRemaining))} over the salary cap</strong><small>Cap relief is required for ${seasonLabel(season.startYear)}.</small></span></div>`);
+  }
+  if (rosterLimit !== null && rosterLimit !== undefined && activeCount > rosterLimit) {
+    attention.push(`<div class="overview-attention-row warning"><span class="overview-attention-icon">!</span><span><strong>${activeCount - rosterLimit} player${activeCount - rosterLimit === 1 ? '' : 's'} over the roster limit</strong><small>${activeCount} active players against a ${rosterLimit}-player limit.</small></span></div>`);
+  }
+  if (missingPlayers.length) {
+    const names = missingPlayers.slice(0, 3).map((player) => player.name).join(', ');
+    const extra = missingPlayers.length > 3 ? ` +${missingPlayers.length - 3} more` : '';
+    attention.push(`<div class="overview-attention-row warning"><span class="overview-attention-icon">$</span><span><strong>${missingPlayers.length} missing current-season salar${missingPlayers.length === 1 ? 'y' : 'ies'}</strong><small>${escapeHtml(names)}${escapeHtml(extra)}</small></span></div>`);
+  }
+  if (!attention.length) {
+    attention.push(`<div class="overview-attention-row good"><span class="overview-attention-icon">✓</span><span><strong>No current cap or salary issues</strong><small>${seasonLabel(season.startYear)} is complete based on the data entered.</small></span></div>`);
+  }
 
-  const issues = [];
-  missingPlayers.forEach((player) => issues.push(`<div class="issue-item"><p><strong>${escapeHtml(player.name)}</strong></p><span class="warning">Missing ${seasonLabel(season.startYear)} salary</span></div>`));
-  if (!issues.length) issues.push('<div class="issue-item"><p class="good"><strong>All current salaries are entered.</strong></p></div>');
+  const activities = state.activity.slice(0, 3).map((item) => `
+    <div class="overview-activity-row">
+      <span class="overview-activity-dot"></span>
+      <span><strong>${escapeHtml(item.label)}</strong><small>${formatDateTime(item.at)}</small></span>
+    </div>`).join('') || `<div class="overview-activity-row"><span class="overview-activity-dot"></span><span><strong>No recent activity</strong><small>Changes to this Front Office will appear here.</small></span></div>`;
 
-  const activities = state.activity.slice(0, 4).map((item) => `<div class="activity-item"><p><strong>${escapeHtml(item.label)}</strong></p><small>${formatDateTime(item.at)}</small></div>`).join('') || '<div class="activity-item"><p class="muted">No recent activity.</p></div>';
-
-  const currentStatus = calc.complete
-    ? (calc.capSpace < 0 ? `<span class="danger">${formatMoney(Math.abs(calc.capSpace))} over cap</span>` : `<span class="good">${formatMoney(calc.capSpace)} cap remaining</span>`)
-    : '<span class="warning">Cap total incomplete</span>';
+  const rosterMeta = rosterLimit === null || rosterLimit === undefined
+    ? `${activeCount} active`
+    : `${activeCount} / ${rosterLimit}`;
+  const openSpotText = openRosterSpots === null
+    ? 'No limit set'
+    : openRosterSpots >= 0
+      ? `${openRosterSpots} open`
+      : `${Math.abs(openRosterSpots)} over`;
 
   el('overviewView').innerHTML = `
-    <div class="overview-stack-v220">
-      <section class="overview-cap-card tone-${tone}">
-        <div class="overview-cap-head">
-          <div><p class="eyebrow">${seasonLabel(season.startYear)} cap summary</p><h3>${currentStatus}</h3></div>
-          <span class="cap-limit">Salary Cap <strong>${salaryCap === null ? 'Not set' : formatMoney(salaryCap)}</strong></span>
+    <div class="overview-v227">
+      <section class="overview-hero-v227 tone-${tone}">
+        <div class="overview-hero-top">
+          <div>
+            <p class="eyebrow">${seasonLabel(season.startYear)} cap position</p>
+            <div class="overview-primary-number ${primaryClass}">${primaryValue}</div>
+            <div class="overview-primary-label">${primaryLabel}</div>
+          </div>
+          <div class="overview-cap-limit-v227">
+            <span>Salary Cap</span>
+            <strong>${salaryCap === null ? 'Not set' : formatMoney(salaryCap)}</strong>
+          </div>
         </div>
-        <div class="overview-metrics">
-          <div class="overview-metric primary"><span>Cap Used</span><strong>${calc.complete ? formatMoney(capUsed) : `${formatMoney(capUsed)} known`}</strong></div>
-          <div class="overview-metric"><span>Cap Remaining</span><strong>${capRemaining === null ? 'Incomplete' : formatMoney(capRemaining)}</strong></div>
-          <div class="overview-metric"><span>Roster Cap</span><strong>${formatMoney(calc.knownRosterCap)}</strong></div>
-          <div class="overview-metric"><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong></div>
-        </div>
-        <div class="overview-cap-progress">
+
+        <div class="overview-progress-v227">
           <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
-          <div class="overview-cap-progress-meta"><span><strong>${Math.round(rawPct)}%</strong> of cap used</span><span>${deadCap !== 0 ? `Dead Cap ${formatMoney(deadCap)}` : 'No Dead Cap'}</span></div>
+          <div class="overview-progress-meta-v227"><span><strong>${Math.round(rawPct)}%</strong> used</span><span>${calc.complete ? `${formatMoney(capUsed)} of ${salaryCap === null ? '—' : formatMoney(salaryCap)}` : `${formatMoney(calc.knownCapUsed)} known`}</span></div>
+        </div>
+
+        <div class="overview-finance-strip-v227">
+          <div><span>Cap Used</span><strong>${calc.complete ? formatMoney(capUsed) : `${formatMoney(calc.knownCapUsed)} known`}</strong></div>
+          <div><span>Roster Cap</span><strong>${formatMoney(calc.knownRosterCap)}</strong></div>
+          <div><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong></div>
         </div>
       </section>
 
-      <section class="subpanel overview-trend-compact tone-neutral">
-        <div class="overview-commitments-head"><div><p class="eyebrow">Cap outlook</p><h3>Seven-season commitments</h3></div><p>Known cap used by season</p></div>
-        <div class="trend-chart" aria-label="Known cap used by season">${trend}</div>
-      </section>
-
-      <section class="subpanel commitments-panel tone-neutral">
-        <div class="overview-commitments-head"><div><p class="eyebrow">Future cap</p><h3>Cap commitments by season</h3></div><p>Roster Cap + Dead Cap</p></div>
-        <div class="table-wrap compact-table-wrap">
-          <table class="commitments-table commitments-table-v220">
-            <thead><tr><th>Season</th><th>Roster Cap</th><th>Dead Cap</th><th>Cap Used</th><th>Cap Remaining</th></tr></thead>
-            <tbody>${futureRows}</tbody>
-          </table>
+      <section class="overview-snapshot-v227">
+        <div class="overview-section-head-v227">
+          <div><p class="eyebrow">Team snapshot</p><h3>Roster at a glance</h3></div>
+          <button id="overviewOpenRosterBtn" class="overview-text-action" type="button">Open Roster →</button>
+        </div>
+        <div class="overview-snapshot-grid-v227">
+          <div class="overview-snapshot-item"><span>Active</span><strong>${escapeHtml(rosterMeta)}</strong><small>${escapeHtml(openSpotText)}</small></div>
+          <div class="overview-snapshot-item"><span>Minors</span><strong>${minorsCount}</strong><small>prospects assigned</small></div>
+          <div class="overview-snapshot-item"><span>Expiring</span><strong>${expiring}</strong><small>this season</small></div>
+          <div class="overview-snapshot-item"><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong><small>${deadCap ? 'on the books' : 'none'}</small></div>
         </div>
       </section>
 
-      <div class="overview-health-grid">
-        <div class="subpanel compact-status-panel tone-${calc.complete ? 'good' : 'warning'}">
-          <p class="eyebrow">Roster & Cap</p>
-          <h3>${calc.complete ? '<span class="good">Current season complete</span>' : '<span class="warning">Needs attention</span>'}</h3>
-          <p class="muted compact-copy">${calc.complete ? 'Current-season roster salaries and cap totals are complete.' : 'Enter a salary for every cap-counting player to complete the current-season cap.'}</p>
+      <section class="overview-panel-v227">
+        <div class="overview-section-head-v227">
+          <div><p class="eyebrow">Cap outlook</p><h3>Seven-season commitments</h3></div>
+          <button id="overviewOpenCapBtn" class="overview-text-action" type="button">Open Cap →</button>
         </div>
-        <div class="subpanel compact-status-panel tone-${missingPlayers.length ? 'warning' : 'good'}">
-          <p class="eyebrow">Salary check</p>
-          <div class="issue-list compact-list">${issues.join('')}</div>
+        <div class="overview-outlook-scroll" role="region" aria-label="Seven-season cap outlook. Swipe horizontally to view future seasons." tabindex="0">
+          <div class="overview-outlook-grid">${outlookCards}</div>
         </div>
-        <div class="subpanel compact-status-panel activity-panel tone-neutral">
-          <p class="eyebrow">Recent activity</p>
-          <div class="activity-list compact-list">${activities}</div>
-        </div>
+      </section>
+
+      <div class="overview-bottom-grid-v227">
+        <section class="overview-panel-v227">
+          <div class="overview-section-head-v227"><div><p class="eyebrow">Attention</p><h3>Front office status</h3></div></div>
+          <div class="overview-attention-list">${attention.join('')}</div>
+        </section>
+
+        <section class="overview-panel-v227">
+          <div class="overview-section-head-v227"><div><p class="eyebrow">Recent activity</p><h3>Latest changes</h3></div></div>
+          <div class="overview-activity-list">${activities}</div>
+        </section>
       </div>
     </div>`;
+
+  if (el('overviewOpenRosterBtn')) el('overviewOpenRosterBtn').addEventListener('click', () => switchView('roster'));
+  if (el('overviewOpenCapBtn')) el('overviewOpenCapBtn').addEventListener('click', () => switchView('cap'));
 }
