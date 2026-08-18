@@ -7,13 +7,11 @@ async function init() {
   setCloudStatus('Connecting…', 'busy');
   const { data, error } = await db.auth.getSession();
   if (error) showAuthError(error.message);
-  session = data?.session || null;
-  await handleSessionChange(session);
+  await handleSessionChange(data?.session || null, 'INITIAL_SESSION');
 
-  db.auth.onAuthStateChange((_event, nextSession) => {
+  db.auth.onAuthStateChange((event, nextSession) => {
     window.setTimeout(async () => {
-      session = nextSession;
-      await handleSessionChange(session);
+      await handleSessionChange(nextSession, event);
     }, 0);
   });
 }
@@ -23,6 +21,7 @@ function bindEvents() {
   el('signOutBtn').addEventListener('click', signOut);
   el('backToOfficesBtn').addEventListener('click', showOfficePicker);
   el('workspaceBackBtn').addEventListener('click', showOfficePicker);
+  el('deleteFrontOfficeBtn').addEventListener('click', deleteCurrentFrontOffice);
   el('newOfficeBtn').addEventListener('click', showCreateOffice);
   el('frontOfficeForm').addEventListener('submit', handleCreateFrontOffice);
   el('salaryCap').addEventListener('input', (event) => formatWholeDollarInput(event.target));
@@ -79,6 +78,11 @@ function bindEvents() {
   el('archiveAssetBtn').addEventListener('click', archiveEditingAsset);
   el('playerIsProspect').addEventListener('change', syncProspectLocationControls);
   el('playerRosterGroup').addEventListener('change', syncProspectLocationControls);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') persistWorkspaceResumeState();
+  });
+  window.addEventListener('pagehide', persistWorkspaceResumeState);
 }
 
 async function handleCreateFrontOffice(event) {
@@ -116,6 +120,7 @@ function render() {
     el('topbarActions').classList.add('hidden');
     el('workspaceNav').classList.add('hidden');
     el('workspaceBackBtn').classList.add('hidden');
+    el('deleteFrontOfficeBtn').classList.add('hidden');
     return;
   }
 
@@ -125,7 +130,9 @@ function render() {
 
   const hasOffice = Boolean(state.frontOffice);
   el('workspaceBackBtn').classList.toggle('hidden', !hasOffice);
+  el('deleteFrontOfficeBtn').classList.toggle('hidden', !hasOffice);
   if (!hasOffice) return;
+
   officePicker.classList.add('hidden');
   onboarding.classList.add('hidden');
   workspace.classList.remove('hidden');
@@ -145,6 +152,8 @@ function render() {
   renderCap();
   renderTransactions();
   renderSettings();
+  switchView(activeView, { persist: false });
+  persistWorkspaceResumeState();
 }
 
 function renderSeasonSelect() {
@@ -155,11 +164,17 @@ function renderSeasonSelect() {
     .join('');
 }
 
-function switchView(view) {
-  document.querySelectorAll('.nav-tab').forEach((b) => b.classList.toggle('active', b.dataset.view === view));
-  ['overview', 'roster', 'farm', 'assets', 'cap', 'transactions', 'settings'].forEach((name) => el(`${name}View`).classList.toggle('hidden', name !== view));
-  // KPI strip is an Overview-only snapshot; operational pages stay focused on their own content.
+function switchView(view, options = {}) {
+  const nextView = WORKSPACE_VIEWS.includes(view) ? view : 'overview';
+  activeView = nextView;
+  document.querySelectorAll('.nav-tab').forEach((button) =>
+    button.classList.toggle('active', button.dataset.view === nextView)
+  );
+  WORKSPACE_VIEWS.forEach((name) =>
+    el(`${name}View`).classList.toggle('hidden', name !== nextView)
+  );
   el('summaryCards').classList.add('hidden');
+  if (options.persist !== false) persistWorkspaceResumeState();
 }
 
 function resetApp() {
