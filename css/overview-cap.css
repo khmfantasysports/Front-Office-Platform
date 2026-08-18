@@ -89,3 +89,369 @@
   .cap-page-v221 { gap:6px; }
   .cap-detail-table-v221 { min-width:790px; }
 }
+
+
+/* V2.27 — Overview dashboard refresh
+   Overview is now a concise GM dashboard. Detailed financial tables stay on the Cap page. */
+.overview-v227 {
+  display:grid;
+  gap:10px;
+}
+.overview-hero-v227,
+.overview-snapshot-v227,
+.overview-panel-v227 {
+  min-width:0;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(13,24,34,.88);
+}
+.overview-hero-v227 {
+  padding:16px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 0 0, rgba(50,173,255,.09), transparent 42%),
+    rgba(13,24,34,.94);
+}
+.overview-hero-v227.tone-good { border-color:rgba(82,215,194,.38); }
+.overview-hero-v227.tone-warning { border-color:rgba(242,198,109,.42); }
+.overview-hero-v227.tone-danger { border-color:rgba(246,123,123,.48); }
+
+.overview-hero-top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+}
+.overview-hero-top .eyebrow { margin-bottom:7px; }
+.overview-primary-number {
+  font-size:clamp(2rem,5vw,3rem);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.05em;
+  font-variant-numeric:tabular-nums;
+}
+.overview-primary-number.good { color:var(--healthy); }
+.overview-primary-number.warning { color:var(--warning); }
+.overview-primary-number.danger { color:var(--danger); }
+.overview-primary-label {
+  margin-top:5px;
+  color:#d7e1e9;
+  font-size:.76rem;
+  font-weight:800;
+}
+.overview-cap-limit-v227 {
+  flex:0 0 auto;
+  min-width:118px;
+  padding:8px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:rgba(7,17,26,.38);
+  text-align:right;
+}
+.overview-cap-limit-v227 span,
+.overview-finance-strip-v227 span,
+.overview-snapshot-item span {
+  display:block;
+  color:var(--muted);
+  font-size:.58rem;
+  font-weight:850;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+.overview-cap-limit-v227 strong {
+  display:block;
+  margin-top:3px;
+  font-size:.9rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.overview-progress-v227 { margin-top:14px; }
+.overview-progress-v227 .cap-bar {
+  height:9px;
+  margin:0;
+}
+.overview-progress-meta-v227 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:.66rem;
+}
+.overview-progress-meta-v227 strong { color:var(--text); }
+
+.overview-finance-strip-v227 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  margin-top:13px;
+  border-top:1px solid var(--border-soft);
+}
+.overview-finance-strip-v227 > div {
+  min-width:0;
+  padding:11px 10px 0;
+}
+.overview-finance-strip-v227 > div:first-child { padding-left:0; }
+.overview-finance-strip-v227 > div + div { border-left:1px solid var(--border-soft); }
+.overview-finance-strip-v227 strong {
+  display:block;
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.94rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.overview-snapshot-v227,
+.overview-panel-v227 { padding:12px 13px; }
+.overview-section-head-v227 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.overview-section-head-v227 .eyebrow { margin-bottom:3px; }
+.overview-section-head-v227 h3 {
+  margin:0;
+  font-size:.98rem;
+  letter-spacing:-.015em;
+}
+.overview-text-action {
+  flex:0 0 auto;
+  border:0;
+  padding:4px 0;
+  background:transparent;
+  color:var(--accent);
+  font-size:.68rem;
+  font-weight:850;
+}
+
+.overview-snapshot-grid-v227 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:1px;
+  overflow:hidden;
+  border:1px solid var(--border-soft);
+  border-radius:11px;
+  background:var(--border-soft);
+}
+.overview-snapshot-item {
+  min-width:0;
+  padding:10px 11px;
+  background:#0b151e;
+}
+.overview-snapshot-item strong {
+  display:block;
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:1rem;
+  font-variant-numeric:tabular-nums;
+}
+.overview-snapshot-item small {
+  display:block;
+  margin-top:3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--muted);
+  font-size:.59rem;
+}
+
+.overview-outlook-scroll {
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(119,201,255,.30) transparent;
+  padding-bottom:2px;
+}
+.overview-outlook-scroll::-webkit-scrollbar { height:5px; }
+.overview-outlook-scroll::-webkit-scrollbar-thumb { background:rgba(119,201,255,.28); border-radius:999px; }
+.overview-outlook-grid {
+  display:grid;
+  grid-template-columns:repeat(7,minmax(124px,1fr));
+  gap:7px;
+  min-width:910px;
+}
+.overview-outlook-card {
+  min-width:0;
+  padding:10px;
+  border:1px solid var(--border-soft);
+  border-radius:11px;
+  background:#0b151e;
+}
+.overview-outlook-card.current {
+  border-color:rgba(119,201,255,.38);
+  background:linear-gradient(180deg,rgba(50,173,255,.07),#0b151e 75%);
+}
+.overview-outlook-season {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.overview-outlook-season strong { font-size:.69rem; }
+.overview-outlook-season span {
+  padding:2px 5px;
+  border-radius:999px;
+  background:rgba(50,173,255,.10);
+  color:var(--accent);
+  font-size:.47rem;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.overview-outlook-value {
+  margin-top:9px;
+  font-size:.94rem;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.overview-outlook-caption {
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.54rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.overview-outlook-track {
+  height:4px;
+  margin-top:9px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+}
+.overview-outlook-track span {
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:var(--accent);
+}
+.overview-outlook-card.current .overview-outlook-track span { background:var(--healthy); }
+.overview-outlook-footer {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  margin-top:7px;
+  color:#8193a2;
+  font-size:.50rem;
+  white-space:nowrap;
+}
+
+.overview-bottom-grid-v227 {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.overview-attention-list,
+.overview-activity-list { display:grid; gap:7px; }
+.overview-attention-row,
+.overview-activity-row {
+  min-width:0;
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr);
+  gap:9px;
+  align-items:center;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0b151e;
+}
+.overview-attention-icon {
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:8px;
+  background:rgba(119,201,255,.08);
+  color:var(--accent);
+  font-size:.72rem;
+  font-weight:950;
+}
+.overview-attention-row.good .overview-attention-icon { background:rgba(82,215,194,.09); color:var(--healthy); }
+.overview-attention-row.warning .overview-attention-icon { background:rgba(242,198,109,.09); color:var(--warning); }
+.overview-attention-row.danger .overview-attention-icon { background:rgba(246,123,123,.09); color:var(--danger); }
+.overview-attention-row strong,
+.overview-activity-row strong {
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.73rem;
+}
+.overview-attention-row small,
+.overview-activity-row small {
+  display:block;
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:var(--muted);
+  font-size:.59rem;
+}
+.overview-activity-row { grid-template-columns:8px minmax(0,1fr); }
+.overview-activity-dot {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px rgba(50,173,255,.06);
+}
+
+@media (max-width:720px) {
+  .overview-v227 { gap:7px; }
+  .overview-hero-v227 { padding:12px; border-radius:12px; }
+  .overview-hero-top { gap:10px; }
+  .overview-primary-number { font-size:2rem; }
+  .overview-primary-label { font-size:.66rem; }
+  .overview-cap-limit-v227 { min-width:104px; padding:7px 8px; }
+  .overview-cap-limit-v227 span { font-size:.50rem; }
+  .overview-cap-limit-v227 strong { font-size:.78rem; }
+  .overview-progress-v227 { margin-top:11px; }
+  .overview-progress-meta-v227 { font-size:.59rem; }
+  .overview-finance-strip-v227 { margin-top:10px; }
+  .overview-finance-strip-v227 > div { padding:9px 7px 0; }
+  .overview-finance-strip-v227 > div:first-child { padding-left:0; }
+  .overview-finance-strip-v227 span { font-size:.49rem; }
+  .overview-finance-strip-v227 strong { font-size:.78rem; }
+
+  .overview-snapshot-v227,
+  .overview-panel-v227 { padding:10px; border-radius:12px; }
+  .overview-section-head-v227 { margin-bottom:8px; }
+  .overview-section-head-v227 h3 { font-size:.88rem; }
+  .overview-text-action { font-size:.61rem; }
+
+  .overview-snapshot-grid-v227 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .overview-snapshot-item { padding:8px 7px; }
+  .overview-snapshot-item span { font-size:.47rem; }
+  .overview-snapshot-item strong { font-size:.82rem; }
+  .overview-snapshot-item small { font-size:.50rem; }
+
+  .overview-outlook-grid {
+    grid-template-columns:repeat(7,112px);
+    min-width:max-content;
+    gap:6px;
+  }
+  .overview-outlook-card { padding:9px; }
+  .overview-outlook-value { font-size:.84rem; }
+  .overview-outlook-footer { font-size:.46rem; }
+
+  .overview-bottom-grid-v227 { grid-template-columns:1fr; gap:7px; }
+  .overview-attention-row,
+  .overview-activity-row { padding:8px 9px; }
+}
+
+@media (max-width:390px) {
+  .overview-primary-number { font-size:1.85rem; }
+  .overview-cap-limit-v227 { min-width:98px; }
+  .overview-snapshot-item small { display:none; }
+  .overview-snapshot-item { padding:8px 6px; }
+}
