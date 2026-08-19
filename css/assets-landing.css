@@ -409,3 +409,15 @@
     padding-right:7px;
   }
 }
+
+
+/* V2.32 — signed-out landing no longer reserves visual space for app chrome. */
+#appHeader.hidden + main .landing-shell {
+  margin-top:18px;
+}
+
+@media (max-width:720px) {
+  #appHeader.hidden + main .landing-shell {
+    margin-top:4px;
+  }
+}
