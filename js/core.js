@@ -1,6 +1,6 @@
 'use strict';
 
-// RosterCap v2.40 — shared application state, auth client, and Team Identity.
+// RosterCap v2.41 — shared application state, auth client, and Team Identity.
 function emptyState() {
   return {
     frontOffice: null,
@@ -29,7 +29,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, 
   }
 });
 
-const APP_VERSION = '2.40';
+const APP_VERSION = '2.41';
 const DEFAULT_STATUSES = [];
 const WORKSPACE_RESUME_KEY = 'fantasy-front-office-workspace-v1';
 const WORKSPACE_VIEWS = ['overview','roster','farm','assets','cap','transactions','settings'];
