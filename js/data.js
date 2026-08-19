@@ -55,10 +55,10 @@ function renderGoogleSignInButton() {
 
   window.google.accounts.id.renderButton(container, {
     type: 'standard',
-    theme: 'outline',
+    theme: 'filled_black',
     size: 'large',
     text: 'continue_with',
-    shape: 'rectangular',
+    shape: 'pill',
     logo_alignment: 'left',
     width: availableWidth
   });
