@@ -5,9 +5,19 @@
 async function init() {
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
+
+  const callbackError = readOAuthCallbackError();
+
   const { data, error } = await db.auth.getSession();
   if (error) showAuthError(error.message);
+
   await handleSessionChange(data?.session || null, 'INITIAL_SESSION');
+
+  if (callbackError && !data?.session) {
+    showAuthError(`Google sign-in failed: ${callbackError.description}`);
+    setCloudStatus('Auth error', 'error');
+    clearOAuthCallbackErrorFromUrl();
+  }
 
   db.auth.onAuthStateChange((event, nextSession) => {
     window.setTimeout(async () => {
