@@ -17,12 +17,10 @@ async function signInWithGoogle() {
     const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: SITE_URL
+        redirectTo: AUTH_REDIRECT_URL
       }
     });
 
-    // In a normal browser this call redirects away immediately.
-    // If it returns with an error, surface it.
     if (error) throw error;
   } catch (error) {
     console.error('Google OAuth start failed', error);
@@ -36,35 +34,6 @@ async function signInWithGoogle() {
   }
 }
 
-
-function readOAuthCallbackError() {
-  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-  const query = new URLSearchParams(window.location.search);
-
-  const errorCode =
-    hash.get('error_code') ||
-    query.get('error_code') ||
-    hash.get('error') ||
-    query.get('error');
-
-  const description =
-    hash.get('error_description') ||
-    query.get('error_description') ||
-    hash.get('error_description') ||
-    query.get('error_description');
-
-  if (!errorCode && !description) return null;
-
-  return {
-    code: errorCode || 'oauth_error',
-    description: (description || 'Google sign-in failed.').replace(/\+/g, ' ')
-  };
-}
-
-function clearOAuthCallbackErrorFromUrl() {
-  const cleanUrl = `${window.location.origin}${window.location.pathname}`;
-  window.history.replaceState({}, document.title, cleanUrl);
-}
 
 async function signOut() {
   setCloudStatus('Signing out…', 'busy');
