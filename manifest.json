@@ -1,5 +1,5 @@
 {
-  "version": "2.38",
+  "version": "2.39",
   "backendBaseline": "2.31",
   "css": [
     "css/base.css",
@@ -36,6 +36,7 @@
   "authStorageKey": "rostercap-auth-token",
   "authRedirectCurrent": "https://khmfantasysports.github.io/Front-Office-Platform/",
   "frontendCacheStrategy": "versioned-local-assets",
-  "assetVersion": "20260819-v238-direct-google",
-  "googleWebClientId": "417912628397-5754anrl89bgjo27an5ni32lncdd3lm8.apps.googleusercontent.com"
+  "assetVersion": "20260819-v239-identity-load-fix",
+  "googleWebClientId": "417912628397-5754anrl89bgjo27an5ni32lncdd3lm8.apps.googleusercontent.com",
+  "fix": "team-identity-module-load"
 }
