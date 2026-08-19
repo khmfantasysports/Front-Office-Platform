@@ -140,6 +140,7 @@ function render() {
   el('exportBtn').disabled = false;
   el('exportBtn').classList.remove('hidden');
 
+  applyTeamIdentityToShell();
   el('teamLabel').textContent = state.frontOffice.teamName;
   el('leagueLabel').textContent = `${state.frontOffice.leagueName} · ${state.frontOffice.sport}`;
   renderSeasonSelect();
