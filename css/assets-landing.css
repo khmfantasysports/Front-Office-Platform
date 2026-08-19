@@ -421,3 +421,39 @@
     margin-top:4px;
   }
 }
+
+
+/* V2.38 — direct Google Identity Services sign-in */
+.google-identity-wrap {
+  width:100%;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:2px;
+}
+
+#googleSignInButton {
+  width:100%;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#googleSignInButton > div {
+  margin-inline:auto !important;
+}
+
+.google-loading {
+  width:100%;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  color:#8ea3b5;
+  font-size:.78rem;
+  background:rgba(255,255,255,.025);
+}
