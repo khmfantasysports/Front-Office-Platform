@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fantasy Front Office</title>
-  <meta name="application-name" content="Fantasy Front Office v2.30" />
+  <title>RosterCap — Fantasy Front Office</title>
+  <meta name="application-name" content="RosterCap v2.31" />
+  <link rel="icon" href="./assets/rostercap-mark.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/shell.css" />
   <link rel="stylesheet" href="./css/workspace.css" />
@@ -12,15 +13,17 @@
   <link rel="stylesheet" href="./css/assets-landing.css" />
   <link rel="stylesheet" href="./css/overview-cap.css" />
   <link rel="stylesheet" href="./css/transactions.css" />
+  <link rel="stylesheet" href="./css/identity.css" />
 </head>
 <body>
   <div id="app" class="app-shell">
     <header class="topbar app-menu-bar">
-      <div class="brand-lockup" aria-label="Fantasy Front Office">
+      <div class="brand-lockup" aria-label="RosterCap">
         <button id="workspaceBackBtn" class="workspace-back-btn hidden" type="button" aria-label="Back to My Front Offices" title="My Front Offices">←</button>
-        <div class="brand-mark" aria-hidden="true"><span>FO</span></div>
+        <div class="brand-mark platform-brand-mark" aria-hidden="true"><img src="./assets/rostercap-mark.svg" alt="" /></div>
         <div class="brand-copy">
-          <h1>Fantasy Front Office</h1>
+          <h1 class="platform-wordmark"><span class="roster">Roster</span><span class="cap">Cap</span></h1>
+          <span class="platform-subtitle">Fantasy Front Office</span>
         </div>
       </div>
 
@@ -55,8 +58,14 @@
     <main>
       <section id="authGate" class="landing-shell">
         <div class="landing-hero">
-          <div class="landing-brand-mark" aria-hidden="true"><span>FO</span></div>
-          <div class="landing-kicker">Fantasy roster management</div>
+          <div class="landing-brand-lockup-v231">
+            <div class="landing-brand-mark" aria-hidden="true"><img src="./assets/rostercap-mark.svg" alt="" /></div>
+            <div class="landing-platform-copy">
+              <strong class="platform-wordmark"><span class="roster">Roster</span><span class="cap">Cap</span></strong>
+              <span>Fantasy Front Office</span>
+            </div>
+          </div>
+          <div class="landing-kicker">Fantasy roster & cap management</div>
           <h2>Run your fantasy team like a front office.</h2>
           <p class="landing-lead">One private workspace for your roster, contracts, cap, minors, assets and transaction history.</p>
 
@@ -169,9 +178,12 @@
 
       <section id="workspace" class="hidden">
         <section class="workspace-heading">
-          <div>
-            <p id="leagueLabel" class="eyebrow"></p>
-            <h2 id="teamLabel"></h2>
+          <div class="workspace-team-lockup-v231">
+            <div id="workspaceTeamLogo" class="workspace-team-logo-v231"><span>FO</span></div>
+            <div class="workspace-team-copy-v231">
+              <p id="leagueLabel" class="eyebrow"></p>
+              <h2 id="teamLabel"></h2>
+            </div>
           </div>
           <label class="season-picker">
             Season
@@ -465,6 +477,7 @@
   <script src="./js/core.js"></script>
   <script src="./js/utils.js"></script>
   <script src="./js/domain.js"></script>
+  <script src="./js/features/identity.js"></script>
   <script src="./js/data.js"></script>
   <script src="./js/pages/overview.js"></script>
   <script src="./js/features/depth-chart.js"></script>
