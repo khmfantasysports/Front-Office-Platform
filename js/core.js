@@ -1,6 +1,6 @@
 'use strict';
 
-// RosterCap v2.37 — shared application state and DOM handles.
+// RosterCap v2.38 — shared application state and DOM handles.
 function emptyState() {
   return {
     frontOffice: null,
@@ -18,38 +18,23 @@ function emptyState() {
 
 const SUPABASE_URL = 'https://gmkmmocunrckiqwwhxhv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vU3vgT3e10spDzXPiva_Nw__TJy-HT7';
-const GITHUB_PAGES_URL = 'https://khmfantasysports.github.io/Front-Office-Platform/';
-
-// Keep auth redirect ownership in one place.
-// Today production is GitHub Pages. Once RosterCap moves to its own domain,
-// the browser's current HTTPS origin/path can become the redirect automatically.
-const AUTH_REDIRECT_URL = (() => {
-  if (window.location.hostname === 'khmfantasysports.github.io') {
-    return GITHUB_PAGES_URL;
-  }
-  if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
-    return `${window.location.origin}${window.location.pathname}`;
-  }
-  return GITHUB_PAGES_URL;
-})();
+const GOOGLE_WEB_CLIENT_ID = '417912628397-5754anrl89bgjo27an5ni32lncdd3lm8.apps.googleusercontent.com';
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: false,
     storageKey: 'rostercap-auth-token'
   }
 });
 
-const APP_VERSION = '2.37';
+const APP_VERSION = '2.38';
 const DEFAULT_STATUSES = [];
 const WORKSPACE_RESUME_KEY = 'fantasy-front-office-workspace-v1';
 const WORKSPACE_VIEWS = ['overview','roster','farm','assets','cap','transactions','settings'];
 let state = emptyState();
 let session = null;
-let authBootstrapResolved = false;
-let lastVerifiedAuthUser = null;
 let activeView = 'overview';
 let editingPlayerId = null;
 let editingAssetId = null;
