@@ -665,3 +665,101 @@
     font-size:.5rem;
   }
 }
+
+
+/* ============================================================
+   V2.44 — Unified team-logo fit system
+   Every uploaded team image uses the same centered, uncropped viewport.
+   ============================================================ */
+
+:root {
+  --team-logo-inset:5%;
+  --team-logo-bg:#08131D;
+}
+
+/* All uploaded-logo frames share the same clipping/centering model. */
+.workspace-team-logo-v231,
+.office-card-mark-v231,
+.team-identity-preview-logo {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+
+/* Uploaded image: never crop, never stretch, always center. */
+.workspace-team-logo-v231 img,
+.office-card-mark-v231 img,
+.team-identity-preview-logo img {
+  position:absolute;
+  inset:var(--team-logo-inset);
+  display:block;
+  width:calc(100% - (var(--team-logo-inset) * 2));
+  height:calc(100% - (var(--team-logo-inset) * 2));
+  max-width:none;
+  max-height:none;
+  margin:0;
+  padding:0;
+  object-fit:contain;
+  object-position:50% 50%;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  transform:none;
+}
+
+/* Uploaded logos get a neutral frame so transparent and white artwork both read well. */
+.workspace-team-logo-v231.has-image,
+.team-identity-preview-logo.has-image,
+.office-card-mark-v231:has(img) {
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255,255,255,.035), transparent 58%),
+    var(--team-logo-bg);
+}
+
+/* Keep initials visually centered when no image exists. */
+.workspace-team-logo-v231:not(.has-image) > span,
+.team-identity-preview-logo:not(.has-image) > span,
+.office-card-mark-v231:not(:has(img)) > span {
+  position:relative;
+  z-index:1;
+}
+
+/* Settings preview is intentionally larger so fit can be judged before saving. */
+.team-identity-preview-logo {
+  width:88px;
+  height:88px;
+  border-radius:20px;
+  --team-logo-inset:6%;
+}
+
+/* Workspace mark remains compact but uses identical fit math. */
+.workspace-team-logo-v231 {
+  --team-logo-inset:7%;
+}
+
+/* Picker cards need slightly more breathing room at their smaller size. */
+.office-card-mark-v231 {
+  --team-logo-inset:7%;
+}
+
+/* Temporary local file preview uses the exact same viewport rules as saved logos. */
+.team-identity-preview-logo img[src^="blob:"] {
+  object-fit:contain;
+  object-position:center;
+}
+
+@media (max-width:720px) {
+  .team-identity-preview-logo {
+    width:82px;
+    height:82px;
+    border-radius:19px;
+  }
+}
+
+@media (max-width:390px) {
+  .team-identity-preview-logo {
+    width:76px;
+    height:76px;
+    border-radius:18px;
+  }
+}
