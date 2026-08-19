@@ -2,103 +2,102 @@
 
 // Authentication, Supabase loading and cloud persistence helpers.
 
-async function signInWithGoogle() {
-  const button = el('googleSignInBtn');
+async function signInWithGoogle(credentialResponse) {
   showAuthError('');
-  setCloudStatus('Opening Google…', 'busy');
 
-  if (button) {
-    button.disabled = true;
-    button.dataset.originalLabel = button.innerHTML;
-    button.innerHTML = '<span class="google-g">G</span> Opening Google…';
+  const credential = credentialResponse?.credential;
+  if (!credential) {
+    showAuthError('Google did not return a sign-in credential. Please try again.');
+    return;
   }
 
+  setCloudStatus('Signing in…', 'busy');
+
   try {
-    const { error } = await db.auth.signInWithOAuth({
+    const { data, error } = await db.auth.signInWithIdToken({
       provider: 'google',
-      options: {
-        redirectTo: AUTH_REDIRECT_URL
-      }
+      token: credential
     });
 
     if (error) throw error;
+    if (!data?.session?.user) {
+      throw new Error('Supabase did not create a RosterCap session.');
+    }
+
+    await handleSessionChange(data.session, 'SIGNED_IN_DIRECT');
   } catch (error) {
-    console.error('Google OAuth start failed', error);
+    console.error('Direct Google sign-in failed', error);
     setCloudStatus('Auth error', 'error');
-    showAuthError(error?.message || 'Google sign-in could not start. Please try again.');
-
-    if (button) {
-      button.disabled = false;
-      button.innerHTML = button.dataset.originalLabel || '<span class="google-g">G</span> Continue with Google';
-    }
+    showAuthError(error?.message || 'Google sign-in failed. Please try again.');
   }
 }
 
 
-
-function sleepAuth(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+function googleIdentityReady() {
+  return Boolean(window.google?.accounts?.id);
 }
 
-async function resolveAuthenticatedBrowserState() {
-  // OAuth callback parsing/persistence is owned by supabase-js.
-  // RosterCap then reconciles both local session storage and the
-  // server-verified user before deciding the browser is signed out.
-  const retryDelays = [0, 120, 320, 700];
-  let lastError = null;
+function renderGoogleSignInButton() {
+  const container = el('googleSignInButton');
+  if (!container || !googleIdentityReady()) return false;
 
-  for (const delay of retryDelays) {
-    if (delay) await sleepAuth(delay);
+  container.innerHTML = '';
 
-    try {
-      const { data: sessionData, error: sessionError } = await db.auth.getSession();
-      if (sessionError) lastError = sessionError;
+  window.google.accounts.id.initialize({
+    client_id: GOOGLE_WEB_CLIENT_ID,
+    callback: signInWithGoogle,
+    ux_mode: 'popup',
+    auto_select: false,
+    cancel_on_tap_outside: true
+  });
 
-      if (sessionData?.session?.user) {
-        return {
-          session: sessionData.session,
-          user: sessionData.session.user,
-          source: 'session',
-          error: null
-        };
-      }
-    } catch (error) {
-      lastError = error;
-    }
+  const availableWidth = Math.max(220, Math.min(400, container.clientWidth || 320));
 
-    try {
-      const { data: userData, error: userError } = await db.auth.getUser();
-      if (userError) {
-        lastError = userError;
-      } else if (userData?.user) {
-        // getUser() succeeding proves the current Supabase client has
-        // authenticated credentials. Ask for the full stored session again;
-        // if Safari has not exposed it yet, keep the verified user for UI state.
-        const { data: secondSessionData } = await db.auth.getSession();
-        return {
-          session: secondSessionData?.session || { user: userData.user },
-          user: userData.user,
-          source: secondSessionData?.session ? 'verified-user+session' : 'verified-user',
-          error: null
-        };
-      }
-    } catch (error) {
-      lastError = error;
-    }
+  window.google.accounts.id.renderButton(container, {
+    type: 'standard',
+    theme: 'outline',
+    size: 'large',
+    text: 'continue_with',
+    shape: 'rectangular',
+    logo_alignment: 'left',
+    width: availableWidth
+  });
+
+  container.classList.add('google-identity-ready');
+  return true;
+}
+
+async function initializeGoogleIdentity() {
+  const container = el('googleSignInButton');
+  if (!container) return;
+
+  container.innerHTML = '<div class="google-loading">Loading Google sign-in…</div>';
+
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if (renderGoogleSignInButton()) return;
+    await new Promise((resolve) => window.setTimeout(resolve, 100));
   }
 
-  return {
-    session: null,
-    user: null,
-    source: 'signed-out',
-    error: lastError
-  };
+  container.innerHTML = '';
+  showAuthError('Google sign-in could not load. Open RosterCap in Safari or Chrome and reload the page.');
 }
+
+
 
 async function signOut() {
   setCloudStatus('Signing out…', 'busy');
+
+  try {
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.disableAutoSelect();
+    }
+  } catch {
+    // Google UI cleanup is best-effort only.
+  }
+
   const { error } = await db.auth.signOut();
   if (error) return showAuthError(error.message);
+
   clearWorkspaceResumeState();
   session = null;
   state = emptyState();
@@ -158,20 +157,10 @@ function currentSignedInSurfaceVisible() {
 }
 
 async function handleSessionChange(nextSession, authEvent = '') {
-  const previousUserId = session?.user?.id || lastVerifiedAuthUser?.id || null;
-  const nextUser = nextSession?.user || null;
-
-  // A late/empty INITIAL_SESSION must not downgrade a browser that was
-  // already verified by getUser(). Explicit SIGNED_OUT still wins.
-  if (!nextUser && authEvent !== 'SIGNED_OUT' && lastVerifiedAuthUser?.id) {
-    setCloudStatus('Synced', '');
-    return;
-  }
-
+  const previousUserId = session?.user?.id || null;
   session = nextSession || null;
 
   if (!session?.user) {
-    lastVerifiedAuthUser = null;
     clearWorkspaceResumeState();
     state = emptyState();
     frontOfficeList = [];
@@ -180,8 +169,6 @@ async function handleSessionChange(nextSession, authEvent = '') {
     render();
     return;
   }
-
-  lastVerifiedAuthUser = session.user;
 
   const sameUser = Boolean(previousUserId && previousUserId === session.user.id);
   if (sameUser && authEvent !== 'INITIAL_SESSION' && currentSignedInSurfaceVisible()) {
