@@ -14,19 +14,16 @@ async function signInWithGoogle() {
   }
 
   try {
-    const { data, error } = await db.auth.signInWithOAuth({
+    const { error } = await db.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: SITE_URL,
-        skipBrowserRedirect: true
+        redirectTo: SITE_URL
       }
     });
 
+    // In a normal browser this call redirects away immediately.
+    // If it returns with an error, surface it.
     if (error) throw error;
-    if (!data?.url) throw new Error('Google sign-in could not create an authorization URL.');
-
-    // Explicit navigation is more reliable in iOS Safari / standalone web-app contexts.
-    window.location.assign(data.url);
   } catch (error) {
     console.error('Google OAuth start failed', error);
     setCloudStatus('Auth error', 'error');
@@ -37,6 +34,36 @@ async function signInWithGoogle() {
       button.innerHTML = button.dataset.originalLabel || '<span class="google-g">G</span> Continue with Google';
     }
   }
+}
+
+
+function readOAuthCallbackError() {
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const query = new URLSearchParams(window.location.search);
+
+  const errorCode =
+    hash.get('error_code') ||
+    query.get('error_code') ||
+    hash.get('error') ||
+    query.get('error');
+
+  const description =
+    hash.get('error_description') ||
+    query.get('error_description') ||
+    hash.get('error_description') ||
+    query.get('error_description');
+
+  if (!errorCode && !description) return null;
+
+  return {
+    code: errorCode || 'oauth_error',
+    description: (description || 'Google sign-in failed.').replace(/\+/g, ' ')
+  };
+}
+
+function clearOAuthCallbackErrorFromUrl() {
+  const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+  window.history.replaceState({}, document.title, cleanUrl);
 }
 
 async function signOut() {
