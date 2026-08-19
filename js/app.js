@@ -6,20 +6,37 @@ async function init() {
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
-  const { data, error } = await db.auth.getSession();
-
-  if (error) {
-    console.error('Initial Supabase session failed', error);
-    showAuthError(error.message || 'Unable to restore your RosterCap session.');
-  }
-
-  await handleSessionChange(data?.session || null, 'INITIAL_SESSION');
-
+  // Subscribe immediately so a callback event cannot be missed while the
+  // initial browser session is being reconciled.
   db.auth.onAuthStateChange((event, nextSession) => {
     window.setTimeout(async () => {
+      if (!authBootstrapResolved && !nextSession?.user && event === 'INITIAL_SESSION') {
+        return;
+      }
       await handleSessionChange(nextSession, event);
     }, 0);
   });
+
+  const resolved = await resolveAuthenticatedBrowserState();
+  authBootstrapResolved = true;
+
+  if (resolved.user) {
+    lastVerifiedAuthUser = resolved.user;
+    await handleSessionChange(
+      resolved.session || { user: resolved.user },
+      `BOOTSTRAP_${String(resolved.source || 'VERIFIED').toUpperCase()}`
+    );
+    return;
+  }
+
+  if (resolved.error && window.location.hash === '#') {
+    console.warn('OAuth returned but RosterCap could not reconcile the browser session', resolved.error);
+    showAuthError(
+      'Google sign-in completed, but this browser did not restore the RosterCap session. Please reload once and try again.'
+    );
+  }
+
+  await handleSessionChange(null, 'BOOTSTRAP_SIGNED_OUT');
 }
 
 function bindEvents() {
