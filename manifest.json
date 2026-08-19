@@ -1,5 +1,5 @@
 {
-  "version": "2.32",
+  "version": "2.33",
   "backendBaseline": "2.31",
   "css": [
     "css/base.css",
@@ -30,5 +30,6 @@
     "js/app.js"
   ],
   "productName": "RosterCap",
-  "productDescription": "Fantasy Front Office"
+  "productDescription": "Fantasy Front Office",
+  "supabaseJsVersion": "2.111.0"
 }
