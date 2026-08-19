@@ -3,15 +3,39 @@
 // Authentication, Supabase loading and cloud persistence helpers.
 
 async function signInWithGoogle() {
+  const button = el('googleSignInBtn');
   showAuthError('');
-  setCloudStatus('Redirecting…', 'busy');
-  const { error } = await db.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: SITE_URL }
-  });
-  if (error) {
+  setCloudStatus('Opening Google…', 'busy');
+
+  if (button) {
+    button.disabled = true;
+    button.dataset.originalLabel = button.innerHTML;
+    button.innerHTML = '<span class="google-g">G</span> Opening Google…';
+  }
+
+  try {
+    const { data, error } = await db.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: SITE_URL,
+        skipBrowserRedirect: true
+      }
+    });
+
+    if (error) throw error;
+    if (!data?.url) throw new Error('Google sign-in could not create an authorization URL.');
+
+    // Explicit navigation is more reliable in iOS Safari / standalone web-app contexts.
+    window.location.assign(data.url);
+  } catch (error) {
+    console.error('Google OAuth start failed', error);
     setCloudStatus('Auth error', 'error');
-    showAuthError(error.message);
+    showAuthError(error?.message || 'Google sign-in could not start. Please try again.');
+
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = button.dataset.originalLabel || '<span class="google-g">G</span> Continue with Google';
+    }
   }
 }
 
