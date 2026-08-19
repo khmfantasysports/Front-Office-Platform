@@ -84,6 +84,11 @@ async function initializeGoogleIdentity() {
 
 
 
+// Allow the Google Identity Services script's onload callback to render
+// the button even when GIS finishes after RosterCap's initial bootstrap.
+window.initializeGoogleIdentity = initializeGoogleIdentity;
+
+
 async function signOut() {
   setCloudStatus('Signing out…', 'busy');
 
