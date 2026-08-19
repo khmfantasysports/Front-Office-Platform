@@ -1,6 +1,8 @@
 'use strict';
 
-// RosterCap V2.31 — platform/team identity.
+window.__ROSTERCAP_IDENTITY_LOADED__ = true;
+
+// RosterCap V2.39 — platform/team identity.
 // Team accent is decorative. Platform interaction and semantic state colours stay independent.
 
 const TEAM_LOGO_BUCKET = 'front-office-logos';
