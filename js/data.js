@@ -115,11 +115,11 @@ async function handleSessionChange(nextSession, authEvent = '') {
 async function loadFrontOffices(showPicker = true) {
   await runCloudAction(async () => {
     const { data, error } = await db.from('front_offices')
-      .select('front_office_id,team_name,league_name,sport,currency_code,roster_limit,minors_limit,updated_at')
+      .select('front_office_id,team_name,league_name,sport,currency_code,roster_limit,minors_limit,team_logo_path,team_accent_color,updated_at')
       .eq('is_archived', false)
       .order('updated_at', { ascending: false });
     if (error) throw error;
-    frontOfficeList = data || [];
+    frontOfficeList = await hydrateFrontOfficeBranding(data || []);
     if (showPicker) {
       state = emptyState();
       showOfficePicker(false);
@@ -132,6 +132,7 @@ function showOfficePicker(shouldReload = true, clearResume = true) {
   if (clearResume) clearWorkspaceResumeState();
   state = emptyState();
   activeView = 'overview';
+  resetTeamIdentityTheme();
   depthEditMode = false;
   depthDraftOrder = [];
   authGate.classList.add('hidden');
@@ -152,6 +153,7 @@ function showCreateOffice() {
   clearWorkspaceResumeState();
   state = emptyState();
   activeView = 'overview';
+  resetTeamIdentityTheme();
   officePicker.classList.add('hidden');
   workspace.classList.add('hidden');
   el('workspaceNav').classList.add('hidden');
@@ -172,18 +174,18 @@ function renderOfficeList() {
   const countLabel = el('officeCountLabel');
   if (countLabel) countLabel.textContent = frontOfficeList.length;
   if (!frontOfficeList.length) {
-    list.innerHTML = `<div class="office-empty-state"><div class="office-empty-mark">FO</div><h3>No Front Offices yet</h3><p>Create your first private workspace to start managing a roster, contracts and cap.</p></div>`;
+    list.innerHTML = `<div class="office-empty-state"><div class="office-empty-mark office-empty-mark-v231"><img src="./assets/rostercap-mark.svg" alt="" /></div><h3>No Front Offices yet</h3><p>Create your first private workspace to start managing a roster, contracts and cap.</p></div>`;
     return;
   }
   list.innerHTML = frontOfficeList.map((office) => {
-    const initials = String(office.team_name || 'FO').split(/\s+/).filter(Boolean).slice(0,2).map((part) => part[0]).join('').toUpperCase();
     const updated = office.updated_at ? formatDateTime(office.updated_at) : 'Recently';
     const rosterText = office.roster_limit === null || office.roster_limit === undefined ? 'Flexible roster' : `${office.roster_limit} active spots`;
     const minorsText = office.minors_limit === null || office.minors_limit === undefined ? null : `${office.minors_limit} minors spots`;
     const meta = [rosterText, minorsText, office.currency_code || 'USD'].filter(Boolean).join(' · ');
+    const teamAccent = normalizeTeamAccent(office.team_accent_color);
     return `
-    <button class="office-card office-card-v219" type="button" data-open-office="${office.front_office_id}">
-      <span class="office-card-mark">${escapeHtml(initials || 'FO')}</span>
+    <button class="office-card office-card-v219 office-card-v231" style="--office-team-accent:${teamAccent}" type="button" data-open-office="${office.front_office_id}">
+      <span class="office-card-mark office-card-mark-v231">${teamLogoInnerHtml({ url:office.team_logo_url, teamName:office.team_name, alt:`${office.team_name} logo` })}</span>
       <span class="office-card-copy"><span class="office-card-topline"><span class="office-sport-chip">${escapeHtml(office.sport || 'NHL')}</span><span class="office-updated">Updated ${escapeHtml(updated)}</span></span><strong>${escapeHtml(office.team_name)}</strong><small>${escapeHtml(office.league_name)}</small><span class="office-card-meta">${escapeHtml(meta)}</span></span>
       <span class="office-open-v219" aria-hidden="true">›</span>
     </button>`;
@@ -219,12 +221,18 @@ async function deleteCurrentFrontOffice() {
     deleteButton.textContent = 'Deleting…';
   }
 
+  const logoPath = office.teamLogoPath || null;
   try {
     const deleted = await runCloudAction(async () => {
       const { error } = await db.rpc('delete_front_office_v1', {
         p_front_office_id: office.id
       });
       if (error) throw error;
+
+      if (logoPath) {
+        const { error: logoDeleteError } = await db.storage.from(TEAM_LOGO_BUCKET).remove([logoPath]);
+        if (logoDeleteError) console.warn('Deleted Front Office logo object could not be removed', logoDeleteError);
+      }
 
       clearWorkspaceResumeState();
       state = emptyState();
@@ -351,6 +359,9 @@ async function loadOffice(frontOfficeId, showBusy = true) {
       currency: office.currency_code,
       rosterLimit: office.roster_limit,
       minorsLimit: office.minors_limit === null || office.minors_limit === undefined ? null : Number(office.minors_limit),
+      teamLogoPath: office.team_logo_path || null,
+      teamLogoUrl: await signedTeamLogoUrl(office.team_logo_path),
+      teamAccentColor: normalizeTeamAccent(office.team_accent_color),
       waiverPenaltyMode: office.waiver_penalty_mode || 'NONE',
       waiverPenaltyValue: office.waiver_penalty_value === null || office.waiver_penalty_value === undefined ? null : Number(office.waiver_penalty_value),
       waiverPenaltyScope: office.waiver_penalty_scope || 'CURRENT_SEASON',
