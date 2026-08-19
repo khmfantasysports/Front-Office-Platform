@@ -1,5 +1,5 @@
 {
-  "version": "2.33",
+  "version": "2.35",
   "backendBaseline": "2.31",
   "css": [
     "css/base.css",
@@ -31,5 +31,8 @@
   ],
   "productName": "RosterCap",
   "productDescription": "Fantasy Front Office",
-  "supabaseJsVersion": "2.111.0"
+  "supabaseJsVersion": "2.111.0",
+  "authStrategy": "standard-supabase-browser-oauth",
+  "authStorageKey": "rostercap-auth-token",
+  "authRedirectCurrent": "https://khmfantasysports.github.io/Front-Office-Platform/"
 }
