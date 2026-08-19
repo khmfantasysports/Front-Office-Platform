@@ -35,6 +35,66 @@ async function signInWithGoogle() {
 }
 
 
+
+function sleepAuth(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function resolveAuthenticatedBrowserState() {
+  // OAuth callback parsing/persistence is owned by supabase-js.
+  // RosterCap then reconciles both local session storage and the
+  // server-verified user before deciding the browser is signed out.
+  const retryDelays = [0, 120, 320, 700];
+  let lastError = null;
+
+  for (const delay of retryDelays) {
+    if (delay) await sleepAuth(delay);
+
+    try {
+      const { data: sessionData, error: sessionError } = await db.auth.getSession();
+      if (sessionError) lastError = sessionError;
+
+      if (sessionData?.session?.user) {
+        return {
+          session: sessionData.session,
+          user: sessionData.session.user,
+          source: 'session',
+          error: null
+        };
+      }
+    } catch (error) {
+      lastError = error;
+    }
+
+    try {
+      const { data: userData, error: userError } = await db.auth.getUser();
+      if (userError) {
+        lastError = userError;
+      } else if (userData?.user) {
+        // getUser() succeeding proves the current Supabase client has
+        // authenticated credentials. Ask for the full stored session again;
+        // if Safari has not exposed it yet, keep the verified user for UI state.
+        const { data: secondSessionData } = await db.auth.getSession();
+        return {
+          session: secondSessionData?.session || { user: userData.user },
+          user: userData.user,
+          source: secondSessionData?.session ? 'verified-user+session' : 'verified-user',
+          error: null
+        };
+      }
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  return {
+    session: null,
+    user: null,
+    source: 'signed-out',
+    error: lastError
+  };
+}
+
 async function signOut() {
   setCloudStatus('Signing out…', 'busy');
   const { error } = await db.auth.signOut();
@@ -98,10 +158,20 @@ function currentSignedInSurfaceVisible() {
 }
 
 async function handleSessionChange(nextSession, authEvent = '') {
-  const previousUserId = session?.user?.id || null;
+  const previousUserId = session?.user?.id || lastVerifiedAuthUser?.id || null;
+  const nextUser = nextSession?.user || null;
+
+  // A late/empty INITIAL_SESSION must not downgrade a browser that was
+  // already verified by getUser(). Explicit SIGNED_OUT still wins.
+  if (!nextUser && authEvent !== 'SIGNED_OUT' && lastVerifiedAuthUser?.id) {
+    setCloudStatus('Synced', '');
+    return;
+  }
+
   session = nextSession || null;
 
   if (!session?.user) {
+    lastVerifiedAuthUser = null;
     clearWorkspaceResumeState();
     state = emptyState();
     frontOfficeList = [];
@@ -110,6 +180,8 @@ async function handleSessionChange(nextSession, authEvent = '') {
     render();
     return;
   }
+
+  lastVerifiedAuthUser = session.user;
 
   const sameUser = Boolean(previousUserId && previousUserId === session.user.id);
   if (sameUser && authEvent !== 'INITIAL_SESSION' && currentSignedInSurfaceVisible()) {
