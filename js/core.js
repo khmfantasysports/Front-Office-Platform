@@ -1,6 +1,6 @@
 'use strict';
 
-// RosterCap v2.41 — shared application state, auth client, and Team Identity.
+// RosterCap v2.42 — shared application state, auth client, and Team Identity.
 function emptyState() {
   return {
     frontOffice: null,
@@ -29,7 +29,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, 
   }
 });
 
-const APP_VERSION = '2.41';
+const APP_VERSION = '2.42';
 const DEFAULT_STATUSES = [];
 const WORKSPACE_RESUME_KEY = 'fantasy-front-office-workspace-v1';
 const WORKSPACE_VIEWS = ['overview','roster','farm','assets','cap','transactions','settings'];
@@ -157,6 +157,72 @@ function applyTeamIdentityToShell() {
   }
 }
 
+
+function syncFrontOfficeIdentityCache() {
+  if (!state.frontOffice) return;
+  const office = frontOfficeList.find((item) => item.front_office_id === state.frontOffice.id);
+  if (!office) return;
+  office.team_logo_path = state.frontOffice.teamLogoPath || null;
+  office.team_logo_url = state.frontOffice.teamLogoUrl || null;
+  office.team_accent_color = normalizeTeamAccent(state.frontOffice.teamAccentColor);
+}
+
+function setTeamIdentityStatus(message = '', mode = '') {
+  const node = el('teamIdentityStatus');
+  if (!node) return;
+  node.textContent = message;
+  node.classList.toggle('is-saving', mode === 'saving');
+  node.classList.toggle('is-success', mode === 'success');
+  node.classList.toggle('is-error', mode === 'error');
+  node.classList.toggle('hidden', !message);
+}
+
+function updateTeamIdentityAccentUi(value) {
+  const accent = normalizeTeamAccent(value);
+  const preview = el('teamIdentityPreview');
+  if (preview) preview.style.setProperty('--preview-team-accent', accent);
+
+  document.querySelectorAll('[data-team-accent]').forEach((button) => {
+    button.classList.toggle('active', normalizeTeamAccent(button.dataset.teamAccent) === accent);
+  });
+
+  const custom = el('customTeamAccent');
+  if (custom && custom.value.toUpperCase() !== accent) custom.value = accent;
+
+  const code = el('customTeamAccentCode');
+  if (code) code.textContent = accent;
+}
+
+function updateTeamIdentityLogoUi(url = null) {
+  if (!state.frontOffice) return;
+  const preview = el('teamIdentityPreviewLogo');
+  if (preview) {
+    preview.innerHTML = teamLogoInnerHtml({
+      url,
+      teamName: state.frontOffice.teamName,
+      alt: `${state.frontOffice.teamName} logo preview`
+    });
+    preview.classList.toggle('has-image', Boolean(url));
+  }
+
+  const remove = el('removeTeamLogoBtn');
+  if (remove) {
+    remove.classList.toggle('hidden', !state.frontOffice.teamLogoPath);
+    remove.disabled = !state.frontOffice.teamLogoPath;
+  }
+
+  const label = el('teamLogoFileLabel');
+  if (label) label.textContent = state.frontOffice.teamLogoPath ? 'Choose replacement' : 'Choose logo';
+}
+
+async function currentAuthenticatedUserId() {
+  if (session?.user?.id) return session.user.id;
+  const { data, error } = await db.auth.getUser();
+  if (error) throw error;
+  if (!data?.user?.id) throw new Error('Your RosterCap session is not available. Sign in again and retry.');
+  return data.user.id;
+}
+
 function renderTeamIdentitySettings() {
   const office = state.frontOffice;
   const accent = normalizeTeamAccent(office.teamAccentColor);
@@ -174,49 +240,62 @@ function renderTeamIdentitySettings() {
     <summary>
       <span class="settings-disclosure-title">
         <strong>Team Identity</strong>
-        <span>Logo and one team accent colour</span>
+        <span>Logo and accent across your workspace</span>
       </span>
     </summary>
     <div class="settings-disclosure-body">
-      <div class="team-identity-layout">
-        <div class="team-identity-preview" style="--preview-team-accent:${accent}">
+      <div class="team-identity-layout team-identity-layout-v242">
+        <div class="team-identity-preview" id="teamIdentityPreview" style="--preview-team-accent:${accent}">
           <div class="team-identity-preview-logo ${office.teamLogoUrl ? 'has-image' : ''}" id="teamIdentityPreviewLogo">
             ${teamLogoInnerHtml({ url: office.teamLogoUrl, teamName: office.teamName, alt: `${office.teamName} logo preview` })}
           </div>
           <div class="team-identity-preview-copy">
+            <span class="team-identity-preview-label">Workspace preview</span>
             <strong>${escapeHtml(office.teamName)}</strong>
             <span>${escapeHtml(office.leagueName)} · ${escapeHtml(office.sport || 'NHL')}</span>
           </div>
         </div>
 
-        <div class="team-logo-controls">
-          <div>
-            <strong>Team logo</strong>
-            <p>PNG, JPG or WebP. Square artwork works best. Maximum 2 MB.</p>
-          </div>
-          <label class="team-logo-file">
-            <span id="teamLogoFileLabel">${office.teamLogoPath ? 'Choose replacement' : 'Choose logo'}</span>
-            <input id="teamLogoFile" type="file" accept="image/png,image/jpeg,image/webp" />
-          </label>
-          <div class="team-logo-actions">
-            <button id="uploadTeamLogoBtn" class="btn btn-primary btn-small" type="button">Upload Logo</button>
-            ${office.teamLogoPath ? '<button id="removeTeamLogoBtn" class="btn btn-ghost btn-small" type="button">Remove</button>' : ''}
-          </div>
-        </div>
+        <div class="team-identity-control-stack">
+          <section class="team-identity-control-card">
+            <div class="team-identity-control-head">
+              <div>
+                <strong>Team logo</strong>
+                <p>PNG, JPG or WebP · maximum 2 MB. Square artwork works best.</p>
+              </div>
+            </div>
 
-        <div class="team-accent-controls">
-          <div>
-            <strong>Team accent</strong>
-            <p>Used for team-specific trim and identity. Cap-health colours remain unchanged.</p>
-          </div>
-          <div class="team-accent-row">${swatches}</div>
-          <label class="team-custom-accent">
-            Custom
-            <input id="customTeamAccent" type="color" value="${escapeAttr(accent)}" />
-            <code>${escapeHtml(accent)}</code>
-          </label>
+            <label class="team-logo-file">
+              <span id="teamLogoFileLabel">${office.teamLogoPath ? 'Choose replacement' : 'Choose logo'}</span>
+              <input id="teamLogoFile" type="file" accept="image/png,image/jpeg,image/webp" />
+            </label>
+
+            <div class="team-logo-actions">
+              <button id="uploadTeamLogoBtn" class="btn btn-primary btn-small" type="button" disabled>Save Logo</button>
+              <button id="removeTeamLogoBtn" class="btn btn-ghost btn-small ${office.teamLogoPath ? '' : 'hidden'}" type="button" ${office.teamLogoPath ? '' : 'disabled'}>Remove</button>
+            </div>
+          </section>
+
+          <section class="team-identity-control-card">
+            <div class="team-identity-control-head">
+              <div>
+                <strong>Team accent</strong>
+                <p>Used for team trim only. Cap-health and warning colours stay unchanged.</p>
+              </div>
+            </div>
+
+            <div class="team-accent-row">${swatches}</div>
+
+            <label class="team-custom-accent">
+              <span>Custom colour</span>
+              <input id="customTeamAccent" type="color" value="${escapeAttr(accent)}" />
+              <code id="customTeamAccentCode">${escapeHtml(accent)}</code>
+            </label>
+          </section>
         </div>
       </div>
+
+      <div id="teamIdentityStatus" class="team-identity-status hidden" role="status" aria-live="polite"></div>
     </div>
   </details>`;
 }
@@ -224,81 +303,141 @@ function renderTeamIdentitySettings() {
 function bindTeamIdentitySettings() {
   const input = el('teamLogoFile');
   const label = el('teamLogoFileLabel');
+  const upload = el('uploadTeamLogoBtn');
+
   if (input && label) {
     input.addEventListener('change', () => {
-      const file = input.files?.[0];
+      const file = input.files?.[0] || null;
       label.textContent = file?.name || (state.frontOffice.teamLogoPath ? 'Choose replacement' : 'Choose logo');
-      if (!file) return;
+      if (upload) upload.disabled = !file;
+      setTeamIdentityStatus('');
 
-      const preview = el('teamIdentityPreviewLogo');
-      if (!preview) return;
+      if (window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__) {
+        URL.revokeObjectURL(window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__);
+        window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__ = null;
+      }
+
+      if (!file) {
+        updateTeamIdentityLogoUi(state.frontOffice.teamLogoUrl);
+        return;
+      }
+
+      const allowed = new Set(['image/png','image/jpeg','image/webp']);
+      if (!allowed.has(file.type)) {
+        setTeamIdentityStatus('Choose a PNG, JPG or WebP image.', 'error');
+        input.value = '';
+        upload.disabled = true;
+        updateTeamIdentityLogoUi(state.frontOffice.teamLogoUrl);
+        return;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        setTeamIdentityStatus('Logo must be 2 MB or smaller.', 'error');
+        input.value = '';
+        upload.disabled = true;
+        updateTeamIdentityLogoUi(state.frontOffice.teamLogoUrl);
+        return;
+      }
+
       const objectUrl = URL.createObjectURL(file);
-      preview.innerHTML = `<img src="${escapeAttr(objectUrl)}" alt="Selected logo preview" />`;
-      preview.classList.add('has-image');
+      window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__ = objectUrl;
+      const preview = el('teamIdentityPreviewLogo');
+      if (preview) {
+        preview.innerHTML = `<img src="${escapeAttr(objectUrl)}" alt="Selected logo preview" />`;
+        preview.classList.add('has-image');
+      }
     });
   }
 
-  if (el('uploadTeamLogoBtn')) {
-    el('uploadTeamLogoBtn').addEventListener('click', uploadTeamLogo);
-  }
-  if (el('removeTeamLogoBtn')) {
-    el('removeTeamLogoBtn').addEventListener('click', removeTeamLogo);
-  }
+  if (upload) upload.addEventListener('click', uploadTeamLogo);
+
+  const remove = el('removeTeamLogoBtn');
+  if (remove) remove.addEventListener('click', removeTeamLogo);
 
   document.querySelectorAll('[data-team-accent]').forEach((button) => {
-    button.addEventListener('click', () => saveTeamAccent(button.dataset.teamAccent));
+    button.addEventListener('click', async () => {
+      updateTeamIdentityAccentUi(button.dataset.teamAccent);
+      await saveTeamAccent(button.dataset.teamAccent);
+    });
   });
 
-  if (el('customTeamAccent')) {
-    el('customTeamAccent').addEventListener('change', () => saveTeamAccent(el('customTeamAccent').value));
+  const custom = el('customTeamAccent');
+  if (custom) {
+    custom.addEventListener('input', () => updateTeamIdentityAccentUi(custom.value));
+    custom.addEventListener('change', () => saveTeamAccent(custom.value));
   }
 }
 
 async function saveTeamAccent(value) {
   const accent = normalizeTeamAccent(value);
+  const previousAccent = normalizeTeamAccent(state.frontOffice.teamAccentColor);
+
+  updateTeamIdentityAccentUi(accent);
+  setTeamIdentityStatus('Saving accent…', 'saving');
+
   const success = await runCloudAction(async () => {
     const { error } = await db.from('front_offices')
       .update({ team_accent_color: accent })
       .eq('front_office_id', state.frontOffice.id);
     if (error) throw error;
+
     state.frontOffice.teamAccentColor = accent;
+    syncFrontOfficeIdentityCache();
+    setTeamAccent(accent);
+    applyTeamIdentityToShell();
     state.activity.unshift(activity('Updated team accent'));
   });
-  if (success) render();
+
+  if (!success) {
+    updateTeamIdentityAccentUi(previousAccent);
+    setTeamAccent(previousAccent);
+    setTeamIdentityStatus('Accent could not be saved.', 'error');
+    return;
+  }
+
+  updateTeamIdentityAccentUi(accent);
+  setTeamIdentityStatus('Accent saved.', 'success');
 }
 
 async function uploadTeamLogo() {
   const input = el('teamLogoFile');
   const file = input?.files?.[0];
+  const button = el('uploadTeamLogoBtn');
+
   if (!file) {
-    alert('Choose a PNG, JPG or WebP logo first.');
+    setTeamIdentityStatus('Choose a logo first.', 'error');
     return;
   }
 
   const allowed = new Set(['image/png','image/jpeg','image/webp']);
   if (!allowed.has(file.type)) {
-    alert('Team logos must be PNG, JPG or WebP.');
+    setTeamIdentityStatus('Team logos must be PNG, JPG or WebP.', 'error');
     return;
   }
   if (file.size > 2 * 1024 * 1024) {
-    alert('Team logo must be 2 MB or smaller.');
+    setTeamIdentityStatus('Team logo must be 2 MB or smaller.', 'error');
     return;
   }
 
   const oldPath = state.frontOffice.teamLogoPath || null;
-  const extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const path = `${state.frontOffice.id}/${session.user.id}/team-logo-${Date.now()}.${extension}`;
-  const button = el('uploadTeamLogoBtn');
+
   if (button) {
     button.disabled = true;
-    button.textContent = 'Uploading…';
+    button.textContent = 'Saving…';
   }
+  setTeamIdentityStatus('Uploading logo…', 'saving');
+
+  let newPath = null;
 
   try {
+    const userId = await currentAuthenticatedUserId();
+    const extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    newPath = `${state.frontOffice.id}/${userId}/team-logo-${Date.now()}.${extension}`;
+
     const success = await runCloudAction(async () => {
       const { error: uploadError } = await db.storage
         .from(TEAM_LOGO_BUCKET)
-        .upload(path, file, {
+        .upload(newPath, file, {
           cacheControl: '3600',
           upsert: false,
           contentType: file.type
@@ -306,37 +445,61 @@ async function uploadTeamLogo() {
       if (uploadError) throw uploadError;
 
       const { error: updateError } = await db.from('front_offices')
-        .update({ team_logo_path: path })
+        .update({ team_logo_path: newPath })
         .eq('front_office_id', state.frontOffice.id);
       if (updateError) {
-        await db.storage.from(TEAM_LOGO_BUCKET).remove([path]);
+        await db.storage.from(TEAM_LOGO_BUCKET).remove([newPath]);
         throw updateError;
       }
 
-      const signedUrl = await signedTeamLogoUrl(path);
-      state.frontOffice.teamLogoPath = path;
+      const signedUrl = await signedTeamLogoUrl(newPath);
+
+      state.frontOffice.teamLogoPath = newPath;
       state.frontOffice.teamLogoUrl = signedUrl;
+      syncFrontOfficeIdentityCache();
+      applyTeamIdentityToShell();
       state.activity.unshift(activity('Updated team logo'));
 
-      if (oldPath && oldPath !== path) {
+      if (oldPath && oldPath !== newPath) {
         const { error: removeError } = await db.storage.from(TEAM_LOGO_BUCKET).remove([oldPath]);
         if (removeError) console.warn('Old logo could not be removed', removeError);
       }
     });
 
-    if (success) render();
-  } finally {
-    if (el('uploadTeamLogoBtn')) {
-      el('uploadTeamLogoBtn').disabled = false;
-      el('uploadTeamLogoBtn').textContent = 'Upload Logo';
+    if (!success) {
+      setTeamIdentityStatus('Logo could not be saved.', 'error');
+      return;
     }
+
+    if (window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__) {
+      URL.revokeObjectURL(window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__);
+      window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__ = null;
+    }
+
+    if (input) input.value = '';
+    if (button) button.disabled = true;
+    updateTeamIdentityLogoUi(state.frontOffice.teamLogoUrl);
+    setTeamIdentityStatus('Logo saved.', 'success');
+  } catch (error) {
+    console.error('Team logo save failed', error);
+    setCloudStatus('Save error', 'error');
+    setTeamIdentityStatus(error?.message || 'Logo could not be saved.', 'error');
+  } finally {
+    if (button) button.textContent = 'Save Logo';
   }
 }
 
 async function removeTeamLogo() {
   const oldPath = state.frontOffice.teamLogoPath;
   if (!oldPath) return;
-  if (!confirm('Remove this team logo? The initials fallback will be used instead.')) return;
+  if (!confirm('Remove this team logo? Team initials will be used instead.')) return;
+
+  const button = el('removeTeamLogoBtn');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Removing…';
+  }
+  setTeamIdentityStatus('Removing logo…', 'saving');
 
   const success = await runCloudAction(async () => {
     const { error } = await db.from('front_offices')
@@ -349,8 +512,28 @@ async function removeTeamLogo() {
 
     state.frontOffice.teamLogoPath = null;
     state.frontOffice.teamLogoUrl = null;
+    syncFrontOfficeIdentityCache();
+    applyTeamIdentityToShell();
     state.activity.unshift(activity('Removed team logo'));
   });
 
-  if (success) render();
+  if (!success) {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Remove';
+    }
+    setTeamIdentityStatus('Logo could not be removed.', 'error');
+    return;
+  }
+
+  const input = el('teamLogoFile');
+  if (input) input.value = '';
+
+  if (window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__) {
+    URL.revokeObjectURL(window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__);
+    window.__ROSTERCAP_TEAM_LOGO_PREVIEW_URL__ = null;
+  }
+
+  updateTeamIdentityLogoUi(null);
+  setTeamIdentityStatus('Logo removed. Team initials are now being used.', 'success');
 }
