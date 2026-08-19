@@ -112,7 +112,10 @@ async function handleCreateFrontOffice(event) {
 }
 
 function render() {
+  const appHeader = el('appHeader');
+
   if (!session?.user) {
+    if (appHeader) appHeader.classList.add('hidden');
     authGate.classList.remove('hidden');
     officePicker.classList.add('hidden');
     onboarding.classList.add('hidden');
@@ -124,6 +127,7 @@ function render() {
     return;
   }
 
+  if (appHeader) appHeader.classList.remove('hidden');
   el('topbarActions').classList.remove('hidden');
   el('userEmail').textContent = session.user.email || session.user.user_metadata?.full_name || 'Signed in';
   authGate.classList.add('hidden');
