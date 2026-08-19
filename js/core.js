@@ -1,6 +1,6 @@
 'use strict';
 
-// RosterCap v2.32 — shared application state and DOM handles.
+// RosterCap v2.33 — shared application state and DOM handles.
 function emptyState() {
   return {
     frontOffice: null,
@@ -20,10 +20,10 @@ const SUPABASE_URL = 'https://gmkmmocunrckiqwwhxhv.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vU3vgT3e10spDzXPiva_Nw__TJy-HT7';
 const SITE_URL = 'https://khmfantasysports.github.io/Front-Office-Platform/';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: 'implicit' }
 });
 
-const APP_VERSION = '2.32';
+const APP_VERSION = '2.33';
 const DEFAULT_STATUSES = [];
 const WORKSPACE_RESUME_KEY = 'fantasy-front-office-workspace-v1';
 const WORKSPACE_VIEWS = ['overview','roster','farm','assets','cap','transactions','settings'];
