@@ -3,6 +3,14 @@
 // Application bootstrap, global navigation and top-level rendering.
 
 async function init() {
+  if (!window.__ROSTERCAP_IDENTITY_LOADED__) {
+    const message = 'RosterCap could not load its Team Identity module. Refresh once after the latest GitHub deployment.';
+    console.error(message);
+    showAuthError(message);
+    setCloudStatus('Load error', 'error');
+    return;
+  }
+
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
