@@ -1,5 +1,5 @@
 {
-  "version": "2.37",
+  "version": "2.38",
   "backendBaseline": "2.31",
   "css": [
     "css/base.css",
@@ -32,9 +32,10 @@
   "productName": "RosterCap",
   "productDescription": "Fantasy Front Office",
   "supabaseJsVersion": "2.111.0",
-  "authStrategy": "supabase-oauth-session-plus-verified-user-reconciliation",
+  "authStrategy": "google-identity-services-id-token",
   "authStorageKey": "rostercap-auth-token",
   "authRedirectCurrent": "https://khmfantasysports.github.io/Front-Office-Platform/",
   "frontendCacheStrategy": "versioned-local-assets",
-  "assetVersion": "20260819-v237-auth-reconcile"
+  "assetVersion": "20260819-v238-direct-google",
+  "googleWebClientId": "417912628397-5754anrl89bgjo27an5ni32lncdd3lm8.apps.googleusercontent.com"
 }
