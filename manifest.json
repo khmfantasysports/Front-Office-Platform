@@ -1,6 +1,6 @@
 {
-  "version": "2.30",
-  "backendBaseline": "2.29",
+  "version": "2.31",
+  "backendBaseline": "2.31",
   "css": [
     "css/base.css",
     "css/shell.css",
@@ -8,12 +8,14 @@
     "css/depth-chart.css",
     "css/assets-landing.css",
     "css/overview-cap.css",
-    "css/transactions.css"
+    "css/transactions.css",
+    "css/identity.css"
   ],
   "js": [
     "js/core.js",
     "js/utils.js",
     "js/domain.js",
+    "js/features/identity.js",
     "js/data.js",
     "js/pages/overview.js",
     "js/features/depth-chart.js",
@@ -26,5 +28,7 @@
     "js/pages/cap.js",
     "js/pages/settings.js",
     "js/app.js"
-  ]
+  ],
+  "productName": "RosterCap",
+  "productDescription": "Fantasy Front Office"
 }
