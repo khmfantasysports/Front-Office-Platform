@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">RosterCap</title>
+  <defs>
+    <linearGradient id="bg" x1="6" y1="4" x2="59" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#12324A"/>
+      <stop offset="1" stop-color="#08131D"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="33" y1="14" x2="57" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#73D7FF"/>
+      <stop offset="1" stop-color="#1AA8FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bg)" stroke="#32ADFF" stroke-width="2"/>
+  <path fill="#F7F9FC" d="M9 49V15h15c7 0 10.8 3.8 10.8 10 0 4.6-2.3 7.8-6.6 9.4L37 49h-8.2l-7.4-12.1h-5V49H9Zm7.4-19h7.9c2.6 0 4-1.5 4-4.3 0-2.6-1.4-4-4-4h-7.9V30Z"/>
+  <path fill="url(#cyan)" d="M56 15H46c-8.6 0-13.8 6.3-13.8 17s5.2 17 13.8 17h10v-7.2h-9.3c-4.5 0-7-3.4-7-9.8s2.5-9.8 7-9.8H56V15Z"/>
+  <path d="M9 54h18" stroke="#32ADFF" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M9 58h12" stroke="#32ADFF" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+</svg>
