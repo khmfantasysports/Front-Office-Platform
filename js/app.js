@@ -6,18 +6,14 @@ async function init() {
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
-  const callbackError = readOAuthCallbackError();
-
   const { data, error } = await db.auth.getSession();
-  if (error) showAuthError(error.message);
+
+  if (error) {
+    console.error('Initial Supabase session failed', error);
+    showAuthError(error.message || 'Unable to restore your RosterCap session.');
+  }
 
   await handleSessionChange(data?.session || null, 'INITIAL_SESSION');
-
-  if (callbackError && !data?.session) {
-    showAuthError(`Google sign-in failed: ${callbackError.description}`);
-    setCloudStatus('Auth error', 'error');
-    clearOAuthCallbackErrorFromUrl();
-  }
 
   db.auth.onAuthStateChange((event, nextSession) => {
     window.setTimeout(async () => {
