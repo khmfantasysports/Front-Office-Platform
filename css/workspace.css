@@ -3832,3 +3832,301 @@
     padding:7px 8px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.59 — Transaction History Polish
+   ============================================================ */
+
+/* The old KPI summary is intentionally retired. Counts now live
+   inside the history filters where they are actionable. */
+#transactionsView .tx-summary-grid-v228 {
+  display:none !important;
+}
+
+#transactionsView .tx-history-toolbar-v259 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+}
+
+#transactionsView .tx-history-filters-v259 {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:1px 1px 3px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+#transactionsView .tx-history-filters-v259::-webkit-scrollbar {
+  display:none;
+}
+
+#transactionsView .tx-history-filter-v259 {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  flex:0 0 auto;
+  min-height:30px;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(13,24,34,.78);
+  color:var(--muted);
+  font-size:.59rem;
+  font-weight:850;
+  line-height:1;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+#transactionsView .tx-history-filter-v259 strong {
+  display:grid;
+  place-items:center;
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  color:#C9D7E3;
+  font-size:.52rem;
+  font-weight:950;
+}
+
+#transactionsView .tx-history-filter-v259:hover,
+#transactionsView .tx-history-filter-v259:focus-visible {
+  border-color:rgba(119,201,255,.36);
+  color:#DCEBFA;
+  outline:none;
+}
+
+#transactionsView .tx-history-filter-v259.active {
+  border-color:rgba(50,173,255,.40);
+  background:rgba(50,173,255,.10);
+  color:#D9EEFF;
+}
+
+#transactionsView .tx-history-filter-v259.active strong {
+  background:rgba(50,173,255,.17);
+  color:#A9D9FF;
+}
+
+#transactionsView .tx-history-status-v259 {
+  flex:0 0 auto;
+  color:var(--muted);
+  font-size:.55rem;
+  font-weight:750;
+  white-space:nowrap;
+}
+
+/* Cards: smaller, but keep the ledger-box visual language. */
+#transactionsView .transaction-list-v228 {
+  gap:4px;
+}
+
+#transactionsView .transaction-card-v228 {
+  padding:6px 8px;
+  border-radius:9px;
+}
+
+#transactionsView .transaction-card-v228[hidden] {
+  display:none !important;
+}
+
+#transactionsView .tx-ledger-head-v228 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:7px;
+}
+
+#transactionsView .tx-ledger-title-v228 .transaction-type {
+  font-size:.49rem;
+  line-height:1.05;
+}
+
+#transactionsView .tx-ledger-title-v228 h4 {
+  margin-top:1px;
+  font-size:.74rem;
+  line-height:1.18;
+}
+
+#transactionsView .tx-ledger-title-v228 p {
+  margin-top:1px;
+  font-size:.52rem;
+  line-height:1.2;
+}
+
+#transactionsView .tx-ledger-meta-v259 {
+  display:grid;
+  justify-items:end;
+  gap:3px;
+  min-width:max-content;
+}
+
+#transactionsView .tx-ledger-meta-v259 time {
+  color:var(--muted);
+  font-size:.50rem;
+  line-height:1;
+}
+
+#transactionsView .tx-ledger-actions-inline-v259 {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:3px;
+  margin:0;
+  padding:0;
+  border:0;
+}
+
+#transactionsView .tx-ledger-actions-inline-v259 .btn {
+  min-height:23px;
+  padding:2px 6px;
+  border-radius:6px;
+  font-size:.52rem;
+  line-height:1;
+}
+
+#transactionsView .tx-ledger-body-v228 {
+  gap:2px;
+  margin-top:4px;
+  padding-top:4px;
+}
+
+#transactionsView .tx-ledger-flow-v228 {
+  grid-template-columns:38px minmax(0,1fr);
+  gap:4px;
+}
+
+#transactionsView .tx-ledger-direction-v228 {
+  font-size:.43rem;
+}
+
+#transactionsView .tx-ledger-flow-v228 > span:last-child {
+  gap:3px;
+}
+
+#transactionsView .tx-ledger-flow-v228 em {
+  padding:1px 4px;
+  border-radius:5px;
+  font-size:.50rem;
+  line-height:1.25;
+}
+
+#transactionsView .tx-ledger-flow-v228.financial strong {
+  font-size:.54rem;
+}
+
+#transactionsView .tx-ledger-notes-v228 {
+  margin-top:4px;
+  font-size:.52rem;
+  line-height:1.25;
+}
+
+/* Old bottom action rows should never consume height once JS moves them. */
+#transactionsView .transaction-card-v228 > .tx-ledger-actions-v228 {
+  margin-top:3px;
+  padding-top:0;
+  border-top:0;
+}
+
+/* Draft retains a subtle visual cue without making the card taller. */
+#transactionsView .draft-history-card {
+  box-shadow:inset 2px 0 0 rgba(50,173,255,.28);
+}
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v228 {
+    gap:6px;
+  }
+
+  #transactionsView .tx-page-heading-v228 {
+    gap:7px;
+  }
+
+  #transactionsView .tx-page-heading-v228 .page-copy {
+    font-size:.66rem;
+    line-height:1.32;
+  }
+
+  #transactionsView #recordTransactionBtn {
+    min-height:33px;
+    padding:5px 9px;
+  }
+
+  #transactionsView .tx-history-toolbar-v259 {
+    display:block;
+  }
+
+  #transactionsView .tx-history-filters-v259 {
+    width:100%;
+    gap:4px;
+    padding-bottom:2px;
+  }
+
+  #transactionsView .tx-history-filter-v259 {
+    min-height:28px;
+    padding:4px 7px;
+    font-size:.56rem;
+  }
+
+  #transactionsView .tx-history-status-v259 {
+    display:none;
+  }
+
+  #transactionsView .transaction-card-v228 {
+    padding:6px 7px;
+  }
+
+  #transactionsView .tx-ledger-head-v228 {
+    gap:5px;
+  }
+
+  #transactionsView .tx-ledger-title-v228 h4 {
+    font-size:.71rem;
+  }
+
+  #transactionsView .tx-ledger-meta-v259 {
+    gap:2px;
+  }
+
+  #transactionsView .tx-ledger-actions-inline-v259 .btn {
+    min-height:22px;
+    padding:2px 5px;
+    font-size:.49rem;
+  }
+
+  #transactionsView .tx-ledger-body-v228 {
+    margin-top:3px;
+    padding-top:3px;
+  }
+
+  #transactionsView .tx-ledger-flow-v228 {
+    grid-template-columns:36px minmax(0,1fr);
+  }
+}
+
+@media (max-width:390px) {
+  #transactionsView .tx-history-filter-v259 {
+    min-height:27px;
+    padding-left:6px;
+    padding-right:6px;
+  }
+
+  #transactionsView .tx-ledger-title-v228 h4 {
+    font-size:.69rem;
+  }
+
+  #transactionsView .tx-ledger-actions-inline-v259 .btn {
+    padding-left:4px;
+    padding-right:4px;
+  }
+}
