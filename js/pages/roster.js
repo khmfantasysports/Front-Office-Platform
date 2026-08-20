@@ -8,14 +8,10 @@ function activeRosterFilterCount() {
     + (rosterFilters.fantrax ? 1 : 0);
 }
 
-function filteredRosterPlayers(query = '') {
-  const q = String(query || '').trim().toLowerCase();
+function filteredRosterPlayers() {
   const season = currentSeason();
   return activeRosterPlayers().filter((player) => {
-    const status = statusById(player.statusId);
     const signals = playerContractSignals(player);
-    const haystack = `${player.name} ${player.position} ${player.eligiblePositions || ''} ${player.realTeam || ''} ${player.ageSnapshot ?? ''} ${status?.name || ''}`.toLowerCase();
-    if (q && !haystack.includes(q)) return false;
     if (rosterFilters.status && player.statusId !== rosterFilters.status) return false;
     if (rosterFilters.position && player.position !== rosterFilters.position) return false;
     if (rosterFilters.team && player.realTeam !== rosterFilters.team) return false;
@@ -35,13 +31,50 @@ function closeRosterMenus() {
   document.querySelectorAll('#rosterView details[open]').forEach((details) => details.removeAttribute('open'));
 }
 
-function renderRosterContractSummary(intel, current) {
+function renderRosterSummary(intel, current) {
+  const activeCount = activeRosterPlayers().length;
+  const minorsCount = farmSystemPlayers().length;
+  const activeLimit = state.frontOffice.rosterLimit;
+  const minorsLimit = state.frontOffice.minorsLimit;
   const currentMissing = calculateSeason(current.id).missingPlayerIds.length;
-  return `<div class="roster-contract-summary" aria-label="Contract watch">
-    <div><span>Expires ${seasonLabel(current.startYear)}</span><strong>${intel.activeExpiringCurrent.length}</strong><small>active roster</small></div>
-    <div><span>Expires next</span><strong>${intel.activeExpiringNext.length}</strong><small>${intel.next ? seasonLabel(intel.next.startYear) : 'next season'}</small></div>
-    <div class="${intel.activeMissingFutureSalary.length ? 'warning' : ''}"><span>Future salary gaps</span><strong>${intel.activeMissingFutureSalary.length}</strong><small>inside entered terms</small></div>
-    <div class="${currentMissing ? 'warning' : ''}"><span>Missing current salary</span><strong>${currentMissing}</strong><small>cap-eligible players</small></div>
+  const futureMissing = intel.activeMissingFutureSalary.length;
+
+  const activeOver = activeLimit !== null && activeLimit !== undefined && activeCount > activeLimit;
+  const minorsOver = minorsLimit !== null && minorsLimit !== undefined && minorsCount > minorsLimit;
+
+  const activeDetail = activeLimit === null || activeLimit === undefined
+    ? 'No limit set'
+    : activeOver
+      ? `${activeCount - activeLimit} over limit`
+      : `${Math.max(0, activeLimit - activeCount)} open`;
+
+  const minorsDetail = minorsLimit === null || minorsLimit === undefined
+    ? 'No limit set'
+    : minorsOver
+      ? `${minorsCount - minorsLimit} over limit`
+      : `${Math.max(0, minorsLimit - minorsCount)} open`;
+
+  return `<div class="roster-summary-grid-v252" aria-label="Roster summary">
+    <div class="${activeOver ? 'warning' : ''}">
+      <span>Active roster</span>
+      <strong>${activeLimit === null || activeLimit === undefined ? activeCount : `${activeCount} / ${activeLimit}`}</strong>
+      <small>${escapeHtml(activeDetail)}</small>
+    </div>
+    <div class="${minorsOver ? 'warning' : ''}">
+      <span>Minors</span>
+      <strong>${minorsLimit === null || minorsLimit === undefined ? minorsCount : `${minorsCount} / ${minorsLimit}`}</strong>
+      <small>${escapeHtml(minorsDetail)}</small>
+    </div>
+    <div>
+      <span>Contract expiries</span>
+      <strong>${intel.activeExpiringCurrent.length}</strong>
+      <small>${seasonLabel(current.startYear)} · ${intel.activeExpiringNext.length} next</small>
+    </div>
+    <div class="${currentMissing || futureMissing ? 'warning' : 'good'}">
+      <span>Salary gaps</span>
+      <strong>${currentMissing + futureMissing}</strong>
+      <small>${currentMissing} current · ${futureMissing} future</small>
+    </div>
   </div>`;
 }
 
@@ -53,8 +86,7 @@ function renderRoster() {
   const intel = contractIntelligence();
   const positions = [...new Set(activePlayers.map((p) => p.position).filter(Boolean))].sort();
   const teams = [...new Set(activePlayers.map((p) => p.realTeam).filter(Boolean))].sort();
-  const query = '';
-  const players = filteredRosterPlayers(query);
+  const players = filteredRosterPlayers();
   const filterCount = activeRosterFilterCount();
 
 
@@ -82,13 +114,23 @@ function renderRoster() {
 
   el('rosterView').innerHTML = `
     <div class="roster-page">
-      <div class="page-heading-row">
-        <div><p class="eyebrow">Roster</p><h3>${activePlayers.length} / ${state.frontOffice.rosterLimit ?? '—'} active · ${farmSystemPlayers().length}${state.frontOffice.minorsLimit !== null && state.frontOffice.minorsLimit !== undefined ? ` / ${state.frontOffice.minorsLimit}` : ''} minors</h3></div>
-        <div class="view-switch v25 v29" aria-label="Roster view"><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
+      <div class="roster-page-heading-v252">
+        <div class="roster-page-heading-copy-v252">
+          <p class="eyebrow">Team Management</p>
+          <h3>Roster</h3>
+          <p class="page-copy">Manage depth, roster status and seven-season contract commitments.</p>
+        </div>
+        <div class="roster-header-actions-v252">
+          <details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details>
+          <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
+        </div>
       </div>
-      ${renderRosterContractSummary(intel, current)}
-      <div class="roster-commandbar">
-        <input id="rosterSearch" class="search-input" placeholder="Search players..." />
+
+      ${renderRosterSummary(intel, current)}
+
+      <div class="view-switch v25 v29 roster-view-switch-v252" aria-label="Roster view"><button id="rosterDepthModeBtn" class="${rosterMode === 'depth' ? 'active' : ''}" type="button">Depth</button><button id="rosterGridModeBtn" class="${rosterMode === 'grid' ? 'active' : ''}" type="button">Cap Grid</button></div>
+
+      <div class="roster-filterbar-v252">
         <details class="filter-menu"><summary>Filters ${filterCount ? `<span class="filter-count">${filterCount}</span>` : ''}</summary><div class="filter-popover">
           <label>Status<select id="rosterStatusFilter"><option value="">All</option>${state.statuses.map((s) => `<option value="${s.id}" ${rosterFilters.status === s.id ? 'selected' : ''}>${escapeHtml(s.name)}</option>`).join('')}</select></label>
           <label>Position<select id="rosterPositionFilter"><option value="">All</option>${positions.map((p) => `<option value="${escapeAttr(p)}" ${rosterFilters.position === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('')}</select></label>
@@ -99,9 +141,8 @@ function renderRoster() {
           <label class="filter-check"><input id="rosterFantraxFilter" type="checkbox" ${rosterFilters.fantrax ? 'checked' : ''} /> Fantrax linked</label>
           <div class="filter-actions"><button id="clearRosterFiltersBtn" class="btn btn-ghost btn-small" type="button">Clear filters</button></div>
         </div></details>
-        <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
+        <span id="rosterResultCount" class="roster-filter-result-v252 ${filterCount ? '' : 'hidden'}">${players.length} of ${activePlayers.length} shown</span>
       </div>
-      <div class="page-heading-row"><span class="muted" id="rosterResultCount">${players.length} shown</span><details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details></div>
       ${!activePlayers.length ? `<div class="empty-state"><h4>No players yet</h4><p>Use Add Player above or import a Fantrax roster from Import / Tools.</p></div>` : ''}
       ${activePlayers.length ? `<div id="depthPanel" class="depth-panel ${rosterMode === 'depth' ? '' : 'hidden'}">${depthChartHtml}<div id="depthNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
       ${activePlayers.length ? `<div id="capGridPanel" class="cap-grid-panel ${rosterMode === 'grid' ? '' : 'hidden'}"><div class="roster-horizon-note"><span><strong>Seven-season contract horizon</strong> · current season + six future years</span><span>${seasonLabel(seasons[0]?.startYear)} → ${seasonLabel(seasons[seasons.length - 1]?.startYear)}</span></div><div class="roster-scroll-hint" aria-hidden="true">Swipe for contract years <span class="scroll-arrow">→</span></div><div class="roster-table-scroll-shell"><div class="table-wrap roster-horizontal-scroll" role="region" aria-label="Cap grid. Swipe horizontally to view all seven contract years." tabindex="0"><table id="rosterTable" class="roster-table-v18 roster-table-compact roster-table-seven"><thead><tr><th class="col-player">Player</th><th class="col-pos">Pos</th><th class="col-eligible">Eligible</th><th class="col-team">NHL</th><th class="col-age">Age</th><th class="col-status">Status</th>${seasons.map((s) => `<th class="col-salary">${seasonLabel(s.startYear)}</th>`).join('')}<th class="col-end">Ends</th></tr></thead><tbody>${gridRows}</tbody><tfoot><tr class="total-row"><td colspan="6">Roster Total</td>${totalCells}<td></td></tr></tfoot></table></div></div><div class="roster-contract-grid-note"><span class="contract-gap-mark">!</span> Missing salary inside an entered contract term</div><div id="gridNoMatches" class="roster-list-empty-filter hidden">No players match these filters.</div></div>` : ''}
@@ -120,8 +161,6 @@ function renderRoster() {
   if (el('cancelDepthOrderBtn')) el('cancelDepthOrderBtn').addEventListener('click', () => { depthEditMode = false; depthDraftOrder = []; renderRoster(); });
   if (el('saveDepthOrderBtn')) el('saveDepthOrderBtn').addEventListener('click', saveDepthOrder);
   document.querySelectorAll('[data-depth-move-index]').forEach((button) => button.addEventListener('click', () => moveDepthDraft(Number(button.dataset.depthMoveIndex), Number(button.dataset.depthMoveDirection))));
-  const refreshFilters = () => applyRosterFilters();
-  el('rosterSearch').addEventListener('input', refreshFilters);
   el('rosterStatusFilter').addEventListener('change', (e) => { rosterFilters.status = e.target.value; renderRoster(); });
   el('rosterPositionFilter').addEventListener('change', (e) => { rosterFilters.position = e.target.value; renderRoster(); });
   el('rosterTeamFilter').addEventListener('change', (e) => { rosterFilters.team = e.target.value; renderRoster(); });
@@ -134,14 +173,17 @@ function renderRoster() {
 }
 
 function applyRosterFilters() {
-  const search = el('rosterSearch')?.value || '';
-  const allowed = new Set(filteredRosterPlayers(search).map((p) => p.id));
+  const allowed = new Set(filteredRosterPlayers().map((p) => p.id));
   document.querySelectorAll('[data-player-grid-row]').forEach((row) => { row.hidden = !allowed.has(row.dataset.playerGridRow); });
   if (!depthEditMode) {
     document.querySelectorAll('[data-depth-open]').forEach((row) => { row.hidden = !allowed.has(row.dataset.depthOpen); });
   }
   const shown = allowed.size;
-  if (el('rosterResultCount')) el('rosterResultCount').textContent = `${shown} shown`;
+  const resultCount = el('rosterResultCount');
+  if (resultCount) {
+    resultCount.textContent = `${shown} of ${activeRosterPlayers().length} shown`;
+    resultCount.classList.toggle('hidden', activeRosterFilterCount() === 0);
+  }
   if (el('depthNoMatches')) el('depthNoMatches').classList.toggle('hidden', shown !== 0 || depthEditMode);
   if (el('gridNoMatches')) el('gridNoMatches').classList.toggle('hidden', shown !== 0);
 }
