@@ -15,7 +15,6 @@ async function init() {
   setCloudStatus('Connecting…', 'busy');
 
   const { data, error } = await db.auth.getSession();
-
   if (error) {
     console.error('Initial Supabase session failed', error);
     showAuthError(error.message || 'Unable to restore your RosterCap session.');
@@ -32,6 +31,37 @@ async function init() {
   if (!data?.session?.user) {
     await initializeGoogleIdentity();
   }
+}
+
+function installMobileWorkspaceNav() {
+  const popover = document.querySelector('.utility-menu-popover');
+  if (!popover || popover.querySelector('[data-mobile-workspace-nav]')) return;
+
+  const accountDivider = popover.querySelector('.utility-menu-divider');
+  const insertBefore = accountDivider || null;
+
+  const label = document.createElement('span');
+  label.className = 'utility-menu-section-label mobile-workspace-nav-only';
+  label.dataset.mobileWorkspaceNav = 'label';
+  label.textContent = 'More';
+
+  const transactionsButton = document.createElement('button');
+  transactionsButton.className = 'btn btn-ghost nav-tab mobile-workspace-nav-only';
+  transactionsButton.dataset.mobileWorkspaceNav = 'transactions';
+  transactionsButton.dataset.view = 'transactions';
+  transactionsButton.type = 'button';
+  transactionsButton.textContent = 'Transactions';
+
+  const settingsButton = document.createElement('button');
+  settingsButton.className = 'btn btn-ghost nav-tab mobile-workspace-nav-only';
+  settingsButton.dataset.mobileWorkspaceNav = 'settings';
+  settingsButton.dataset.view = 'settings';
+  settingsButton.type = 'button';
+  settingsButton.textContent = 'Settings';
+
+  popover.insertBefore(label, insertBefore);
+  popover.insertBefore(transactionsButton, insertBefore);
+  popover.insertBefore(settingsButton, insertBefore);
 }
 
 function bindEvents() {
@@ -58,6 +88,8 @@ function bindEvents() {
     render();
   });
 
+  installMobileWorkspaceNav();
+
   document.querySelectorAll('.nav-tab').forEach((button) => {
     button.addEventListener('click', () => switchView(button.dataset.view));
   });
@@ -72,12 +104,10 @@ function bindEvents() {
   el('quickSalary').addEventListener('blur', (event) => formatWholeDollarInput(event.target));
   el('salaryChangeMode').addEventListener('change', updateQuickContractControls);
   el('contractYearsRemaining').addEventListener('input', syncContractEndFromYears);
-
   el('closeImportDialog').addEventListener('click', () => importDialog.close());
   el('cancelImportBtn').addEventListener('click', () => importDialog.close());
   el('csvFile').addEventListener('change', handleCsvFile);
   el('applyImportBtn').addEventListener('click', applyImport);
-
   el('closeTransactionDialog').addEventListener('click', () => { transactionDialog.close(); resetTransactionEditState(); });
   el('cancelTransactionBtn').addEventListener('click', () => { transactionDialog.close(); resetTransactionEditState(); });
   el('transactionForm').addEventListener('submit', saveTransactionFromDialog);
@@ -87,7 +117,6 @@ function bindEvents() {
   el('transactionSummary').addEventListener('input', () => { transactionSummaryTouched = true; });
   el('transactionCounterparty').addEventListener('input', () => { if (el('transactionType').value === 'Trade') autoTransactionSummary(); });
   el('recalculateTransactionPenaltyBtn').addEventListener('click', applyAutomaticTransactionPenalty);
-
   el('closeAssetDialog').addEventListener('click', () => assetDialog.close());
   el('cancelAssetBtn').addEventListener('click', () => assetDialog.close());
   el('assetForm').addEventListener('submit', saveAssetFromDialog);
@@ -95,7 +124,6 @@ function bindEvents() {
   el('archiveAssetBtn').addEventListener('click', archiveEditingAsset);
   el('playerIsProspect').addEventListener('change', syncProspectLocationControls);
   el('playerRosterGroup').addEventListener('change', syncProspectLocationControls);
-
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') persistWorkspaceResumeState();
   });
@@ -111,7 +139,6 @@ async function handleCreateFrontOffice(event) {
     alert('Use a season in the format 2026-27.');
     return;
   }
-
   await runCloudAction(async () => {
     const { data, error } = await db.rpc('create_front_office_with_seasons_v1', {
       p_team_name: el('teamName').value.trim(),
@@ -130,7 +157,6 @@ async function handleCreateFrontOffice(event) {
 
 function render() {
   const appHeader = el('appHeader');
-
   if (!session?.user) {
     if (appHeader) appHeader.classList.add('hidden');
     authGate.classList.remove('hidden');
@@ -160,7 +186,6 @@ function render() {
   el('workspaceNav').classList.remove('hidden');
   el('exportBtn').disabled = false;
   el('exportBtn').classList.remove('hidden');
-
   applyTeamIdentityToShell();
   el('teamLabel').textContent = state.frontOffice.teamName;
   el('leagueLabel').textContent = `${state.frontOffice.leagueName} · ${state.frontOffice.sport}`;
@@ -189,12 +214,31 @@ function renderSeasonSelect() {
 function switchView(view, options = {}) {
   const nextView = WORKSPACE_VIEWS.includes(view) ? view : 'overview';
   activeView = nextView;
+
   document.querySelectorAll('.nav-tab').forEach((button) =>
     button.classList.toggle('active', button.dataset.view === nextView)
   );
+
   WORKSPACE_VIEWS.forEach((name) =>
     el(`${name}View`).classList.toggle('hidden', name !== nextView)
   );
+
+  const utilityMenu = document.querySelector('.utility-menu');
+  const secondaryActive = nextView === 'transactions' || nextView === 'settings';
+  utilityMenu?.classList.toggle('workspace-secondary-active', secondaryActive);
+
+  const utilitySummary = utilityMenu?.querySelector('summary');
+  if (utilitySummary) {
+    utilitySummary.setAttribute(
+      'aria-label',
+      secondaryActive
+        ? `${nextView === 'transactions' ? 'Transactions' : 'Settings'} selected. Workspace menu`
+        : 'Workspace menu'
+    );
+  }
+
+  if (utilityMenu?.open) utilityMenu.removeAttribute('open');
+
   el('summaryCards').classList.add('hidden');
   if (options.persist !== false) persistWorkspaceResumeState();
 }
