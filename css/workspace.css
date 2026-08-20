@@ -5297,3 +5297,271 @@
     padding:6px 7px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.63 — Transaction Modal Fit Polish
+   ============================================================ */
+
+#transactionDialog.transaction-dialog-v263 {
+  padding:10px;
+  box-sizing:border-box;
+}
+
+#transactionDialog.transaction-dialog-v263 .modal-card {
+  width:min(740px,calc(100vw - 20px));
+  height:min(82dvh,760px);
+  max-height:calc(100dvh - 28px);
+  margin:auto;
+  overflow:hidden;
+}
+
+#transactionDialog.transaction-dialog-v263 .drawer-header {
+  padding:8px 10px;
+}
+
+#transactionDialog.transaction-dialog-v263 .drawer-header h3 {
+  font-size:.90rem;
+}
+
+#transactionDialog.transaction-dialog-v263 .transaction-form-body-v262 {
+  padding:8px 10px;
+  overscroll-behavior:contain;
+}
+
+#transactionDialog.transaction-dialog-v263 .transaction-primary-grid-v262 {
+  gap:5px 7px;
+}
+
+#transactionDialog.transaction-dialog-v263 input,
+#transactionDialog.transaction-dialog-v263 select {
+  min-height:34px;
+  padding:5px 8px;
+}
+
+#transactionDialog.transaction-dialog-v263 .transaction-smart-note,
+#transactionDialog.transaction-dialog-v263 .transaction-edit-note {
+  padding:5px 7px;
+  line-height:1.25;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-structured-section {
+  margin-top:6px;
+  padding:7px;
+}
+
+#transactionDialog.transaction-dialog-v263 .transaction-trade-tabs-v263 {
+  display:none;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-side {
+  min-width:0;
+  padding:7px;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-side-head {
+  gap:3px;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-side-head h4 {
+  font-size:.71rem;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-side-head p {
+  margin-top:1px;
+  font-size:.50rem;
+  line-height:1.22;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-choice-list {
+  min-height:0;
+  max-height:230px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:2px;
+  scrollbar-width:thin;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-builder-list {
+  max-height:155px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:2px;
+  scrollbar-width:thin;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-choice-list > *,
+#transactionDialog.transaction-dialog-v263 .trade-builder-list > * {
+  min-height:0;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-choice-list input[type="checkbox"] {
+  width:20px;
+  height:20px;
+  min-width:20px;
+  min-height:20px;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-choice-list strong,
+#transactionDialog.transaction-dialog-v263 .trade-builder-list strong {
+  font-size:.66rem;
+  line-height:1.15;
+}
+
+#transactionDialog.transaction-dialog-v263 .trade-choice-list small,
+#transactionDialog.transaction-dialog-v263 .trade-builder-list small {
+  font-size:.50rem;
+  line-height:1.2;
+}
+
+#transactionDialog.transaction-dialog-v263 .drawer-footer {
+  position:relative;
+  flex:0 0 auto;
+  padding:6px 8px;
+  border-top:1px solid var(--border);
+}
+
+#transactionDialog.transaction-dialog-v263 #saveTransactionBtn {
+  min-height:32px;
+  min-width:108px;
+}
+
+/* Mobile Trade builder: one side at a time so the popup stays inside
+   the viewport rather than stacking two full roster selectors. */
+@media (max-width:720px) {
+  #transactionDialog.transaction-dialog-v263 {
+    padding:6px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .modal-card {
+    width:calc(100vw - 12px);
+    height:min(80dvh,690px);
+    max-height:calc(100dvh - 18px);
+    border-radius:14px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .drawer-header {
+    padding:7px 9px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .transaction-form-body-v262 {
+    padding:7px 8px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .transaction-primary-grid-v262 {
+    gap:5px 6px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-structured-section {
+    padding:6px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .transaction-trade-tabs-v263 {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:3px;
+    margin-bottom:6px;
+    padding:3px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    background:rgba(7,16,24,.75);
+  }
+
+  #transactionDialog.transaction-dialog-v263 .transaction-trade-tabs-v263 button {
+    min-height:29px;
+    padding:4px 7px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--muted);
+    font:inherit;
+    font-size:.58rem;
+    font-weight:850;
+    cursor:pointer;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .transaction-trade-tabs-v263 button.active {
+    background:rgba(50,173,255,.11);
+    color:#E5F3FF;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-side-grid {
+    display:block;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-side {
+    display:none;
+    gap:5px;
+    padding:6px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-side.trade-side-active-v263 {
+    display:grid;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-choice-list {
+    max-height:min(26dvh,205px);
+    gap:4px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-builder-list {
+    max-height:min(18dvh,130px);
+    gap:4px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-choice-list > *,
+  #transactionDialog.transaction-dialog-v263 .trade-builder-list > * {
+    padding-top:5px;
+    padding-bottom:5px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-add-actions {
+    gap:4px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-add-actions .btn {
+    min-height:29px;
+    padding:4px 6px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .drawer-footer {
+    position:relative;
+    bottom:auto;
+    z-index:2;
+    padding:6px 8px;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionDialog.transaction-dialog-v263 .modal-card {
+    height:min(78dvh,650px);
+  }
+
+  #transactionDialog.transaction-dialog-v263 .drawer-header .eyebrow {
+    font-size:.53rem;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .drawer-header h3 {
+    font-size:.86rem;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .transaction-primary-grid-v262 {
+    grid-template-columns:1fr 1fr;
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-choice-list {
+    max-height:min(25dvh,190px);
+  }
+
+  #transactionDialog.transaction-dialog-v263 .trade-builder-list {
+    max-height:min(16dvh,115px);
+  }
+
+  #transactionDialog.transaction-dialog-v263 .drawer-footer {
+    min-height:44px;
+  }
+
+  #transactionDialog.transaction-dialog-v263 #saveTransactionBtn {
+    min-height:31px;
+  }
+}
