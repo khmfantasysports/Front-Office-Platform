@@ -18,6 +18,7 @@ async function init() {
   installTransactionEditorPolish();
   installCapControlsPolish();
   installTransactionModalFitPolish();
+  installTransactionModalWidthFix();
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -1927,6 +1928,58 @@ function installTransactionModalFitPolish() {
       return result;
     };
   }
+}
+
+
+
+// -----------------------------------------------------------------------------
+// V2.64 — Transaction Modal Width Fix
+// Prevents horizontal modal panning and always opens aligned to the left edge.
+// No transaction behavior/data changes.
+// -----------------------------------------------------------------------------
+let transactionModalWidthFixInstalled = false;
+
+function resetTransactionModalHorizontalScrollV264() {
+  const dialog = el('transactionDialog');
+  if (!dialog) return;
+
+  const card = dialog.querySelector('.modal-card');
+  const body = dialog.querySelector('.transaction-form-body-v262');
+  const tradeSection = el('transactionTradeStructuredSection');
+
+  [dialog, card, body, tradeSection].filter(Boolean).forEach((node) => {
+    node.scrollLeft = 0;
+  });
+}
+
+function installTransactionModalWidthFix() {
+  if (transactionModalWidthFixInstalled) return;
+  transactionModalWidthFixInstalled = true;
+
+  const dialog = el('transactionDialog');
+  dialog?.classList.add('transaction-dialog-v264');
+
+  if (typeof openTransactionDialog === 'function') {
+    const originalOpenTransactionDialogV264 = openTransactionDialog;
+    openTransactionDialog = function(prefill = {}) {
+      const result = originalOpenTransactionDialogV264(prefill);
+      window.requestAnimationFrame(resetTransactionModalHorizontalScrollV264);
+      return result;
+    };
+  }
+
+  if (typeof openEditTransactionDialog === 'function') {
+    const originalOpenEditTransactionDialogV264 = openEditTransactionDialog;
+    openEditTransactionDialog = function(transactionId) {
+      const result = originalOpenEditTransactionDialogV264(transactionId);
+      window.requestAnimationFrame(resetTransactionModalHorizontalScrollV264);
+      return result;
+    };
+  }
+
+  dialog?.addEventListener('toggle', () => {
+    if (dialog.open) window.requestAnimationFrame(resetTransactionModalHorizontalScrollV264);
+  });
 }
 
 
