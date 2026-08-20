@@ -1,7 +1,47 @@
 'use strict';
 
+let settingsOpenDisclosureKeys = new Set();
+
+function settingsDisclosureKey(detail) {
+  if (!detail) return '';
+  const explicitKey = detail.dataset?.settingsSection;
+  if (explicitKey) return explicitKey;
+  return (detail.querySelector('summary')?.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function rememberOpenSettingsDisclosures() {
+  const view = el('settingsView');
+  if (!view) return;
+  const disclosures = [...view.querySelectorAll('details')];
+  if (!disclosures.length) return;
+  settingsOpenDisclosureKeys = new Set(
+    disclosures
+      .filter((detail) => detail.open)
+      .map(settingsDisclosureKey)
+      .filter(Boolean)
+  );
+}
+
+function restoreOpenSettingsDisclosures() {
+  const view = el('settingsView');
+  if (!view) return;
+
+  view.querySelectorAll('details').forEach((detail) => {
+    const key = settingsDisclosureKey(detail);
+    detail.open = Boolean(key && settingsOpenDisclosureKeys.has(key));
+
+    detail.addEventListener('toggle', () => {
+      const currentKey = settingsDisclosureKey(detail);
+      if (!currentKey) return;
+      if (detail.open) settingsOpenDisclosureKeys.add(currentKey);
+      else settingsOpenDisclosureKeys.delete(currentKey);
+    });
+  });
+}
+
 // League, roster, cap and transaction-rule settings.
 function renderSettings() {
+  rememberOpenSettingsDisclosures();
   const horizonSeasons = contractHorizonSeasons();
   const seasonSettings = horizonSeasons.map((s) => {
     const stateLabel = s.id === state.frontOffice.currentSeasonId ? 'Current' : (s.salaryCap === null ? 'Unset' : 'Set');
@@ -10,15 +50,16 @@ function renderSettings() {
   const statusSettings = state.statuses.map((s) => `<div class="status-setting-compact" data-status-setting="${s.id}"><input data-status-name="${s.id}" value="${escapeAttr(s.name)}" aria-label="Status name" /><select data-status-cap="${s.id}" aria-label="Cap rule for ${escapeAttr(s.name)}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select><button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">×</button></div>`).join('');
   el('settingsView').innerHTML = `<div class="settings-accordion">
     ${renderTeamIdentitySettings()}
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Team & League</strong><span>Name, roster limits and currency</span></span></summary><div class="settings-disclosure-body"><div class="settings-fields"><label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label><label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label><label>Active roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label><label>Max Minors spots<input data-office-minors-limit type="number" min="0" step="1" value="${state.frontOffice.minorsLimit ?? ''}" placeholder="No limit" /></label><label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label></div><div class="settings-context-strip"><div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div><div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div></div></div></details>
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span></summary><div class="settings-disclosure-body"><div class="settings-card-head"><p class="settings-card-copy">Status cap rules apply to Active-roster players. Players in Minors are excluded from cap regardless of roster status.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div><div class="status-settings-list">${statusSettings}</div></div></details>
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Salary Caps</strong><span>Current + six future seasons</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p><div class="cap-settings-list">${seasonSettings}</div></div></details>
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Transaction Rules</strong><span>Automate waiver and buyout penalties</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">These are league settings, not NHL rules. Choose how your league handles each penalty. Full Salary and Half Salary are included as quick options.</p><div class="transaction-rule-settings">
+    <details class="settings-disclosure" data-settings-section="team-league"><summary><span class="settings-disclosure-title"><strong>Team & League</strong><span>Name, roster limits and currency</span></span></summary><div class="settings-disclosure-body"><div class="settings-fields"><label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label><label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label><label>Active roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label><label>Max Minors spots<input data-office-minors-limit type="number" min="0" step="1" value="${state.frontOffice.minorsLimit ?? ''}" placeholder="No limit" /></label><label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label></div><div class="settings-context-strip"><div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div><div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div></div></div></details>
+    <details class="settings-disclosure" data-settings-section="roster-rules"><summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span></summary><div class="settings-disclosure-body"><div class="settings-card-head"><p class="settings-card-copy">Status cap rules apply to Active-roster players. Players in Minors are excluded from cap regardless of roster status.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div><div class="status-settings-list">${statusSettings}</div></div></details>
+    <details class="settings-disclosure" data-settings-section="salary-caps"><summary><span class="settings-disclosure-title"><strong>Salary Caps</strong><span>Current + six future seasons</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p><div class="cap-settings-list">${seasonSettings}</div></div></details>
+    <details class="settings-disclosure" data-settings-section="transaction-rules"><summary><span class="settings-disclosure-title"><strong>Transaction Rules</strong><span>Automate waiver and buyout penalties</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">These are league settings, not NHL rules. Choose how your league handles each penalty. Full Salary and Half Salary are included as quick options.</p><div class="transaction-rule-settings">
       <div class="transaction-rule-card"><div><h4>Waiver penalty</h4><p>Applied automatically when you record a Waiver transaction.</p></div><label>Penalty method<select id="waiverPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="waiverPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="waiverPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="waiverPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
       <div class="transaction-rule-card"><div><h4>Buyout penalty</h4><p>Applied automatically when you record a Buyout transaction.</p></div><label>Penalty method<select id="buyoutPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="buyoutPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="buyoutPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="buyoutPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
     </div><div class="transaction-rules-footer"><span>For Custom Percentage, enter 0–100. For Flat Amount, enter the dollar penalty per affected season.</span><button id="saveTransactionRulesBtn" class="btn btn-primary btn-small" type="button">Save Transaction Rules</button></div></div></details>
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Refresh, Fantrax import and portable backups</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Fantrax imports can refresh roster identity and current salary without touching future contracts.</p><div class="settings-data-actions"><button id="settingsRefreshBtn" class="btn btn-secondary" type="button">Refresh Front Office</button><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div></div></details>
+    <details class="settings-disclosure" data-settings-section="data-export"><summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Refresh, Fantrax import and portable backups</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Fantrax imports can refresh roster identity and current salary without touching future contracts.</p><div class="settings-data-actions"><button id="settingsRefreshBtn" class="btn btn-secondary" type="button">Refresh Front Office</button><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div></div></details>
   </div>`;
+  restoreOpenSettingsDisclosures();
   bindTeamIdentitySettings();
   el('waiverPenaltyMode').value = state.frontOffice.waiverPenaltyMode || 'NONE';
   el('waiverPenaltyScope').value = state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON';
