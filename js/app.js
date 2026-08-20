@@ -17,6 +17,7 @@ async function init() {
   installPlayerEditorPolish();
   installTransactionEditorPolish();
   installCapControlsPolish();
+  installTransactionModalFitPolish();
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -1778,6 +1779,151 @@ function installCapControlsPolish() {
     renderCap = function() {
       const result = originalRenderCapV262();
       applyCapControlsPolishV262();
+      return result;
+    };
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+// V2.63 — Transaction Modal Fit Polish
+// Mobile-only Trade-side tabs + bounded internal lists.
+// No transaction persistence or structured-trade behavior changes.
+// -----------------------------------------------------------------------------
+let transactionModalFitPolishInstalled = false;
+let transactionTradeSideV263 = 'outgoing';
+
+function transactionTradeSidesV263() {
+  const grid = el('transactionTradeStructuredSection')?.querySelector('.trade-side-grid');
+  if (!grid) return [];
+
+  return [...grid.querySelectorAll(':scope > .trade-side')];
+}
+
+function transactionTradeSideKeyV263(side, index) {
+  const title = side.querySelector('.trade-side-head h4')?.textContent.trim().toLowerCase() || '';
+  if (title.includes('incoming')) return 'incoming';
+  if (title.includes('outgoing')) return 'outgoing';
+  return index === 1 ? 'incoming' : 'outgoing';
+}
+
+function setTransactionTradeSideV263(sideKey) {
+  transactionTradeSideV263 = sideKey === 'incoming' ? 'incoming' : 'outgoing';
+
+  transactionTradeSidesV263().forEach((side, index) => {
+    const key = transactionTradeSideKeyV263(side, index);
+    side.dataset.tradeSideV263 = key;
+    side.classList.toggle('trade-side-active-v263', key === transactionTradeSideV263);
+  });
+
+  document.querySelectorAll('#transactionDialog [data-trade-side-tab-v263]').forEach((button) => {
+    const active = button.dataset.tradeSideTabV263 === transactionTradeSideV263;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+}
+
+function ensureTransactionTradeTabsV263() {
+  const section = el('transactionTradeStructuredSection');
+  const grid = section?.querySelector('.trade-side-grid');
+  if (!section || !grid) return;
+
+  const sides = transactionTradeSidesV263();
+  if (sides.length < 2) return;
+
+  sides.forEach((side, index) => {
+    side.dataset.tradeSideV263 = transactionTradeSideKeyV263(side, index);
+  });
+
+  if (!el('transactionTradeTabsV263')) {
+    const tabs = document.createElement('div');
+    tabs.id = 'transactionTradeTabsV263';
+    tabs.className = 'transaction-trade-tabs-v263';
+    tabs.setAttribute('role', 'group');
+    tabs.setAttribute('aria-label', 'Trade side');
+
+    const outgoing = document.createElement('button');
+    outgoing.type = 'button';
+    outgoing.dataset.tradeSideTabV263 = 'outgoing';
+    outgoing.textContent = 'Outgoing';
+    outgoing.addEventListener('click', () => setTransactionTradeSideV263('outgoing'));
+
+    const incoming = document.createElement('button');
+    incoming.type = 'button';
+    incoming.dataset.tradeSideTabV263 = 'incoming';
+    incoming.textContent = 'Incoming';
+    incoming.addEventListener('click', () => setTransactionTradeSideV263('incoming'));
+
+    tabs.append(outgoing, incoming);
+    grid.insertAdjacentElement('beforebegin', tabs);
+  }
+
+  setTransactionTradeSideV263(transactionTradeSideV263);
+}
+
+function resetTransactionTradeSideV263() {
+  transactionTradeSideV263 = 'outgoing';
+  setTransactionTradeSideV263('outgoing');
+}
+
+function syncTransactionModalFitV263() {
+  const dialog = el('transactionDialog');
+  if (!dialog) return;
+
+  dialog.classList.add('transaction-dialog-v263');
+
+  const isTrade = el('transactionType')?.value === 'Trade';
+  dialog.classList.toggle('transaction-is-trade-v263', isTrade);
+
+  if (isTrade) {
+    ensureTransactionTradeTabsV263();
+    setTransactionTradeSideV263(transactionTradeSideV263);
+  }
+
+  // Scroll the modal body back to the top whenever a fresh transaction opens.
+  const body = dialog.querySelector('.transaction-form-body-v262');
+  if (body && !dialog.dataset.v263PreserveScroll) body.scrollTop = 0;
+  delete dialog.dataset.v263PreserveScroll;
+}
+
+function installTransactionModalFitPolish() {
+  if (transactionModalFitPolishInstalled) return;
+  transactionModalFitPolishInstalled = true;
+
+  ensureTransactionTradeTabsV263();
+
+  if (typeof handleTransactionTypeChange === 'function') {
+    const originalHandleTransactionTypeChangeV263 = handleTransactionTypeChange;
+    handleTransactionTypeChange = function() {
+      const priorType = el('transactionType')?.value;
+      const result = originalHandleTransactionTypeChangeV263();
+
+      if (priorType === 'Trade') {
+        resetTransactionTradeSideV263();
+      }
+
+      syncTransactionModalFitV263();
+      return result;
+    };
+  }
+
+  if (typeof openTransactionDialog === 'function') {
+    const originalOpenTransactionDialogV263 = openTransactionDialog;
+    openTransactionDialog = function(prefill = {}) {
+      resetTransactionTradeSideV263();
+      const result = originalOpenTransactionDialogV263(prefill);
+      syncTransactionModalFitV263();
+      return result;
+    };
+  }
+
+  if (typeof openEditTransactionDialog === 'function') {
+    const originalOpenEditTransactionDialogV263 = openEditTransactionDialog;
+    openEditTransactionDialog = function(transactionId) {
+      resetTransactionTradeSideV263();
+      const result = originalOpenEditTransactionDialogV263(transactionId);
+      syncTransactionModalFitV263();
       return result;
     };
   }
