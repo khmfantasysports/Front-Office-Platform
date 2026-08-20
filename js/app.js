@@ -15,6 +15,8 @@ async function init() {
   installTransactionHistoryPolish();
   installWorkspaceDensityPass();
   installPlayerEditorPolish();
+  installTransactionEditorPolish();
+  installCapControlsPolish();
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -1393,6 +1395,389 @@ function installPlayerEditorPolish() {
     updateQuickContractControls = function() {
       const result = originalUpdateQuickContractControlsV261();
       updateSalaryChangeSummaryV261();
+      return result;
+    };
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+// V2.62 — Transaction Entry + Cap Controls Polish
+// Progressive disclosure and compact controls only. No backend contract changes.
+// -----------------------------------------------------------------------------
+let transactionEditorPolishInstalled = false;
+let transactionFormDirtyV262 = false;
+let capControlsPolishInstalled = false;
+
+function transactionFieldLabelV262(id) {
+  return el(id)?.closest('label') || el(id) || null;
+}
+
+function updateTransactionNotesSummaryV262() {
+  const summary = el('transactionNotesSummaryV262');
+  if (!summary) return;
+  summary.textContent = el('transactionNotes')?.value.trim() ? 'Added' : 'Optional';
+}
+
+function updateTransactionAdditionalSummaryV262() {
+  const summary = el('transactionAdditionalSummaryV262');
+  if (!summary) return;
+
+  const incoming = el('transactionIncoming')?.value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean).length || 0;
+  const outgoing = el('transactionOutgoing')?.value
+    .split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter(Boolean).length || 0;
+  const count = incoming + outgoing;
+
+  summary.textContent = count ? `${count} item${count === 1 ? '' : 's'}` : 'Optional';
+}
+
+function syncTransactionEditorDisclosuresV262() {
+  const itemsDetails = el('transactionAdditionalItemsV262');
+  const incomingField = el('transactionIncomingField');
+  const outgoingField = el('transactionOutgoingField');
+
+  if (itemsDetails && incomingField && outgoingField) {
+    const hasVisibleField =
+      !incomingField.classList.contains('hidden')
+      || !outgoingField.classList.contains('hidden');
+
+    itemsDetails.classList.toggle('hidden', !hasVisibleField);
+
+    if (hasVisibleField) {
+      const hasItems =
+        Boolean(el('transactionIncoming')?.value.trim())
+        || Boolean(el('transactionOutgoing')?.value.trim());
+      itemsDetails.open = hasItems;
+    } else {
+      itemsDetails.open = false;
+    }
+  }
+
+  const notesDetails = el('transactionNotesDetailsV262');
+  if (notesDetails) {
+    notesDetails.open = Boolean(el('transactionNotes')?.value.trim());
+  }
+
+  updateTransactionAdditionalSummaryV262();
+  updateTransactionNotesSummaryV262();
+
+  const help = el('transactionTypeHelp');
+  if (help) help.classList.toggle('hidden', !help.textContent.trim());
+
+  const financial = el('transactionFinancialSection');
+  if (financial) financial.classList.add('transaction-financial-v262');
+
+  const snapshot = el('transactionPlayerSnapshot');
+  if (snapshot) snapshot.classList.add('transaction-player-snapshot-v262');
+}
+
+function ensureTransactionEditorPolishStructure() {
+  const dialog = el('transactionDialog');
+  if (!dialog || dialog.dataset.v262TransactionPolish === 'true') return;
+
+  dialog.dataset.v262TransactionPolish = 'true';
+  dialog.classList.add('transaction-dialog-v262');
+
+  const body = dialog.querySelector('.transaction-form-body');
+  body?.classList.add('transaction-form-body-v262');
+
+  const primaryGrid = body?.querySelector(':scope > .form-grid.compact');
+  primaryGrid?.classList.add('transaction-primary-grid-v262');
+
+  // Manual/free-text incoming/outgoing items are useful for generic history,
+  // but structured Trade/Draft flows already have their own dedicated editors.
+  const incomingField = el('transactionIncomingField');
+  const outgoingField = el('transactionOutgoingField');
+
+  if (
+    primaryGrid
+    && incomingField
+    && outgoingField
+    && !el('transactionAdditionalItemsV262')
+  ) {
+    const details = document.createElement('details');
+    details.id = 'transactionAdditionalItemsV262';
+    details.className = 'transaction-disclosure-v262';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `
+      <span>Additional items</span>
+      <small id="transactionAdditionalSummaryV262">Optional</small>
+    `;
+
+    const content = document.createElement('div');
+    content.className = 'transaction-disclosure-body-v262 transaction-item-fields-v262';
+    content.append(incomingField, outgoingField);
+
+    details.append(summary, content);
+    primaryGrid.insertAdjacentElement('afterend', details);
+
+    ['transactionIncoming', 'transactionOutgoing'].forEach((id) => {
+      el(id)?.addEventListener('input', updateTransactionAdditionalSummaryV262);
+    });
+  }
+
+  const notes = el('transactionNotes');
+  const notesField = notes?.closest('label');
+
+  if (notesField && !el('transactionNotesDetailsV262')) {
+    const details = document.createElement('details');
+    details.id = 'transactionNotesDetailsV262';
+    details.className = 'transaction-disclosure-v262 transaction-notes-v262';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `
+      <span>Notes</span>
+      <small id="transactionNotesSummaryV262">Optional</small>
+    `;
+
+    const content = document.createElement('div');
+    content.className = 'transaction-disclosure-body-v262';
+    content.appendChild(notesField);
+
+    details.append(summary, content);
+
+    const additional = el('transactionAdditionalItemsV262');
+    if (additional) additional.insertAdjacentElement('afterend', details);
+    else primaryGrid?.insertAdjacentElement('afterend', details);
+
+    notes.addEventListener('input', updateTransactionNotesSummaryV262);
+  }
+
+  // The form already has all type-specific logic. Dirty tracking only protects
+  // against accidentally closing the modal after the user starts editing it.
+  const form = el('transactionForm');
+  if (form) {
+    const markDirty = () => {
+      if (dialog.open) transactionFormDirtyV262 = true;
+    };
+    form.addEventListener('input', markDirty);
+    form.addEventListener('change', markDirty);
+  }
+
+  [el('closeTransactionDialog'), el('cancelTransactionBtn')]
+    .filter(Boolean)
+    .forEach((button) => {
+      button.addEventListener('click', (event) => {
+        if (!transactionFormDirtyV262) return;
+        if (!confirm('Discard unsaved transaction changes?')) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+    });
+
+  dialog.addEventListener('cancel', (event) => {
+    if (!transactionFormDirtyV262) return;
+    if (!confirm('Discard unsaved transaction changes?')) event.preventDefault();
+  });
+
+  dialog.addEventListener('close', () => {
+    transactionFormDirtyV262 = false;
+  });
+
+  syncTransactionEditorDisclosuresV262();
+}
+
+function syncTransactionEditorStateV262() {
+  ensureTransactionEditorPolishStructure();
+  syncTransactionEditorDisclosuresV262();
+
+  const title = el('transactionDialogTitle');
+  if (title && !title.textContent.trim()) title.textContent = 'Record transaction';
+}
+
+function installTransactionEditorPolish() {
+  if (transactionEditorPolishInstalled) return;
+  transactionEditorPolishInstalled = true;
+
+  ensureTransactionEditorPolishStructure();
+
+  if (typeof handleTransactionTypeChange === 'function') {
+    const originalHandleTransactionTypeChangeV262 = handleTransactionTypeChange;
+    handleTransactionTypeChange = function() {
+      const result = originalHandleTransactionTypeChangeV262();
+      syncTransactionEditorDisclosuresV262();
+      return result;
+    };
+  }
+
+  if (typeof openTransactionDialog === 'function') {
+    const originalOpenTransactionDialogV262 = openTransactionDialog;
+    openTransactionDialog = function(prefill = {}) {
+      ensureTransactionEditorPolishStructure();
+      transactionFormDirtyV262 = false;
+      const result = originalOpenTransactionDialogV262(prefill);
+      syncTransactionEditorStateV262();
+      transactionFormDirtyV262 = false;
+      return result;
+    };
+  }
+
+  if (typeof openEditTransactionDialog === 'function') {
+    const originalOpenEditTransactionDialogV262 = openEditTransactionDialog;
+    openEditTransactionDialog = function(transactionId) {
+      ensureTransactionEditorPolishStructure();
+      transactionFormDirtyV262 = false;
+      const result = originalOpenEditTransactionDialogV262(transactionId);
+      syncTransactionEditorStateV262();
+      transactionFormDirtyV262 = false;
+      return result;
+    };
+  }
+}
+
+function openCapSettingsV262() {
+  switchView('settings');
+
+  window.requestAnimationFrame(() => {
+    const disclosures = [...document.querySelectorAll('#settingsView details')];
+    const salaryCaps = disclosures.find((details) =>
+      details.querySelector('summary')?.textContent
+        .toLowerCase()
+        .includes('salary cap')
+    );
+
+    if (!salaryCaps) return;
+    salaryCaps.open = true;
+    salaryCaps.scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+}
+
+function capPanelByEyebrowV262(label) {
+  return [...document.querySelectorAll('#capView .cap-panel-v228')].find((panel) =>
+    panel.querySelector('.eyebrow')?.textContent.trim().toLowerCase()
+      === String(label).trim().toLowerCase()
+  ) || null;
+}
+
+function compactDeadCapPanelV262() {
+  const panel = capPanelByEyebrowV262('Dead Cap');
+  if (!panel) return;
+
+  const head = panel.querySelector('.cap-section-head-v228');
+  const button = el('capRecordTransactionBtn');
+  const entries = panel.querySelectorAll('.cap-dead-entry-v228');
+
+  if (button) button.textContent = '+ Transaction';
+
+  if (entries.length === 0) {
+    panel.classList.add('cap-dead-zero-v262');
+
+    const copy = head?.querySelector('div');
+    if (copy) {
+      copy.innerHTML = `
+        <p class="eyebrow">Dead Cap</p>
+        <strong class="cap-dead-zero-value-v262">No active Dead Cap</strong>
+      `;
+    }
+
+    panel.querySelector('.cap-empty-v228')?.remove();
+    return;
+  }
+
+  panel.classList.add('cap-dead-active-v262');
+
+  const copy = head?.querySelector('div');
+  if (copy) {
+    copy.querySelector('h3')?.remove();
+    const paragraph = copy.querySelector('p:not(.eyebrow)');
+    paragraph?.classList.add('cap-dead-summary-v262');
+  }
+}
+
+function compactContractIntelligenceV262() {
+  const panel = document.querySelector('#capView .contract-intelligence-panel');
+  if (!panel || panel.dataset.v262Compact === 'true') return;
+
+  panel.dataset.v262Compact = 'true';
+  panel.classList.add('contract-intelligence-v262');
+
+  const head = panel.querySelector('.contract-intelligence-head');
+  if (head) {
+    head.querySelector('h3')?.remove();
+    head.querySelector('p:not(.eyebrow)')?.remove();
+  }
+
+  const columns = panel.querySelector('.contract-intel-columns');
+  if (columns && !panel.querySelector('.contract-intel-main-details-v262')) {
+    const details = document.createElement('details');
+    details.className = 'contract-intel-main-details-v262';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `
+      <span>
+        <strong>Charges & future commitments</strong>
+        <small>Largest current charges and entered future salary</small>
+      </span>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'contract-intel-main-body-v262';
+    body.appendChild(columns);
+
+    details.append(summary, body);
+
+    const summaryGrid = panel.querySelector('.contract-intel-summary');
+    if (summaryGrid) summaryGrid.insertAdjacentElement('afterend', details);
+    else panel.appendChild(details);
+  }
+}
+
+function addCapHeroControlsV262() {
+  const heroLimit = document.querySelector('#capView .cap-hero-limit-v228');
+  if (!heroLimit || heroLimit.querySelector('.cap-edit-settings-v262')) return;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'cap-edit-settings-v262';
+  button.textContent = 'Edit Cap';
+  button.addEventListener('click', openCapSettingsV262);
+  heroLimit.appendChild(button);
+}
+
+function compactCapDisclosuresV262() {
+  const detail = document.querySelector('#capView .cap-detail-disclosure-v228');
+  const detailSummary = detail?.querySelector('summary span');
+  if (detailSummary) {
+    const strong = detailSummary.querySelector('strong');
+    const small = detailSummary.querySelector('small');
+    if (strong) strong.textContent = 'Cap Detail';
+    if (small) small.textContent = 'All seven seasons';
+  }
+
+  const history = document.querySelector('#capView .cap-history-disclosure');
+  const historySmall = history?.querySelector('summary .settings-disclosure-title span');
+  if (historySmall) historySmall.textContent = 'Prior salary caps';
+}
+
+function applyCapControlsPolishV262() {
+  const page = document.querySelector('#capView .cap-page-v228');
+  if (!page) return;
+
+  page.classList.add('cap-page-v262');
+
+  addCapHeroControlsV262();
+  compactDeadCapPanelV262();
+  compactContractIntelligenceV262();
+  compactCapDisclosuresV262();
+}
+
+function installCapControlsPolish() {
+  if (capControlsPolishInstalled) return;
+  capControlsPolishInstalled = true;
+
+  if (typeof renderCap === 'function') {
+    const originalRenderCapV262 = renderCap;
+    renderCap = function() {
+      const result = originalRenderCapV262();
+      applyCapControlsPolishV262();
       return result;
     };
   }
