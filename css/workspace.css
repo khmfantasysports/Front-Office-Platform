@@ -3076,3 +3076,314 @@
     padding:3px 7px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.54 — Cap Grid-only advanced filters
+   ============================================================ */
+
+/* Retire the standalone advanced-filter row. Depth has its own
+   All / LW / C / RW / D / G navigation and does not need it. */
+.roster-filterbar-v252 {
+  display:none !important;
+}
+
+.roster-cap-grid-head-v254 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(13,24,34,.84);
+}
+
+.roster-cap-grid-horizon-v254 {
+  min-width:0;
+}
+
+.roster-cap-grid-horizon-v254 strong {
+  display:block;
+  color:#DCE8F2;
+  font-size:.68rem;
+  font-weight:900;
+  line-height:1.25;
+}
+
+.roster-cap-grid-horizon-v254 span {
+  display:inline;
+  color:var(--muted);
+  font-size:.63rem;
+  line-height:1.3;
+}
+
+.roster-cap-grid-horizon-v254 small {
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  font-size:.61rem;
+  line-height:1.25;
+}
+
+.roster-cap-grid-filter-actions-v254 {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+  min-width:0;
+}
+
+.roster-cap-grid-filter-actions-v254 .filter-menu > summary {
+  min-height:34px;
+  padding:5px 9px;
+  border-radius:8px;
+  font-size:.64rem;
+}
+
+.roster-cap-grid-filter-actions-v254 .filter-popover {
+  right:0 !important;
+}
+
+.roster-cap-grid-result-v254 {
+  flex:0 0 auto;
+  color:var(--muted);
+  font-size:.58rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.roster-cap-grid-result-v254.hidden {
+  display:none;
+}
+
+@media (max-width:720px) {
+  .roster-cap-grid-head-v254 {
+    gap:8px;
+    padding:9px 10px;
+  }
+
+  .roster-cap-grid-horizon-v254 strong {
+    font-size:.65rem;
+  }
+
+  .roster-cap-grid-horizon-v254 span,
+  .roster-cap-grid-horizon-v254 small {
+    font-size:.58rem;
+  }
+
+  .roster-cap-grid-filter-actions-v254 {
+    gap:5px;
+  }
+
+  .roster-cap-grid-filter-actions-v254 .filter-menu > summary {
+    min-height:32px;
+    padding:5px 8px;
+    font-size:.61rem;
+  }
+
+  .roster-cap-grid-filter-actions-v254 .filter-popover {
+    right:0 !important;
+  }
+}
+
+@media (max-width:430px) {
+  .roster-cap-grid-head-v254 {
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:start;
+  }
+
+  .roster-cap-grid-horizon-v254 span {
+    display:block;
+    margin-top:1px;
+  }
+
+  .roster-cap-grid-result-v254 {
+    display:none !important;
+  }
+}
+
+
+/* ============================================================
+   RosterCap V2.55 — Compact Overview
+   ============================================================ */
+
+#overviewView .overview-v255 {
+  gap:7px;
+}
+
+#overviewView .overview-v255 .overview-hero-v227 {
+  padding:13px 14px;
+}
+
+#overviewView .overview-v255 .overview-hero-top .eyebrow {
+  margin-bottom:5px;
+}
+
+#overviewView .overview-v255 .overview-primary-number {
+  font-size:clamp(1.9rem,4.6vw,2.7rem);
+}
+
+#overviewView .overview-v255 .overview-progress-v227 {
+  margin-top:11px;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 {
+  margin-top:10px;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 > div {
+  padding-top:8px;
+}
+
+#overviewView .overview-compact-panel-v255 {
+  padding:9px 10px;
+}
+
+#overviewView .overview-section-head-compact-v255 {
+  align-items:center;
+  margin-bottom:6px;
+}
+
+#overviewView .overview-section-head-compact-v255 > .eyebrow {
+  margin:0;
+}
+
+#overviewView .overview-section-head-compact-v255 .overview-text-action {
+  padding:2px 0;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+  padding:8px 9px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+  margin-top:3px;
+  font-size:.92rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item small {
+  margin-top:2px;
+  font-size:.55rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+  gap:6px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-card {
+  padding:8px 9px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-value {
+  margin-top:7px;
+  font-size:.88rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-track {
+  margin-top:7px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-footer {
+  margin-top:5px;
+}
+
+@media (max-width:720px) {
+  #overviewView .overview-v255 {
+    gap:6px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:10px 11px;
+  }
+
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.82rem;
+  }
+
+  #overviewView .overview-v255 .overview-primary-label {
+    margin-top:4px;
+    font-size:.63rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    padding:6px 8px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 {
+    margin-top:9px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-meta-v227 {
+    margin-top:5px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 {
+    margin-top:8px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 > div {
+    padding:7px 6px 0;
+  }
+
+  #overviewView .overview-compact-panel-v255 {
+    padding:8px 9px;
+  }
+
+  #overviewView .overview-section-head-compact-v255 {
+    margin-bottom:5px;
+  }
+
+  #overviewView .overview-section-head-compact-v255 .eyebrow {
+    font-size:.62rem;
+  }
+
+  #overviewView .overview-section-head-compact-v255 .overview-text-action {
+    font-size:.59rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+    padding:7px 6px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+    grid-template-columns:repeat(7,106px);
+    gap:5px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-card {
+    padding:8px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-value {
+    margin-top:6px;
+    font-size:.80rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-caption {
+    font-size:.50rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-track {
+    margin-top:6px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-footer {
+    margin-top:5px;
+    font-size:.44rem;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.72rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+    padding:7px 5px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+    font-size:.78rem;
+  }
+}
