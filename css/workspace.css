@@ -4130,3 +4130,332 @@
     padding-right:4px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.60 — Workspace Density Pass
+   ============================================================ */
+
+/* ---------- Utility menu: workspace destinations first ---------- */
+@media (max-width:720px) {
+  .utility-menu-popover .mobile-workspace-divider-v260 {
+    display:block !important;
+    width:100%;
+    margin:4px 0 3px;
+  }
+
+  .utility-menu-popover [data-mobile-workspace-nav="label"] {
+    margin-top:0;
+  }
+}
+
+/* ---------- Minors: remove redundant KPI block ---------- */
+#farmView .farm-page-v260 {
+  gap:6px;
+}
+
+#farmView .farm-page-v260 .farm-page-heading-v228 {
+  gap:8px;
+}
+
+#farmView .farm-page-v260 .farm-page-heading-v228 .page-copy {
+  margin-top:3px;
+}
+
+#farmView .farm-page-v260 .farm-panel-v228 {
+  padding:8px 9px;
+}
+
+#farmView .farm-page-v260 .farm-section-head-v228 {
+  padding-bottom:1px;
+}
+
+#farmView .farm-page-v260 .farm-section-head-v228 h3 {
+  font-size:.79rem;
+}
+
+#farmView .farm-page-v260 .farm-player-list-v228 {
+  gap:4px;
+}
+
+/* ---------- Assets: counts live in the tabs, not separate boxes ---------- */
+#assetsView .assets-page-v260 {
+  gap:6px;
+}
+
+#assetsView .assets-page-v260 .asset-hero-v230 {
+  gap:8px;
+  padding-bottom:0;
+}
+
+#assetsView .assets-page-v260 .asset-tabs {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:3px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+#assetsView .assets-page-v260 .asset-tabs::-webkit-scrollbar {
+  display:none;
+}
+
+#assetsView .assets-page-v260 .asset-tab {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  flex:1 0 auto;
+  min-width:max-content;
+  min-height:30px;
+  padding:4px 8px;
+  white-space:nowrap;
+}
+
+#assetsView .asset-tab-count-v260 {
+  display:grid;
+  place-items:center;
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  color:#C8D6E2;
+  font-size:.50rem;
+  font-weight:950;
+  line-height:1;
+}
+
+#assetsView .asset-tab.active .asset-tab-count-v260 {
+  background:rgba(50,173,255,.17);
+  color:#A9D9FF;
+}
+
+#assetsView .assets-page-v260 .asset-sections-v230,
+#assetsView .assets-page-v260 .asset-section {
+  gap:6px;
+}
+
+#assetsView .assets-page-v260 .asset-portfolio-panel-v230,
+#assetsView .assets-page-v260 .asset-portfolio-panel-v228 {
+  padding:8px 9px;
+}
+
+#assetsView .assets-page-v260 .asset-grid {
+  gap:5px;
+}
+
+#assetsView .assets-page-v260 .asset-card {
+  min-height:78px;
+  gap:5px;
+  padding:8px;
+  border-radius:10px;
+}
+
+#assetsView .assets-page-v260 .asset-card h5 {
+  font-size:.78rem;
+}
+
+#assetsView .assets-page-v260 .asset-card-meta {
+  font-size:.58rem;
+}
+
+#assetsView .assets-page-v260 .asset-round-badge {
+  min-width:32px;
+  height:32px;
+  font-size:.63rem;
+}
+
+/* ---------- Cap: hero is the heading; remove duplicate title layers ---------- */
+#capView .cap-page-v260 {
+  gap:6px;
+}
+
+#capView .cap-page-v260 .cap-hero-v228 {
+  padding:10px 11px;
+}
+
+#capView .cap-page-v260 .cap-hero-primary-v228 {
+  font-size:1.78rem;
+}
+
+#capView .cap-page-v260 .cap-hero-progress-v228 {
+  margin-top:8px;
+}
+
+#capView .cap-page-v260 .cap-hero-strip-v228 {
+  margin-top:8px;
+}
+
+#capView .cap-page-v260 .cap-hero-strip-v228 > div {
+  padding-top:7px;
+}
+
+#capView .cap-page-v260 .cap-panel-v228 {
+  padding:8px 9px;
+}
+
+#capView .cap-section-head-compact-v260 {
+  min-height:24px;
+  margin-bottom:4px;
+  align-items:center;
+}
+
+#capView .cap-section-head-compact-v260 .eyebrow {
+  margin:0;
+}
+
+#capView .cap-page-v260 .cap-outlook-grid-v228 {
+  gap:5px;
+}
+
+#capView .cap-page-v260 .cap-season-card-v228 {
+  padding:8px;
+}
+
+#capView .cap-page-v260 .cap-season-used-v228 {
+  margin-top:6px;
+  font-size:.80rem;
+}
+
+#capView .cap-page-v260 .cap-season-track-v228 {
+  margin-top:6px;
+}
+
+#capView .cap-page-v260 .cap-season-metrics-v228,
+#capView .cap-page-v260 .cap-season-footer-v228 {
+  margin-top:5px;
+}
+
+/* ---------- Settings: already task-based, only tighten the accordion ---------- */
+#settingsView .settings-accordion-v260 {
+  gap:6px;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure > summary {
+  min-height:46px;
+  padding:8px 10px;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure-title strong {
+  font-size:.79rem;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure-title span {
+  margin-top:1px;
+  font-size:.60rem;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure-body {
+  padding:0 10px 9px;
+}
+
+#settingsView .settings-accordion-v260 .settings-summary-grid {
+  gap:5px;
+  margin-top:8px;
+  margin-bottom:8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-summary-item {
+  padding:7px 8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-health-panel {
+  margin-top:8px;
+  margin-bottom:8px;
+  padding:9px;
+}
+
+#settingsView .settings-accordion-v260 .settings-current-season-control {
+  margin-top:8px;
+  padding:8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-data-actions {
+  margin-top:8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-danger-zone {
+  margin-top:1px;
+}
+
+@media (max-width:720px) {
+  #farmView .farm-page-v260 .farm-page-heading-v228 {
+    gap:7px;
+  }
+
+  #farmView .farm-page-v260 .farm-page-heading-v228 .inline-actions .btn {
+    min-height:33px;
+  }
+
+  #assetsView .assets-page-v260 .asset-hero-v230 {
+    gap:7px;
+  }
+
+  #assetsView .assets-page-v260 .asset-add-btn-v230 {
+    min-height:33px;
+  }
+
+  #assetsView .assets-page-v260 .asset-tab {
+    flex:0 0 auto;
+    min-height:28px;
+    padding:4px 7px;
+    font-size:.57rem;
+  }
+
+  #assetsView .assets-page-v260 .asset-grid {
+    gap:5px;
+  }
+
+  #assetsView .assets-page-v260 .asset-card {
+    min-height:74px;
+    padding:7px;
+  }
+
+  #capView .cap-page-v260 .cap-hero-v228 {
+    padding:9px 10px;
+  }
+
+  #capView .cap-page-v260 .cap-hero-primary-v228 {
+    font-size:1.66rem;
+  }
+
+  #capView .cap-page-v260 .cap-panel-v228 {
+    padding:8px;
+  }
+
+  #capView .cap-page-v260 .cap-outlook-grid-v228 {
+    gap:4px;
+  }
+
+  #capView .cap-page-v260 .cap-season-card-v228 {
+    padding:7px;
+  }
+
+  #settingsView .settings-accordion-v260 .settings-disclosure > summary {
+    min-height:43px;
+    padding:7px 9px;
+  }
+
+  #settingsView .settings-accordion-v260 .settings-disclosure-body {
+    padding:0 9px 8px;
+  }
+}
+
+@media (max-width:390px) {
+  #assetsView .assets-page-v260 .asset-card {
+    min-height:70px;
+  }
+
+  #capView .cap-page-v260 .cap-hero-primary-v228 {
+    font-size:1.58rem;
+  }
+
+  #settingsView .settings-accordion-v260 {
+    gap:5px;
+  }
+}
