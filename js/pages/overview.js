@@ -84,14 +84,42 @@ function renderCapVisuals() {
       </div>
     </section>
     <section class="subpanel overview-trend-compact tone-neutral">
-      <div class="overview-commitments-head"><div><p class="eyebrow">Cap outlook</p><h3>Seven-season commitments</h3></div><p>Known cap used by season</p></div>
+      <div class="overview-commitments-head"><div><p class="eyebrow">Cap outlook</p></div><p>Known cap used by season</p></div>
       <div class="trend-chart" aria-label="Known cap used by season">${trend}</div>
     </section>
   </div>`;
 }
 
+function renderOverviewContractWatch(intel) {
+  const gapCount = intel.missingFutureSalary.length;
+  const currentCount = intel.expiringCurrent.length;
+  const nextCount = intel.expiringNext.length;
+  const minorsCount = intel.minorsContracts.length;
+
+  const priority = gapCount
+    ? `<span class="contract-watch-priority warning"><strong>${gapCount} future salar${gapCount === 1 ? 'y gap' : 'y gaps'}</strong><small>Inside entered contract terms</small></span>`
+    : currentCount
+      ? `<span class="contract-watch-priority neutral"><strong>${currentCount} expiring this season</strong><small>Review before rollover</small></span>`
+      : `<span class="contract-watch-priority good"><strong>Contract data looks current</strong><small>No future salary gaps found</small></span>`;
+
+  return `<section class="overview-panel-v227 contract-watch-v246">
+    <div class="overview-section-head-v227">
+      <div><p class="eyebrow">Contract watch</p><h3>Key contract timing</h3></div>
+      <button id="overviewContractRosterBtn" class="overview-text-action" type="button">Open Roster →</button>
+    </div>
+    <div class="contract-watch-metrics-v246">
+      <div><span>Expiring</span><strong>${currentCount}</strong><small>this season</small></div>
+      <div><span>Next year</span><strong>${nextCount}</strong><small>contract ends</small></div>
+      <div class="${gapCount ? 'warning' : ''}"><span>Salary gaps</span><strong>${gapCount}</strong><small>future entered terms</small></div>
+      <div><span>Minors deals</span><strong>${minorsCount}</strong><small>with contract data</small></div>
+    </div>
+    <div class="contract-watch-footer-v246">${priority}</div>
+  </section>`;
+}
+
 function renderOverview() {
   const season = currentSeason();
+  const contractIntel = contractIntelligence();
   const calc = calculateSeason(season.id);
   const tone = capTone(calc);
   const salaryCap = calc.salaryCap;
@@ -178,7 +206,7 @@ function renderOverview() {
       : `${Math.abs(openRosterSpots)} over`;
 
   el('overviewView').innerHTML = `
-    <div class="overview-v227">
+    <div class="overview-v227 overview-v255">
       <section class="overview-hero-v227 tone-${tone}">
         <div class="overview-hero-top">
           <div>
@@ -204,9 +232,9 @@ function renderOverview() {
         </div>
       </section>
 
-      <section class="overview-snapshot-v227">
-        <div class="overview-section-head-v227">
-          <div><p class="eyebrow">Team snapshot</p><h3>Roster at a glance</h3></div>
+      <section class="overview-snapshot-v227 overview-compact-panel-v255">
+        <div class="overview-section-head-v227 overview-section-head-compact-v255">
+          <p class="eyebrow">Team snapshot</p>
           <button id="overviewOpenRosterBtn" class="overview-text-action" type="button">Open Roster →</button>
         </div>
         <div class="overview-snapshot-grid-v227">
@@ -217,9 +245,11 @@ function renderOverview() {
         </div>
       </section>
 
-      <section class="overview-panel-v227">
-        <div class="overview-section-head-v227">
-          <div><p class="eyebrow">Cap outlook</p><h3>Seven-season commitments</h3></div>
+      ${renderOverviewContractWatch(contractIntel)}
+
+      <section class="overview-panel-v227 overview-compact-panel-v255">
+        <div class="overview-section-head-v227 overview-section-head-compact-v255">
+          <p class="eyebrow">Cap outlook</p>
           <button id="overviewOpenCapBtn" class="overview-text-action" type="button">Open Cap →</button>
         </div>
         <div class="overview-outlook-scroll" role="region" aria-label="Seven-season cap outlook. Swipe horizontally to view future seasons." tabindex="0">
@@ -241,5 +271,6 @@ function renderOverview() {
     </div>`;
 
   if (el('overviewOpenRosterBtn')) el('overviewOpenRosterBtn').addEventListener('click', () => switchView('roster'));
+  if (el('overviewContractRosterBtn')) el('overviewContractRosterBtn').addEventListener('click', () => switchView('roster'));
   if (el('overviewOpenCapBtn')) el('overviewOpenCapBtn').addEventListener('click', () => switchView('cap'));
 }
