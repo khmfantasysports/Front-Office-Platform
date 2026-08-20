@@ -1,7 +1,6 @@
 'use strict';
 
 // League, roster, cap and transaction-rule settings.
-
 function renderSettings() {
   const horizonSeasons = contractHorizonSeasons();
   const seasonSettings = horizonSeasons.map((s) => {
@@ -9,21 +8,18 @@ function renderSettings() {
     return `<div class="compact-cap-row" data-season-setting="${s.id}"><div class="season-name">${seasonLabel(s.startYear)}</div><label><input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Salary cap" /></label><div class="cap-state">${stateLabel}</div></div>`;
   }).join('');
   const statusSettings = state.statuses.map((s) => `<div class="status-setting-compact" data-status-setting="${s.id}"><input data-status-name="${s.id}" value="${escapeAttr(s.name)}" aria-label="Status name" /><select data-status-cap="${s.id}" aria-label="Cap rule for ${escapeAttr(s.name)}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select><button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">×</button></div>`).join('');
-
   el('settingsView').innerHTML = `<div class="settings-accordion">
     ${renderTeamIdentitySettings()}
     <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Team & League</strong><span>Name, roster limits and currency</span></span></summary><div class="settings-disclosure-body"><div class="settings-fields"><label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label><label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label><label>Active roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label><label>Max Minors spots<input data-office-minors-limit type="number" min="0" step="1" value="${state.frontOffice.minorsLimit ?? ''}" placeholder="No limit" /></label><label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label></div><div class="settings-context-strip"><div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div><div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(currentSeason()?.startYear))}</strong></div></div></div></details>
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span></summary><div class="settings-disclosure-body"><div class="settings-card-head"><p class="settings-card-copy">Configure which roster statuses count against the cap.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div><div class="status-settings-list">${statusSettings}</div></div></details>
+    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span></summary><div class="settings-disclosure-body"><div class="settings-card-head"><p class="settings-card-copy">Status cap rules apply to Active-roster players. Players in Minors are excluded from cap regardless of roster status.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div><div class="status-settings-list">${statusSettings}</div></div></details>
     <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Salary Caps</strong><span>Current + six future seasons</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Leave future caps blank until your league confirms them.</p><div class="cap-settings-list">${seasonSettings}</div></div></details>
     <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Transaction Rules</strong><span>Automate waiver and buyout penalties</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">These are league settings, not NHL rules. Choose how your league handles each penalty. Full Salary and Half Salary are included as quick options.</p><div class="transaction-rule-settings">
       <div class="transaction-rule-card"><div><h4>Waiver penalty</h4><p>Applied automatically when you record a Waiver transaction.</p></div><label>Penalty method<select id="waiverPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="waiverPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="waiverPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="waiverPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
       <div class="transaction-rule-card"><div><h4>Buyout penalty</h4><p>Applied automatically when you record a Buyout transaction.</p></div><label>Penalty method<select id="buyoutPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="buyoutPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="buyoutPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="buyoutPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
     </div><div class="transaction-rules-footer"><span>For Custom Percentage, enter 0–100. For Flat Amount, enter the dollar penalty per affected season.</span><button id="saveTransactionRulesBtn" class="btn btn-primary btn-small" type="button">Save Transaction Rules</button></div></div></details>
-    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Fantrax import and portable backups</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Fantrax imports can refresh roster identity and current salary without touching future contracts.</p><div class="settings-data-actions"><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div></div></details>
+    <details class="settings-disclosure"><summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Refresh, Fantrax import and portable backups</span></span></summary><div class="settings-disclosure-body"><p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Fantrax imports can refresh roster identity and current salary without touching future contracts.</p><div class="settings-data-actions"><button id="settingsRefreshBtn" class="btn btn-secondary" type="button">Refresh Front Office</button><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div></div></details>
   </div>`;
-
   bindTeamIdentitySettings();
-
   el('waiverPenaltyMode').value = state.frontOffice.waiverPenaltyMode || 'NONE';
   el('waiverPenaltyScope').value = state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON';
   el('waiverPenaltyValue').value = state.frontOffice.waiverPenaltyValue ?? '';
@@ -43,7 +39,6 @@ function renderSettings() {
   el('buyoutPenaltyMode').addEventListener('change', updatePenaltyValueVisibility);
   updatePenaltyValueVisibility();
   el('saveTransactionRulesBtn').addEventListener('click', saveTransactionRuleSettings);
-
   document.querySelectorAll('[data-office-team]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim() || state.frontOffice.teamName; await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ team_name:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.teamName = value; }); render(); }));
   document.querySelectorAll('[data-office-league]').forEach((input) => input.addEventListener('change', async () => { const value = input.value.trim() || state.frontOffice.leagueName; await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ league_name:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.leagueName = value; }); render(); }));
   document.querySelectorAll('[data-office-roster-limit]').forEach((input) => input.addEventListener('change', async () => { const value = nullableInteger(input.value); await runCloudAction(async () => { const { error } = await db.from('front_offices').update({ roster_limit:value }).eq('front_office_id', state.frontOffice.id); if (error) throw error; state.frontOffice.rosterLimit = value; }); render(); }));
@@ -54,8 +49,33 @@ function renderSettings() {
   document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', async () => { const counts = select.value === 'true'; await runCloudAction(async () => { const { error } = await db.from('front_office_roster_statuses').update({ counts_toward_cap:counts }).eq('front_office_id', state.frontOffice.id).eq('roster_status_id', select.dataset.statusCap); if (error) throw error; statusById(select.dataset.statusCap).countsTowardCap = counts; }); render(); }));
   document.querySelectorAll('[data-remove-status]').forEach((button) => button.addEventListener('click', () => removeStatus(button.dataset.removeStatus)));
   el('addStatusBtn').addEventListener('click', addStatus);
+  el('settingsRefreshBtn').addEventListener('click', refreshCurrentFrontOfficeData);
   el('settingsImportBtn').addEventListener('click', openImportDialog);
   el('settingsExportBtn').addEventListener('click', exportRosterCsv);
+}
+
+async function refreshCurrentFrontOfficeData() {
+  const frontOfficeId = state.frontOffice?.id;
+  const button = el('settingsRefreshBtn');
+  if (!frontOfficeId || !button || button.disabled) return;
+
+  button.disabled = true;
+  button.textContent = 'Refreshing…';
+  setCloudStatus('Refreshing…', 'busy');
+
+  try {
+    await loadOffice(frontOfficeId, false);
+  } catch (error) {
+    console.error('Front Office refresh failed', error);
+    setCloudStatus('Refresh error', 'error');
+    alert(error?.message || 'Unable to refresh Front Office data.');
+  } finally {
+    const currentButton = el('settingsRefreshBtn');
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Refresh Front Office';
+    }
+  }
 }
 
 async function saveTransactionRuleSettings() {
