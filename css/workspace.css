@@ -1981,3 +1981,20 @@
     white-space:normal;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.50 — Equal Roster View Tabs
+   ============================================================ */
+
+/* The Roster view now has only two modes. Override any older
+   three-column view-switch rule so Depth and Cap Grid split
+   the available switch width evenly. */
+.roster-page .view-switch.v25.v29 {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+}
+
+.roster-page .view-switch.v25.v29 > button {
+  width:100%;
+  min-width:0;
+}
