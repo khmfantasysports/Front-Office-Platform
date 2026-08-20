@@ -13,6 +13,7 @@ async function init() {
 
   installDraftHistoryFeature();
   installTransactionHistoryPolish();
+  installWorkspaceDensityPass();
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -39,13 +40,14 @@ function installMobileWorkspaceNav() {
   const popover = document.querySelector('.utility-menu-popover');
   if (!popover || popover.querySelector('[data-mobile-workspace-nav]')) return;
 
-  const accountDivider = popover.querySelector('.utility-menu-divider');
-  const insertBefore = accountDivider || null;
+  const frontOfficeLabel = [...popover.querySelectorAll('.utility-menu-section-label')]
+    .find((item) => item.textContent.trim() === 'Front Office');
+  const insertBefore = frontOfficeLabel || popover.firstElementChild?.nextElementSibling || null;
 
   const label = document.createElement('span');
   label.className = 'utility-menu-section-label mobile-workspace-nav-only';
   label.dataset.mobileWorkspaceNav = 'label';
-  label.textContent = 'More';
+  label.textContent = 'Workspace';
 
   const transactionsButton = document.createElement('button');
   transactionsButton.className = 'btn btn-ghost nav-tab mobile-workspace-nav-only';
@@ -61,9 +63,14 @@ function installMobileWorkspaceNav() {
   settingsButton.type = 'button';
   settingsButton.textContent = 'Settings';
 
+  const divider = document.createElement('div');
+  divider.className = 'utility-menu-divider mobile-workspace-nav-only mobile-workspace-divider-v260';
+  divider.dataset.mobileWorkspaceNav = 'divider';
+
   popover.insertBefore(label, insertBefore);
   popover.insertBefore(transactionsButton, insertBefore);
   popover.insertBefore(settingsButton, insertBefore);
+  popover.insertBefore(divider, insertBefore);
 }
 
 function bindEvents() {
@@ -970,6 +977,171 @@ function installTransactionHistoryPolish() {
     decorateTransactionHistory();
     return result;
   };
+}
+
+
+
+// -----------------------------------------------------------------------------
+// V2.60 — Workspace Density Pass
+// Applies the compact Transactions philosophy where it removes redundancy.
+// Presentation only; page data and mutations remain unchanged.
+// -----------------------------------------------------------------------------
+let workspaceDensityPassInstalled = false;
+
+function normalizeWorkspaceLabel(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+}
+
+function activeWorkspaceAssets() {
+  return (state.assets || []).filter((asset) => !asset.archivedAt);
+}
+
+function assetTabCountV260(label) {
+  const key = normalizeWorkspaceLabel(label);
+  const assets = activeWorkspaceAssets();
+
+  if (key === 'all' || key.includes('allassets')) return assets.length;
+
+  if (key.includes('draft') || key === 'picks' || key.includes('draftpick')) {
+    return assets.filter((asset) => asset.type === 'DRAFT_PICK').length;
+  }
+
+  if (key.includes('rights')) {
+    return assets.filter((asset) =>
+      asset.type === 'PROSPECT_RIGHTS' || asset.type === 'PLAYER_RIGHTS'
+    ).length;
+  }
+
+  if (key.includes('conditional')) {
+    return assets.filter((asset) =>
+      asset.status === 'CONDITIONAL' || asset.type === 'CONDITIONAL_ASSET'
+    ).length;
+  }
+
+  if (key.includes('future')) {
+    return assets.filter((asset) => asset.type === 'FUTURE_CONSIDERATIONS').length;
+  }
+
+  if (key.includes('other')) {
+    return assets.filter((asset) =>
+      ![
+        'DRAFT_PICK',
+        'PROSPECT_RIGHTS',
+        'PLAYER_RIGHTS',
+        'CONDITIONAL_ASSET',
+        'FUTURE_CONSIDERATIONS'
+      ].includes(asset.type)
+    ).length;
+  }
+
+  return null;
+}
+
+function compactMinorsPageV260() {
+  const page = document.querySelector('#farmView .farm-page-v228');
+  if (!page) return;
+
+  // The Minors roster and called-up sections already carry their own counts.
+  page.querySelector('.farm-summary-grid-v228')?.remove();
+
+  const copy = page.querySelector('.farm-page-heading-v228 .page-copy');
+  if (copy) copy.textContent = 'Prospects, Minors assignments and call-ups.';
+
+  page.classList.add('farm-page-v260');
+}
+
+function compactAssetsPageV260() {
+  const page = document.querySelector('#assetsView .assets-page-v230, #assetsView .assets-page-v228, #assetsView .assets-page');
+  if (!page) return;
+
+  const summary = page.querySelector('.asset-summary-grid-v230, .asset-summary-grid-v228, .asset-summary-strip');
+  summary?.remove();
+
+  const copy = page.querySelector('.asset-hero-copy-v230 p:last-child');
+  if (copy) copy.textContent = 'Draft picks, rights and future assets.';
+
+  page.querySelectorAll('.asset-tab').forEach((button) => {
+    if (button.querySelector('.asset-tab-count-v260')) return;
+
+    const count = assetTabCountV260(button.textContent);
+    if (count === null) return;
+
+    const badge = document.createElement('strong');
+    badge.className = 'asset-tab-count-v260';
+    badge.textContent = String(count);
+    button.appendChild(badge);
+  });
+
+  page.classList.add('assets-page-v260');
+}
+
+function compactCapPageV260() {
+  const page = document.querySelector('#capView .cap-page-v228');
+  if (!page) return;
+
+  // The cap hero already says season + cap position, so this heading is redundant.
+  page.querySelector(':scope > .cap-page-heading-v228')?.remove();
+
+  // The first Cap panel after the hero is the outlook. Keep the useful label
+  // but remove the second title/paragraph layer.
+  const outlookPanel = page.querySelector('.cap-hero-v228 + .cap-panel-v228');
+  const outlookHead = outlookPanel?.querySelector('.cap-section-head-v228');
+  if (outlookHead) {
+    outlookHead.querySelector('h3')?.remove();
+    outlookHead.querySelector('p:not(.eyebrow)')?.remove();
+    outlookHead.classList.add('cap-section-head-compact-v260');
+  }
+
+  page.classList.add('cap-page-v260');
+}
+
+function compactSettingsPageV260() {
+  const page = document.querySelector('#settingsView .settings-accordion');
+  if (!page) return;
+  page.classList.add('settings-accordion-v260');
+}
+
+function installWorkspaceDensityPass() {
+  if (workspaceDensityPassInstalled) return;
+  workspaceDensityPassInstalled = true;
+
+  if (typeof renderFarm === 'function') {
+    const originalRenderFarmV260 = renderFarm;
+    renderFarm = function() {
+      const result = originalRenderFarmV260();
+      compactMinorsPageV260();
+      return result;
+    };
+  }
+
+  if (typeof renderAssets === 'function') {
+    const originalRenderAssetsV260 = renderAssets;
+    renderAssets = function() {
+      const result = originalRenderAssetsV260();
+      compactAssetsPageV260();
+      return result;
+    };
+  }
+
+  if (typeof renderCap === 'function') {
+    const originalRenderCapV260 = renderCap;
+    renderCap = function() {
+      const result = originalRenderCapV260();
+      compactCapPageV260();
+      return result;
+    };
+  }
+
+  if (typeof renderSettings === 'function') {
+    const originalRenderSettingsV260 = renderSettings;
+    renderSettings = function() {
+      const result = originalRenderSettingsV260();
+      compactSettingsPageV260();
+      return result;
+    };
+  }
 }
 
 
