@@ -1395,3 +1395,271 @@
     grid-template-columns:auto 38px minmax(0,1fr);
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.47 — Settings usability + safety
+   ============================================================ */
+
+.settings-data-actions {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.settings-save-status {
+  flex:0 0 auto;
+  min-width:64px;
+  margin-left:auto;
+  margin-right:4px;
+  color:var(--muted);
+  font-size:.59rem;
+  font-weight:850;
+  text-align:right;
+  white-space:nowrap;
+}
+.settings-save-status.saving { color:var(--accent); }
+.settings-save-status.saved { color:var(--healthy); }
+.settings-save-status.error { color:var(--danger); }
+
+.settings-summary-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  margin-top:12px;
+  margin-bottom:11px;
+}
+.settings-summary-item {
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0B151E;
+}
+.settings-summary-item span {
+  display:block;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.56rem;
+  font-weight:850;
+  letter-spacing:.035em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.settings-summary-item strong {
+  display:block;
+  margin-top:4px;
+  overflow:hidden;
+  color:var(--text);
+  font-size:.78rem;
+  font-weight:900;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.settings-summary-item.good {
+  border-color:rgba(82,215,194,.24);
+  background:rgba(82,215,194,.045);
+}
+.settings-summary-item.good strong { color:var(--healthy); }
+.settings-summary-item.warning {
+  border-color:rgba(242,198,109,.30);
+  background:rgba(242,198,109,.045);
+}
+.settings-summary-item.warning strong { color:var(--warning); }
+
+.settings-current-season-control {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:7px;
+  align-items:end;
+  margin-top:10px;
+  padding:10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0B151E;
+}
+.settings-current-season-control label {
+  display:grid;
+  gap:5px;
+  min-width:0;
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:700;
+}
+.settings-current-season-control select { min-width:0; }
+.settings-current-season-control small {
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:.61rem;
+  line-height:1.4;
+}
+
+.settings-health-panel {
+  margin-top:12px;
+  margin-bottom:11px;
+  padding:11px;
+  border:1px solid var(--border-soft);
+  border-radius:11px;
+  background:#0B151E;
+}
+.settings-health-panel.is-good {
+  border-color:rgba(82,215,194,.25);
+  background:linear-gradient(180deg,rgba(82,215,194,.045),#0B151E 72%);
+}
+.settings-health-panel.has-warning {
+  border-color:rgba(242,198,109,.30);
+  background:linear-gradient(180deg,rgba(242,198,109,.045),#0B151E 72%);
+}
+.settings-health-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.settings-health-head > div span {
+  display:block;
+  color:var(--muted);
+  font-size:.56rem;
+  font-weight:850;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.settings-health-head > div strong {
+  display:block;
+  margin-top:3px;
+  font-size:.83rem;
+}
+.settings-health-badge {
+  flex:0 0 auto;
+  padding:4px 7px;
+  border:1px solid var(--border-soft);
+  border-radius:999px;
+  color:#CFEAFF;
+  background:rgba(50,173,255,.05);
+  font-size:.58rem;
+  font-weight:850;
+}
+.settings-health-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+  margin-top:9px;
+}
+.settings-health-grid > div {
+  min-width:0;
+  padding:7px 8px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:8px;
+  background:rgba(255,255,255,.018);
+}
+.settings-health-grid span {
+  display:block;
+  color:var(--muted);
+  font-size:.54rem;
+  line-height:1.25;
+}
+.settings-health-grid strong {
+  display:block;
+  margin-top:3px;
+  font-size:.76rem;
+}
+.settings-health-grid .warning strong { color:var(--warning); }
+.settings-health-panel > p {
+  margin:9px 0 0;
+  color:var(--muted);
+  font-size:.60rem;
+  line-height:1.4;
+}
+
+.settings-danger-zone {
+  border:1.5px solid rgba(255,96,96,.70) !important;
+  background:
+    linear-gradient(180deg,rgba(255,72,72,.075),rgba(13,24,34,.88) 70%) !important;
+  box-shadow:0 0 0 1px rgba(255,96,96,.09), inset 3px 0 0 rgba(255,96,96,.58);
+}
+.settings-danger-zone > summary {
+  color:#FFD6D6;
+  background:rgba(255,68,68,.035);
+}
+.settings-danger-zone > summary::after { color:#FF7D7D; }
+.settings-danger-zone .settings-disclosure-title strong { color:#FF8E8E; }
+.settings-danger-zone .settings-disclosure-title span { color:#D69A9A; }
+.settings-danger-zone-body {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  border-top-color:rgba(255,96,96,.26) !important;
+}
+.settings-danger-copy strong {
+  display:block;
+  color:#FFD1D1;
+  font-size:.82rem;
+}
+.settings-danger-copy p {
+  margin:4px 0 0;
+  max-width:760px;
+  color:#CFA2A2;
+  font-size:.65rem;
+  line-height:1.45;
+}
+.settings-danger-button {
+  min-width:164px;
+  border-color:rgba(255,96,96,.72) !important;
+  box-shadow:0 0 0 1px rgba(255,96,96,.10);
+}
+
+@media (max-width:720px) {
+  .settings-data-actions { grid-template-columns:1fr 1fr; }
+  .settings-save-status {
+    min-width:52px;
+    margin-right:2px;
+    font-size:.54rem;
+  }
+  .settings-summary-grid,
+  .settings-health-grid {
+    grid-template-columns:1fr 1fr;
+  }
+  .settings-current-season-control {
+    grid-template-columns:minmax(0,1fr) auto;
+    padding:9px;
+  }
+  .settings-danger-zone-body {
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .settings-danger-button {
+    width:100%;
+    min-width:0;
+  }
+}
+@media (max-width:390px) {
+  .settings-data-actions { grid-template-columns:1fr; }
+  .settings-disclosure > summary {
+    gap:6px;
+  }
+  .settings-save-status {
+    max-width:62px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .settings-summary-grid,
+  .settings-health-grid {
+    gap:5px;
+  }
+  .settings-summary-item {
+    padding:8px;
+  }
+  .settings-summary-item span {
+    font-size:.51rem;
+  }
+  .settings-summary-item strong {
+    font-size:.70rem;
+  }
+  .settings-current-season-control {
+    grid-template-columns:1fr;
+    align-items:stretch;
+  }
+  .settings-current-season-control .btn {
+    width:100%;
+  }
+}
