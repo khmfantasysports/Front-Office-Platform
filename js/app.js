@@ -12,6 +12,7 @@ async function init() {
   }
 
   installDraftHistoryFeature();
+  installTransactionHistoryPolish();
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -723,6 +724,252 @@ function installDraftHistoryFeature() {
       return result;
     };
   }
+}
+
+
+
+// -----------------------------------------------------------------------------
+// V2.59 — Transaction History Polish
+// Removes redundant summary blocks, adds type-count filters and compacts cards.
+// This is presentation/filtering only; transaction persistence is unchanged.
+// -----------------------------------------------------------------------------
+let transactionHistoryFilter = 'ALL';
+
+const TRANSACTION_HISTORY_TYPE_ORDER = [
+  'Draft',
+  'Trade',
+  'Signing',
+  'Extension',
+  'Call Up',
+  'Send Down',
+  'Waiver',
+  'Buyout',
+  'Release',
+  'Drop',
+  'Add',
+  'Other'
+];
+
+function transactionHistoryTypeCounts() {
+  const counts = new Map();
+  (state.transactions || []).forEach((tx) => {
+    const type = String(tx.type || 'Other').trim() || 'Other';
+    counts.set(type, (counts.get(type) || 0) + 1);
+  });
+  return counts;
+}
+
+function transactionHistoryTypes() {
+  const counts = transactionHistoryTypeCounts();
+  const known = TRANSACTION_HISTORY_TYPE_ORDER.filter((type) => counts.has(type));
+  const unknown = [...counts.keys()]
+    .filter((type) => !TRANSACTION_HISTORY_TYPE_ORDER.includes(type))
+    .sort((a,b) => a.localeCompare(b));
+  return [...known, ...unknown];
+}
+
+function transactionHistoryFilterLabel(type) {
+  return type === 'ALL' ? 'All' : type;
+}
+
+function applyTransactionHistoryFilter() {
+  const cards = [...document.querySelectorAll('#transactionsView .transaction-card-v228[data-history-type]')];
+  const validTypes = new Set(cards.map((card) => card.dataset.historyType));
+
+  if (
+    transactionHistoryFilter !== 'ALL'
+    && !validTypes.has(transactionHistoryFilter)
+  ) {
+    transactionHistoryFilter = 'ALL';
+  }
+
+  let shown = 0;
+  cards.forEach((card) => {
+    const visible =
+      transactionHistoryFilter === 'ALL'
+      || card.dataset.historyType === transactionHistoryFilter;
+    card.hidden = !visible;
+    if (visible) shown += 1;
+  });
+
+  document.querySelectorAll('#transactionsView [data-transaction-history-filter]').forEach((button) => {
+    const active = button.dataset.transactionHistoryFilter === transactionHistoryFilter;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
+
+  const status = document.querySelector('#transactionsView [data-transaction-history-status]');
+  if (status) {
+    status.textContent =
+      transactionHistoryFilter === 'ALL'
+        ? `${shown} recorded`
+        : `${shown} ${transactionHistoryFilter}`;
+  }
+}
+
+function transactionHistoryCardTransaction(card) {
+  const editButton = card.querySelector('[data-edit-transaction]');
+  const deleteButton = card.querySelector('[data-delete-transaction]');
+  const transactionId =
+    editButton?.dataset.editTransaction
+    || deleteButton?.dataset.deleteTransaction
+    || '';
+  return (state.transactions || []).find((tx) => tx.id === transactionId) || null;
+}
+
+function moveTransactionHistoryActions(card) {
+  const head = card.querySelector('.tx-ledger-head-v228');
+  const actions = card.querySelector('.tx-ledger-actions-v228');
+  if (!head || !actions || head.querySelector('.tx-ledger-meta-v259')) return;
+
+  const meta = document.createElement('div');
+  meta.className = 'tx-ledger-meta-v259';
+
+  const time = head.querySelector('time');
+  if (time) meta.appendChild(time);
+
+  actions.classList.add('tx-ledger-actions-inline-v259');
+  meta.appendChild(actions);
+  head.appendChild(meta);
+}
+
+function removeRedundantTransactionPlayerRow(card, tx) {
+  if (!tx) return;
+
+  const compactTypes = new Set([
+    'Call Up',
+    'Send Down',
+    'Extension',
+    'Waiver',
+    'Buyout',
+    'Release',
+    'Drop'
+  ]);
+
+  if (!compactTypes.has(tx.type)) return;
+
+  const items = transactionItemsFor(tx.id);
+  const playerItems = items.filter((item) =>
+    item.kind === 'PLAYER'
+    && item.direction === 'NONE'
+  );
+
+  if (playerItems.length !== 1) return;
+
+  const playerLabel = String(playerItems[0].label || '').trim().toLowerCase();
+  const summary = String(tx.summary || '').trim().toLowerCase();
+  if (!playerLabel || !summary.includes(playerLabel)) return;
+
+  const body = card.querySelector('.tx-ledger-body-v228');
+  if (!body) return;
+
+  const playerRow = [...body.querySelectorAll('.tx-ledger-flow-v228')].find((row) => {
+    const direction = row.querySelector('.tx-ledger-direction-v228');
+    return direction?.textContent.trim().toUpperCase() === 'PLAYER';
+  });
+
+  playerRow?.remove();
+  if (!body.children.length) body.remove();
+}
+
+function renderTransactionHistoryFilterBar(page) {
+  const existingSummary = page.querySelector('.tx-summary-grid-v228');
+  existingSummary?.remove();
+
+  const existingBar = page.querySelector('.tx-history-toolbar-v259');
+  existingBar?.remove();
+
+  const counts = transactionHistoryTypeCounts();
+  const types = transactionHistoryTypes();
+
+  if (
+    transactionHistoryFilter !== 'ALL'
+    && !counts.has(transactionHistoryFilter)
+  ) {
+    transactionHistoryFilter = 'ALL';
+  }
+
+  const toolbar = document.createElement('div');
+  toolbar.className = 'tx-history-toolbar-v259';
+
+  const filters = document.createElement('div');
+  filters.className = 'tx-history-filters-v259';
+  filters.setAttribute('role', 'group');
+  filters.setAttribute('aria-label', 'Filter transaction history');
+
+  const filterTypes = ['ALL', ...types];
+  filterTypes.forEach((type) => {
+    const count = type === 'ALL'
+      ? (state.transactions || []).length
+      : (counts.get(type) || 0);
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'tx-history-filter-v259';
+    button.dataset.transactionHistoryFilter = type;
+    button.setAttribute(
+      'aria-pressed',
+      transactionHistoryFilter === type ? 'true' : 'false'
+    );
+    if (transactionHistoryFilter === type) button.classList.add('active');
+
+    const label = document.createElement('span');
+    label.textContent = transactionHistoryFilterLabel(type);
+
+    const badge = document.createElement('strong');
+    badge.textContent = String(count);
+
+    button.append(label, badge);
+    button.addEventListener('click', () => {
+      transactionHistoryFilter = type;
+      applyTransactionHistoryFilter();
+    });
+    filters.appendChild(button);
+  });
+
+  const status = document.createElement('span');
+  status.className = 'tx-history-status-v259';
+  status.dataset.transactionHistoryStatus = '';
+
+  toolbar.append(filters, status);
+
+  const heading = page.querySelector('.tx-page-heading-v228');
+  if (heading) heading.insertAdjacentElement('afterend', toolbar);
+  else page.prepend(toolbar);
+}
+
+function decorateTransactionHistory() {
+  const page = document.querySelector('#transactionsView .transactions-page-v228');
+  if (!page) return;
+
+  const copy = page.querySelector('.tx-page-heading-v228 .page-copy');
+  if (copy) {
+    copy.textContent = 'Drafts, trades, signings and roster moves — all in one chronological history.';
+  }
+
+  const cards = [...page.querySelectorAll('.transaction-card-v228')];
+  cards.forEach((card) => {
+    const tx = transactionHistoryCardTransaction(card);
+    if (!tx) return;
+
+    card.dataset.historyType = tx.type || 'Other';
+    moveTransactionHistoryActions(card);
+    removeRedundantTransactionPlayerRow(card, tx);
+  });
+
+  renderTransactionHistoryFilterBar(page);
+  applyTransactionHistoryFilter();
+}
+
+function installTransactionHistoryPolish() {
+  if (typeof renderTransactions !== 'function') return;
+
+  const originalRenderTransactionsV259 = renderTransactions;
+  renderTransactions = function() {
+    const result = originalRenderTransactionsV259();
+    decorateTransactionHistory();
+    return result;
+  };
 }
 
 
