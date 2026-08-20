@@ -4459,3 +4459,340 @@
     gap:5px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.61 — Player Editor Polish
+   ============================================================ */
+
+#playerDialog.player-dialog-v261 .drawer-card {
+  width:100%;
+}
+
+#playerDialog.player-dialog-v261 .drawer-header {
+  padding:12px 14px;
+}
+
+#playerDialog.player-dialog-v261 .drawer-header .eyebrow {
+  margin-bottom:2px;
+  font-size:.60rem;
+}
+
+#playerDialog.player-dialog-v261 .drawer-header h3 {
+  margin:0;
+  font-size:1rem;
+}
+
+#playerDialog.player-dialog-v261 .drawer-body {
+  padding:12px 14px 84px;
+}
+
+#playerDialog.player-dialog-v261 .player-intro-v261 {
+  display:none;
+}
+
+/* Daily-use roster fields stay immediately visible. */
+#playerDialog.player-dialog-v261 .player-basics-v261 {
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+#playerDialog.player-dialog-v261 .player-basics-v261 .player-name-field {
+  grid-column:1 / -1;
+}
+
+#playerDialog.player-dialog-v261 .player-basics-v261 .status-field {
+  grid-column:auto;
+}
+
+#playerDialog.player-dialog-v261 .player-basics-v261 label,
+#playerDialog.player-dialog-v261 .player-more-grid-v261 label,
+#playerDialog.player-dialog-v261 .salary-change-grid-v261 label,
+#playerDialog.player-dialog-v261 .player-notes-body-v261 label {
+  gap:4px;
+  font-size:.66rem;
+}
+
+#playerDialog.player-dialog-v261 input,
+#playerDialog.player-dialog-v261 select,
+#playerDialog.player-dialog-v261 textarea {
+  min-height:38px;
+  padding:7px 9px;
+  border-radius:9px;
+}
+
+/* Shared compact disclosure language. */
+#playerDialog.player-dialog-v261 .player-disclosure-v261 {
+  margin-top:8px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:rgba(9,18,27,.72);
+  overflow:hidden;
+}
+
+#playerDialog.player-dialog-v261 .player-disclosure-v261 > summary {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:34px;
+  padding:7px 9px;
+  list-style:none;
+  cursor:pointer;
+  color:#D5E1EA;
+  font-size:.64rem;
+  font-weight:850;
+}
+
+#playerDialog.player-dialog-v261 .player-disclosure-v261 > summary::-webkit-details-marker {
+  display:none;
+}
+
+#playerDialog.player-dialog-v261 .player-disclosure-v261 > summary::after {
+  content:'+';
+  flex:0 0 auto;
+  color:var(--accent);
+  font-size:.85rem;
+  line-height:1;
+}
+
+#playerDialog.player-dialog-v261 .player-disclosure-v261[open] > summary::after {
+  content:'−';
+}
+
+#playerDialog.player-dialog-v261 .player-disclosure-v261 > summary > span {
+  min-width:0;
+}
+
+#playerDialog.player-dialog-v261 .player-disclosure-v261 > summary > small {
+  margin-left:auto;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.54rem;
+  font-weight:700;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#playerDialog.player-dialog-v261 .player-more-grid-v261 {
+  display:grid;
+  grid-template-columns:minmax(0,1.25fr) minmax(0,.8fr) minmax(64px,.45fr);
+  gap:7px;
+  padding:0 9px 9px;
+}
+
+/* Contract is the primary editor block, but no longer needs four equal fields. */
+#playerDialog.player-dialog-v261 .quick-contract {
+  margin-top:9px;
+  padding:10px;
+  border-radius:11px;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-head {
+  margin-bottom:8px;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-head .eyebrow {
+  margin-bottom:2px;
+  font-size:.58rem;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-head h4 {
+  font-size:.82rem;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-head p {
+  margin-top:2px;
+  font-size:.58rem;
+  line-height:1.3;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-grid-v261 {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-grid-v261 .contract-through-field {
+  grid-column:auto;
+}
+
+#playerDialog.player-dialog-v261 .salary-change-details-v261 {
+  grid-column:1 / -1;
+  margin-top:0;
+}
+
+#playerDialog.player-dialog-v261 .salary-change-grid-v261 {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  padding:0 9px 9px;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-grid-v261 .quick-contract-action {
+  grid-column:1 / -1;
+  gap:3px;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-grid-v261 .quick-contract-action .btn {
+  min-height:34px;
+  padding:6px 9px;
+  font-size:.62rem;
+}
+
+#playerDialog.player-dialog-v261 .quick-contract-grid-v261 .quick-contract-action small {
+  font-size:.50rem;
+  line-height:1.25;
+}
+
+/* Existing advanced contract remains native details, simply made denser. */
+#playerDialog.player-dialog-v261 .advanced-contract {
+  margin-top:8px;
+  padding-top:8px;
+}
+
+#playerDialog.player-dialog-v261 .advanced-contract summary {
+  min-height:28px;
+  font-size:.61rem;
+}
+
+#playerDialog.player-dialog-v261 .advanced-contract-copy {
+  margin:4px 0 7px;
+  font-size:.54rem;
+  line-height:1.3;
+}
+
+#playerDialog.player-dialog-v261 .contract-grid {
+  gap:6px;
+  margin-top:7px;
+}
+
+#playerDialog.player-dialog-v261 .contract-row {
+  grid-template-columns:78px 1fr 1fr;
+  gap:6px;
+  padding:7px;
+  border-radius:9px;
+}
+
+#playerDialog.player-dialog-v261 .contract-row .season-label {
+  padding-bottom:8px;
+  font-size:.62rem;
+}
+
+#playerDialog.player-dialog-v261 .player-notes-section {
+  margin-top:8px;
+}
+
+#playerDialog.player-dialog-v261 .player-notes-details-v261 {
+  margin-top:0;
+}
+
+#playerDialog.player-dialog-v261 .player-notes-body-v261 {
+  padding:0 9px 9px;
+}
+
+#playerDialog.player-dialog-v261 .player-notes-body-v261 textarea {
+  min-height:70px;
+}
+
+/* Save controls stay reachable without a large footer. */
+#playerDialog.player-dialog-v261 .drawer-footer {
+  gap:7px;
+  padding:8px 10px;
+  background:rgba(13,24,34,.985);
+}
+
+#playerDialog.player-dialog-v261 .drawer-footer-right {
+  gap:5px;
+  align-items:center;
+}
+
+#playerDialog.player-dialog-v261 .drawer-footer .btn {
+  min-height:34px;
+  padding:6px 9px;
+  font-size:.61rem;
+}
+
+#playerDialog.player-dialog-v261 #savePlayerBtn {
+  min-width:96px;
+}
+
+#playerDialog.player-dialog-v261 #playerSaveStatus {
+  font-size:.52rem;
+  white-space:nowrap;
+}
+
+#playerDialog.player-dialog-v261 #playerWarnings {
+  margin-top:8px;
+  padding:8px 9px;
+  font-size:.58rem;
+}
+
+@media (max-width:720px) {
+  #playerDialog.player-dialog-v261 .drawer-header {
+    padding:10px 11px;
+  }
+
+  #playerDialog.player-dialog-v261 .drawer-body {
+    padding:10px 11px 76px;
+  }
+
+  #playerDialog.player-dialog-v261 .player-basics-v261 {
+    gap:7px;
+  }
+
+  #playerDialog.player-dialog-v261 .quick-contract {
+    padding:9px;
+  }
+
+  #playerDialog.player-dialog-v261 .quick-contract-grid-v261 {
+    grid-template-columns:1fr 1fr;
+  }
+
+  #playerDialog.player-dialog-v261 .quick-contract-grid-v261 .contract-through-field {
+    grid-column:1 / -1;
+  }
+
+  #playerDialog.player-dialog-v261 .contract-row {
+    grid-template-columns:1fr 1fr 1fr;
+    align-items:end;
+  }
+
+  #playerDialog.player-dialog-v261 .contract-row .season-label {
+    padding-bottom:8px;
+  }
+
+  #playerDialog.player-dialog-v261 .drawer-footer {
+    padding:7px 9px;
+  }
+}
+
+@media (max-width:430px) {
+  #playerDialog.player-dialog-v261 .player-more-grid-v261 {
+    grid-template-columns:minmax(0,1.2fr) minmax(72px,.7fr) minmax(54px,.45fr);
+    gap:6px;
+  }
+
+  #playerDialog.player-dialog-v261 .player-disclosure-v261 > summary {
+    padding:6px 8px;
+  }
+
+  #playerDialog.player-dialog-v261 .player-disclosure-v261 > summary > small {
+    max-width:180px;
+  }
+
+  #playerDialog.player-dialog-v261 .contract-row {
+    grid-template-columns:1fr;
+  }
+
+  #playerDialog.player-dialog-v261 .contract-row .season-label {
+    padding-bottom:0;
+  }
+
+  #playerDialog.player-dialog-v261 .drawer-footer-right {
+    margin-left:auto;
+  }
+
+  #playerDialog.player-dialog-v261 #cancelPlayerBtn {
+    display:none;
+  }
+}
