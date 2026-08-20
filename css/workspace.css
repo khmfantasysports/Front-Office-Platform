@@ -3705,3 +3705,130 @@
     font-size:.56rem;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.58 — Draft History
+   ============================================================ */
+
+.draft-history-section {
+  margin-top:10px;
+  padding:11px;
+  border:1px solid rgba(50,173,255,.24);
+  border-radius:11px;
+  background:linear-gradient(180deg,rgba(50,173,255,.045),rgba(11,21,30,.92));
+}
+
+.draft-history-section.hidden {
+  display:none;
+}
+
+.draft-history-head h4 {
+  margin:2px 0 0;
+  color:var(--text);
+  font-size:.84rem;
+}
+
+.draft-history-head p:last-child {
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.62rem;
+  line-height:1.4;
+}
+
+.draft-history-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+.draft-history-grid label {
+  display:grid;
+  gap:5px;
+  min-width:0;
+  color:var(--muted);
+  font-size:.66rem;
+  font-weight:750;
+}
+
+.draft-history-grid select {
+  min-width:0;
+}
+
+.draft-history-selection-meta {
+  margin-top:8px;
+  padding:8px 9px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:rgba(255,255,255,.018);
+  color:var(--muted);
+  font-size:.58rem;
+  line-height:1.35;
+}
+
+.draft-history-selection-meta span,
+.draft-history-selection-meta small {
+  display:block;
+}
+
+.draft-history-selection-meta strong {
+  color:#DCEBFA;
+}
+
+.draft-history-selection-meta small {
+  margin-top:2px;
+}
+
+.draft-history-selection-meta .warning {
+  color:var(--warning);
+}
+
+.draft-history-lock {
+  margin-top:8px;
+  padding:7px 9px;
+  border:1px solid rgba(242,198,109,.26);
+  border-radius:9px;
+  color:#E4C77F;
+  background:rgba(242,198,109,.04);
+  font-size:.57rem;
+  line-height:1.4;
+}
+
+.draft-history-card {
+  border-color:rgba(50,173,255,.22) !important;
+  box-shadow:inset 2px 0 0 rgba(50,173,255,.34);
+}
+
+.draft-history-card .transaction-type {
+  color:#8DCCFF;
+}
+
+.draft-history-card .draft-pick-flow .tx-ledger-direction-v228 {
+  color:#8DCCFF;
+}
+
+.asset-status.used,
+.asset-status.used-drafted {
+  border-color:rgba(134,159,180,.26);
+  color:#AFC1D1;
+  background:rgba(134,159,180,.055);
+}
+
+@media (max-width:720px) {
+  .draft-history-section {
+    margin-top:8px;
+    padding:9px;
+  }
+
+  .draft-history-grid {
+    grid-template-columns:1fr;
+    gap:7px;
+    margin-top:8px;
+  }
+
+  .draft-history-selection-meta,
+  .draft-history-lock {
+    padding:7px 8px;
+  }
+}
