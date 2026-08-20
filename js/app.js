@@ -14,6 +14,7 @@ async function init() {
   installDraftHistoryFeature();
   installTransactionHistoryPolish();
   installWorkspaceDensityPass();
+  installPlayerEditorPolish();
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -1139,6 +1140,259 @@ function installWorkspaceDensityPass() {
     renderSettings = function() {
       const result = originalRenderSettingsV260();
       compactSettingsPageV260();
+      return result;
+    };
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+// V2.61 — Player Editor Polish
+// Progressive disclosure + compact mobile editing. No data contract changes.
+// -----------------------------------------------------------------------------
+let playerEditorPolishInstalled = false;
+
+function playerEditorLabelFor(id) {
+  return el(id)?.closest('label') || null;
+}
+
+function updatePlayerMoreDetailsSummaryV261() {
+  const summary = el('playerMoreDetailsSummaryV261');
+  if (!summary) return;
+
+  const details = [];
+  const team = el('realTeam')?.value.trim();
+  const age = el('playerAge')?.value.trim();
+  const eligible = el('playerEligible')?.value.trim();
+
+  if (team) details.push(team.toUpperCase());
+  if (age) details.push(`Age ${age}`);
+  if (eligible) details.push(eligible.toUpperCase());
+
+  summary.textContent = details.length
+    ? details.join(' · ')
+    : 'NHL team · age · eligibility';
+}
+
+function updatePlayerNotesSummaryV261() {
+  const summary = el('playerNotesSummaryV261');
+  if (!summary) return;
+  summary.textContent = el('playerNotes')?.value.trim() ? 'Added' : 'Optional';
+}
+
+function updateSalaryChangeSummaryV261() {
+  const summary = el('salaryChangeSummaryV261');
+  const details = el('salaryChangeDetailsV261');
+  if (!summary || !details) return;
+
+  const mode = el('salaryChangeMode')?.value || 'same';
+  const pct = Number(el('salaryChangePct')?.value || 0);
+
+  if (mode === 'same') {
+    summary.textContent = 'Optional';
+    return;
+  }
+
+  const label = mode === 'increase' ? 'Increase' : 'Decrease';
+  summary.textContent = pct > 0 ? `${label} ${pct}% / year` : `${label} each year`;
+  details.open = true;
+}
+
+function ensurePlayerEditorPolishStructure() {
+  const dialog = el('playerDialog');
+  if (!dialog || dialog.dataset.v261PlayerPolish === 'true') return;
+
+  dialog.dataset.v261PlayerPolish = 'true';
+  dialog.classList.add('player-dialog-v261');
+
+  const intro = el('playerDialogIntro');
+  if (intro) intro.classList.add('player-intro-v261');
+
+  const basics = dialog.querySelector('.player-basics-v18');
+  if (basics) {
+    basics.classList.add('player-basics-v261');
+
+    const extraFields = [
+      playerEditorLabelFor('playerEligible'),
+      playerEditorLabelFor('realTeam'),
+      playerEditorLabelFor('playerAge')
+    ].filter(Boolean);
+
+    if (extraFields.length && !el('playerMoreDetailsV261')) {
+      const details = document.createElement('details');
+      details.id = 'playerMoreDetailsV261';
+      details.className = 'player-disclosure-v261 player-more-details-v261';
+
+      const summary = document.createElement('summary');
+      summary.innerHTML = `
+        <span>More player details</span>
+        <small id="playerMoreDetailsSummaryV261">NHL team · age · eligibility</small>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'player-more-grid-v261';
+
+      extraFields.forEach((field) => body.appendChild(field));
+      details.append(summary, body);
+      basics.insertAdjacentElement('afterend', details);
+
+      ['realTeam', 'playerAge', 'playerEligible'].forEach((id) => {
+        el(id)?.addEventListener('input', updatePlayerMoreDetailsSummaryV261);
+        el(id)?.addEventListener('change', updatePlayerMoreDetailsSummaryV261);
+      });
+    }
+  }
+
+  const quickContract = dialog.querySelector('.quick-contract');
+  const quickHead = quickContract?.querySelector('.quick-contract-head');
+  if (quickHead) {
+    const title = quickHead.querySelector('h4');
+    const copy = quickHead.querySelector('p:not(.eyebrow)');
+    if (title) title.textContent = 'Contract';
+    if (copy) copy.textContent = 'Salary and term first. Use the optional controls only when needed.';
+  }
+
+  const quickGrid = quickContract?.querySelector('.quick-contract-grid-v19');
+  if (quickGrid) {
+    quickGrid.classList.add('quick-contract-grid-v261');
+
+    const modeLabel = playerEditorLabelFor('salaryChangeMode');
+    const pctLabel = el('salaryChangePctLabel');
+    const contractThrough = quickGrid.querySelector('.contract-through-field');
+
+    if (modeLabel && pctLabel && !el('salaryChangeDetailsV261')) {
+      const details = document.createElement('details');
+      details.id = 'salaryChangeDetailsV261';
+      details.className = 'player-disclosure-v261 salary-change-details-v261';
+
+      const summary = document.createElement('summary');
+      summary.innerHTML = `
+        <span>Annual salary change</span>
+        <small id="salaryChangeSummaryV261">Optional</small>
+      `;
+
+      const body = document.createElement('div');
+      body.className = 'salary-change-grid-v261';
+      body.append(modeLabel, pctLabel);
+      details.append(summary, body);
+
+      if (contractThrough) contractThrough.insertAdjacentElement('afterend', details);
+      else quickGrid.appendChild(details);
+
+      el('salaryChangeMode')?.addEventListener('change', updateSalaryChangeSummaryV261);
+      el('salaryChangePct')?.addEventListener('input', updateSalaryChangeSummaryV261);
+      el('salaryChangePct')?.addEventListener('change', updateSalaryChangeSummaryV261);
+    }
+
+    const action = quickGrid.querySelector('.quick-contract-action');
+    if (action) {
+      const button = action.querySelector('#applyQuickContractBtn');
+      const helper = action.querySelector('small');
+      if (button) button.textContent = 'Apply contract years';
+      if (helper) helper.textContent = 'Applies from the current season. Percentage changes compound year to year.';
+    }
+  }
+
+  const advanced = el('advancedContract');
+  const advancedSummary = advanced?.querySelector('summary');
+  if (advancedSummary) advancedSummary.textContent = 'Year-by-year salaries & cap overrides';
+
+  const notesSection = dialog.querySelector('.player-notes-section');
+  const notesLabel = playerEditorLabelFor('playerNotes');
+  if (notesSection && notesLabel && !el('playerNotesDetailsV261')) {
+    const details = document.createElement('details');
+    details.id = 'playerNotesDetailsV261';
+    details.className = 'player-disclosure-v261 player-notes-details-v261';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = `
+      <span>Notes</span>
+      <small id="playerNotesSummaryV261">Optional</small>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'player-notes-body-v261';
+    body.appendChild(notesLabel);
+    details.append(summary, body);
+
+    notesSection.replaceChildren(details);
+
+    el('playerNotes')?.addEventListener('input', updatePlayerNotesSummaryV261);
+  }
+
+  const closeOrCancel = [el('closePlayerDialog'), el('cancelPlayerBtn')].filter(Boolean);
+  closeOrCancel.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const dirty = typeof playerFormDirty !== 'undefined' && playerFormDirty;
+      if (!dirty) return;
+
+      if (!confirm('Discard unsaved player changes?')) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+    }, true);
+  });
+
+  dialog.addEventListener('cancel', (event) => {
+    const dirty = typeof playerFormDirty !== 'undefined' && playerFormDirty;
+    if (!dirty) return;
+    if (!confirm('Discard unsaved player changes?')) event.preventDefault();
+  });
+
+  updatePlayerMoreDetailsSummaryV261();
+  updatePlayerNotesSummaryV261();
+  updateSalaryChangeSummaryV261();
+}
+
+function syncPlayerEditorPolishState(playerId = null) {
+  ensurePlayerEditorPolishStructure();
+
+  const player = playerId
+    ? state.players.find((item) => item.id === playerId)
+    : null;
+
+  const more = el('playerMoreDetailsV261');
+  if (more) more.open = false;
+
+  const notes = el('playerNotesDetailsV261');
+  if (notes) notes.open = Boolean(player?.notes?.trim());
+
+  const salaryChange = el('salaryChangeDetailsV261');
+  if (salaryChange) salaryChange.open = el('salaryChangeMode')?.value !== 'same';
+
+  const intro = el('playerDialogIntro');
+  if (intro) {
+    intro.textContent = player
+      ? 'Update roster details and contract.'
+      : 'Add roster details and contract.';
+  }
+
+  updatePlayerMoreDetailsSummaryV261();
+  updatePlayerNotesSummaryV261();
+  updateSalaryChangeSummaryV261();
+}
+
+function installPlayerEditorPolish() {
+  if (playerEditorPolishInstalled) return;
+  playerEditorPolishInstalled = true;
+
+  ensurePlayerEditorPolishStructure();
+
+  if (typeof openPlayerDialog === 'function') {
+    const originalOpenPlayerDialogV261 = openPlayerDialog;
+    openPlayerDialog = function(playerId = null) {
+      const result = originalOpenPlayerDialogV261(playerId);
+      syncPlayerEditorPolishState(playerId);
+      return result;
+    };
+  }
+
+  if (typeof updateQuickContractControls === 'function') {
+    const originalUpdateQuickContractControlsV261 = updateQuickContractControls;
+    updateQuickContractControls = function() {
+      const result = originalUpdateQuickContractControlsV261();
+      updateSalaryChangeSummaryV261();
       return result;
     };
   }
