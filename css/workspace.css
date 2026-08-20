@@ -2373,3 +2373,246 @@
     max-width:190px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.52 — Roster Header + Toolbar Cleanup
+   ============================================================ */
+
+.roster-page-heading-v252 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.roster-page-heading-copy-v252 {
+  min-width:0;
+  flex:1 1 360px;
+}
+
+.roster-page-heading-copy-v252 .eyebrow {
+  margin-bottom:3px;
+}
+
+.roster-page-heading-copy-v252 h3 {
+  margin:0;
+  font-size:1.22rem;
+}
+
+.roster-page-heading-copy-v252 .page-copy {
+  margin:5px 0 0;
+  max-width:620px;
+}
+
+.roster-header-actions-v252 {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex:0 0 auto;
+}
+
+.roster-header-actions-v252 .btn,
+.roster-header-actions-v252 .tools-menu > summary {
+  min-height:40px;
+}
+
+.roster-summary-grid-v252 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:13px;
+  background:rgba(13,24,34,.82);
+}
+
+.roster-summary-grid-v252 > div {
+  min-width:0;
+  padding:10px 12px;
+  border-right:1px solid var(--border);
+}
+
+.roster-summary-grid-v252 > div:last-child {
+  border-right:0;
+}
+
+.roster-summary-grid-v252 > div.warning {
+  background:rgba(242,198,109,.045);
+}
+
+.roster-summary-grid-v252 > div.good {
+  background:rgba(82,215,194,.035);
+}
+
+.roster-summary-grid-v252 span {
+  display:block;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.56rem;
+  font-weight:850;
+  letter-spacing:.05em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.roster-summary-grid-v252 strong {
+  display:block;
+  margin-top:4px;
+  color:var(--text);
+  font-size:.86rem;
+  font-weight:950;
+}
+
+.roster-summary-grid-v252 small {
+  display:block;
+  margin-top:3px;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.57rem;
+  line-height:1.3;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.roster-summary-grid-v252 .warning strong {
+  color:var(--warning);
+}
+
+.roster-summary-grid-v252 .good strong {
+  color:var(--healthy);
+}
+
+.roster-view-switch-v252 {
+  display:grid;
+  width:100%;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  border-radius:11px;
+}
+
+.roster-view-switch-v252 > button {
+  width:100%;
+  min-height:40px;
+}
+
+.roster-filterbar-v252 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:38px;
+}
+
+.roster-filter-result-v252 {
+  margin-left:auto;
+  color:var(--muted);
+  font-size:.66rem;
+  font-weight:750;
+  white-space:nowrap;
+}
+
+.roster-filter-result-v252.hidden {
+  display:none;
+}
+
+/* The old search/three-control command bar is intentionally retired
+   from the Roster page in V2.52. */
+.roster-page .roster-commandbar {
+  display:none !important;
+}
+
+@media (max-width:720px) {
+  .roster-page-heading-v252 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    align-items:stretch;
+  }
+
+  .roster-page-heading-copy-v252 {
+    flex:auto;
+  }
+
+  .roster-page-heading-copy-v252 h3 {
+    font-size:1.16rem;
+  }
+
+  .roster-page-heading-copy-v252 .page-copy {
+    font-size:.72rem;
+    line-height:1.45;
+  }
+
+  .roster-header-actions-v252 {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    width:100%;
+  }
+
+  .roster-header-actions-v252 .tools-menu,
+  .roster-header-actions-v252 .tools-menu > summary,
+  .roster-header-actions-v252 .btn {
+    width:100%;
+  }
+
+  .roster-summary-grid-v252 {
+    grid-template-columns:1fr 1fr;
+  }
+
+  .roster-summary-grid-v252 > div {
+    padding:9px 10px;
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+  }
+
+  .roster-summary-grid-v252 > div:nth-child(2n) {
+    border-right:0;
+  }
+
+  .roster-summary-grid-v252 > div:nth-last-child(-n+2) {
+    border-bottom:0;
+  }
+
+  .roster-view-switch-v252 > button {
+    min-height:38px;
+    font-size:.72rem;
+  }
+
+  .roster-filterbar-v252 {
+    min-height:36px;
+  }
+}
+
+@media (max-width:390px) {
+  .roster-header-actions-v252 {
+    gap:6px;
+  }
+
+  .roster-header-actions-v252 .tools-menu > summary,
+  .roster-header-actions-v252 .btn {
+    min-height:38px;
+    padding:7px 9px;
+    font-size:.68rem;
+  }
+
+  .roster-summary-grid-v252 {
+    border-radius:11px;
+  }
+
+  .roster-summary-grid-v252 > div {
+    padding:8px 9px;
+  }
+
+  .roster-summary-grid-v252 span {
+    font-size:.51rem;
+  }
+
+  .roster-summary-grid-v252 strong {
+    font-size:.78rem;
+  }
+
+  .roster-summary-grid-v252 small {
+    font-size:.53rem;
+  }
+}
