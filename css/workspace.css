@@ -3387,3 +3387,226 @@
     font-size:.78rem;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.56 — Restore compact Overview boxes
+   ============================================================ */
+
+/* Contract Watch should retain the same boxed dashboard language
+   as Team Snapshot while remaining compact. */
+#overviewView .contract-watch-v246 {
+  padding:9px 10px;
+}
+
+#overviewView .contract-watch-v246 .overview-section-head-v227 {
+  align-items:center;
+  margin-bottom:6px;
+}
+
+#overviewView .contract-watch-v246 .overview-section-head-v227 h3 {
+  margin-top:3px;
+  font-size:.88rem;
+  line-height:1.18;
+}
+
+#overviewView .contract-watch-metrics-v246 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:rgba(13,24,34,.82);
+}
+
+#overviewView .contract-watch-metrics-v246 > div {
+  min-width:0;
+  padding:8px 9px;
+  border-right:1px solid var(--border);
+}
+
+#overviewView .contract-watch-metrics-v246 > div:last-child {
+  border-right:0;
+}
+
+#overviewView .contract-watch-metrics-v246 > div.warning {
+  background:rgba(242,198,109,.045);
+}
+
+#overviewView .contract-watch-metrics-v246 > div > span {
+  display:block;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.54rem;
+  font-weight:850;
+  letter-spacing:.045em;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+#overviewView .contract-watch-metrics-v246 > div > strong {
+  display:block;
+  margin-top:3px;
+  color:var(--text);
+  font-size:.86rem;
+  font-weight:950;
+  line-height:1.15;
+}
+
+#overviewView .contract-watch-metrics-v246 > div.warning > strong {
+  color:var(--warning);
+}
+
+#overviewView .contract-watch-metrics-v246 > div > small {
+  display:block;
+  margin-top:2px;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.53rem;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#overviewView .contract-watch-footer-v246 {
+  margin-top:6px;
+}
+
+#overviewView .contract-watch-priority {
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  gap:7px;
+  width:100%;
+  padding:7px 9px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:rgba(255,255,255,.018);
+}
+
+#overviewView .contract-watch-priority::before {
+  content:'•';
+  display:grid;
+  place-items:center;
+  width:18px;
+  height:18px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:6px;
+  color:var(--muted);
+  font-size:.72rem;
+  font-weight:950;
+}
+
+#overviewView .contract-watch-priority.warning {
+  border-color:rgba(242,198,109,.25);
+  background:rgba(242,198,109,.035);
+}
+
+#overviewView .contract-watch-priority.warning::before {
+  content:'!';
+  border-color:rgba(242,198,109,.28);
+  color:var(--warning);
+}
+
+#overviewView .contract-watch-priority.good {
+  border-color:rgba(82,215,194,.22);
+  background:rgba(82,215,194,.03);
+}
+
+#overviewView .contract-watch-priority.good::before {
+  content:'✓';
+  border-color:rgba(82,215,194,.25);
+  color:var(--healthy);
+}
+
+#overviewView .contract-watch-priority > strong {
+  display:block;
+  color:var(--text);
+  font-size:.64rem;
+  font-weight:900;
+  line-height:1.2;
+}
+
+#overviewView .contract-watch-priority > small {
+  display:block;
+  margin-top:1px;
+  color:var(--muted);
+  font-size:.53rem;
+  line-height:1.25;
+}
+
+/* Snapshot stays boxed; keep the V2.55 compact spacing rather than
+   flattening its metric cells. */
+#overviewView .overview-snapshot-v227 .overview-snapshot-grid-v227 {
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:11px;
+}
+
+@media (max-width:720px) {
+  #overviewView .contract-watch-v246 {
+    padding:8px 9px;
+  }
+
+  #overviewView .contract-watch-v246 .overview-section-head-v227 {
+    margin-bottom:5px;
+  }
+
+  #overviewView .contract-watch-v246 .overview-section-head-v227 h3 {
+    font-size:.82rem;
+  }
+
+  #overviewView .contract-watch-metrics-v246 {
+    grid-template-columns:1fr 1fr;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div {
+    padding:7px 8px;
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div:nth-child(2n) {
+    border-right:0;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div:nth-last-child(-n+2) {
+    border-bottom:0;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div > strong {
+    font-size:.80rem;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div > span {
+    font-size:.51rem;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div > small {
+    font-size:.51rem;
+  }
+
+  #overviewView .contract-watch-priority {
+    padding:6px 8px;
+  }
+
+  #overviewView .contract-watch-priority > strong {
+    font-size:.61rem;
+  }
+
+  #overviewView .contract-watch-priority > small {
+    font-size:.50rem;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .contract-watch-metrics-v246 > div {
+    padding:7px;
+  }
+
+  #overviewView .contract-watch-priority {
+    gap:6px;
+  }
+}
