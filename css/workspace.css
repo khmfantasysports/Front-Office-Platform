@@ -1663,3 +1663,321 @@
     width:100%;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.48 — Contract & Roster Intelligence
+   ============================================================ */
+
+.roster-contract-summary {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  margin:9px 0 10px;
+}
+.roster-contract-summary > div {
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0B151E;
+}
+.roster-contract-summary > div.warning {
+  border-color:rgba(242,198,109,.30);
+  background:rgba(242,198,109,.045);
+}
+.roster-contract-summary span,
+.contract-intel-summary span {
+  display:block;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.55rem;
+  font-weight:850;
+  letter-spacing:.04em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.roster-contract-summary strong,
+.contract-intel-summary strong {
+  display:block;
+  margin-top:3px;
+  color:var(--text);
+  font-size:.82rem;
+  font-weight:900;
+}
+.roster-contract-summary small,
+.contract-intel-summary small {
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.56rem;
+  line-height:1.3;
+}
+.roster-contract-summary .warning strong,
+.contract-intel-summary .warning strong { color:var(--warning); }
+
+.roster-list-name {
+  flex-wrap:wrap;
+  row-gap:4px;
+}
+.contract-signal-badge {
+  display:inline-flex;
+  align-items:center;
+  min-height:18px;
+  padding:2px 6px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:999px;
+  color:#B9C9D8;
+  background:rgba(255,255,255,.025);
+  font-size:.52rem;
+  font-weight:850;
+  line-height:1;
+  white-space:nowrap;
+}
+.contract-signal-badge.expiry {
+  border-color:rgba(242,198,109,.32);
+  color:#F4D389;
+  background:rgba(242,198,109,.06);
+}
+.contract-signal-badge.next {
+  border-color:rgba(50,173,255,.28);
+  color:#8DCCFF;
+  background:rgba(50,173,255,.055);
+}
+.contract-signal-badge.warning {
+  border-color:rgba(255,170,84,.34);
+  color:#FFC27B;
+  background:rgba(255,170,84,.06);
+}
+
+.contract-gap-cell {
+  background:rgba(242,198,109,.055) !important;
+}
+.contract-gap-mark {
+  display:inline-grid;
+  place-items:center;
+  width:18px;
+  height:18px;
+  border:1px solid rgba(242,198,109,.42);
+  border-radius:999px;
+  color:var(--warning);
+  background:rgba(242,198,109,.08);
+  font-size:.60rem;
+  font-weight:950;
+}
+.roster-contract-grid-note {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:7px;
+  color:var(--muted);
+  font-size:.60rem;
+}
+
+.contract-intelligence-panel {
+  overflow:hidden;
+}
+.contract-intelligence-head {
+  margin-bottom:10px;
+}
+.contract-intel-summary {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:7px;
+  margin-bottom:10px;
+}
+.contract-intel-summary > div {
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0B151E;
+}
+.contract-intel-summary > div.warning {
+  border-color:rgba(242,198,109,.30);
+  background:rgba(242,198,109,.045);
+}
+.contract-intel-columns {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.contract-intel-block {
+  min-width:0;
+  overflow:hidden;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0A141C;
+}
+.contract-intel-block-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px 10px;
+  border-bottom:1px solid var(--border-soft);
+}
+.contract-intel-block-head span {
+  color:var(--text);
+  font-size:.68rem;
+  font-weight:900;
+}
+.contract-intel-block-head small {
+  color:var(--muted);
+  font-size:.55rem;
+  text-align:right;
+}
+.contract-intel-list {
+  display:grid;
+}
+.contract-intel-row,
+.contract-gap-row {
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:8px 10px;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.045);
+  color:var(--text);
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+}
+.contract-intel-row:last-child,
+.contract-gap-row:last-child { border-bottom:0; }
+.contract-intel-row:hover,
+.contract-gap-row:hover { background:rgba(255,255,255,.025); }
+.contract-intel-row > span,
+.contract-gap-row > span { min-width:0; }
+.contract-intel-row > span:last-child,
+.contract-gap-row > span:last-child { text-align:right; }
+.contract-intel-row strong,
+.contract-gap-row strong {
+  display:block;
+  overflow:hidden;
+  font-size:.68rem;
+  font-weight:900;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.contract-intel-row small,
+.contract-gap-row small {
+  display:block;
+  margin-top:2px;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.55rem;
+  line-height:1.3;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.contract-intel-row.minors { background:rgba(50,173,255,.018); }
+
+.contract-intel-empty {
+  padding:10px;
+  color:var(--muted);
+  font-size:.62rem;
+}
+.contract-intel-empty.good { color:var(--healthy); }
+
+.contract-intel-disclosure {
+  margin-top:9px;
+  overflow:hidden;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0A141C;
+}
+.contract-intel-disclosure > summary {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 10px;
+  cursor:pointer;
+  list-style:none;
+}
+.contract-intel-disclosure > summary::-webkit-details-marker { display:none; }
+.contract-intel-disclosure > summary::after {
+  content:'›';
+  color:var(--muted);
+  font-size:1rem;
+  font-weight:900;
+  transform:rotate(90deg);
+  transition:transform .15s ease;
+}
+.contract-intel-disclosure[open] > summary::after { transform:rotate(-90deg); }
+.contract-intel-disclosure > summary span { min-width:0; }
+.contract-intel-disclosure > summary strong {
+  display:block;
+  font-size:.68rem;
+  font-weight:900;
+}
+.contract-intel-disclosure > summary small {
+  display:block;
+  margin-top:2px;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.55rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.contract-intel-detail-body {
+  border-top:1px solid var(--border-soft);
+}
+
+.farm-cap-excluded {
+  border-color:rgba(82,215,194,.24) !important;
+  background:rgba(82,215,194,.045) !important;
+}
+.farm-cap-excluded strong { color:var(--healthy) !important; }
+.farm-player-name-signals {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:5px;
+}
+.farm-player-name-signals > strong { min-width:0; }
+
+@media (max-width:820px) {
+  .contract-intel-columns { grid-template-columns:1fr; }
+}
+@media (max-width:720px) {
+  .roster-contract-summary,
+  .contract-intel-summary {
+    grid-template-columns:1fr 1fr;
+  }
+  .contract-intel-row,
+  .contract-gap-row {
+    gap:8px;
+  }
+}
+@media (max-width:430px) {
+  .roster-contract-summary,
+  .contract-intel-summary {
+    gap:5px;
+  }
+  .roster-contract-summary > div,
+  .contract-intel-summary > div {
+    padding:8px;
+  }
+  .contract-intel-block-head {
+    display:block;
+  }
+  .contract-intel-block-head small {
+    display:block;
+    margin-top:2px;
+    text-align:left;
+  }
+  .contract-intel-row,
+  .contract-gap-row {
+    grid-template-columns:minmax(0,1fr) minmax(86px,auto);
+    padding:8px;
+  }
+  .contract-intel-row small,
+  .contract-gap-row small {
+    white-space:normal;
+  }
+}
