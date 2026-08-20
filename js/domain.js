@@ -73,7 +73,7 @@ function seasonById(id) { return state.seasons.find((s) => s.id === id); }
 function statusById(id) { return state.statuses.find((s) => s.id === id); }
 
 
-// V2.46 — contract & roster intelligence.
+// V2.48 — contract & roster intelligence.
 // These helpers surface only entered/known contract evidence. They do not
 // infer future salary or label contracts as good/bad.
 
@@ -142,6 +142,7 @@ function contractIntelligence() {
   const allPlayers = [...state.players];
   const active = activeRosterPlayers();
   const minors = farmSystemPlayers();
+  const capEligibleActive = active.filter(playerCountsTowardCap);
 
   const expiringCurrent = current
     ? allPlayers.filter((player) => player.contractEndSeasonId === current.id)
@@ -149,14 +150,30 @@ function contractIntelligence() {
   const expiringNext = next
     ? allPlayers.filter((player) => player.contractEndSeasonId === next.id)
     : [];
+  const activeExpiringCurrent = current
+    ? active.filter((player) => player.contractEndSeasonId === current.id)
+    : [];
+  const activeExpiringNext = next
+    ? active.filter((player) => player.contractEndSeasonId === next.id)
+    : [];
 
   const missingFutureSalary = allPlayers
     .map((player) => ({ player, seasons:missingFutureContractSeasons(player) }))
     .filter((item) => item.seasons.length > 0)
     .sort((a,b) => b.seasons.length - a.seasons.length || a.player.name.localeCompare(b.player.name));
 
+  const activeMissingFutureSalary = missingFutureSalary
+    .filter((item) => (item.player.rosterGroup || 'ACTIVE') === 'ACTIVE');
+
   const largestCurrent = current
     ? allPlayers
+        .map((player) => ({ player, charge:effectivePlayerCharge(player, current.id) }))
+        .filter((item) => item.charge !== null)
+        .sort((a,b) => Number(b.charge) - Number(a.charge))
+    : [];
+
+  const largestCurrentCapCharges = current
+    ? capEligibleActive
         .map((player) => ({ player, charge:effectivePlayerCharge(player, current.id) }))
         .filter((item) => item.charge !== null)
         .sort((a,b) => Number(b.charge) - Number(a.charge))
@@ -170,11 +187,20 @@ function contractIntelligence() {
     .filter((item) => item.seasons > 0)
     .sort((a,b) => b.total - a.total || b.seasons - a.seasons);
 
+  const activeLongTermCommitments = capEligibleActive
+    .map((player) => {
+      const future = knownFutureCommitment(player);
+      return { player, total:future.total, seasons:future.seasons };
+    })
+    .filter((item) => item.seasons > 0)
+    .sort((a,b) => b.total - a.total || b.seasons - a.seasons);
+
   const minorsContracts = minors
     .filter(hasEnteredContractData)
     .map((player) => ({
       player,
-      charge:current ? effectivePlayerCharge(player, current.id) : null
+      charge:current ? effectivePlayerCharge(player, current.id) : null,
+      future:knownFutureCommitment(player)
     }))
     .sort((a,b) => Number(b.charge || 0) - Number(a.charge || 0));
 
@@ -196,11 +222,17 @@ function contractIntelligence() {
     next,
     active,
     minors,
+    capEligibleActive,
     expiringCurrent,
     expiringNext,
+    activeExpiringCurrent,
+    activeExpiringNext,
     missingFutureSalary,
+    activeMissingFutureSalary,
     largestCurrent,
+    largestCurrentCapCharges,
     longTermCommitments,
+    activeLongTermCommitments,
     minorsContracts,
     futureSeasonPressure
   };
