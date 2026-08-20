@@ -3610,3 +3610,98 @@
     gap:6px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.57 — Mobile navigation cleanup
+   ============================================================ */
+
+/* Dynamically-created secondary workspace links are mobile-only. */
+.mobile-workspace-nav-only {
+  display:none !important;
+}
+
+@media (max-width:720px) {
+  /* Keep the five highest-frequency pages fixed in the top bar. */
+  #workspaceNav {
+    display:grid !important;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:2px;
+    min-width:0;
+    overflow:visible !important;
+    scrollbar-width:none;
+  }
+
+  #workspaceNav::-webkit-scrollbar {
+    display:none;
+  }
+
+  #workspaceNav .nav-tab {
+    width:100%;
+    min-width:0;
+    padding-left:5px;
+    padding-right:5px;
+    font-size:.60rem;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  #workspaceNav .nav-tab[data-view="transactions"],
+  #workspaceNav .nav-tab[data-view="settings"] {
+    display:none !important;
+  }
+
+  .mobile-workspace-nav-only {
+    display:flex !important;
+  }
+
+  .utility-menu-popover .mobile-workspace-nav-only.utility-menu-section-label {
+    display:block !important;
+    width:100%;
+  }
+
+  .utility-menu-popover .mobile-workspace-nav-only.nav-tab {
+    width:100%;
+    min-height:36px;
+    justify-content:flex-start;
+    padding:7px 9px;
+    border:1px solid transparent;
+    border-radius:8px;
+    color:var(--text);
+    background:transparent;
+    font-size:.67rem;
+    font-weight:800;
+    text-align:left;
+  }
+
+  .utility-menu-popover .mobile-workspace-nav-only.nav-tab:hover,
+  .utility-menu-popover .mobile-workspace-nav-only.nav-tab:focus-visible {
+    border-color:var(--border-soft);
+    background:rgba(255,255,255,.035);
+  }
+
+  .utility-menu-popover .mobile-workspace-nav-only.nav-tab.active {
+    border-color:rgba(50,173,255,.25);
+    color:#D9EEFF;
+    background:rgba(50,173,255,.09);
+  }
+
+  .utility-menu.workspace-secondary-active > summary {
+    border-color:rgba(50,173,255,.42);
+    color:#D9EEFF;
+    background:rgba(50,173,255,.10);
+    box-shadow:0 0 0 1px rgba(50,173,255,.08);
+  }
+}
+
+@media (max-width:390px) {
+  #workspaceNav {
+    gap:1px;
+  }
+
+  #workspaceNav .nav-tab {
+    padding-left:3px;
+    padding-right:3px;
+    font-size:.56rem;
+  }
+}
