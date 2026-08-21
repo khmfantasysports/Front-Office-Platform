@@ -58,7 +58,7 @@ function renderGoogleSignInButton() {
     theme: 'filled_black',
     size: 'large',
     text: 'continue_with',
-    shape: 'pill',
+    shape: 'rectangular',
     logo_alignment: 'left',
     width: availableWidth
   });
