@@ -208,6 +208,7 @@ function render() {
   el('summaryCards').classList.add('hidden');
   renderOverview();
   renderRoster();
+  updateRosterBackupExportLabels();
   renderFarm();
   renderAssets();
   renderCap();
@@ -261,17 +262,95 @@ function resetApp() {
   showOfficePicker();
 }
 
+const ROSTERCAP_ROSTER_BACKUP_VERSION = 'ROSTERCAP_ROSTER_BACKUP_V1';
+
+function rosterBackupDepthAssignments(playerId) {
+  const assignments = [];
+
+  Object.entries(state.depthCharts || {}).forEach(([position, playerIds]) => {
+    (playerIds || []).forEach((id, index) => {
+      if (id === playerId) assignments.push(`${position}:${index + 1}`);
+    });
+  });
+
+  return assignments.join('|');
+}
+
 function exportRosterCsv() {
   if (!state.frontOffice) return;
+
   const sortedSeasons = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
-  const headers = ['Fantrax ID','Player','Pos','Eligible','NHL Team','Age','Status','Prospect','Roster Location', ...sortedSeasons.map((s) => `${seasonLabel(s.startYear)} Salary`), 'Contract End','Notes'];
-  const rows = state.players.map((p) => [
-    p.fantraxId || '', p.name, p.position, p.eligiblePositions || p.position || '', p.realTeam, p.ageSnapshot ?? '', statusById(p.statusId)?.name || '', p.isProspect ? 'Yes' : 'No', p.rosterGroup || 'ACTIVE',
-    ...sortedSeasons.map((s) => p.salaries?.[s.id]?.salary ?? ''),
-    p.contractEndSeasonId ? seasonLabel(seasonById(p.contractEndSeasonId)?.startYear) : '', p.notes || ''
+  const generatedAt = new Date().toISOString();
+
+  const headers = [
+    'RosterCap Backup Version',
+    'Backup Generated At',
+    'Backup Team',
+    'Backup League',
+    'RosterCap Player ID',
+    'Fantrax ID',
+    'Player',
+    'Pos',
+    'Eligible',
+    'NHL Team',
+    'Age',
+    'Age As Of',
+    'Status',
+    'Prospect',
+    'Roster Location',
+    ...sortedSeasons.flatMap((season) => [
+      `${seasonLabel(season.startYear)} Salary`,
+      `${seasonLabel(season.startYear)} Cap Override`
+    ]),
+    'Contract End',
+    'Depth Assignments',
+    'Notes'
+  ];
+
+  const rows = state.players.map((player) => [
+    ROSTERCAP_ROSTER_BACKUP_VERSION,
+    generatedAt,
+    state.frontOffice.teamName || '',
+    state.frontOffice.leagueName || '',
+    player.id || '',
+    player.fantraxId || '',
+    player.name,
+    player.position,
+    player.eligiblePositions || player.position || '',
+    player.realTeam || '',
+    player.ageSnapshot ?? '',
+    player.ageAsOf || '',
+    statusById(player.statusId)?.name || '',
+    player.isProspect ? 'Yes' : 'No',
+    player.rosterGroup === 'FARM' ? 'Minors' : 'Active',
+    ...sortedSeasons.flatMap((season) => {
+      const row = player.salaries?.[season.id] || {};
+      return [row.salary ?? '', row.capOverride ?? ''];
+    }),
+    player.contractEndSeasonId
+      ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear)
+      : '',
+    rosterBackupDepthAssignments(player.id),
+    player.notes || ''
   ]);
-  const csv = [headers, ...rows].map((row) => row.map(csvEscape).join(',')).join('\n');
-  downloadText(`${safeFileName(state.frontOffice.teamName)}-front-office.csv`, csv, 'text/csv');
+
+  const csv = [headers, ...rows]
+    .map((row) => row.map(csvEscape).join(','))
+    .join('\n');
+
+  downloadText(
+    `${safeFileName(state.frontOffice.teamName)}-rostercap-roster-backup-${todayIsoDate()}.csv`,
+    csv,
+    'text/csv'
+  );
+}
+
+function updateRosterBackupExportLabels() {
+  const utilityExport = el('exportBtn');
+  if (utilityExport) utilityExport.textContent = 'Roster Backup CSV';
+
+  const rosterExport = el('rosterExportBtn');
+  if (rosterExport) rosterExport.textContent = 'Roster Backup CSV';
 }
 
 function saveState() {
