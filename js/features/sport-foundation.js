@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.79.2 — responsive workspace page navigation
+// RosterCap V2.79.3 — mobile navigation observer loop fix
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -21,7 +21,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79.2';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79.3';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -510,7 +510,10 @@ function syncWorkspacePageSelectV2792() {
       select.appendChild(option);
     }
 
-    option.textContent = button.textContent.trim() || view;
+    const nextLabel = button.textContent.trim() || view;
+    if (option.textContent !== nextLabel) {
+      option.textContent = nextLabel;
+    }
   });
 
   [...select.options].forEach((option) => {
@@ -567,6 +570,10 @@ function installWorkspacePageSelectV2792() {
     syncWorkspacePageSelectV2792();
   });
 
+  // Watch only existing tab active-state changes. Do NOT watch child/text
+  // mutations here: syncWorkspacePageSelectV2792() updates <option> content
+  // inside this same nav, and observing those writes would create a self-
+  // triggering MutationObserver loop in browsers such as mobile Safari.
   workspacePageSelectObserverV2792 = new MutationObserver(() => {
     syncWorkspacePageSelectV2792();
   });
@@ -574,9 +581,7 @@ function installWorkspacePageSelectV2792() {
   workspacePageSelectObserverV2792.observe(nav, {
     subtree: true,
     attributes: true,
-    attributeFilter: ['class'],
-    childList: true,
-    characterData: true
+    attributeFilter: ['class']
   });
 
   syncWorkspacePageSelectV2792();
