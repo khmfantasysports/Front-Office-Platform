@@ -1929,3 +1929,306 @@ Load after workspace-shared.css.
     padding:6px 7px;
   }
 }
+
+/* V2.67 controlled annual Season Rollover */
+.season-rollover-settings {
+  border-color:rgba(96,190,255,.22);
+  background:linear-gradient(180deg,rgba(96,190,255,.035),rgba(11,21,30,.96) 72%);
+}
+.season-rollover-annual-badge {
+  flex:0 0 auto;
+  margin-left:auto;
+  margin-right:5px;
+  padding:3px 7px;
+  border:1px solid rgba(96,190,255,.25);
+  border-radius:999px;
+  background:rgba(96,190,255,.07);
+  color:var(--accent);
+  font-size:.54rem;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.season-rollover-hero {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  padding:11px;
+  border:1px solid var(--border-soft);
+  border-radius:11px;
+  background:#0B151E;
+}
+.season-rollover-kicker,
+.season-rollover-review-head > div > span,
+.season-rollover-rollback > div > span {
+  display:block;
+  color:var(--accent);
+  font-size:.54rem;
+  font-weight:900;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+.season-rollover-hero strong {
+  display:block;
+  margin-top:3px;
+  font-size:.90rem;
+  font-weight:950;
+}
+.season-rollover-hero p {
+  margin:4px 0 0;
+  max-width:760px;
+  color:var(--muted);
+  font-size:.63rem;
+  line-height:1.45;
+}
+.season-rollover-notice {
+  display:grid;
+  gap:2px;
+  margin-bottom:9px;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+}
+.season-rollover-notice.is-success {
+  border-color:rgba(82,215,194,.28);
+  background:rgba(82,215,194,.05);
+}
+.season-rollover-notice strong {
+  font-size:.72rem;
+  font-weight:900;
+}
+.season-rollover-notice.is-success strong { color:var(--healthy); }
+.season-rollover-notice span {
+  color:var(--muted);
+  font-size:.60rem;
+  line-height:1.4;
+}
+.season-rollover-review {
+  margin-top:10px;
+  padding:11px;
+  border:1px solid rgba(96,190,255,.22);
+  border-radius:11px;
+  background:rgba(96,190,255,.025);
+}
+.season-rollover-review-head {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+}
+.season-rollover-review-head strong {
+  display:block;
+  margin-top:2px;
+  font-size:.80rem;
+  font-weight:950;
+}
+.season-rollover-readiness {
+  flex:0 0 auto;
+  padding:4px 8px;
+  border:1px solid rgba(82,215,194,.25);
+  border-radius:999px;
+  background:rgba(82,215,194,.055);
+  color:var(--healthy);
+  font-size:.55rem;
+  font-weight:900;
+}
+.season-rollover-review-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:9px;
+}
+.season-rollover-review-item {
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:#0B151E;
+}
+.season-rollover-review-item.attention {
+  border-color:rgba(242,198,109,.28);
+  background:rgba(242,198,109,.04);
+}
+.season-rollover-review-item > span {
+  display:block;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.52rem;
+  font-weight:850;
+  letter-spacing:.025em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.season-rollover-review-item > strong {
+  display:block;
+  margin-top:3px;
+  font-size:.78rem;
+  font-weight:950;
+}
+.season-rollover-review-item.attention > strong { color:var(--warning); }
+.season-rollover-review-item > small {
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.54rem;
+  line-height:1.35;
+}
+.season-rollover-cap-field {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(150px,220px);
+  gap:5px 10px;
+  align-items:center;
+  margin-top:9px;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:#0B151E;
+  color:var(--text);
+  font-size:.65rem;
+  font-weight:850;
+}
+.season-rollover-cap-field input { min-width:0; }
+.season-rollover-cap-field small {
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:.56rem;
+  font-weight:600;
+  line-height:1.35;
+}
+.season-rollover-protection {
+  margin-top:9px;
+  padding:9px 10px;
+  border:1px solid rgba(82,215,194,.18);
+  border-radius:9px;
+  background:rgba(82,215,194,.025);
+}
+.season-rollover-protection > strong {
+  display:block;
+  color:var(--healthy);
+  font-size:.65rem;
+  font-weight:900;
+}
+.season-rollover-protection-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:4px 12px;
+  margin-top:6px;
+}
+.season-rollover-protection-grid span {
+  color:var(--text);
+  font-size:.58rem;
+  line-height:1.35;
+}
+.season-rollover-protection > p {
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:.56rem;
+  line-height:1.4;
+}
+.season-rollover-confirm-check {
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:9px;
+  padding:8px 9px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:#0B151E;
+  color:var(--text);
+  font-size:.61rem;
+  font-weight:750;
+  line-height:1.4;
+}
+.season-rollover-confirm-check input {
+  flex:0 0 auto;
+  width:auto;
+  min-height:0;
+  margin-top:2px;
+}
+.season-rollover-confirm-actions {
+  display:flex;
+  gap:7px;
+  justify-content:flex-end;
+  margin-top:9px;
+}
+.season-rollover-rollback {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  margin-top:10px;
+  padding:9px 10px;
+  border:1px dashed rgba(255,255,255,.13);
+  border-radius:9px;
+  background:rgba(255,255,255,.012);
+}
+.season-rollover-rollback strong {
+  display:block;
+  margin-top:2px;
+  font-size:.68rem;
+}
+.season-rollover-rollback p {
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:.56rem;
+  line-height:1.38;
+}
+.season-rollover-manual-override {
+  opacity:.82;
+}
+.season-rollover-manual-override::before {
+  content:'Manual override';
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:.51rem;
+  font-weight:900;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+@media (max-width:720px) {
+  .season-rollover-hero,
+  .season-rollover-rollback {
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+  .season-rollover-hero .btn,
+  .season-rollover-rollback .btn {
+    width:100%;
+  }
+  .season-rollover-review-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width:430px) {
+  .season-rollover-annual-badge {
+    margin-right:2px;
+    padding:3px 6px;
+    font-size:.50rem;
+  }
+  .season-rollover-review {
+    padding:8px;
+  }
+  .season-rollover-review-grid {
+    gap:5px;
+  }
+  .season-rollover-review-item {
+    padding:7px;
+  }
+  .season-rollover-review-item > span { font-size:.48rem; }
+  .season-rollover-review-item > strong { font-size:.70rem; }
+  .season-rollover-review-item > small { font-size:.50rem; }
+  .season-rollover-cap-field {
+    grid-template-columns:1fr;
+  }
+  .season-rollover-protection-grid {
+    grid-template-columns:1fr;
+  }
+  .season-rollover-confirm-actions {
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .season-rollover-confirm-actions .btn { width:100%; }
+}
