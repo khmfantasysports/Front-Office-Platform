@@ -1,68 +1,104 @@
 /*
-RosterCap workspace-shared.css
-Consolidated shared workspace overrides from V2.47–V2.64.
+RosterCap V2.80 — workspace-shared.css
 
 Owns:
-- mobile workspace navigation
-- utility / overflow menu
-- shared workspace-shell behavior
+- responsive workspace navigation presentation
+- shared workspace-shell overrides
+
+Navigation behavior is owned by js/app.js.
+Sport terminology/configuration is owned by js/features/sport-foundation.js.
 
 Load immediately after workspace.css.
 */
 
-.mobile-workspace-nav-only {
-  display:none !important;
+/* Desktop keeps the established segmented navigation. */
+.workspace-page-select-shell {
+  display:none;
 }
 
-@media (max-width:720px) {
-  #workspaceNav {
-    display:grid !important; grid-template-columns:repeat(5,minmax(0,1fr)); gap:2px; min-width:0; overflow:visible !important; scrollbar-width:none;
-  }
-  #workspaceNav::-webkit-scrollbar {
-    display:none;
-  }
-  #workspaceNav .nav-tab {
-    width:100%; min-width:0; padding-left:5px; padding-right:5px; font-size:.60rem; text-align:center; white-space:nowrap;
-  }
-  #workspaceNav .nav-tab[data-view="transactions"],
-    #workspaceNav .nav-tab[data-view="settings"] {
+/*
+At compact widths, use one native page selector instead of forcing variable
+page names into fixed-width tabs. This is especially important now that the
+development page can be called Minors or Development depending on the sport.
+*/
+@media (max-width:900px) {
+  /* Preserve the app's explicit hidden state. */
+  #workspaceNav.hidden {
     display:none !important;
   }
-  .mobile-workspace-nav-only {
-    display:flex !important;
+
+  #workspaceNav:not(.hidden) {
+    display:block !important;
+    width:100%;
+    min-width:0;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
   }
-  .utility-menu-popover .mobile-workspace-nav-only.utility-menu-section-label {
-    display:block !important; width:100%;
+
+  #workspaceNav:not(.hidden) > .nav-tab {
+    display:none !important;
   }
-  .utility-menu-popover .mobile-workspace-nav-only.nav-tab {
-    width:100%; min-height:36px; justify-content:flex-start; padding:7px 9px; border:1px solid transparent; border-radius:8px; color:var(--text); background:transparent; font-size:.67rem; font-weight:800; text-align:left;
+
+  .workspace-page-select-shell {
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    align-items:center;
+    gap:6px;
+    width:100%;
+    min-width:0;
+    margin:0;
   }
-  .utility-menu-popover .mobile-workspace-nav-only.nav-tab:hover,
-    .utility-menu-popover .mobile-workspace-nav-only.nav-tab:focus-visible {
-    border-color:var(--border-soft); background:rgba(255,255,255,.035);
+
+  .workspace-page-select-label {
+    color:var(--muted);
+    font-size:.50rem;
+    font-weight:900;
+    letter-spacing:.07em;
+    line-height:1;
+    text-transform:uppercase;
+    white-space:nowrap;
   }
-  .utility-menu-popover .mobile-workspace-nav-only.nav-tab.active {
-    border-color:rgba(50,173,255,.25); color:#D9EEFF; background:rgba(50,173,255,.09);
+
+  #workspacePageSelect {
+    width:100%;
+    min-width:0;
+    min-height:30px;
+    padding:4px 8px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:var(--text);
+    background:rgba(15,29,40,.92);
+    color-scheme:dark;
+    font:inherit;
+    font-size:.67rem;
+    font-weight:850;
+    line-height:1.1;
   }
-  .utility-menu.workspace-secondary-active > summary {
-    border-color:rgba(50,173,255,.42); color:#D9EEFF; background:rgba(50,173,255,.10); box-shadow:0 0 0 1px rgba(50,173,255,.08);
+
+  #workspacePageSelect:focus-visible {
+    outline:2px solid rgba(50,173,255,.38);
+    outline-offset:2px;
   }
 }
 
-@media (max-width:390px) {
-  #workspaceNav {
-    gap:1px;
+@media (max-width:430px) {
+  .workspace-page-select-shell {
+    grid-template-columns:1fr;
+    gap:0;
   }
-  #workspaceNav .nav-tab {
-    padding-left:3px; padding-right:3px; font-size:.56rem;
-  }
-}
 
-@media (max-width:720px) {
-  .utility-menu-popover .mobile-workspace-divider-v260 {
-    display:block !important; width:100%; margin:4px 0 3px;
+  .workspace-page-select-label {
+    display:none;
   }
-  .utility-menu-popover [data-mobile-workspace-nav="label"] {
-    margin-top:0;
+
+  #workspacePageSelect {
+    min-height:29px;
+    padding:4px 7px;
+    font-size:.63rem;
   }
 }
