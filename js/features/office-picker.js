@@ -13,6 +13,9 @@
 let officePickerPolishInstalledV268 = false;
 
 function defaultNhlSeasonLabelV268(date = new Date()) {
+  const configured = window.RosterCapSports?.defaultSeasonLabel?.('NHL', date);
+  if (configured) return configured;
+
   const month = date.getMonth();
   const calendarYear = date.getFullYear();
   const startYear = month >= 6 ? calendarYear : calendarYear - 1;
@@ -276,7 +279,6 @@ function installOfficePickerPolishV268() {
     window.setTimeout(() => el('teamName')?.focus(), 0);
   };
 }
-
 
 // -----------------------------------------------------------------------------
 // RosterCap V2.69 — Global landing context
