@@ -1,26 +1,51 @@
 /* ============================================================
-   RosterCap V2.74 — Signed-out landing refinement
+   RosterCap V2.75 — Block-based signed-out landing
    APPEND TO: css/assets-landing.css
    Scope: #authGate only
    ============================================================ */
 
-/* Restore the compact horizontal identity lockup on every viewport. */
+#authGate.landing-shell-v275 {
+  width:min(980px,calc(100% - 24px)) !important;
+  margin:24px auto 28px !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(290px,.72fr) !important;
+  grid-template-areas:
+    "hero signin"
+    "features signin";
+  gap:12px !important;
+  overflow:visible !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+#authGate .landing-hero-v275 {
+  grid-area:hero;
+  padding:28px 30px 26px !important;
+  border:1px solid rgba(119,201,255,.16) !important;
+  border-radius:20px !important;
+  background:
+    radial-gradient(circle at 8% 0%,rgba(50,173,255,.14),transparent 40%),
+    linear-gradient(145deg,rgba(13,26,37,.98),rgba(8,18,27,.98)) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.15) !important;
+}
+
 #authGate .landing-brand-row-v243 {
-  width:100%;
   display:flex !important;
   flex-direction:row !important;
   align-items:center !important;
   justify-content:flex-start !important;
   gap:14px !important;
-  margin:0 0 18px !important;
+  margin:0 0 22px !important;
 }
 
 #authGate .landing-brand-mark-v243 {
-  flex:0 0 62px !important;
-  width:62px !important;
-  height:62px !important;
+  flex:0 0 68px !important;
+  width:68px !important;
+  height:68px !important;
   margin:0 !important;
-  border-radius:15px !important;
+  border-radius:17px !important;
 }
 
 #authGate .landing-brand-copy-v243 {
@@ -29,174 +54,361 @@
   flex-direction:column !important;
   align-items:flex-start !important;
   justify-content:center !important;
-  gap:4px !important;
+  gap:5px !important;
 }
 
 #authGate .landing-wordmark-v243 {
-  display:block;
-  margin:0;
-  font-size:1.72rem;
-  line-height:.94;
+  margin:0 !important;
+  font-size:1.95rem !important;
+  line-height:.95 !important;
   white-space:nowrap;
 }
 
 #authGate .landing-brand-subtitle-v243 {
-  display:block;
-  margin:0;
-  font-size:.67rem;
-  line-height:1.1;
+  margin:0 !important;
+  font-size:.71rem !important;
+  line-height:1.1 !important;
   white-space:nowrap;
 }
 
-/* Cleaner capability cards: content only, no R / $ / M / arrow boxes. */
+#authGate .landing-kicker {
+  color:#82CBFA !important;
+  font-size:.63rem !important;
+  font-weight:900 !important;
+  letter-spacing:.12em !important;
+  line-height:1.35 !important;
+}
+
+#authGate .landing-hero-v275 h2 {
+  max-width:620px;
+  margin:10px 0 12px !important;
+  font-size:clamp(2.15rem,5.4vw,3.75rem) !important;
+  line-height:1 !important;
+  letter-spacing:-.05em !important;
+}
+
+#authGate .landing-hero-v275 .landing-lead {
+  max-width:620px;
+  margin:0 !important;
+  color:#A6B6C4 !important;
+  font-size:.92rem !important;
+  line-height:1.58 !important;
+}
+
+#authGate .landing-feature-panel-v275 {
+  grid-area:features;
+  padding:12px !important;
+  border:1px solid rgba(119,201,255,.14);
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(11,23,33,.94),rgba(7,17,25,.94));
+  box-shadow:0 14px 34px rgba(0,0,0,.12);
+}
+
+#authGate .landing-feature-panel-v275 > .eyebrow {
+  margin:2px 3px 10px !important;
+  color:#7DC6F7 !important;
+  font-size:.60rem !important;
+  letter-spacing:.13em !important;
+}
+
 #authGate .landing-feature-grid {
+  display:grid !important;
   grid-template-columns:repeat(2,minmax(0,1fr)) !important;
   gap:8px !important;
-  margin-top:21px !important;
+  margin:0 !important;
 }
 
 #authGate .landing-feature {
-  min-height:72px !important;
-  display:block !important;
+  min-width:0 !important;
+  min-height:92px !important;
+  display:flex !important;
+  align-items:flex-start !important;
   padding:13px 14px !important;
-  border-radius:12px !important;
+  border:1px solid rgba(119,201,255,.12) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(9,21,31,.98),rgba(7,16,24,.98)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018) !important;
+}
+
+#authGate .landing-feature > span {
+  display:block !important;
+  min-width:0;
 }
 
 #authGate .landing-feature-icon {
   display:none !important;
 }
 
-#authGate .landing-feature > span {
-  display:block;
-  min-width:0;
-}
-
 #authGate .landing-feature strong {
-  font-size:.78rem;
-  line-height:1.2;
+  display:block !important;
+  color:#EFF5FA !important;
+  font-size:.78rem !important;
+  line-height:1.2 !important;
 }
 
 #authGate .landing-feature small {
-  margin-top:5px;
-  font-size:.63rem;
-  line-height:1.38;
+  display:block !important;
+  margin-top:6px !important;
+  color:#879AA9 !important;
+  font-size:.64rem !important;
+  line-height:1.42 !important;
 }
 
-/* Keep the Google control visually black without a light shell behind it. */
+#authGate .landing-signin-card-v275 {
+  grid-area:signin;
+  align-self:stretch;
+  min-width:0;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  padding:28px 24px !important;
+  border:1px solid rgba(119,201,255,.16) !important;
+  border-radius:20px !important;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(50,173,255,.08),transparent 38%),
+    linear-gradient(180deg,rgba(10,21,30,.98),rgba(7,16,24,.98)) !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.15) !important;
+}
+
+#authGate .landing-signin-card-v275::before {
+  display:none !important;
+}
+
+#authGate .landing-signin-card-v275 .eyebrow {
+  margin:0 0 8px !important;
+  color:#7DC6F7 !important;
+  font-size:.62rem !important;
+  letter-spacing:.13em !important;
+}
+
+#authGate .landing-signin-card-v275 h3 {
+  max-width:340px;
+  margin:0 0 10px !important;
+  font-size:1.42rem !important;
+  line-height:1.14 !important;
+  letter-spacing:-.03em !important;
+}
+
+#authGate .landing-signin-card-v275 > p:not(.eyebrow) {
+  max-width:350px;
+  margin:0 0 18px !important;
+  color:#9DAEBC !important;
+  font-size:.80rem !important;
+  line-height:1.52 !important;
+}
+
+/* Google Identity Services:
+   - Keep the official filled-black button.
+   - Clip the renderer to one dark rounded block.
+   - V2.75 data.js switches GIS from pill -> rectangular so no white
+     iframe/background can show around the black control. */
 #authGate .google-identity-wrap {
+  width:100% !important;
+  max-width:400px !important;
+  min-height:44px !important;
+  margin:0 !important;
   padding:0 !important;
-  border:0 !important;
-  background:transparent !important;
+  overflow:hidden !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+  border-radius:11px !important;
+  background:#202124 !important;
   box-shadow:none !important;
 }
 
 #authGate #googleSignInButton {
-  min-height:44px;
+  width:100% !important;
+  max-width:400px !important;
+  min-height:44px !important;
+  margin:0 !important;
   padding:0 !important;
   overflow:hidden !important;
   border:0 !important;
-  border-radius:999px !important;
+  border-radius:10px !important;
   background:#202124 !important;
-  box-shadow:none !important;
 }
 
 #authGate #googleSignInButton > div {
   width:100% !important;
   max-width:100% !important;
+  min-height:44px !important;
   margin:0 !important;
   padding:0 !important;
   overflow:hidden !important;
   border:0 !important;
-  border-radius:999px !important;
+  border-radius:10px !important;
   background:#202124 !important;
-  box-shadow:none !important;
 }
 
 #authGate #googleSignInButton iframe {
   display:block !important;
+  width:100% !important;
   max-width:100% !important;
+  min-height:44px !important;
   margin:0 !important;
+  padding:0 !important;
   border:0 !important;
-  border-radius:999px !important;
+  border-radius:10px !important;
   background:#202124 !important;
 }
 
-@media (max-width:720px) {
-  #authGate .landing-hero {
-    padding:21px 18px 18px;
+#authGate .landing-security {
+  display:flex !important;
+  align-items:flex-start !important;
+  gap:8px !important;
+  margin-top:13px !important;
+  padding:10px 11px !important;
+  border:1px solid rgba(119,201,255,.10) !important;
+  border-radius:10px !important;
+  background:rgba(255,255,255,.018) !important;
+  color:#7F929F !important;
+  font-size:.62rem !important;
+  line-height:1.42 !important;
+}
+
+#authGate .landing-security .security-dot {
+  flex:0 0 auto;
+  margin-top:3px !important;
+}
+
+#appHeader.hidden + main #authGate.landing-shell-v275 {
+  margin-top:18px !important;
+}
+
+@media (max-width:760px) {
+  #authGate.landing-shell-v275 {
+    width:calc(100% - 20px) !important;
+    margin:8px auto 18px !important;
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "hero"
+      "features"
+      "signin" !important;
+    gap:9px !important;
+  }
+
+  #appHeader.hidden + main #authGate.landing-shell-v275 {
+    margin-top:6px !important;
+  }
+
+  #authGate .landing-hero-v275 {
+    padding:20px 17px 19px !important;
+    border-radius:17px !important;
   }
 
   #authGate .landing-brand-row-v243 {
     gap:12px !important;
-    margin-bottom:17px !important;
+    margin-bottom:18px !important;
   }
 
   #authGate .landing-brand-mark-v243 {
-    flex-basis:58px !important;
-    width:58px !important;
-    height:58px !important;
-    border-radius:14px !important;
+    flex-basis:60px !important;
+    width:60px !important;
+    height:60px !important;
+    border-radius:15px !important;
   }
 
   #authGate .landing-wordmark-v243 {
-    font-size:1.55rem;
+    font-size:1.65rem !important;
   }
 
   #authGate .landing-brand-subtitle-v243 {
-    font-size:.62rem;
+    font-size:.64rem !important;
   }
 
   #authGate .landing-kicker {
-    font-size:.57rem;
-    letter-spacing:.115em;
+    font-size:.57rem !important;
+    letter-spacing:.105em !important;
   }
 
-  #authGate .landing-hero h2 {
-    margin:9px 0 10px;
-    font-size:1.98rem;
-    line-height:1.025;
+  #authGate .landing-hero-v275 h2 {
+    margin:9px 0 10px !important;
+    font-size:2.05rem !important;
+    line-height:1.025 !important;
   }
 
-  #authGate .landing-lead {
-    font-size:.81rem;
-    line-height:1.5;
+  #authGate .landing-hero-v275 .landing-lead {
+    font-size:.80rem !important;
+    line-height:1.5 !important;
+  }
+
+  #authGate .landing-feature-panel-v275 {
+    padding:9px !important;
+    border-radius:16px !important;
+  }
+
+  #authGate .landing-feature-panel-v275 > .eyebrow {
+    margin:2px 2px 8px !important;
+    font-size:.57rem !important;
   }
 
   #authGate .landing-feature-grid {
+    display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     gap:7px !important;
-    margin-top:18px !important;
   }
 
   #authGate .landing-feature {
-    min-height:82px !important;
+    min-height:98px !important;
     padding:11px 12px !important;
+    border-radius:12px !important;
   }
 
   #authGate .landing-feature strong {
-    font-size:.72rem;
+    font-size:.72rem !important;
   }
 
   #authGate .landing-feature small {
-    display:block !important;
-    font-size:.58rem;
-    line-height:1.35;
+    margin-top:5px !important;
+    font-size:.59rem !important;
+    line-height:1.38 !important;
+  }
+
+  #authGate .landing-signin-card-v275 {
+    padding:19px 17px !important;
+    border-radius:17px !important;
+  }
+
+  #authGate .landing-signin-card-v275 h3 {
+    max-width:none;
+    font-size:1.18rem !important;
+  }
+
+  #authGate .landing-signin-card-v275 > p:not(.eyebrow) {
+    max-width:none;
+    margin-bottom:15px !important;
+    font-size:.75rem !important;
+    line-height:1.48 !important;
+  }
+
+  #authGate .google-identity-wrap,
+  #authGate #googleSignInButton {
+    max-width:none !important;
+  }
+
+  #authGate .landing-security {
+    margin-top:10px !important;
+    padding:9px 10px !important;
+    font-size:.58rem !important;
   }
 }
 
-@media (max-width:340px) {
+@media (max-width:360px) {
   #authGate .landing-brand-mark-v243 {
-    flex-basis:54px !important;
-    width:54px !important;
-    height:54px !important;
+    flex-basis:55px !important;
+    width:55px !important;
+    height:55px !important;
   }
 
   #authGate .landing-wordmark-v243 {
-    font-size:1.42rem;
+    font-size:1.50rem !important;
   }
 
   #authGate .landing-brand-subtitle-v243 {
-    font-size:.58rem;
+    font-size:.59rem !important;
+  }
+
+  #authGate .landing-hero-v275 h2 {
+    font-size:1.88rem !important;
   }
 
   #authGate .landing-feature-grid {
