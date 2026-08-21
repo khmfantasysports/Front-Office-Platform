@@ -7,15 +7,17 @@
 // - enriches office cards with current season/cap + Active/Minors counts
 // - preserves the existing full loadOffice() path
 // - adds a Back action to New Front Office
-// - uses a dynamic default NHL season
+// - uses editable creation suggestions from the league-configuration foundation
 // -----------------------------------------------------------------------------
 
 let officePickerPolishInstalledV268 = false;
 
-function defaultNhlSeasonLabelV268(date = new Date()) {
-  const configured = window.RosterCapSports?.defaultSeasonLabel?.('NHL', date);
+function defaultCreateSeasonLabelV277(date = new Date()) {
+  const sport = el('sport')?.value || 'NHL';
+  const configured = window.RosterCapLeagueConfig?.defaultSeasonLabel?.(sport, date);
   if (configured) return configured;
 
+  // Legacy safety fallback only. Platform rules do not live in this helper.
   const month = date.getMonth();
   const calendarYear = date.getFullYear();
   const startYear = month >= 6 ? calendarYear : calendarYear - 1;
@@ -273,8 +275,13 @@ function installOfficePickerPolishV268() {
     ensureCreateOfficeBackActionV268();
     syncOfficePickerGlobalShellV269();
 
-    const seasonInput = el('currentSeason');
-    if (seasonInput) seasonInput.value = defaultNhlSeasonLabelV268();
+    const sport = el('sport')?.value || 'NHL';
+    const applied = window.RosterCapLeagueConfig?.applyCreateSuggestions?.(sport);
+
+    if (!applied) {
+      const seasonInput = el('currentSeason');
+      if (seasonInput) seasonInput.value = defaultCreateSeasonLabelV277();
+    }
 
     window.setTimeout(() => el('teamName')?.focus(), 0);
   };
