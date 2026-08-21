@@ -1,6 +1,8 @@
 'use strict';
 
-// Application bootstrap, global navigation and top-level rendering.
+// Application bootstrap, global shell/navigation and top-level rendering.
+// V2.80: responsive workspace navigation is owned here; sport-foundation
+// supplies labels/configuration only.
 
 async function init() {
   if (!window.__ROSTERCAP_IDENTITY_LOADED__) {
@@ -41,41 +43,80 @@ async function init() {
   }
 }
 
-function installMobileWorkspaceNav() {
-  const popover = document.querySelector('.utility-menu-popover');
-  if (!popover || popover.querySelector('[data-mobile-workspace-nav]')) return;
 
-  const frontOfficeLabel = [...popover.querySelectorAll('.utility-menu-section-label')]
-    .find((item) => item.textContent.trim() === 'Front Office');
-  const insertBefore = frontOfficeLabel || popover.firstElementChild?.nextElementSibling || null;
+function workspaceNavigationSportConfig() {
+  const sport =
+    state?.frontOffice?.sport
+    || el('sport')?.value
+    || 'NHL';
 
-  const label = document.createElement('span');
-  label.className = 'utility-menu-section-label mobile-workspace-nav-only';
-  label.dataset.mobileWorkspaceNav = 'label';
-  label.textContent = 'Workspace';
+  return window.RosterCapSports?.get?.(sport) || null;
+}
 
-  const transactionsButton = document.createElement('button');
-  transactionsButton.className = 'btn btn-ghost nav-tab mobile-workspace-nav-only';
-  transactionsButton.dataset.mobileWorkspaceNav = 'transactions';
-  transactionsButton.dataset.view = 'transactions';
-  transactionsButton.type = 'button';
-  transactionsButton.textContent = 'Transactions';
+function workspaceNavigationLabels() {
+  const sportConfig = workspaceNavigationSportConfig();
+  const developmentLabel =
+    sportConfig?.terminology?.developmentRoster
+    || 'Minors';
 
-  const settingsButton = document.createElement('button');
-  settingsButton.className = 'btn btn-ghost nav-tab mobile-workspace-nav-only';
-  settingsButton.dataset.mobileWorkspaceNav = 'settings';
-  settingsButton.dataset.view = 'settings';
-  settingsButton.type = 'button';
-  settingsButton.textContent = 'Settings';
+  return {
+    overview: 'Overview',
+    roster: 'Roster',
+    farm: developmentLabel,
+    assets: 'Assets',
+    cap: 'Cap',
+    transactions: 'Transactions',
+    settings: 'Settings'
+  };
+}
 
-  const divider = document.createElement('div');
-  divider.className = 'utility-menu-divider mobile-workspace-nav-only mobile-workspace-divider-v260';
-  divider.dataset.mobileWorkspaceNav = 'divider';
+function syncWorkspaceNavigation(view = activeView) {
+  const labels = workspaceNavigationLabels();
+  const nextView = WORKSPACE_VIEWS.includes(view) ? view : 'overview';
 
-  popover.insertBefore(label, insertBefore);
-  popover.insertBefore(transactionsButton, insertBefore);
-  popover.insertBefore(settingsButton, insertBefore);
-  popover.insertBefore(divider, insertBefore);
+  document.querySelectorAll('#workspaceNav .nav-tab[data-view]').forEach((button) => {
+    const buttonView = button.dataset.view;
+    const nextLabel = labels[buttonView] || button.textContent.trim() || buttonView;
+
+    if (button.textContent !== nextLabel) {
+      button.textContent = nextLabel;
+    }
+
+    button.classList.toggle('active', buttonView === nextView);
+  });
+
+  const select = el('workspacePageSelect');
+  if (!select) return;
+
+  [...select.options].forEach((option) => {
+    const nextLabel = labels[option.value] || option.textContent;
+    if (option.textContent !== nextLabel) {
+      option.textContent = nextLabel;
+    }
+  });
+
+  if ([...select.options].some((option) => option.value === nextView)) {
+    select.value = nextView;
+  }
+
+  const selectedLabel =
+    select.options[select.selectedIndex]?.textContent
+    || labels[nextView]
+    || 'Overview';
+
+  select.setAttribute('aria-label', `Workspace page: ${selectedLabel}`);
+}
+
+function installResponsiveWorkspaceNav() {
+  const select = el('workspacePageSelect');
+  if (!select || select.dataset.navBound === 'true') return;
+
+  select.dataset.navBound = 'true';
+  select.addEventListener('change', () => {
+    switchView(select.value);
+  });
+
+  syncWorkspaceNavigation(activeView);
 }
 
 function bindEvents() {
@@ -102,9 +143,9 @@ function bindEvents() {
     render();
   });
 
-  installMobileWorkspaceNav();
+  installResponsiveWorkspaceNav();
 
-  document.querySelectorAll('.nav-tab').forEach((button) => {
+  document.querySelectorAll('#workspaceNav .nav-tab[data-view]').forEach((button) => {
     button.addEventListener('click', () => switchView(button.dataset.view));
   });
 
@@ -147,22 +188,38 @@ function bindEvents() {
 async function handleCreateFrontOffice(event) {
   event.preventDefault();
   if (!session?.user) return showAuthError('Sign in before creating a Front Office.');
+
+  const sport = el('sport').value;
   const currentSeason = el('currentSeason').value.trim();
-  const startYear = parseSeasonStart(currentSeason);
+
+  const configuredSeason =
+    window.RosterCapLeagueConfig?.parseSeasonInput?.(currentSeason, sport);
+
+  const startYear =
+    configuredSeason?.startYear
+    ?? parseSeasonStart(currentSeason);
+
   if (!startYear) {
-    alert('Use a season in the format 2026-27.');
+    alert(
+      window.RosterCapLeagueConfig?.seasonInputHelp?.(sport)
+      || 'Use a valid season.'
+    );
     return;
   }
+
+  const configuredSeasonCount =
+    window.RosterCapLeagueConfig?.creationSeasonCount?.(sport);
+
   await runCloudAction(async () => {
     const { data, error } = await db.rpc('create_front_office_with_seasons_v1', {
       p_team_name: el('teamName').value.trim(),
       p_league_name: el('leagueName').value.trim(),
-      p_sport: el('sport').value,
+      p_sport: sport,
       p_currency_code: el('currency').value,
       p_roster_limit: nullableNumber(el('rosterLimit').value),
       p_current_season_start_year: startYear,
       p_current_salary_cap: nullableNumber(el('salaryCap').value),
-      p_season_count: 7
+      p_season_count: configuredSeasonCount ?? 7
     });
     if (error) throw error;
     await loadOffice(data);
@@ -198,6 +255,7 @@ function render() {
   onboarding.classList.add('hidden');
   workspace.classList.remove('hidden');
   el('workspaceNav').classList.remove('hidden');
+  syncWorkspaceNavigation(activeView);
   el('exportBtn').disabled = false;
   el('exportBtn').classList.remove('hidden');
   applyTeamIdentityToShell();
@@ -230,28 +288,17 @@ function switchView(view, options = {}) {
   const nextView = WORKSPACE_VIEWS.includes(view) ? view : 'overview';
   activeView = nextView;
 
-  document.querySelectorAll('.nav-tab').forEach((button) =>
-    button.classList.toggle('active', button.dataset.view === nextView)
-  );
+  syncWorkspaceNavigation(nextView);
 
   WORKSPACE_VIEWS.forEach((name) =>
     el(`${name}View`).classList.toggle('hidden', name !== nextView)
   );
 
   const utilityMenu = document.querySelector('.utility-menu');
-  const secondaryActive = nextView === 'transactions' || nextView === 'settings';
-  utilityMenu?.classList.toggle('workspace-secondary-active', secondaryActive);
-
   const utilitySummary = utilityMenu?.querySelector('summary');
-  if (utilitySummary) {
-    utilitySummary.setAttribute(
-      'aria-label',
-      secondaryActive
-        ? `${nextView === 'transactions' ? 'Transactions' : 'Settings'} selected. Workspace menu`
-        : 'Workspace menu'
-    );
-  }
 
+  utilityMenu?.classList.remove('workspace-secondary-active');
+  if (utilitySummary) utilitySummary.setAttribute('aria-label', 'Workspace menu');
   if (utilityMenu?.open) utilityMenu.removeAttribute('open');
 
   el('summaryCards').classList.add('hidden');
