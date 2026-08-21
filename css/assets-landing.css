@@ -1,10 +1,31 @@
 /* ============================================================
-   RosterCap V2.75 — Block-based signed-out landing
-   APPEND TO: css/assets-landing.css
+   RosterCap V2.76 — Block-based signed-out landing
+   FILE: css/assets-landing.css
    Scope: #authGate only
+
+   Corrections:
+   - signed-out landing now fully respects .hidden after authentication
+   - prevents authGate and My Front Offices from appearing together
+   - keeps the block-based landing layout
+   - removes the extra white Google-button shell
+   - designed to pair with data.js using:
+       theme: 'outline_dark'
+       shape: 'pill'
    ============================================================ */
 
-#authGate.landing-shell-v275 {
+/* --------------------------------------------------------------------------
+   Critical surface visibility
+   -------------------------------------------------------------------------- */
+
+#authGate.landing-shell-v275.hidden,
+#officePicker.hidden,
+#onboarding.hidden,
+#workspace.hidden {
+  display:none !important;
+}
+
+/* Only apply the landing grid while the auth gate is actually visible. */
+#authGate.landing-shell-v275:not(.hidden) {
   width:min(980px,calc(100% - 24px)) !important;
   margin:24px auto 28px !important;
   display:grid !important;
@@ -19,6 +40,10 @@
   background:transparent !important;
   box-shadow:none !important;
 }
+
+/* --------------------------------------------------------------------------
+   Hero / brand
+   -------------------------------------------------------------------------- */
 
 #authGate .landing-hero-v275 {
   grid-area:hero;
@@ -46,6 +71,13 @@
   height:68px !important;
   margin:0 !important;
   border-radius:17px !important;
+}
+
+#authGate .landing-brand-mark-v243 img {
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
 #authGate .landing-brand-copy-v243 {
@@ -94,6 +126,10 @@
   font-size:.92rem !important;
   line-height:1.58 !important;
 }
+
+/* --------------------------------------------------------------------------
+   Feature block
+   -------------------------------------------------------------------------- */
 
 #authGate .landing-feature-panel-v275 {
   grid-area:features;
@@ -154,6 +190,10 @@
   line-height:1.42 !important;
 }
 
+/* --------------------------------------------------------------------------
+   Sign-in block
+   -------------------------------------------------------------------------- */
+
 #authGate .landing-signin-card-v275 {
   grid-area:signin;
   align-self:stretch;
@@ -197,11 +237,18 @@
   line-height:1.52 !important;
 }
 
-/* Google Identity Services:
-   - Keep the official filled-black button.
-   - Clip the renderer to one dark rounded block.
-   - V2.75 data.js switches GIS from pill -> rectangular so no white
-     iframe/background can show around the black control. */
+/* --------------------------------------------------------------------------
+   Google Identity Services
+   --------------------------------------------------------------------------
+
+   The visible button is rendered by Google inside an iframe, so RosterCap
+   should not create a second border, white shell, or fake button around it.
+
+   Pair with data.js:
+     theme: 'outline_dark'
+     shape: 'pill'
+   -------------------------------------------------------------------------- */
+
 #authGate .google-identity-wrap {
   width:100% !important;
   max-width:400px !important;
@@ -209,13 +256,14 @@
   margin:0 !important;
   padding:0 !important;
   overflow:hidden !important;
-  border:1px solid rgba(255,255,255,.10) !important;
-  border-radius:11px !important;
-  background:#202124 !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:#131314 !important;
   box-shadow:none !important;
 }
 
-#authGate #googleSignInButton {
+#authGate #googleSignInButton,
+#authGate #googleSignInButton > div {
   width:100% !important;
   max-width:400px !important;
   min-height:44px !important;
@@ -223,33 +271,25 @@
   padding:0 !important;
   overflow:hidden !important;
   border:0 !important;
-  border-radius:10px !important;
-  background:#202124 !important;
-}
-
-#authGate #googleSignInButton > div {
-  width:100% !important;
-  max-width:100% !important;
-  min-height:44px !important;
-  margin:0 !important;
-  padding:0 !important;
-  overflow:hidden !important;
-  border:0 !important;
-  border-radius:10px !important;
-  background:#202124 !important;
+  border-radius:999px !important;
+  background:#131314 !important;
+  box-shadow:none !important;
 }
 
 #authGate #googleSignInButton iframe {
   display:block !important;
-  width:100% !important;
   max-width:100% !important;
-  min-height:44px !important;
   margin:0 !important;
   padding:0 !important;
   border:0 !important;
-  border-radius:10px !important;
-  background:#202124 !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  box-shadow:none !important;
 }
+
+/* --------------------------------------------------------------------------
+   Security note
+   -------------------------------------------------------------------------- */
 
 #authGate .landing-security {
   display:flex !important;
@@ -270,12 +310,16 @@
   margin-top:3px !important;
 }
 
-#appHeader.hidden + main #authGate.landing-shell-v275 {
+#appHeader.hidden + main #authGate.landing-shell-v275:not(.hidden) {
   margin-top:18px !important;
 }
 
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
 @media (max-width:760px) {
-  #authGate.landing-shell-v275 {
+  #authGate.landing-shell-v275:not(.hidden) {
     width:calc(100% - 20px) !important;
     margin:8px auto 18px !important;
     grid-template-columns:1fr !important;
@@ -286,7 +330,7 @@
     gap:9px !important;
   }
 
-  #appHeader.hidden + main #authGate.landing-shell-v275 {
+  #appHeader.hidden + main #authGate.landing-shell-v275:not(.hidden) {
     margin-top:6px !important;
   }
 
@@ -342,7 +386,6 @@
   }
 
   #authGate .landing-feature-grid {
-    display:grid !important;
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     gap:7px !important;
   }
@@ -381,7 +424,8 @@
   }
 
   #authGate .google-identity-wrap,
-  #authGate #googleSignInButton {
+  #authGate #googleSignInButton,
+  #authGate #googleSignInButton > div {
     max-width:none !important;
   }
 
