@@ -1,0 +1,395 @@
+/* ============================================================
+   RosterCap V2.73 — My Front Offices professional polish
+   APPEND TO: css/office-picker.css
+   Existing V2.68/V2.69 behavior remains authoritative.
+   ============================================================ */
+
+#officePicker.office-picker-shell {
+  width:min(900px,100%);
+  margin:24px auto 34px;
+  padding:0 2px;
+}
+
+#officePicker .office-picker-hero {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:20px;
+  margin:0 0 10px;
+  padding:20px 22px 18px;
+  border:1px solid rgba(118,151,174,.18);
+  border-radius:18px;
+  background:radial-gradient(circle at 0% 0%,rgba(50,173,255,.095),transparent 35%),linear-gradient(145deg,rgba(13,26,36,.88),rgba(8,18,27,.92));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.022),0 12px 32px rgba(0,0,0,.12);
+}
+
+#officePicker .office-picker-hero .eyebrow {
+  margin-bottom:5px;
+  color:#82CBFB;
+  font-size:.62rem;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+
+#officePicker .office-picker-hero h2 {
+  margin:0;
+  color:#F1F6FA;
+  font-size:clamp(1.9rem,4vw,2.55rem);
+  line-height:1.02;
+  letter-spacing:-.04em;
+}
+
+#officePicker .office-picker-hero > div > p:last-child {
+  max-width:590px;
+  margin:8px 0 0;
+  color:#9CAEBC;
+  font-size:.78rem;
+  line-height:1.48;
+}
+
+#officePicker .office-create-btn {
+  min-width:184px;
+  min-height:42px;
+  padding-inline:16px;
+  border-radius:11px;
+  font-size:.73rem;
+  font-weight:900;
+  box-shadow:0 8px 20px rgba(27,144,222,.12);
+}
+
+#officePicker .office-picker-summary {
+  min-height:38px;
+  margin:0 0 10px;
+  padding:7px 4px;
+  border-top:0;
+  border-bottom:1px solid rgba(118,151,174,.16);
+  color:#8FA2B1;
+  font-size:.64rem;
+}
+
+#officePicker .office-picker-summary > span:first-child strong {
+  color:#EEF7FD;
+  font-size:.70rem;
+  font-weight:900;
+}
+
+#officePicker .office-picker-sync {
+  color:#8FA2B1;
+  font-size:.62rem;
+}
+
+#officePicker .office-picker-sync .security-dot {
+  width:6px;
+  height:6px;
+  margin-top:0;
+}
+
+#officePicker .office-list-v219 {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+#officePicker .office-card-v268 {
+  position:relative;
+  min-height:0;
+  grid-template-columns:52px minmax(0,1fr) 18px !important;
+  align-items:start;
+  gap:11px;
+  padding:13px 12px 13px 14px;
+  overflow:hidden;
+  border:1px solid rgba(118,151,174,.18);
+  border-radius:15px;
+  background:linear-gradient(145deg,rgba(13,26,36,.94),rgba(8,18,27,.96));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+  transition:border-color .16s ease,transform .16s ease,background .16s ease;
+}
+
+#officePicker .office-card-v268::before {
+  content:'';
+  position:absolute;
+  left:0;
+  top:16px;
+  bottom:16px;
+  width:2px;
+  border-radius:999px;
+  background:var(--office-team-accent);
+  opacity:.9;
+}
+
+#officePicker .office-card-v268:hover,
+#officePicker .office-card-v268:focus-visible {
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--office-team-accent) 34%,rgba(118,151,174,.25));
+  background:linear-gradient(145deg,rgba(15,29,40,.97),rgba(9,20,29,.98));
+}
+
+#officePicker .office-card-v268:focus-visible {
+  outline:2px solid color-mix(in srgb,var(--office-team-accent) 45%,#5EBEFF);
+  outline-offset:2px;
+}
+
+#officePicker .office-card-v268 .office-card-mark-v231 {
+  width:52px;
+  height:52px;
+  margin:1px 0 0;
+  border-radius:13px;
+  border-color:color-mix(in srgb,var(--office-team-accent) 38%,rgba(118,151,174,.25));
+  background:#09141D;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+#officePicker .office-card-v268 .office-card-copy-v268 {
+  min-width:0;
+  display:block;
+}
+
+#officePicker .office-card-v268 .office-card-topline {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-width:0;
+  gap:8px;
+  margin:0 0 5px;
+}
+
+#officePicker .office-card-v268 .office-card-chip-row-v268 {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+
+#officePicker .office-card-v268 .office-sport-chip {
+  min-height:19px;
+  padding:2px 7px;
+  border:1px solid rgba(76,176,241,.15);
+  border-radius:999px;
+  background:rgba(50,173,255,.075);
+  color:#82CBFB;
+  font-size:.48rem;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+
+#officePicker .office-card-v268 .office-recent-chip-v268 {
+  min-height:19px;
+  padding:2px 7px;
+  border-color:color-mix(in srgb,var(--office-team-accent) 28%,rgba(118,151,174,.2));
+  background:color-mix(in srgb,var(--office-team-accent) 7%,rgba(255,255,255,.01));
+  color:#DCEAF4;
+  font-size:.47rem;
+  font-weight:850;
+}
+
+#officePicker .office-card-v268 .office-updated {
+  color:#708594;
+  font-size:.46rem;
+  font-weight:650;
+}
+
+#officePicker .office-card-v268 .office-card-team-v268 {
+  display:block;
+  min-width:0;
+  margin:0;
+  overflow:hidden;
+  color:#F0F5F9;
+  font-size:.94rem;
+  font-weight:900;
+  line-height:1.18;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#officePicker .office-card-v268 .office-card-league-v268 {
+  display:block;
+  min-width:0;
+  margin-top:3px;
+  overflow:hidden;
+  color:#8FA2B1;
+  font-size:.63rem;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:5px !important;
+  width:100%;
+  min-width:0;
+  margin:9px 0 0 !important;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 > span {
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:2px !important;
+  min-width:0;
+  min-height:39px;
+  align-content:center;
+  margin:0 !important;
+  padding:6px 7px !important;
+  border:1px solid rgba(118,151,174,.12) !important;
+  border-radius:8px !important;
+  background:rgba(255,255,255,.018) !important;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 small {
+  display:block;
+  margin:0;
+  color:#738998;
+  font-size:.41rem !important;
+  font-weight:850;
+  letter-spacing:.065em;
+  line-height:1;
+  text-transform:uppercase;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 strong {
+  display:block;
+  min-width:0;
+  margin:0;
+  overflow:hidden;
+  color:#EAF3F9;
+  font-size:.58rem !important;
+  font-weight:850;
+  line-height:1.15;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#officePicker .office-card-v268 .office-open-v268 {
+  align-self:center;
+  justify-self:end;
+  color:#6EC8FF;
+  font-size:1.15rem;
+  opacity:.9;
+}
+
+@media (max-width:760px) {
+  #officePicker.office-picker-shell {
+    width:100%;
+    margin:10px auto 28px;
+    padding:0;
+  }
+
+  #officePicker .office-picker-hero {
+    grid-template-columns:1fr;
+    align-items:stretch;
+    gap:13px;
+    margin-bottom:9px;
+    padding:16px;
+    border-radius:16px;
+  }
+
+  #officePicker .office-picker-hero h2 {
+    font-size:1.82rem;
+  }
+
+  #officePicker .office-picker-hero > div > p:last-child {
+    margin-top:7px;
+    font-size:.72rem;
+    line-height:1.46;
+  }
+
+  #officePicker .office-create-btn {
+    width:100%;
+    min-height:42px;
+    font-size:.72rem;
+  }
+
+  #officePicker .office-picker-summary {
+    min-height:34px;
+    margin-bottom:8px;
+    padding:6px 2px;
+    font-size:.62rem;
+  }
+
+  #officePicker .office-list-v219 {
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  #officePicker .office-card-v268 {
+    grid-template-columns:46px minmax(0,1fr) 17px !important;
+    gap:9px;
+    padding:11px 10px 11px 11px;
+    border-radius:14px;
+  }
+
+  #officePicker .office-card-v268::before {
+    top:14px;
+    bottom:14px;
+  }
+
+  #officePicker .office-card-v268 .office-card-mark-v231 {
+    width:46px;
+    height:46px;
+    border-radius:12px;
+  }
+
+  #officePicker .office-card-v268 .office-updated {
+    display:none;
+  }
+
+  #officePicker .office-card-v268 .office-card-team-v268 {
+    font-size:.88rem;
+  }
+
+  #officePicker .office-card-v268 .office-card-league-v268 {
+    font-size:.61rem;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:5px !important;
+    margin-top:8px !important;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 > span {
+    min-height:38px;
+    padding:6px 7px !important;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 small {
+    font-size:.42rem !important;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 strong {
+    font-size:.60rem !important;
+  }
+}
+
+@media (max-width:390px) {
+  #officePicker .office-picker-hero {
+    padding:15px 14px;
+  }
+
+  #officePicker .office-picker-hero .eyebrow {
+    font-size:.58rem;
+  }
+
+  #officePicker .office-picker-hero h2 {
+    font-size:1.72rem;
+  }
+
+  #officePicker .office-card-v268 {
+    grid-template-columns:44px minmax(0,1fr) 15px !important;
+    gap:8px;
+    padding:10px 9px 10px 10px;
+  }
+
+  #officePicker .office-card-v268 .office-card-mark-v231 {
+    width:44px;
+    height:44px;
+  }
+
+  #officePicker .office-card-v268 .office-recent-chip-v268 {
+    display:inline-flex !important;
+  }
+
+  #officePicker .office-picker-summary {
+    font-size:.60rem;
+  }
+}
