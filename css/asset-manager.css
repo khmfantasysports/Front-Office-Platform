@@ -1,0 +1,442 @@
+/*
+RosterCap V2.70 — Asset Manager
+
+Dedicated Assets ownership layer.
+Load after assets-landing.css.
+*/
+
+/* ------------------------------------------------------------------
+   Assets page — status/lifecycle controls
+   ------------------------------------------------------------------ */
+
+#assetsView .assets-page-v270 {
+  gap:8px;
+}
+
+#assetsView .asset-status-rail-v270 {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding:1px 0;
+}
+
+#assetsView .asset-status-rail-v270::-webkit-scrollbar {
+  display:none;
+}
+
+#assetsView .asset-status-rail-v270 button {
+  flex:0 0 auto;
+  min-height:29px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.015);
+  color:var(--muted);
+  font:inherit;
+  font-size:.57rem;
+  font-weight:820;
+  cursor:pointer;
+}
+
+#assetsView .asset-status-rail-v270 button strong {
+  min-width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  padding:0 4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.035);
+  color:#B9C9D5;
+  font-size:.50rem;
+  font-variant-numeric:tabular-nums;
+}
+
+#assetsView .asset-status-rail-v270 button.active {
+  border-color:rgba(119,201,255,.32);
+  background:rgba(50,173,255,.09);
+  color:#EDF8FF;
+}
+
+#assetsView .asset-status-rail-v270 button.active strong {
+  background:rgba(50,173,255,.15);
+  color:#CFEAFF;
+}
+
+#assetsView .asset-filter-hidden-v270 {
+  display:none !important;
+}
+
+#assetsView .asset-status-empty-v270 {
+  min-height:92px;
+  display:grid;
+  align-content:center;
+  gap:4px;
+  padding:14px;
+  border:1px dashed #2B4355;
+  border-radius:11px;
+  background:rgba(255,255,255,.01);
+}
+
+#assetsView .asset-status-empty-v270 strong {
+  font-size:.78rem;
+}
+
+#assetsView .asset-status-empty-v270 span {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+#assetsView .asset-lifecycle-v270 {
+  display:block;
+  margin-top:4px;
+  color:#8DA3B4;
+  font-size:.57rem;
+  font-weight:700;
+  line-height:1.25;
+}
+
+#assetsView .asset-card-used-v270 {
+  border-color:rgba(119,201,255,.19);
+  background:
+    linear-gradient(180deg,rgba(50,173,255,.018),rgba(255,255,255,0)),
+    #0B151E;
+}
+
+#assetsView .asset-card-traded-v270 {
+  opacity:.82;
+}
+
+#assetsView .asset-card-conditional-v270 {
+  border-color:rgba(242,198,109,.18);
+}
+
+#assetsView .asset-status.used {
+  color:#8FCCF4;
+  border-color:rgba(119,201,255,.25);
+  background:rgba(50,173,255,.055);
+}
+
+/* ------------------------------------------------------------------
+   Asset editor
+   ------------------------------------------------------------------ */
+
+#assetDialog.asset-dialog-v270 {
+  width:min(680px,calc(100vw - 16px));
+  max-width:calc(100vw - 16px);
+  margin:auto;
+  padding:0;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+#assetDialog.asset-dialog-v270 .modal-card {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  max-height:calc(100dvh - 28px);
+  margin:0;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+#assetDialog.asset-dialog-v270 .asset-editor-body-v270 {
+  display:grid;
+  gap:8px;
+  min-width:0;
+  overflow-x:hidden;
+}
+
+#assetDialog.asset-dialog-v270 .asset-primary-grid-v270 {
+  gap:7px;
+}
+
+#assetDialog.asset-dialog-v270 label,
+#assetDialog.asset-dialog-v270 input,
+#assetDialog.asset-dialog-v270 select,
+#assetDialog.asset-dialog-v270 textarea {
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
+}
+
+#assetDialog.asset-dialog-v270 input:not([type="checkbox"]):not([type="radio"]),
+#assetDialog.asset-dialog-v270 select,
+#assetDialog.asset-dialog-v270 textarea {
+  width:100%;
+}
+
+#assetDialog.asset-dialog-v270 .asset-draft-fields-v270 {
+  grid-template-columns:minmax(0,.75fr) minmax(0,.65fr) minmax(0,1.6fr);
+  gap:7px;
+  margin-top:0 !important;
+}
+
+#assetDialog.asset-dialog-v270 .asset-pick-preview-v270 {
+  display:grid;
+  gap:2px;
+  padding:8px 9px;
+  border:1px solid rgba(119,201,255,.16);
+  border-radius:9px;
+  background:rgba(50,173,255,.035);
+}
+
+#assetDialog.asset-dialog-v270 .asset-pick-preview-v270 > span {
+  color:var(--muted);
+  font-size:.48rem;
+  font-weight:780;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+#assetDialog.asset-dialog-v270 .asset-pick-preview-v270 > strong {
+  color:#B9CBD8;
+  font-size:.66rem;
+  line-height:1.25;
+}
+
+#assetDialog.asset-dialog-v270 .asset-pick-preview-v270.complete > strong {
+  color:#E5F4FE;
+}
+
+#assetDialog.asset-dialog-v270 .asset-form-note-v270 {
+  margin:0;
+  padding:6px 8px;
+  border:1px solid rgba(113,147,169,.12);
+  border-radius:8px;
+  background:rgba(255,255,255,.012);
+  font-size:.59rem;
+  line-height:1.35;
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-v270 {
+  min-width:0;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:rgba(255,255,255,.012);
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-v270 > summary {
+  min-height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:7px 9px;
+  cursor:pointer;
+  list-style:none;
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-v270 > summary::-webkit-details-marker {
+  display:none;
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-v270 > summary > span {
+  color:#DDE9F1;
+  font-size:.64rem;
+  font-weight:820;
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-v270 > summary > small {
+  color:var(--muted);
+  font-size:.53rem;
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-v270[open] > summary {
+  border-bottom:1px solid var(--border-soft);
+}
+
+#assetDialog.asset-dialog-v270 .asset-details-body-v270 {
+  display:grid;
+  gap:8px;
+  padding:8px 9px 9px;
+}
+
+#assetDialog.asset-dialog-v270 .asset-notes-field-v270 {
+  display:grid;
+  gap:5px;
+  margin:0;
+  color:var(--muted);
+  font-size:.66rem;
+  font-weight:750;
+}
+
+#assetDialog.asset-dialog-v270 .asset-notes-field-v270 textarea {
+  min-height:68px;
+  resize:vertical;
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-body-v270 {
+  display:grid;
+  gap:5px;
+  padding:7px 8px 8px;
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-row-v270 {
+  min-width:0;
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr) auto;
+  align-items:center;
+  gap:7px;
+  padding:6px 7px;
+  border:1px solid rgba(113,147,169,.12);
+  border-radius:8px;
+  background:rgba(7,16,24,.48);
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-direction-v270 {
+  color:#A9DFFF;
+  font-size:.52rem;
+  font-weight:850;
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-copy-v270 {
+  min-width:0;
+  display:grid;
+  gap:1px;
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-copy-v270 strong {
+  min-width:0;
+  overflow:hidden;
+  color:#E6F0F6;
+  font-size:.59rem;
+  line-height:1.18;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-copy-v270 small {
+  min-width:0;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.52rem;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetDialog.asset-dialog-v270 .asset-activity-row-v270 time {
+  color:#8397A7;
+  font-size:.49rem;
+  white-space:nowrap;
+}
+
+#assetDialog.asset-dialog-v270 .asset-open-ledger-v270 {
+  justify-self:start;
+  margin-top:2px;
+}
+
+#assetDialog.asset-dialog-v270 .drawer-footer {
+  gap:6px;
+  padding:7px 9px;
+}
+
+#assetDialog.asset-dialog-v270 .asset-archive-btn {
+  margin-right:auto;
+}
+
+/* Non-draft assets need the name as a primary field. */
+#assetDialog.asset-is-other-v270 .asset-primary-grid-v270 {
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+}
+
+#assetDialog.asset-is-other-v270 .asset-primary-grid-v270 label:has(#assetLabel) {
+  grid-column:1 / -1;
+}
+
+/* Used Draft Picks are historical records. The app.js V2.58 lock remains the
+   authority; this only makes the locked state obvious. */
+#assetDialog.asset-dialog-v270 select:disabled,
+#assetDialog.asset-dialog-v270 input:disabled {
+  opacity:.68;
+  cursor:not-allowed;
+}
+
+@media (max-width:720px) {
+  #assetsView .asset-status-rail-v270 {
+    margin-inline:-1px;
+  }
+
+  #assetsView .asset-status-rail-v270 button {
+    min-height:28px;
+    padding:4px 7px;
+    font-size:.54rem;
+  }
+
+  #assetsView .asset-lifecycle-v270 {
+    font-size:.54rem;
+  }
+
+  #assetDialog.asset-dialog-v270 {
+    width:calc(100vw - 10px);
+    max-width:calc(100vw - 10px);
+  }
+
+  #assetDialog.asset-dialog-v270 .modal-card {
+    max-height:calc(100dvh - 18px);
+  }
+
+  #assetDialog.asset-dialog-v270 .drawer-header {
+    padding:8px 9px;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-editor-body-v270 {
+    gap:7px;
+    padding:8px 9px;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-primary-grid-v270 {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:6px;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-draft-fields-v270 {
+    grid-template-columns:minmax(0,.75fr) minmax(0,.65fr) minmax(0,1.4fr);
+    gap:6px;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-activity-row-v270 {
+    grid-template-columns:58px minmax(0,1fr);
+    gap:6px;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-activity-row-v270 time {
+    grid-column:2;
+  }
+
+  #assetDialog.asset-dialog-v270 .drawer-footer {
+    padding:6px 8px;
+  }
+}
+
+@media (max-width:430px) {
+  #assetDialog.asset-dialog-v270 .asset-draft-fields-v270 {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-draft-fields-v270 label:last-child {
+    grid-column:1 / -1;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-form-note-v270 {
+    font-size:.56rem;
+  }
+
+  #assetDialog.asset-dialog-v270 .asset-details-v270 > summary {
+    min-height:34px;
+  }
+
+  #assetDialog.asset-dialog-v270 #cancelAssetBtn {
+    display:none;
+  }
+
+  #assetDialog.asset-dialog-v270 .drawer-footer {
+    min-height:45px;
+  }
+}
