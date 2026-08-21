@@ -8,6 +8,7 @@
 // - preserves the existing full loadOffice() path
 // - adds a Back action to New Front Office
 // - uses editable creation suggestions from the league-configuration foundation
+// - formats season/development labels from each office's sport configuration
 // -----------------------------------------------------------------------------
 
 let officePickerPolishInstalledV268 = false;
@@ -136,7 +137,7 @@ function renderOfficeListV268() {
           <img src="./assets/rostercap-mark.svg" alt="" />
         </div>
         <h3>Create your first Front Office</h3>
-        <p>Set up the league essentials once, then manage roster, contracts, cap, minors, assets and transactions from one workspace.</p>
+        <p>Set up the league essentials once, then manage roster, contracts, cap, development, assets and transactions from one workspace.</p>
         <button class="btn btn-primary" type="button" data-create-office-v268>+ New Front Office</button>
       </div>`;
 
@@ -148,7 +149,13 @@ function renderOfficeListV268() {
     const updated = office.updated_at ? formatDateTime(office.updated_at) : 'Recently';
     const teamAccent = normalizeTeamAccent(office.team_accent_color);
     const season = office.picker_current_season_start_year
-      ? seasonLabel(office.picker_current_season_start_year)
+      ? (
+          window.RosterCapLeagueConfig?.formatSeasonStart?.(
+            office.picker_current_season_start_year,
+            office.sport || 'NHL'
+          )
+          || seasonLabel(office.picker_current_season_start_year)
+        )
       : 'Not set';
     const cap = formatOfficePickerCapV268(
       office.picker_current_salary_cap,
@@ -162,6 +169,9 @@ function renderOfficeListV268() {
       office.picker_minors_count,
       office.minors_limit
     );
+    const developmentLabel =
+      window.RosterCapSports?.get?.(office.sport || 'NHL')?.terminology?.developmentRoster
+      || 'Minors';
 
     return `
       <button
@@ -204,7 +214,7 @@ function renderOfficeListV268() {
               <strong>${escapeHtml(active)}</strong>
             </span>
             <span>
-              <small>Minors</small>
+              <small>${escapeHtml(developmentLabel)}</small>
               <strong>${escapeHtml(minors)}</strong>
             </span>
           </span>
@@ -216,8 +226,14 @@ function renderOfficeListV268() {
 
   list.querySelectorAll('[data-open-office]').forEach((button) => {
     button.addEventListener('click', () => {
+      const selectedOffice = frontOfficeList.find(
+        (office) => office.front_office_id === button.dataset.openOffice
+      );
+
       activeView = 'overview';
-      rosterMode = 'depth';
+      rosterMode = window.RosterCapSports?.isEarlyAccess?.(selectedOffice?.sport)
+        ? 'grid'
+        : 'depth';
       depthPosition = 'ALL';
       document.body.classList.remove('office-global-context-v269');
       loadOffice(button.dataset.openOffice);
