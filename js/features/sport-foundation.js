@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.79 — Multi-sport early-access foundation
+// RosterCap V2.79.1 — NFL position catalog + new-player default fix
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -21,7 +21,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79.1';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -50,7 +50,12 @@ const ROSTERCAP_SPORTS = Object.freeze({
     player: Object.freeze({
       positions: Object.freeze([
         'QB', 'RB', 'WR', 'TE', 'FB',
-        'OL', 'DL', 'EDGE', 'LB', 'CB', 'S', 'K', 'P'
+        'OL', 'OT', 'OG', 'C',
+        'DL', 'DE', 'DT', 'EDGE',
+        'LB',
+        'CB', 'S', 'DB',
+        'IDP',
+        'K', 'P'
       ]),
       eligiblePlaceholder: 'RB,WR',
       teamLabel: 'NFL team',
@@ -553,10 +558,13 @@ function setLabelTextForInputV279(input, text) {
   }
 }
 
-function syncPlayerEditorForSportV279() {
+function syncPlayerEditorForSportV279(options = {}) {
   const sport = activeWorkspaceSportV279();
   const config = sportPlayerConfigV279(sport);
   const terminology = sportTerminologyV279(sport);
+  const preserveCurrent =
+    options.preserveCurrent
+    ?? Boolean(typeof editingPlayerId !== 'undefined' && editingPlayerId);
 
   const position = document.getElementById('playerPosition');
   if (position) {
@@ -570,16 +578,19 @@ function syncPlayerEditorForSportV279() {
       position.appendChild(option);
     });
 
-    if (current && !config.positions.includes(current)) {
+    if (preserveCurrent && current && !config.positions.includes(current)) {
       const existing = document.createElement('option');
       existing.value = current;
       existing.textContent = current;
       position.appendChild(existing);
     }
 
-    position.value = current && [...position.options].some((o) => o.value === current)
-      ? current
-      : config.positions[0];
+    position.value =
+      preserveCurrent
+      && current
+      && [...position.options].some((option) => option.value === current)
+        ? current
+        : config.positions[0];
   }
 
   const eligible = document.getElementById('playerEligible');
@@ -645,8 +656,9 @@ function installPlayerDialogSportAdapterV279() {
 
   const originalOpenPlayerDialogV279 = openPlayerDialog;
   openPlayerDialog = function(...args) {
+    const playerId = args[0] || null;
     const result = originalOpenPlayerDialogV279(...args);
-    syncPlayerEditorForSportV279();
+    syncPlayerEditorForSportV279({ preserveCurrent: Boolean(playerId) });
     return result;
   };
 }
