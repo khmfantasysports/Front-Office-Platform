@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.79.3 — mobile navigation observer loop fix
+// RosterCap V2.80 — multi-sport configuration foundation
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -11,6 +11,7 @@
 // - NFL/NBA/MLB use sport-aware creation/player inputs plus the generic Cap Grid
 //   while their configurable lineup/depth layouts are still being built.
 // - V2.78B roster-group parity diagnostics remain installed.
+// - Workspace navigation is owned by app.js / workspace-shared.css.
 //
 // This release intentionally does NOT:
 // - change Supabase tables, columns, RPC signatures or RLS
@@ -21,7 +22,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79.3';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.80';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -424,9 +425,8 @@ function syncCreateOfficeSportOptionsV277() {
   select.dataset.sportFoundation = ROSTERCAP_SPORT_FOUNDATION_VERSION;
 }
 
-function installSportFoundationV277() {
+function installSportFoundationV280() {
   syncCreateOfficeSportOptionsV277();
-  installWorkspacePageSelectV2792();
   installMultiSportUiV279();
 
   document.documentElement.dataset.rostercapSportFoundation =
@@ -461,131 +461,6 @@ window.RosterCapLeagueConfig = Object.freeze({
 
 
 
-
-// -----------------------------------------------------------------------------
-// RosterCap V2.79.2 — responsive workspace page selector
-//
-// Desktop retains the established segmented navigation.
-// At <=900px CSS hides the fixed text tabs and shows one compact select inside
-// #workspaceNav. The options mirror the actual navigation-button labels, so
-// sport-specific terminology such as Minors / Development does not create
-// overlapping fixed-width tabs.
-// -----------------------------------------------------------------------------
-
-let workspacePageSelectInstalledV2792 = false;
-let workspacePageSelectObserverV2792 = null;
-
-function currentWorkspacePageV2792() {
-  if (typeof activeView !== 'undefined' && activeView) {
-    return activeView;
-  }
-
-  const activeButton = document.querySelector('#workspaceNav .nav-tab.active[data-view]');
-  return activeButton?.dataset?.view || 'overview';
-}
-
-function workspacePageButtonsV2792() {
-  return [
-    ...document.querySelectorAll('#workspaceNav .nav-tab[data-view]')
-  ];
-}
-
-function syncWorkspacePageSelectV2792() {
-  const select = document.getElementById('workspacePageSelectV2792');
-  if (!select) return;
-
-  const buttons = workspacePageButtonsV2792();
-  const existing = new Map(
-    [...select.options].map((option) => [option.value, option])
-  );
-
-  buttons.forEach((button) => {
-    const view = button.dataset.view;
-    if (!view) return;
-
-    let option = existing.get(view);
-    if (!option) {
-      option = document.createElement('option');
-      option.value = view;
-      select.appendChild(option);
-    }
-
-    const nextLabel = button.textContent.trim() || view;
-    if (option.textContent !== nextLabel) {
-      option.textContent = nextLabel;
-    }
-  });
-
-  [...select.options].forEach((option) => {
-    if (!buttons.some((button) => button.dataset.view === option.value)) {
-      option.remove();
-    }
-  });
-
-  const current = currentWorkspacePageV2792();
-  if ([...select.options].some((option) => option.value === current)) {
-    select.value = current;
-  }
-
-  select.setAttribute(
-    'aria-label',
-    `Workspace page: ${select.options[select.selectedIndex]?.textContent || 'Overview'}`
-  );
-}
-
-function installWorkspacePageSelectV2792() {
-  if (workspacePageSelectInstalledV2792) return;
-
-  const nav = document.getElementById('workspaceNav');
-  if (!nav) return;
-
-  workspacePageSelectInstalledV2792 = true;
-
-  const wrap = document.createElement('label');
-  wrap.className = 'workspace-page-select-v2792';
-  wrap.htmlFor = 'workspacePageSelectV2792';
-
-  const prefix = document.createElement('span');
-  prefix.className = 'workspace-page-select-prefix-v2792';
-  prefix.textContent = 'Page';
-
-  const select = document.createElement('select');
-  select.id = 'workspacePageSelectV2792';
-  select.className = 'workspace-page-select-control-v2792';
-
-  wrap.append(prefix, select);
-  nav.appendChild(wrap);
-
-  select.addEventListener('change', () => {
-    const nextView = select.value;
-
-    if (typeof switchView === 'function') {
-      switchView(nextView);
-    } else {
-      document.querySelector(
-        `#workspaceNav .nav-tab[data-view="${nextView}"]`
-      )?.click();
-    }
-
-    syncWorkspacePageSelectV2792();
-  });
-
-  // Watch only existing tab active-state changes. Do NOT watch child/text
-  // mutations here: syncWorkspacePageSelectV2792() updates <option> content
-  // inside this same nav, and observing those writes would create a self-
-  // triggering MutationObserver loop in browsers such as mobile Safari.
-  workspacePageSelectObserverV2792 = new MutationObserver(() => {
-    syncWorkspacePageSelectV2792();
-  });
-
-  workspacePageSelectObserverV2792.observe(nav, {
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class']
-  });
-
-  syncWorkspacePageSelectV2792();
-}
 
 // -----------------------------------------------------------------------------
 // RosterCap V2.79 — early-access sport UI compatibility
@@ -739,18 +614,11 @@ function syncPlayerEditorForSportV279(options = {}) {
 
 function syncWorkspaceSportUiV279() {
   const sport = activeWorkspaceSportV279();
-  const terminology = sportTerminologyV279(sport);
   const earlyAccess = isRosterCapSportEarlyAccess(sport);
 
   document.documentElement.dataset.rostercapSport = sport;
   document.documentElement.dataset.rostercapSportMode =
     earlyAccess ? 'EARLY_ACCESS' : 'OPERATIONAL';
-
-  document.querySelectorAll('.nav-tab[data-view="farm"]').forEach((button) => {
-    button.textContent = terminology.developmentRoster;
-  });
-
-  syncWorkspacePageSelectV2792();
 
   if (typeof rosterMode !== 'undefined' && earlyAccess) {
     rosterMode = 'grid';
@@ -1200,8 +1068,7 @@ window.RosterCapRosterGroupsShadow = Object.freeze({
 
 installRosterGroupShadowV278b();
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', installSportFoundationV277, { once: true });
-} else {
-  installSportFoundationV277();
-}
+// All required DOM nodes and dependent page modules are loaded before this
+// script in index.html, so install immediately. This avoids a second startup
+// race between DOMContentLoaded and app.js init().
+installSportFoundationV280();
