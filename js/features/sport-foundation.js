@@ -1,33 +1,27 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.78B — League configuration + roster-group shadow foundation
+// RosterCap V2.79 — Multi-sport early-access foundation
 //
 // Architecture:
-// - Sport is a catalog/filter, not the platform ruleset.
-// - Setup templates provide editable suggestions for new Front Offices.
-// - Persisted Front Office / season values remain authoritative after creation.
-// - NHL is operational because it was implemented first, not because NHL rules
-//   are canonical to RosterCap.
-// - NFL / NBA / MLB remain planned until their complete workspace lifecycle is
-//   implemented and validated.
+// - Sport provides templates/options, not permanent platform rules.
+// - Saved Front Office configuration remains authoritative.
+// - NHL, NFL, NBA and MLB can now be created for early-access testing.
+// - NHL keeps its current full experience.
+// - NFL/NBA/MLB use sport-aware creation/player inputs plus the generic Cap Grid
+//   while their configurable lineup/depth layouts are still being built.
+// - V2.78B roster-group parity diagnostics remain installed.
 //
 // This release intentionally does NOT:
-// - add or change Supabase tables, columns, RPC signatures or RLS
-// - enable NFL / NBA / MLB Front Office creation
-// - change roster/depth behavior
-// - change cap/contract formulas
+// - change Supabase tables, columns, RPC signatures or RLS
+// - make any sport's suggested roster/cap values permanent rules
+// - enable sport-specific import adapters for NFL/NBA/MLB
+// - pretend the hockey depth renderer is valid for other sports
 // - change transaction formulas
-// - persist new roster-slot or terminology configuration yet
-//
-// V2.78B additionally:
-// - reads public.front_office_roster_groups after the established loadOffice()
-// - stores normalized roster-group configuration on state.rosterGroups
-// - compares generic roster-group behavior against the existing ACTIVE/FARM path
-// - reports parity diagnostics without changing any production calculation
+// - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.78B';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -35,33 +29,81 @@ const ROSTERCAP_SPORTS = Object.freeze({
     label: 'NHL',
     status: 'OPERATIONAL',
     order: 1,
-    suggestedTemplateKey: 'CURRENT_HOCKEY'
+    suggestedTemplateKey: 'CURRENT_HOCKEY',
+    player: Object.freeze({
+      positions: Object.freeze(['C', 'LW', 'RW', 'F', 'D', 'G']),
+      eligiblePlaceholder: 'C,LW',
+      teamLabel: 'NHL team',
+      teamPlaceholder: 'EDM'
+    }),
+    terminology: Object.freeze({
+      primaryRoster: 'Active roster',
+      developmentRoster: 'Minors'
+    })
   }),
   NFL: Object.freeze({
     code: 'NFL',
     label: 'NFL',
-    status: 'PLANNED',
+    status: 'EARLY_ACCESS',
     order: 2,
-    suggestedTemplateKey: null
+    suggestedTemplateKey: 'NFL_STARTER',
+    player: Object.freeze({
+      positions: Object.freeze([
+        'QB', 'RB', 'WR', 'TE', 'FB',
+        'OL', 'DL', 'EDGE', 'LB', 'CB', 'S', 'K', 'P'
+      ]),
+      eligiblePlaceholder: 'RB,WR',
+      teamLabel: 'NFL team',
+      teamPlaceholder: 'BUF'
+    }),
+    terminology: Object.freeze({
+      primaryRoster: 'Active roster',
+      developmentRoster: 'Development'
+    })
   }),
   NBA: Object.freeze({
     code: 'NBA',
     label: 'NBA',
-    status: 'PLANNED',
+    status: 'EARLY_ACCESS',
     order: 3,
-    suggestedTemplateKey: null
+    suggestedTemplateKey: 'NBA_STARTER',
+    player: Object.freeze({
+      positions: Object.freeze(['PG', 'SG', 'SF', 'PF', 'C']),
+      eligiblePlaceholder: 'PG,SG',
+      teamLabel: 'NBA team',
+      teamPlaceholder: 'TOR'
+    }),
+    terminology: Object.freeze({
+      primaryRoster: 'Active roster',
+      developmentRoster: 'Development'
+    })
   }),
   MLB: Object.freeze({
     code: 'MLB',
     label: 'MLB',
-    status: 'PLANNED',
+    status: 'EARLY_ACCESS',
     order: 4,
-    suggestedTemplateKey: null
+    suggestedTemplateKey: 'MLB_STARTER',
+    player: Object.freeze({
+      positions: Object.freeze([
+        'C', '1B', '2B', '3B', 'SS',
+        'LF', 'CF', 'RF', 'OF', 'DH',
+        'SP', 'RP', 'P'
+      ]),
+      eligiblePlaceholder: '2B,SS',
+      teamLabel: 'MLB team',
+      teamPlaceholder: 'TOR'
+    }),
+    terminology: Object.freeze({
+      primaryRoster: 'Active roster',
+      developmentRoster: 'Minors'
+    })
   })
 });
 
-// Templates are suggestions only. They are deliberately separate from SPORT.
-// A user may edit every field exposed by the creation/settings UI.
+// Templates initialize editable creation fields only.
+// Blank cap/roster values for early-access sports deliberately avoid inventing
+// league rules. Users can enter the values that match their fantasy league.
 const ROSTERCAP_SETUP_TEMPLATES = Object.freeze({
   CURRENT_HOCKEY: Object.freeze({
     key: 'CURRENT_HOCKEY',
@@ -69,11 +111,48 @@ const ROSTERCAP_SETUP_TEMPLATES = Object.freeze({
     sport: 'NHL',
     suggestions: Object.freeze({
       seasonDisplay: 'SPLIT_YEAR',
-      seasonBoundaryMonth: 6, // July, zero-indexed
+      seasonBoundaryMonth: 6,
       seasonCount: 7,
       currency: 'USD',
       rosterLimit: 30,
       salaryCap: 119600000
+    })
+  }),
+  NFL_STARTER: Object.freeze({
+    key: 'NFL_STARTER',
+    label: 'NFL starter',
+    sport: 'NFL',
+    suggestions: Object.freeze({
+      seasonDisplay: 'CALENDAR_YEAR',
+      seasonCount: 7,
+      currency: 'USD',
+      rosterLimit: null,
+      salaryCap: null
+    })
+  }),
+  NBA_STARTER: Object.freeze({
+    key: 'NBA_STARTER',
+    label: 'NBA starter',
+    sport: 'NBA',
+    suggestions: Object.freeze({
+      seasonDisplay: 'SPLIT_YEAR',
+      seasonBoundaryMonth: 6,
+      seasonCount: 7,
+      currency: 'USD',
+      rosterLimit: null,
+      salaryCap: null
+    })
+  }),
+  MLB_STARTER: Object.freeze({
+    key: 'MLB_STARTER',
+    label: 'MLB starter',
+    sport: 'MLB',
+    suggestions: Object.freeze({
+      seasonDisplay: 'CALENDAR_YEAR',
+      seasonCount: 7,
+      currency: 'USD',
+      rosterLimit: null,
+      salaryCap: null
     })
   })
 });
@@ -88,7 +167,11 @@ function getRosterCapSport(value) {
 }
 
 function isRosterCapSportOperational(value) {
-  return getRosterCapSport(value).status === 'OPERATIONAL';
+  return ['OPERATIONAL', 'EARLY_ACCESS'].includes(getRosterCapSport(value).status);
+}
+
+function isRosterCapSportEarlyAccess(value) {
+  return getRosterCapSport(value).status === 'EARLY_ACCESS';
 }
 
 function rosterCapSportList() {
@@ -149,6 +232,14 @@ function defaultRosterCapSeasonLabel(sport, date = new Date()) {
   if (suggestions.seasonDisplay === 'SPLIT_YEAR') return splitYearLabel(startYear);
   if (suggestions.seasonDisplay === 'CALENDAR_YEAR') return calendarYearLabel(startYear);
   return '';
+}
+
+function formatRosterCapSeasonStart(startYear, sport) {
+  const suggestions = rosterCapTemplateSuggestions(sport);
+  if (suggestions?.seasonDisplay === 'CALENDAR_YEAR') {
+    return calendarYearLabel(startYear);
+  }
+  return splitYearLabel(startYear);
 }
 
 function parseSplitYearSeason(value) {
@@ -314,6 +405,8 @@ function syncCreateOfficeSportOptionsV277() {
 
     if (sport.status === 'OPERATIONAL') {
       option.textContent = sport.label;
+    } else if (sport.status === 'EARLY_ACCESS') {
+      option.textContent = `${sport.label} — early access`;
     } else {
       option.textContent = `${sport.label} — coming soon`;
       option.disabled = true;
@@ -328,6 +421,7 @@ function syncCreateOfficeSportOptionsV277() {
 
 function installSportFoundationV277() {
   syncCreateOfficeSportOptionsV277();
+  installMultiSportUiV279();
 
   document.documentElement.dataset.rostercapSportFoundation =
     ROSTERCAP_SPORT_FOUNDATION_VERSION;
@@ -340,6 +434,7 @@ window.RosterCapSports = Object.freeze({
   normalize: normalizeRosterCapSport,
   get: getRosterCapSport,
   isOperational: isRosterCapSportOperational,
+  isEarlyAccess: isRosterCapSportEarlyAccess,
   list: rosterCapSportList,
   current: currentRosterCapSport,
   suggestedTemplate: suggestedRosterCapTemplateForSport,
@@ -351,6 +446,7 @@ window.RosterCapLeagueConfig = Object.freeze({
   creationSuggestions: rosterCapTemplateSuggestions,
   applyCreateSuggestions: applyRosterCapCreateSuggestions,
   defaultSeasonLabel: defaultRosterCapSeasonLabel,
+  formatSeasonStart: formatRosterCapSeasonStart,
   parseSeasonInput: parseRosterCapSeasonInput,
   seasonInputHelp: rosterCapSeasonInputHelp,
   creationSeasonCount: rosterCapCreationSeasonCount,
@@ -358,6 +454,243 @@ window.RosterCapLeagueConfig = Object.freeze({
 });
 
 
+
+
+// -----------------------------------------------------------------------------
+// RosterCap V2.79 — early-access sport UI compatibility
+// -----------------------------------------------------------------------------
+
+let multiSportUiInstalledV279 = false;
+let legacySeasonLabelV279 = null;
+let legacyParseSeasonStartV279 = null;
+
+function sportPlayerConfigV279(sport) {
+  return getRosterCapSport(sport).player || getRosterCapSport('NHL').player;
+}
+
+function sportTerminologyV279(sport) {
+  return getRosterCapSport(sport).terminology || getRosterCapSport('NHL').terminology;
+}
+
+function selectedCreateSportV279() {
+  return normalizeRosterCapSport(document.getElementById('sport')?.value || 'NHL');
+}
+
+function activeWorkspaceSportV279() {
+  return normalizeRosterCapSport(
+    (typeof state !== 'undefined' && state?.frontOffice?.sport)
+      || selectedCreateSportV279()
+      || 'NHL'
+  );
+}
+
+function syncCreateSeasonInputV279() {
+  const sport = selectedCreateSportV279();
+  const input = document.getElementById('currentSeason');
+  if (!input) return;
+
+  const display = rosterCapTemplateSuggestions(sport)?.seasonDisplay || 'SPLIT_YEAR';
+
+  if (display === 'CALENDAR_YEAR') {
+    input.pattern = '\\d{4}';
+    input.placeholder = '2026';
+    input.title = 'Use a season in the format 2026.';
+  } else {
+    input.pattern = '\\d{4}-\\d{2}';
+    input.placeholder = '2026-27';
+    input.title = 'Use a season in the format 2026-27.';
+  }
+}
+
+function ensureSportEarlyAccessNoteV279() {
+  const form = document.getElementById('frontOfficeForm');
+  if (!form) return null;
+
+  let note = document.getElementById('sportEarlyAccessNoteV279');
+  if (note) return note;
+
+  note = document.createElement('small');
+  note.id = 'sportEarlyAccessNoteV279';
+  note.style.display = 'block';
+  note.style.marginTop = '8px';
+  note.style.color = 'var(--muted)';
+  note.style.lineHeight = '1.4';
+
+  const sportSelect = document.getElementById('sport');
+  const section = sportSelect?.closest('.form-section');
+  if (section) section.appendChild(note);
+
+  return note;
+}
+
+function syncCreateSportUiV279(options = {}) {
+  const sport = selectedCreateSportV279();
+
+  if (options.applySuggestions !== false) {
+    window.RosterCapLeagueConfig?.applyCreateSuggestions?.(sport);
+  }
+
+  syncCreateSeasonInputV279();
+
+  const note = ensureSportEarlyAccessNoteV279();
+  if (note) {
+    note.textContent = isRosterCapSportEarlyAccess(sport)
+      ? `${sport} is available for early testing. Player entry, contracts, cap and the generic roster grid can be tested now; sport-specific lineup/depth and import adapters are still being built.`
+      : 'These are editable starting values. Your saved Front Office settings remain authoritative.';
+  }
+}
+
+function setLabelTextForInputV279(input, text) {
+  const label = input?.closest('label');
+  if (!label) return;
+
+  const textNode = [...label.childNodes].find(
+    (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+  );
+
+  if (textNode) {
+    textNode.textContent = `\n            ${text}\n            `;
+  }
+}
+
+function syncPlayerEditorForSportV279() {
+  const sport = activeWorkspaceSportV279();
+  const config = sportPlayerConfigV279(sport);
+  const terminology = sportTerminologyV279(sport);
+
+  const position = document.getElementById('playerPosition');
+  if (position) {
+    const current = String(position.value || '').trim().toUpperCase();
+    position.replaceChildren();
+
+    config.positions.forEach((value) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      position.appendChild(option);
+    });
+
+    if (current && !config.positions.includes(current)) {
+      const existing = document.createElement('option');
+      existing.value = current;
+      existing.textContent = current;
+      position.appendChild(existing);
+    }
+
+    position.value = current && [...position.options].some((o) => o.value === current)
+      ? current
+      : config.positions[0];
+  }
+
+  const eligible = document.getElementById('playerEligible');
+  if (eligible) eligible.placeholder = config.eligiblePlaceholder;
+
+  const team = document.getElementById('realTeam');
+  if (team) {
+    team.placeholder = config.teamPlaceholder;
+    setLabelTextForInputV279(team, config.teamLabel);
+  }
+
+  const rosterGroup = document.getElementById('playerRosterGroup');
+  if (rosterGroup) {
+    const primary = rosterGroup.querySelector('option[value="ACTIVE"]');
+    const development = rosterGroup.querySelector('option[value="FARM"]');
+    if (primary) primary.textContent = terminology.primaryRoster;
+    if (development) development.textContent = terminology.developmentRoster;
+  }
+}
+
+function syncWorkspaceSportUiV279() {
+  const sport = activeWorkspaceSportV279();
+  const terminology = sportTerminologyV279(sport);
+  const earlyAccess = isRosterCapSportEarlyAccess(sport);
+
+  document.documentElement.dataset.rostercapSport = sport;
+  document.documentElement.dataset.rostercapSportMode =
+    earlyAccess ? 'EARLY_ACCESS' : 'OPERATIONAL';
+
+  document.querySelectorAll('.nav-tab[data-view="farm"]').forEach((button) => {
+    button.textContent = terminology.developmentRoster;
+  });
+
+  if (typeof rosterMode !== 'undefined' && earlyAccess) {
+    rosterMode = 'grid';
+  }
+
+  syncPlayerEditorForSportV279();
+}
+
+function installSportAwareSeasonHelpersV279() {
+  if (typeof seasonLabel === 'function' && !legacySeasonLabelV279) {
+    legacySeasonLabelV279 = seasonLabel;
+    seasonLabel = function(startYear) {
+      const sport = activeWorkspaceSportV279();
+      const formatted = formatRosterCapSeasonStart(startYear, sport);
+      return formatted || legacySeasonLabelV279(startYear);
+    };
+  }
+
+  if (typeof parseSeasonStart === 'function' && !legacyParseSeasonStartV279) {
+    legacyParseSeasonStartV279 = parseSeasonStart;
+    parseSeasonStart = function(value) {
+      const sport = activeWorkspaceSportV279();
+      const parsed = parseRosterCapSeasonInput(value, sport);
+      return parsed?.startYear ?? legacyParseSeasonStartV279(value);
+    };
+  }
+}
+
+function installPlayerDialogSportAdapterV279() {
+  if (typeof openPlayerDialog !== 'function') return;
+
+  const originalOpenPlayerDialogV279 = openPlayerDialog;
+  openPlayerDialog = function(...args) {
+    const result = originalOpenPlayerDialogV279(...args);
+    syncPlayerEditorForSportV279();
+    return result;
+  };
+}
+
+function installRosterEarlyAccessAdapterV279() {
+  if (typeof renderRoster !== 'function') return;
+
+  const originalRenderRosterV279 = renderRoster;
+  renderRoster = function(...args) {
+    const sport = activeWorkspaceSportV279();
+    if (isRosterCapSportEarlyAccess(sport) && typeof rosterMode !== 'undefined') {
+      rosterMode = 'grid';
+    }
+
+    const result = originalRenderRosterV279(...args);
+
+    const depthButton = document.getElementById('rosterDepthModeBtn');
+    if (depthButton) {
+      depthButton.classList.toggle(
+        'hidden',
+        isRosterCapSportEarlyAccess(sport)
+      );
+    }
+
+    return result;
+  };
+}
+
+function installMultiSportUiV279() {
+  if (multiSportUiInstalledV279) return;
+  multiSportUiInstalledV279 = true;
+
+  installSportAwareSeasonHelpersV279();
+  installPlayerDialogSportAdapterV279();
+  installRosterEarlyAccessAdapterV279();
+
+  const sportSelect = document.getElementById('sport');
+  sportSelect?.addEventListener('change', () => {
+    syncCreateSportUiV279({ applySuggestions: true });
+  });
+
+  syncCreateSportUiV279({ applySuggestions: false });
+  syncWorkspaceSportUiV279();
+}
 
 // -----------------------------------------------------------------------------
 // RosterCap V2.78B — roster-group shadow read + parity diagnostics
@@ -709,7 +1042,9 @@ function installRosterGroupShadowV278b() {
       return result;
     }
 
+    syncWorkspaceSportUiV279();
     await loadRosterGroupShadowV278b(frontOfficeId);
+    syncWorkspaceSportUiV279();
     return result;
   };
 }
