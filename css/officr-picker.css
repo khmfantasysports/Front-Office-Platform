@@ -294,3 +294,354 @@ This intentionally stays out of workspace.css after the V2.65 consolidation.
     order:2;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.69 — Global landing / My Front Offices polish
+   ============================================================ */
+
+.office-global-hide-v269 {
+  display:none !important;
+}
+
+/* My Front Offices and New Front Office are app-level screens.
+   Workspace tabs only belong to an opened Front Office. */
+body.office-global-context-v269 #workspaceNav {
+  display:none !important;
+}
+
+body.office-global-context-v269 #appHeader {
+  justify-content:space-between;
+}
+
+body.office-global-context-v269 #appHeader .brand-lockup {
+  flex:0 1 auto;
+  min-width:0;
+}
+
+body.office-global-context-v269 #topbarActions {
+  margin-left:auto;
+  flex:0 0 auto;
+}
+
+/* Keep the global/account menu clean when no Front Office is open. */
+body.office-global-context-v269 .utility-menu-popover {
+  min-width:190px;
+}
+
+/* Picker hierarchy */
+#officePicker.office-picker-shell {
+  max-width:920px;
+}
+
+#officePicker .office-picker-hero {
+  align-items:end;
+  gap:16px;
+  padding-top:5px;
+  padding-bottom:14px;
+}
+
+#officePicker .office-picker-hero h2 {
+  letter-spacing:-.025em;
+}
+
+#officePicker .office-picker-hero > div > p:last-child {
+  max-width:520px;
+  line-height:1.45;
+}
+
+#officePicker .office-picker-summary {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:36px;
+  margin:0 0 9px;
+  padding:7px 2px;
+  border-top:1px solid rgba(115,151,174,.17);
+  border-bottom:1px solid rgba(115,151,174,.17);
+}
+
+#officePicker .office-picker-summary > span {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+#officePicker .office-picker-summary > span:first-child {
+  color:var(--muted);
+}
+
+#officePicker .office-picker-summary > span:first-child strong {
+  color:#EEF7FD;
+}
+
+#officePicker .office-list-v219 {
+  gap:9px;
+}
+
+/* Stronger specificity than legacy office-card rules so the V2.68 metrics
+   render as actual metric cells rather than an inline sentence. */
+#officePicker .office-card-v268 {
+  grid-template-columns:52px minmax(0,1fr) 24px;
+  min-height:0;
+  gap:12px;
+  padding:13px 13px 13px 14px;
+}
+
+#officePicker .office-card-v268 .office-card-mark-v231 {
+  width:52px;
+  height:52px;
+  margin-top:2px;
+}
+
+#officePicker .office-card-v268 .office-card-topline {
+  display:flex;
+  min-width:0;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin:0 0 3px;
+}
+
+#officePicker .office-card-v268 .office-card-chip-row-v268 {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+}
+
+#officePicker .office-card-v268 .office-recent-chip-v268 {
+  display:inline-flex;
+  align-items:center;
+  min-height:19px;
+  padding:2px 6px;
+  border:1px solid color-mix(in srgb,var(--office-team-accent) 30%,rgba(113,147,169,.28));
+  border-radius:999px;
+  background:color-mix(in srgb,var(--office-team-accent) 8%,rgba(255,255,255,.015));
+  color:#DDECF7;
+  font-size:.49rem;
+  font-weight:820;
+  line-height:1;
+}
+
+#officePicker .office-card-v268 .office-updated {
+  color:var(--muted);
+  font-size:.48rem;
+  font-weight:650;
+  white-space:nowrap;
+}
+
+#officePicker .office-card-v268 .office-card-team-v268 {
+  display:block;
+  margin-top:1px;
+  font-size:.94rem;
+  line-height:1.17;
+}
+
+#officePicker .office-card-v268 .office-card-league-v268 {
+  display:block;
+  margin-top:1px;
+  color:var(--muted);
+  font-size:.66rem;
+  line-height:1.2;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:5px !important;
+  width:100%;
+  min-width:0;
+  margin:8px 0 0 !important;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 > span {
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:1px !important;
+  min-width:0;
+  margin:0 !important;
+  padding:6px 7px !important;
+  border:1px solid rgba(113,147,169,.14) !important;
+  border-radius:8px !important;
+  background:rgba(255,255,255,.018) !important;
+  line-height:1.1 !important;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 small {
+  display:block;
+  margin:0;
+  color:var(--muted);
+  font-size:.44rem !important;
+  font-weight:780;
+  letter-spacing:.055em;
+  line-height:1.05;
+  text-transform:uppercase;
+}
+
+#officePicker .office-card-v268 .office-card-context-v268 strong {
+  display:block;
+  min-width:0;
+  margin:1px 0 0;
+  overflow:hidden;
+  color:#EBF6FD;
+  font-size:.61rem !important;
+  font-weight:850;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#officePicker .office-card-v268 .office-open-v268 {
+  align-self:center;
+  justify-self:end;
+  opacity:.8;
+}
+
+/* App-level onboarding also should not reserve workspace-navigation space. */
+body.office-global-context-v269 #onboarding {
+  margin-top:12px;
+}
+
+@media (max-width:760px) {
+  /* With workspace tabs gone, show a compact RosterCap identity in the app bar. */
+  body.office-global-context-v269 #appHeader {
+    min-height:58px;
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  body.office-global-context-v269 #appHeader .brand-copy {
+    display:flex !important;
+    flex-direction:column;
+    justify-content:center;
+    min-width:0;
+  }
+
+  body.office-global-context-v269 #appHeader .platform-wordmark {
+    display:block !important;
+    font-size:.76rem;
+    line-height:1;
+  }
+
+  body.office-global-context-v269 #appHeader .platform-subtitle {
+    display:none !important;
+  }
+
+  #officePicker.office-picker-shell {
+    margin-top:8px;
+  }
+
+  #officePicker .office-picker-hero {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:11px;
+    padding:4px 2px 13px;
+  }
+
+  #officePicker .office-picker-hero h2 {
+    margin-bottom:4px;
+    font-size:1.72rem;
+  }
+
+  #officePicker .office-picker-hero > div > p:last-child {
+    font-size:.74rem;
+  }
+
+  #officePicker .office-picker-hero .office-create-btn {
+    width:100%;
+    min-height:42px;
+  }
+
+  #officePicker .office-picker-summary {
+    min-height:34px;
+    padding:6px 2px;
+    font-size:.65rem;
+  }
+
+  #officePicker .office-picker-sync {
+    font-size:.62rem;
+  }
+
+  #officePicker .office-card-v268 {
+    grid-template-columns:44px minmax(0,1fr) 18px;
+    gap:9px;
+    padding:10px 9px 10px 10px;
+  }
+
+  #officePicker .office-card-v268 .office-card-mark-v231 {
+    width:44px;
+    height:44px;
+  }
+
+  #officePicker .office-card-v268 .office-updated {
+    display:none;
+  }
+
+  #officePicker .office-card-v268 .office-card-team-v268 {
+    font-size:.86rem;
+  }
+
+  #officePicker .office-card-v268 .office-card-league-v268 {
+    font-size:.61rem;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:4px !important;
+    margin-top:7px !important;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 > span {
+    min-height:36px;
+    padding:5px 6px !important;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 small {
+    font-size:.42rem !important;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 strong {
+    font-size:.58rem !important;
+  }
+}
+
+@media (max-width:430px) {
+  body.office-global-context-v269 #appHeader .brand-mark {
+    width:34px;
+    height:34px;
+  }
+
+  body.office-global-context-v269 #appHeader .platform-wordmark {
+    font-size:.72rem;
+  }
+
+  #officePicker .office-picker-hero h2 {
+    font-size:1.56rem;
+  }
+
+  #officePicker .office-picker-summary {
+    font-size:.62rem;
+  }
+
+  #officePicker .office-card-v268 {
+    grid-template-columns:40px minmax(0,1fr) 16px;
+    gap:8px;
+    padding:9px 8px 9px 9px;
+  }
+
+  #officePicker .office-card-v268 .office-card-mark-v231 {
+    width:40px;
+    height:40px;
+  }
+
+  #officePicker .office-card-v268 .office-recent-chip-v268 {
+    min-height:18px;
+    font-size:.46rem;
+  }
+
+  #officePicker .office-card-v268 .office-card-context-v268 > span {
+    min-height:34px;
+  }
+}
