@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.79.1 — NFL position catalog + new-player default fix
+// RosterCap V2.79.2 — responsive workspace page navigation
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -21,7 +21,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79.1';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.79.2';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -426,6 +426,7 @@ function syncCreateOfficeSportOptionsV277() {
 
 function installSportFoundationV277() {
   syncCreateOfficeSportOptionsV277();
+  installWorkspacePageSelectV2792();
   installMultiSportUiV279();
 
   document.documentElement.dataset.rostercapSportFoundation =
@@ -460,6 +461,126 @@ window.RosterCapLeagueConfig = Object.freeze({
 
 
 
+
+// -----------------------------------------------------------------------------
+// RosterCap V2.79.2 — responsive workspace page selector
+//
+// Desktop retains the established segmented navigation.
+// At <=900px CSS hides the fixed text tabs and shows one compact select inside
+// #workspaceNav. The options mirror the actual navigation-button labels, so
+// sport-specific terminology such as Minors / Development does not create
+// overlapping fixed-width tabs.
+// -----------------------------------------------------------------------------
+
+let workspacePageSelectInstalledV2792 = false;
+let workspacePageSelectObserverV2792 = null;
+
+function currentWorkspacePageV2792() {
+  if (typeof activeView !== 'undefined' && activeView) {
+    return activeView;
+  }
+
+  const activeButton = document.querySelector('#workspaceNav .nav-tab.active[data-view]');
+  return activeButton?.dataset?.view || 'overview';
+}
+
+function workspacePageButtonsV2792() {
+  return [
+    ...document.querySelectorAll('#workspaceNav .nav-tab[data-view]')
+  ];
+}
+
+function syncWorkspacePageSelectV2792() {
+  const select = document.getElementById('workspacePageSelectV2792');
+  if (!select) return;
+
+  const buttons = workspacePageButtonsV2792();
+  const existing = new Map(
+    [...select.options].map((option) => [option.value, option])
+  );
+
+  buttons.forEach((button) => {
+    const view = button.dataset.view;
+    if (!view) return;
+
+    let option = existing.get(view);
+    if (!option) {
+      option = document.createElement('option');
+      option.value = view;
+      select.appendChild(option);
+    }
+
+    option.textContent = button.textContent.trim() || view;
+  });
+
+  [...select.options].forEach((option) => {
+    if (!buttons.some((button) => button.dataset.view === option.value)) {
+      option.remove();
+    }
+  });
+
+  const current = currentWorkspacePageV2792();
+  if ([...select.options].some((option) => option.value === current)) {
+    select.value = current;
+  }
+
+  select.setAttribute(
+    'aria-label',
+    `Workspace page: ${select.options[select.selectedIndex]?.textContent || 'Overview'}`
+  );
+}
+
+function installWorkspacePageSelectV2792() {
+  if (workspacePageSelectInstalledV2792) return;
+
+  const nav = document.getElementById('workspaceNav');
+  if (!nav) return;
+
+  workspacePageSelectInstalledV2792 = true;
+
+  const wrap = document.createElement('label');
+  wrap.className = 'workspace-page-select-v2792';
+  wrap.htmlFor = 'workspacePageSelectV2792';
+
+  const prefix = document.createElement('span');
+  prefix.className = 'workspace-page-select-prefix-v2792';
+  prefix.textContent = 'Page';
+
+  const select = document.createElement('select');
+  select.id = 'workspacePageSelectV2792';
+  select.className = 'workspace-page-select-control-v2792';
+
+  wrap.append(prefix, select);
+  nav.appendChild(wrap);
+
+  select.addEventListener('change', () => {
+    const nextView = select.value;
+
+    if (typeof switchView === 'function') {
+      switchView(nextView);
+    } else {
+      document.querySelector(
+        `#workspaceNav .nav-tab[data-view="${nextView}"]`
+      )?.click();
+    }
+
+    syncWorkspacePageSelectV2792();
+  });
+
+  workspacePageSelectObserverV2792 = new MutationObserver(() => {
+    syncWorkspacePageSelectV2792();
+  });
+
+  workspacePageSelectObserverV2792.observe(nav, {
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['class'],
+    childList: true,
+    characterData: true
+  });
+
+  syncWorkspacePageSelectV2792();
+}
 
 // -----------------------------------------------------------------------------
 // RosterCap V2.79 — early-access sport UI compatibility
@@ -623,6 +744,8 @@ function syncWorkspaceSportUiV279() {
   document.querySelectorAll('.nav-tab[data-view="farm"]').forEach((button) => {
     button.textContent = terminology.developmentRoster;
   });
+
+  syncWorkspacePageSelectV2792();
 
   if (typeof rosterMode !== 'undefined' && earlyAccess) {
     rosterMode = 'grid';
