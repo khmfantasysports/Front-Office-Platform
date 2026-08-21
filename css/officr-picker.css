@@ -1,0 +1,296 @@
+/*
+RosterCap V2.68 — My Front Offices / landing polish
+
+Dedicated ownership file.
+This intentionally stays out of workspace.css after the V2.65 consolidation.
+*/
+
+.office-picker-shell {
+  max-width:980px;
+}
+
+.office-picker-hero {
+  gap:18px;
+  padding-bottom:12px;
+}
+
+.office-picker-hero > div {
+  min-width:0;
+}
+
+.office-picker-hero h2 {
+  margin-bottom:4px;
+}
+
+.office-picker-hero p:not(.eyebrow) {
+  max-width:560px;
+}
+
+.office-picker-summary {
+  margin-bottom:10px;
+}
+
+.office-list-v219 {
+  gap:10px;
+}
+
+.office-card-v268 {
+  grid-template-columns:52px minmax(0,1fr) 28px;
+  min-height:132px;
+  gap:13px;
+  padding:13px 14px;
+  text-align:left;
+  overflow:hidden;
+}
+
+.office-card-v268 .office-card-mark-v231 {
+  width:52px;
+  height:52px;
+  align-self:start;
+  border-radius:13px;
+}
+
+.office-card-copy-v268 {
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+
+.office-card-v268 .office-card-topline {
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:1px;
+}
+
+.office-card-chip-row-v268 {
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:wrap;
+}
+
+.office-recent-chip-v268 {
+  display:inline-flex;
+  align-items:center;
+  min-height:20px;
+  padding:2px 7px;
+  border:1px solid color-mix(in srgb,var(--office-team-accent) 34%,var(--border));
+  border-radius:999px;
+  background:color-mix(in srgb,var(--office-team-accent) 7%,transparent);
+  color:#DCEFFF;
+  font-size:.54rem;
+  font-weight:850;
+  letter-spacing:.02em;
+}
+
+.office-card-team-v268 {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.94rem;
+  line-height:1.2;
+}
+
+.office-card-league-v268 {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.office-card-context-v268 {
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+  margin-top:8px;
+}
+
+.office-card-context-v268 > span {
+  min-width:0;
+  display:grid;
+  gap:1px;
+  padding:6px 7px;
+  border:1px solid rgba(113,147,169,.15);
+  border-radius:8px;
+  background:rgba(255,255,255,.018);
+}
+
+.office-card-context-v268 small {
+  color:var(--muted);
+  font-size:.49rem;
+  font-weight:760;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+
+.office-card-context-v268 strong {
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#E8F4FC;
+  font-size:.63rem;
+  font-weight:850;
+}
+
+.office-open-v268 {
+  align-self:center;
+  font-size:1.25rem;
+}
+
+.office-empty-state-v268 {
+  min-height:260px;
+  gap:0;
+}
+
+.office-empty-state-v268 p {
+  margin-bottom:15px;
+}
+
+.create-office-actions-v268 {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+
+.create-office-actions-v268 #cancelCreateOfficeBtnV268 {
+  margin-right:auto;
+}
+
+@media (max-width:760px) {
+  .office-picker-shell {
+    margin-top:10px;
+  }
+
+  .office-picker-hero {
+    gap:10px;
+    padding-bottom:10px;
+  }
+
+  .office-picker-hero .office-create-btn {
+    min-height:39px;
+  }
+
+  .office-picker-summary {
+    padding-top:7px;
+    margin-bottom:7px;
+  }
+
+  .office-list-v219 {
+    gap:7px;
+  }
+
+  .office-card-v268 {
+    grid-template-columns:44px minmax(0,1fr) 20px;
+    min-height:116px;
+    gap:9px;
+    padding:10px;
+    border-radius:12px;
+  }
+
+  .office-card-v268 .office-card-mark-v231 {
+    width:44px;
+    height:44px;
+    border-radius:11px;
+  }
+
+  .office-card-v268 .office-card-topline {
+    align-items:flex-start;
+  }
+
+  .office-card-v268 .office-updated {
+    flex:0 0 auto;
+    font-size:.50rem;
+  }
+
+  .office-card-team-v268 {
+    font-size:.85rem;
+  }
+
+  .office-card-context-v268 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px;
+    margin-top:6px;
+  }
+
+  .office-card-context-v268 > span {
+    padding:5px 6px;
+  }
+
+  .office-card-context-v268 small {
+    font-size:.46rem;
+  }
+
+  .office-card-context-v268 strong {
+    font-size:.59rem;
+  }
+
+  .create-office-actions-v268 {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .create-office-actions-v268 #cancelCreateOfficeBtnV268 {
+    margin-right:0;
+  }
+
+  .create-office-actions-v268 .btn {
+    width:100%;
+  }
+}
+
+@media (max-width:430px) {
+  .office-picker-hero h2 {
+    font-size:1.58rem;
+  }
+
+  .office-picker-hero p:not(.eyebrow) {
+    font-size:.73rem;
+  }
+
+  .office-card-v268 {
+    grid-template-columns:40px minmax(0,1fr) 18px;
+    gap:8px;
+    padding:9px;
+  }
+
+  .office-card-v268 .office-card-mark-v231 {
+    width:40px;
+    height:40px;
+  }
+
+  .office-recent-chip-v268 {
+    display:none;
+  }
+
+  .office-card-v268 .office-updated {
+    max-width:105px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .office-card-context-v268 > span {
+    padding:5px;
+  }
+
+  .office-empty-state-v268 {
+    min-height:220px;
+    padding:20px 14px;
+  }
+
+  .create-office-actions-v268 {
+    grid-template-columns:1fr;
+  }
+
+  .create-office-actions-v268 #cancelCreateOfficeBtnV268 {
+    order:2;
+  }
+}
