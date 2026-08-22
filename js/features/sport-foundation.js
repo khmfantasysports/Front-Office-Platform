@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.84 — universal positional depth + Front Office configuration
+// RosterCap V2.85 — editable position catalog + universal depth terminology
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -22,7 +22,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.84';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.85';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -117,7 +117,7 @@ const ROSTERCAP_SPORTS = Object.freeze({
     order: 3,
     suggestedTemplateKey: 'NBA_STARTER',
     player: Object.freeze({
-      positions: Object.freeze(['PG', 'SG', 'SF', 'PF', 'C']),
+      positions: Object.freeze(['PG', 'SG', 'G', 'SF', 'PF', 'F', 'C']),
       defaultPositions: Object.freeze(['PG', 'SG', 'SF', 'PF', 'C']),
       eligiblePlaceholder: 'PG,SG',
       teamLabel: 'NBA team',
@@ -133,8 +133,10 @@ const ROSTERCAP_SPORTS = Object.freeze({
       positions: Object.freeze([
         Object.freeze({ key:'PG', label:'PG', section:'Guards', eligible:Object.freeze(['PG']) }),
         Object.freeze({ key:'SG', label:'SG', section:'Guards', eligible:Object.freeze(['SG']) }),
+        Object.freeze({ key:'G', label:'G', section:'Guards', eligible:Object.freeze(['G','PG','SG']) }),
         Object.freeze({ key:'SF', label:'SF', section:'Forwards', eligible:Object.freeze(['SF']) }),
         Object.freeze({ key:'PF', label:'PF', section:'Forwards', eligible:Object.freeze(['PF']) }),
+        Object.freeze({ key:'F', label:'F', section:'Forwards', eligible:Object.freeze(['F','SF','PF']) }),
         Object.freeze({ key:'C', label:'C', section:'Centers', eligible:Object.freeze(['C']) })
       ])
     })
@@ -148,6 +150,7 @@ const ROSTERCAP_SPORTS = Object.freeze({
     player: Object.freeze({
       positions: Object.freeze([
         'C', '1B', '2B', '3B', 'SS',
+        'MI', 'CI', 'INF',
         'LF', 'CF', 'RF', 'OF', 'DH',
         'SP', 'RP', 'P'
       ]),
@@ -172,6 +175,9 @@ const ROSTERCAP_SPORTS = Object.freeze({
         Object.freeze({ key:'2B', label:'2B', section:'Infield', eligible:Object.freeze(['2B']) }),
         Object.freeze({ key:'3B', label:'3B', section:'Infield', eligible:Object.freeze(['3B']) }),
         Object.freeze({ key:'SS', label:'SS', section:'Infield', eligible:Object.freeze(['SS']) }),
+        Object.freeze({ key:'MI', label:'MI', section:'Infield', eligible:Object.freeze(['MI','2B','SS']) }),
+        Object.freeze({ key:'CI', label:'CI', section:'Infield', eligible:Object.freeze(['CI','1B','3B']) }),
+        Object.freeze({ key:'INF', label:'INF', section:'Infield', eligible:Object.freeze(['INF','1B','2B','3B','SS','MI','CI']) }),
         Object.freeze({ key:'LF', label:'LF', section:'Outfield', eligible:Object.freeze(['LF']) }),
         Object.freeze({ key:'CF', label:'CF', section:'Outfield', eligible:Object.freeze(['CF']) }),
         Object.freeze({ key:'RF', label:'RF', section:'Outfield', eligible:Object.freeze(['RF']) }),
@@ -547,6 +553,7 @@ window.RosterCapPositionConfig = Object.freeze({
   available: availablePositionCodesV282,
   defaults: defaultPositionCodesV282,
   active: activeFrontOfficePositionCodesV282,
+  orderedSelection: orderedPositionSelectionV285,
   selectedCreatePositions: selectedCreatePositionCodesV282,
   renderCreateOptions: renderCreatePositionOptionsV282,
   refresh: async () => {
@@ -619,6 +626,26 @@ function activeFrontOfficePositionCodesV282() {
 
   if (saved.length) return saved;
   return defaultPositionCodesV282(activeWorkspaceSportV279());
+}
+
+
+function orderedPositionSelectionV285(selectedCodes, sport = activeWorkspaceSportV279()) {
+  const selected = [...new Set(
+    (selectedCodes || [])
+      .map((value) => String(value || '').trim().toUpperCase())
+      .filter(Boolean)
+  )];
+
+  const selectedSet = new Set(selected);
+  const current = activeFrontOfficePositionCodesV282();
+  const available = availablePositionCodesV282(sport);
+
+  return [
+    ...current.filter((code) => selectedSet.has(code)),
+    ...available.filter((code) =>
+      selectedSet.has(code) && !current.includes(code)
+    )
+  ];
 }
 
 function selectedCreatePositionCodesV282() {
