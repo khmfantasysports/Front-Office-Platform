@@ -1,6 +1,6 @@
 'use strict';
 
-// RosterCap V2.81 — sport-aware positional depth-chart ordering and rendering.
+// RosterCap V2.82 — saved Front Office position-aware depth rendering.
 //
 // NHL keeps the established forward-line / defense-pair / goalie presentation.
 // NFL uses positional depth groups with multi-position eligibility.
@@ -24,7 +24,19 @@ function activeDepthConfig() {
 
 function activeDepthDefinitions() {
   const configured = activeDepthConfig()?.positions;
-  if (Array.isArray(configured) && configured.length) return configured;
+  const selected = window.RosterCapPositionConfig?.active?.() || [];
+
+  if (Array.isArray(configured) && configured.length) {
+    const selectedSet = new Set(
+      selected.map((value) => String(value || '').trim().toUpperCase())
+    );
+
+    const filtered = configured.filter((definition) =>
+      selectedSet.has(String(definition.key || '').trim().toUpperCase())
+    );
+
+    if (filtered.length) return filtered;
+  }
 
   return LEGACY_NHL_DEPTH_POSITIONS.map((key) => ({
     key,
@@ -213,7 +225,7 @@ function renderAllNhlDepthChart(current) {
   </div>`;
 }
 
-function nflDepthPlayerRow(player, index, current) {
+function groupedDepthPlayerRow(player, index, current) {
   const status = statusById(player.statusId);
   const charge = effectivePlayerCharge(player, current.id);
   const eligibility = player.eligiblePositions || player.position || '—';
@@ -225,9 +237,11 @@ function nflDepthPlayerRow(player, index, current) {
   </button>`;
 }
 
-function renderAllNflDepthChart(current) {
+function renderAllGroupedDepthChart(current) {
   const definitions = activeDepthDefinitions();
-  const sectionOrder = ['Offense', 'Defense', 'Special teams'];
+  const sectionOrder = [
+    ...new Set(definitions.map((definition) => definition.section || 'Positions'))
+  ];
 
   const sections = sectionOrder.map((section) => {
     const sectionDefinitions = definitions.filter((definition) => definition.section === section);
@@ -236,7 +250,7 @@ function renderAllNflDepthChart(current) {
     const cards = sectionDefinitions.map((definition) => {
       const players = resolvedDepthPlayers(definition.key);
       const rows = players.length
-        ? players.map((player, index) => nflDepthPlayerRow(player, index, current)).join('')
+        ? players.map((player, index) => groupedDepthPlayerRow(player, index, current)).join('')
         : '<div class="depth-empty">No qualifying players</div>';
 
       return `<article class="depth-card">
@@ -254,9 +268,23 @@ function renderAllNflDepthChart(current) {
   return `<div class="depth-lineup-all depth-lineup-nfl">${sections}</div>`;
 }
 
+function usesCanonicalNhlDepthLayout() {
+  if (activeDepthSportCode() !== 'NHL') return false;
+
+  const selected = new Set(
+    (window.RosterCapPositionConfig?.active?.() || [])
+      .map((value) => String(value || '').trim().toUpperCase())
+  );
+
+  return LEGACY_NHL_DEPTH_POSITIONS.every((position) => selected.has(position));
+}
+
 function renderAllDepthChart(current) {
-  if (activeDepthSportCode() === 'NFL') return renderAllNflDepthChart(current);
-  return renderAllNhlDepthChart(current);
+  if (activeDepthSportCode() === 'NHL' && usesCanonicalNhlDepthLayout()) {
+    return renderAllNhlDepthChart(current);
+  }
+
+  return renderAllGroupedDepthChart(current);
 }
 
 function renderSinglePositionDepth(position, current) {
@@ -325,13 +353,15 @@ function renderDepthChart(current) {
   const canEdit = depthPosition !== 'ALL' && resolvedDepthPlayerIds(depthPosition).length > 0;
   const sport = activeDepthSportCode();
   const title = depthPosition === 'ALL'
-    ? (sport === 'NFL' ? 'Football depth chart' : 'Depth chart')
+    ? sport === 'NFL'
+      ? 'Football depth chart'
+      : 'Depth chart'
     : `${depthPosition} depth`;
 
   const copy = depthPosition === 'ALL'
-    ? sport === 'NFL'
-      ? 'All active players are grouped by the football positions they qualify for. Open a position to set its preferred order.'
-      : 'Your preferred lines, defense pairs and goalie order.'
+    ? sport === 'NHL' && usesCanonicalNhlDepthLayout()
+      ? 'Your preferred lines, defense pairs and goalie order.'
+      : 'Active players are grouped by the positions this Front Office uses. Open a position to set its preferred order.'
     : `Set your preferred ${depthPosition} order. Select Edit order to move players up or down.`;
 
   const actions = depthPosition === 'ALL'
