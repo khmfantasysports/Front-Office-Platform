@@ -183,16 +183,42 @@ function syncWorkspaceNavigation(view = activeView) {
     }
   });
 
-  if ([...select.options].some((option) => option.value === nextView)) {
+  const hasCurrentOption = [...select.options].some(
+    (option) => option.value === nextView
+  );
+
+  if (hasCurrentOption) {
     select.value = nextView;
+  } else {
+    // Settings intentionally lives in the utility menu rather than Page nav.
+    select.value = '';
   }
 
-  const selectedLabel =
-    select.options[select.selectedIndex]?.textContent
-    || labels[nextView]
-    || 'Overview';
+  const selectedLabel = hasCurrentOption
+    ? (
+        select.options[select.selectedIndex]?.textContent
+        || labels[nextView]
+        || 'Overview'
+      )
+    : 'Pages';
 
-  select.setAttribute('aria-label', `Workspace page: ${selectedLabel}`);
+  select.setAttribute(
+    'aria-label',
+    nextView === 'settings'
+      ? 'Workspace pages. Settings is open from the workspace menu.'
+      : `Workspace page: ${selectedLabel}`
+  );
+
+  const settingsMenuButton = el('settingsMenuBtn');
+  settingsMenuButton?.classList.toggle('active', nextView === 'settings');
+
+  if (settingsMenuButton) {
+    if (nextView === 'settings') {
+      settingsMenuButton.setAttribute('aria-current', 'page');
+    } else {
+      settingsMenuButton.removeAttribute('aria-current');
+    }
+  }
 }
 
 function installResponsiveWorkspaceNav() {
@@ -235,6 +261,10 @@ function bindEvents() {
 
   document.querySelectorAll('#workspaceNav .nav-tab[data-view]').forEach((button) => {
     button.addEventListener('click', () => switchView(button.dataset.view));
+  });
+
+  el('settingsMenuBtn')?.addEventListener('click', () => {
+    switchView('settings');
   });
 
   el('closePlayerDialog').addEventListener('click', () => playerDialog.close());
