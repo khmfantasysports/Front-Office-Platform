@@ -231,9 +231,9 @@ function renderOfficeListV268() {
       );
 
       activeView = 'overview';
-      rosterMode = window.RosterCapSports?.isEarlyAccess?.(selectedOffice?.sport)
-        ? 'grid'
-        : 'depth';
+      rosterMode = window.RosterCapSports?.supportsDepth?.(selectedOffice?.sport)
+        ? 'depth'
+        : 'grid';
       depthPosition = 'ALL';
       document.body.classList.remove('office-global-context-v269');
       loadOffice(button.dataset.openOffice);
