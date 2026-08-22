@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.81 — NFL positional depth + terminology foundation
+// RosterCap V2.83 — configurable positions + user-owned Minors label
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -22,7 +22,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.81';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.83';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -33,6 +33,7 @@ const ROSTERCAP_SPORTS = Object.freeze({
     suggestedTemplateKey: 'CURRENT_HOCKEY',
     player: Object.freeze({
       positions: Object.freeze(['C', 'LW', 'RW', 'F', 'D', 'G']),
+      defaultPositions: Object.freeze(['C', 'LW', 'RW', 'F', 'D', 'G']),
       eligiblePlaceholder: 'C,LW',
       teamLabel: 'NHL team',
       teamPlaceholder: 'EDM'
@@ -48,6 +49,7 @@ const ROSTERCAP_SPORTS = Object.freeze({
         Object.freeze({ key:'LW', label:'LW', section:'Forwards', eligible:Object.freeze(['LW']) }),
         Object.freeze({ key:'C', label:'C', section:'Forwards', eligible:Object.freeze(['C']) }),
         Object.freeze({ key:'RW', label:'RW', section:'Forwards', eligible:Object.freeze(['RW']) }),
+        Object.freeze({ key:'F', label:'F', section:'Forwards', eligible:Object.freeze(['F','LW','C','RW']) }),
         Object.freeze({ key:'D', label:'D', section:'Defense', eligible:Object.freeze(['D']) }),
         Object.freeze({ key:'G', label:'G', section:'Goalies', eligible:Object.freeze(['G']) })
       ])
@@ -69,13 +71,17 @@ const ROSTERCAP_SPORTS = Object.freeze({
         'IDP',
         'K', 'P'
       ]),
+      defaultPositions: Object.freeze([
+        'QB', 'RB', 'WR', 'TE',
+        'DL', 'LB', 'DB', 'K'
+      ]),
       eligiblePlaceholder: 'RB,WR',
       teamLabel: 'NFL team',
       teamPlaceholder: 'BUF'
     }),
     terminology: Object.freeze({
       primaryRoster: 'Active roster',
-      developmentRoster: 'Development'
+      developmentRoster: 'Minors'
     }),
     depth: Object.freeze({
       enabled: true,
@@ -87,8 +93,16 @@ const ROSTERCAP_SPORTS = Object.freeze({
         Object.freeze({ key:'TE', label:'TE', section:'Offense', eligible:Object.freeze(['TE']) }),
         Object.freeze({ key:'FB', label:'FB', section:'Offense', eligible:Object.freeze(['FB']) }),
         Object.freeze({ key:'OL', label:'OL', section:'Offense', eligible:Object.freeze(['OL','OT','OG','C']) }),
+        Object.freeze({ key:'OT', label:'OT', section:'Offense', eligible:Object.freeze(['OT']) }),
+        Object.freeze({ key:'OG', label:'OG', section:'Offense', eligible:Object.freeze(['OG']) }),
+        Object.freeze({ key:'C', label:'C', section:'Offense', eligible:Object.freeze(['C']) }),
         Object.freeze({ key:'DL', label:'DL', section:'Defense', eligible:Object.freeze(['DL','DE','DT','EDGE']) }),
+        Object.freeze({ key:'DE', label:'DE', section:'Defense', eligible:Object.freeze(['DE']) }),
+        Object.freeze({ key:'DT', label:'DT', section:'Defense', eligible:Object.freeze(['DT']) }),
+        Object.freeze({ key:'EDGE', label:'EDGE', section:'Defense', eligible:Object.freeze(['EDGE']) }),
         Object.freeze({ key:'LB', label:'LB', section:'Defense', eligible:Object.freeze(['LB']) }),
+        Object.freeze({ key:'CB', label:'CB', section:'Defense', eligible:Object.freeze(['CB']) }),
+        Object.freeze({ key:'S', label:'S', section:'Defense', eligible:Object.freeze(['S']) }),
         Object.freeze({ key:'DB', label:'DB', section:'Defense', eligible:Object.freeze(['DB','CB','S']) }),
         Object.freeze({ key:'IDP', label:'IDP', section:'Defense', eligible:Object.freeze(['IDP','DL','DE','DT','EDGE','LB','DB','CB','S']) }),
         Object.freeze({ key:'K', label:'K', section:'Special teams', eligible:Object.freeze(['K']) }),
@@ -104,13 +118,14 @@ const ROSTERCAP_SPORTS = Object.freeze({
     suggestedTemplateKey: 'NBA_STARTER',
     player: Object.freeze({
       positions: Object.freeze(['PG', 'SG', 'SF', 'PF', 'C']),
+      defaultPositions: Object.freeze(['PG', 'SG', 'SF', 'PF', 'C']),
       eligiblePlaceholder: 'PG,SG',
       teamLabel: 'NBA team',
       teamPlaceholder: 'TOR'
     }),
     terminology: Object.freeze({
       primaryRoster: 'Active roster',
-      developmentRoster: 'Development'
+      developmentRoster: 'Minors'
     }),
     depth: Object.freeze({
       enabled: false,
@@ -129,6 +144,10 @@ const ROSTERCAP_SPORTS = Object.freeze({
         'C', '1B', '2B', '3B', 'SS',
         'LF', 'CF', 'RF', 'OF', 'DH',
         'SP', 'RP', 'P'
+      ]),
+      defaultPositions: Object.freeze([
+        'C', '1B', '2B', '3B', 'SS',
+        'OF', 'DH', 'SP', 'RP'
       ]),
       eligiblePlaceholder: '2B,SS',
       teamLabel: 'MLB team',
@@ -496,6 +515,29 @@ window.RosterCapSports = Object.freeze({
   syncCreateOfficeOptions: syncCreateOfficeSportOptionsV277
 });
 
+window.RosterCapTerminology = Object.freeze({
+  version: ROSTERCAP_SPORT_FOUNDATION_VERSION,
+  defaultDevelopmentLabel: 'Minors',
+  developmentLabel: activeDevelopmentLabelV283,
+  selectedCreateDevelopmentLabel: selectedCreateDevelopmentLabelV283
+});
+
+window.RosterCapPositionConfig = Object.freeze({
+  version: ROSTERCAP_SPORT_FOUNDATION_VERSION,
+  available: availablePositionCodesV282,
+  defaults: defaultPositionCodesV282,
+  active: activeFrontOfficePositionCodesV282,
+  selectedCreatePositions: selectedCreatePositionCodesV282,
+  renderCreateOptions: renderCreatePositionOptionsV282,
+  refresh: async () => {
+    const frontOfficeId = state?.frontOffice?.id || null;
+    const rows = await loadFrontOfficePositionOptionsV282(frontOfficeId);
+    syncWorkspaceSportUiV279();
+    if (typeof renderRoster === 'function') renderRoster();
+    return rows;
+  }
+});
+
 window.RosterCapLeagueConfig = Object.freeze({
   version: ROSTERCAP_SPORT_FOUNDATION_VERSION,
   creationSuggestions: rosterCapTemplateSuggestions,
@@ -523,8 +565,136 @@ function sportPlayerConfigV279(sport) {
   return getRosterCapSport(sport).player || getRosterCapSport('NHL').player;
 }
 
+
+function availablePositionCodesV282(sport) {
+  const config = sportPlayerConfigV279(sport);
+  return Array.isArray(config?.positions) ? [...config.positions] : [];
+}
+
+function defaultPositionCodesV282(sport) {
+  const config = sportPlayerConfigV279(sport);
+  const defaults = Array.isArray(config?.defaultPositions)
+    ? config.defaultPositions
+    : config?.positions;
+  return [...new Set((defaults || []).map((value) => String(value).trim().toUpperCase()).filter(Boolean))];
+}
+
+function normalizePositionOptionRowsV282(rows) {
+  return (rows || [])
+    .filter((row) => row?.is_active !== false)
+    .sort((a,b) => Number(a.sort_order || 0) - Number(b.sort_order || 0))
+    .map((row) => ({
+      id: row.position_option_id,
+      code: String(row.position_code || '').trim().toUpperCase(),
+      sortOrder: Number(row.sort_order || 0),
+      isActive: row.is_active !== false
+    }))
+    .filter((row) => row.code);
+}
+
+function activeFrontOfficePositionCodesV282() {
+  const saved = Array.isArray(state?.positionOptions)
+    ? state.positionOptions.map((row) => row.code).filter(Boolean)
+    : [];
+
+  if (saved.length) return saved;
+  return defaultPositionCodesV282(activeWorkspaceSportV279());
+}
+
+function selectedCreatePositionCodesV282() {
+  const options = document.querySelectorAll(
+    '#positionSetupOptions input[type="checkbox"][data-position-code]'
+  );
+
+  return [...options]
+    .filter((input) => input.checked)
+    .map((input) => String(input.dataset.positionCode || '').trim().toUpperCase())
+    .filter(Boolean);
+}
+
+function renderCreatePositionOptionsV282(options = {}) {
+  const host = document.getElementById('positionSetupOptions');
+  if (!host) return;
+
+  const sport = selectedCreateSportV279();
+  const available = availablePositionCodesV282(sport);
+  const defaults = new Set(defaultPositionCodesV282(sport));
+
+  const currentSelection = options.resetToDefaults
+    ? defaults
+    : new Set(selectedCreatePositionCodesV282());
+
+  host.innerHTML = available.map((code) => {
+    const checked = currentSelection.size
+      ? currentSelection.has(code)
+      : defaults.has(code);
+
+    return `<label class="position-choice-v282">
+      <input type="checkbox" data-position-code="${code}" ${checked ? 'checked' : ''}>
+      <span>${code}</span>
+    </label>`;
+  }).join('');
+
+  syncCreatePositionCountV282();
+}
+
+function syncCreatePositionCountV282() {
+  const count = selectedCreatePositionCodesV282().length;
+  const node = document.getElementById('positionSetupCount');
+  if (node) {
+    node.textContent = `${count} position${count === 1 ? '' : 's'} selected`;
+    node.classList.toggle('warning', count === 0);
+  }
+}
+
+async function loadFrontOfficePositionOptionsV282(frontOfficeId) {
+  if (!frontOfficeId) {
+    state.positionOptions = [];
+    return [];
+  }
+
+  const { data, error } = await db
+    .from('front_office_position_options')
+    .select('position_option_id,front_office_id,position_code,sort_order,is_active')
+    .eq('front_office_id', frontOfficeId)
+    .eq('is_active', true)
+    .order('sort_order')
+    .order('position_code');
+
+  if (error) {
+    console.error(
+      '[RosterCap V2.82] position catalog read failed. Sport defaults remain available.',
+      error
+    );
+    state.positionOptions = [];
+    return [];
+  }
+
+  if (state?.frontOffice?.id !== frontOfficeId) return [];
+
+  state.positionOptions = normalizePositionOptionRowsV282(data || []);
+  return state.positionOptions;
+}
+
 function sportTerminologyV279(sport) {
   return getRosterCapSport(sport).terminology || getRosterCapSport('NHL').terminology;
+}
+
+
+function activeDevelopmentLabelV283() {
+  const configured = (state?.rosterGroups || []).find((group) =>
+    group?.isActive !== false
+    && (group?.isDevelopment || String(group?.key || '').toUpperCase() === 'FARM')
+  );
+
+  const label = String(configured?.displayName || '').trim();
+  return label || 'Minors';
+}
+
+function selectedCreateDevelopmentLabelV283() {
+  const input = document.getElementById('developmentRosterLabel');
+  const label = String(input?.value || '').trim();
+  return label || 'Minors';
 }
 
 function selectedCreateSportV279() {
@@ -587,6 +757,17 @@ function syncCreateSportUiV279(options = {}) {
 
   syncCreateSeasonInputV279();
 
+  const developmentLabelInput = document.getElementById('developmentRosterLabel');
+  if (developmentLabelInput && !String(developmentLabelInput.value || '').trim()) {
+    developmentLabelInput.value = 'Minors';
+  }
+
+  if (options.resetPositions === true) {
+    renderCreatePositionOptionsV282({ resetToDefaults:true });
+  } else if (!document.querySelector('#positionSetupOptions [data-position-code]')) {
+    renderCreatePositionOptionsV282({ resetToDefaults:true });
+  }
+
   const note = ensureSportEarlyAccessNoteV279();
   if (note) {
     const supportsDepth = rosterCapSportSupportsDepth(sport);
@@ -615,6 +796,7 @@ function syncPlayerEditorForSportV279(options = {}) {
   const sport = activeWorkspaceSportV279();
   const config = sportPlayerConfigV279(sport);
   const terminology = sportTerminologyV279(sport);
+  const developmentLabel = activeDevelopmentLabelV283();
   const preserveCurrent =
     options.preserveCurrent
     ?? Boolean(typeof editingPlayerId !== 'undefined' && editingPlayerId);
@@ -622,16 +804,17 @@ function syncPlayerEditorForSportV279(options = {}) {
   const position = document.getElementById('playerPosition');
   if (position) {
     const current = String(position.value || '').trim().toUpperCase();
+    const configuredPositions = activeFrontOfficePositionCodesV282();
     position.replaceChildren();
 
-    config.positions.forEach((value) => {
+    configuredPositions.forEach((value) => {
       const option = document.createElement('option');
       option.value = value;
       option.textContent = value;
       position.appendChild(option);
     });
 
-    if (preserveCurrent && current && !config.positions.includes(current)) {
+    if (preserveCurrent && current && !configuredPositions.includes(current)) {
       const existing = document.createElement('option');
       existing.value = current;
       existing.textContent = current;
@@ -643,7 +826,7 @@ function syncPlayerEditorForSportV279(options = {}) {
       && current
       && [...position.options].some((option) => option.value === current)
         ? current
-        : config.positions[0];
+        : configuredPositions[0] || '';
   }
 
   const eligible = document.getElementById('playerEligible');
@@ -660,7 +843,7 @@ function syncPlayerEditorForSportV279(options = {}) {
     const primary = rosterGroup.querySelector('option[value="ACTIVE"]');
     const development = rosterGroup.querySelector('option[value="FARM"]');
     if (primary) primary.textContent = terminology.primaryRoster;
-    if (development) development.textContent = terminology.developmentRoster;
+    if (development) development.textContent = developmentLabel;
   }
 }
 
@@ -750,10 +933,21 @@ function installMultiSportUiV279() {
 
   const sportSelect = document.getElementById('sport');
   sportSelect?.addEventListener('change', () => {
-    syncCreateSportUiV279({ applySuggestions: true });
+    syncCreateSportUiV279({
+      applySuggestions: true,
+      resetPositions: true
+    });
   });
 
-  syncCreateSportUiV279({ applySuggestions: false });
+  document.getElementById('positionSetupOptions')?.addEventListener(
+    'change',
+    syncCreatePositionCountV282
+  );
+
+  syncCreateSportUiV279({
+    applySuggestions: false,
+    resetPositions: true
+  });
   syncWorkspaceSportUiV279();
 }
 
@@ -1107,9 +1301,23 @@ function installRosterGroupShadowV278b() {
       return result;
     }
 
+    await Promise.all([
+      loadRosterGroupShadowV278b(frontOfficeId),
+      loadFrontOfficePositionOptionsV282(frontOfficeId)
+    ]);
+
     syncWorkspaceSportUiV279();
-    await loadRosterGroupShadowV278b(frontOfficeId);
-    syncWorkspaceSportUiV279();
+
+    if (typeof syncWorkspaceNavigation === 'function') {
+      syncWorkspaceNavigation(
+        typeof activeView !== 'undefined' ? activeView : 'overview'
+      );
+    }
+
+    if (typeof renderRoster === 'function') {
+      renderRoster();
+    }
+
     return result;
   };
 }
