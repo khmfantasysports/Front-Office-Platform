@@ -8,7 +8,7 @@
 // - preserves the existing full loadOffice() path
 // - adds a Back action to New Front Office
 // - uses editable creation suggestions from the league-configuration foundation
-// - formats season/development labels from each office's sport configuration
+// - formats season labels by sport and development labels from saved Front Office configuration
 // -----------------------------------------------------------------------------
 
 let officePickerPolishInstalledV268 = false;
@@ -59,7 +59,7 @@ async function enrichFrontOfficePickerListV268(offices) {
 
   if (!officeIds.length) return offices;
 
-  const [seasonsResult, rosterResult] = await Promise.all([
+  const [seasonsResult, rosterResult, groupsResult] = await Promise.all([
     db.from('front_office_seasons')
       .select('front_office_id,season_start_year,salary_cap,is_current')
       .in('front_office_id', officeIds)
@@ -67,7 +67,11 @@ async function enrichFrontOfficePickerListV268(offices) {
     db.from('roster_entries')
       .select('front_office_id,roster_group')
       .in('front_office_id', officeIds)
-      .is('removed_at', null)
+      .is('removed_at', null),
+    db.from('front_office_roster_groups')
+      .select('front_office_id,group_key,display_name,is_development,is_active')
+      .in('front_office_id', officeIds)
+      .eq('is_active', true)
   ]);
 
   if (seasonsResult.error) {
@@ -77,6 +81,19 @@ async function enrichFrontOfficePickerListV268(offices) {
   if (rosterResult.error) {
     console.warn('Front Office picker roster counts could not load', rosterResult.error);
   }
+
+  if (groupsResult.error) {
+    console.warn('Front Office picker roster labels could not load', groupsResult.error);
+  }
+
+  const developmentLabels = new Map();
+  (groupsResult.data || []).forEach((group) => {
+    if (!group.is_development && String(group.group_key || '').toUpperCase() !== 'FARM') return;
+    developmentLabels.set(
+      group.front_office_id,
+      String(group.display_name || '').trim() || 'Minors'
+    );
+  });
 
   const seasonsByOffice = new Map();
   (seasonsResult.data || []).forEach((season) => {
@@ -115,7 +132,9 @@ async function enrichFrontOfficePickerListV268(offices) {
           ? null
           : Number(currentSeason.salary_cap),
       picker_active_count: counts.active,
-      picker_minors_count: counts.minors
+      picker_minors_count: counts.minors,
+      picker_development_label:
+        developmentLabels.get(office.front_office_id) || 'Minors'
     };
   });
 }
@@ -169,9 +188,7 @@ function renderOfficeListV268() {
       office.picker_minors_count,
       office.minors_limit
     );
-    const developmentLabel =
-      window.RosterCapSports?.get?.(office.sport || 'NHL')?.terminology?.developmentRoster
-      || 'Minors';
+    const developmentLabel = office.picker_development_label || 'Minors';
 
     return `
       <button
