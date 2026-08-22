@@ -644,3 +644,95 @@ html, body { max-width: 100%; overflow-x: hidden; }
     padding:6px 9px;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.85 — Settings position editor
+   ============================================================ */
+
+.settings-position-editor-v285 .settings-disclosure-body {
+  display:grid;
+  gap:11px;
+}
+
+.settings-position-editor-head-v285 {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.settings-position-editor-head-v285 > div {
+  min-width:0;
+}
+
+.settings-position-editor-head-v285 strong {
+  display:block;
+  color:var(--text);
+  font-size:.78rem;
+}
+
+.settings-position-editor-head-v285 p {
+  margin:4px 0 0;
+  max-width:680px;
+  color:var(--muted);
+  font-size:.64rem;
+  line-height:1.42;
+}
+
+.settings-position-options-v285 {
+  padding:10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0B151E;
+}
+
+.settings-position-warning-v285 {
+  padding:9px 10px;
+  border:1px solid rgba(242,198,109,.30);
+  border-radius:9px;
+  color:#E7C875;
+  background:rgba(242,198,109,.055);
+  font-size:.63rem;
+  line-height:1.42;
+}
+
+.settings-position-order-note-v285 {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:5px;
+  color:var(--muted);
+  font-size:.61rem;
+  line-height:1.4;
+}
+
+.settings-position-order-note-v285 strong {
+  color:var(--text);
+  font-size:.64rem;
+}
+
+.settings-position-order-note-v285 span {
+  flex-basis:100%;
+}
+
+.settings-position-actions-v285 {
+  display:flex;
+  justify-content:flex-end;
+}
+
+@media (max-width:720px) {
+  .settings-position-editor-head-v285 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  .settings-position-editor-head-v285 .position-setup-count-v282 {
+    justify-self:start;
+  }
+
+  .settings-position-actions-v285 .btn {
+    width:100%;
+  }
+}
