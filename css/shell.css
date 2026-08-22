@@ -736,3 +736,50 @@ html, body { max-width: 100%; overflow-x: hidden; }
     width:100%;
   }
 }
+
+
+/* ============================================================
+   RosterCap V2.86 — workspace navigation polish
+   ============================================================ */
+
+.utility-menu-popover .utility-settings-pill-v286 {
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:7px;
+  border-radius:999px;
+  border-color:rgba(119,201,255,.22);
+  background:rgba(50,173,255,.055);
+  color:#D9EEFF;
+}
+
+.utility-menu-popover .utility-settings-pill-v286:hover,
+.utility-menu-popover .utility-settings-pill-v286:focus-visible {
+  border-color:rgba(119,201,255,.42);
+  background:rgba(50,173,255,.10);
+}
+
+.utility-menu-popover .utility-settings-pill-v286.active {
+  border-color:rgba(119,201,255,.52);
+  background:rgba(50,173,255,.14);
+  box-shadow:inset 0 0 0 1px rgba(119,201,255,.08);
+}
+
+.utility-settings-icon-v286 {
+  display:grid;
+  place-items:center;
+  width:19px;
+  height:19px;
+  flex:0 0 19px;
+  border-radius:999px;
+  background:rgba(119,201,255,.10);
+  color:#8FCFFF;
+  font-size:.66rem;
+  line-height:1;
+}
+
+@media (max-width:900px) {
+  .app-menu-bar #workspaceNav {
+    justify-self:start;
+  }
+}
