@@ -4,11 +4,11 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v2.85" name="application-name"/>
+<meta content="RosterCap v2.86" name="application-name"/>
 <link href="./css/base.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/shell.css?v=20260821-v285-position-editor" rel="stylesheet"/>
+<link href="./css/shell.css?v=20260821-v286-navigation-polish" rel="stylesheet"/>
 <link href="./css/workspace.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/workspace-shared.css?v=20260821-v280-shell-navigation-cleanup" rel="stylesheet"/>
+<link href="./css/workspace-shared.css?v=20260821-v286-navigation-polish" rel="stylesheet"/>
 <link href="./css/workspace-pages.css?v=20260820-v267-season-rollover" rel="stylesheet"/>
 <link href="./css/workspace-dialogs.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/office-picker.css?v=20260821-v273-landing-office-hub" rel="stylesheet"/>
@@ -18,7 +18,7 @@
 <link href="./css/overview-cap.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="2.85">
+<body data-rostercap-version="2.86">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -36,17 +36,16 @@
 <button class="nav-tab" data-view="assets" type="button">Assets</button>
 <button class="nav-tab" data-view="cap" type="button">Cap</button>
 <button class="nav-tab" data-view="transactions" type="button">Transactions</button>
-<button class="nav-tab" data-view="settings" type="button">Settings</button>
 <label class="workspace-page-select-shell" for="workspacePageSelect">
 <span class="workspace-page-select-label">Page</span>
 <select aria-label="Workspace page: Overview" id="workspacePageSelect">
+<option disabled="" value="">Pages</option>
 <option value="overview">Overview</option>
 <option value="roster">Roster</option>
 <option value="farm">Minors</option>
 <option value="assets">Assets</option>
 <option value="cap">Cap</option>
 <option value="transactions">Transactions</option>
-<option value="settings">Settings</option>
 </select>
 </label>
 </nav>
@@ -58,6 +57,10 @@
 <span class="user-email" id="userEmail"></span>
 <span class="utility-menu-section-label">Front Office</span>
 <button class="btn btn-ghost" id="backToOfficesBtn" type="button">My Front Offices</button>
+<button class="btn btn-secondary utility-settings-pill-v286" id="settingsMenuBtn" type="button">
+<span aria-hidden="true" class="utility-settings-icon-v286">⚙</span>
+<span>Settings</span>
+</button>
 <button class="btn btn-secondary" id="exportBtn" type="button">Export CSV</button>
 <button class="btn btn-danger hidden" id="deleteFrontOfficeBtn" type="button">Delete Front Office</button>
 <div class="utility-menu-divider"></div>
@@ -509,6 +512,6 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/features/sport-foundation.js?v=20260821-v285-position-editor"></script>
 <script src="./js/features/office-picker.js?v=20260821-v284-universal-depth"></script>
 <script src="./js/features/season-rollover.js?v=20260820-v267-season-rollover"></script>
-<script src="./js/app.js?v=20260821-v285-position-editor"></script>
+<script src="./js/app.js?v=20260821-v286-navigation-polish"></script>
 </body>
 </html>
