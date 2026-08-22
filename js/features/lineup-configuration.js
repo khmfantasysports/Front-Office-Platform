@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.89';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.90';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = true;
@@ -554,6 +554,184 @@ function lineupMatrixGroupsV289(slots) {
   return groups;
 }
 
+
+function renderNhlForwardsV290(slotMap, current) {
+  const forwardSlots = ['LW','C','RW']
+    .map((key) => slotMap.get(key))
+    .filter(Boolean);
+
+  if (!forwardSlots.length) return '';
+
+  return `<section class="lineup-matrix-group-v289 nhl-forwards-group-v290">
+    <div class="lineup-matrix-group-head-v289">
+      <div>
+        <p class="eyebrow">Roster</p>
+        <h3>Forwards</h3>
+      </div>
+      <span>${forwardSlots.length} position${forwardSlots.length === 1 ? '' : 's'}</span>
+    </div>
+
+    <div class="nhl-forward-grid-v290">
+      ${forwardSlots
+        .map((slot) => renderMatrixSlotColumnV289(slot, current))
+        .join('')}
+    </div>
+  </section>`;
+}
+
+function renderNhlDefensePairRowV290(slot, leftNumber, rightNumber, current) {
+  return `<div class="nhl-defense-pair-row-v290">
+    ${renderMatrixStarterCardV289(slot, leftNumber, current)}
+    ${rightNumber <= slot.slotCount
+      ? renderMatrixStarterCardV289(slot, rightNumber, current)
+      : '<div class="nhl-defense-pair-spacer-v290"></div>'
+    }
+  </div>`;
+}
+
+function renderNhlDefenseBlockV290(slot, current) {
+  if (!slot) return '';
+
+  const pairRows = [];
+
+  for (let slotNumber = 1; slotNumber <= slot.slotCount; slotNumber += 2) {
+    pairRows.push(
+      renderNhlDefensePairRowV290(
+        slot,
+        slotNumber,
+        slotNumber + 1,
+        current
+      )
+    );
+  }
+
+  const depthPlayers = lineupDepthPlayersV289(slot);
+
+  return `<section class="nhl-defense-block-v290">
+    <div class="nhl-special-block-head-v290">
+      <div>
+        <p class="eyebrow">Defense</p>
+        <h4>D Pairs</h4>
+      </div>
+      <span>${slot.slotCount}</span>
+    </div>
+
+    <div class="nhl-defense-pairs-v290">
+      ${pairRows.join('')}
+    </div>
+
+    <div class="lineup-matrix-depth-label-v289 nhl-special-depth-label-v290">
+      <span>Depth</span>
+      <small>${depthPlayers.length}</small>
+    </div>
+
+    <div class="nhl-defense-depth-grid-v290">
+      ${depthPlayers.length
+        ? depthPlayers
+            .map((player, index) =>
+              renderMatrixDepthCardV289(player, index, current)
+            )
+            .join('')
+        : '<div class="lineup-matrix-depth-empty-v289">No additional eligible defensemen.</div>'
+      }
+    </div>
+  </section>`;
+}
+
+function renderNhlGoalieBlockV290(slot, current) {
+  if (!slot) return '';
+
+  const starters = [];
+
+  for (let slotNumber = 1; slotNumber <= slot.slotCount; slotNumber += 1) {
+    starters.push(
+      renderMatrixStarterCardV289(slot, slotNumber, current)
+    );
+  }
+
+  const depthPlayers = lineupDepthPlayersV289(slot);
+
+  return `<section class="nhl-goalie-block-v290">
+    <div class="nhl-special-block-head-v290">
+      <div>
+        <p class="eyebrow">Goalies</p>
+        <h4>G</h4>
+      </div>
+      <span>${slot.slotCount}</span>
+    </div>
+
+    <div class="nhl-goalie-starters-v290">
+      ${starters.join('')}
+    </div>
+
+    <div class="lineup-matrix-depth-label-v289 nhl-special-depth-label-v290">
+      <span>Depth</span>
+      <small>${depthPlayers.length}</small>
+    </div>
+
+    <div class="nhl-goalie-depth-v290">
+      ${depthPlayers.length
+        ? depthPlayers
+            .map((player, index) =>
+              renderMatrixDepthCardV289(player, index, current)
+            )
+            .join('')
+        : '<div class="lineup-matrix-depth-empty-v289">No additional eligible goalies.</div>'
+      }
+    </div>
+  </section>`;
+}
+
+function renderNhlDefenseGoaliesV290(slotMap, current) {
+  const defense = slotMap.get('D') || null;
+  const goalies = slotMap.get('G') || null;
+
+  if (!defense && !goalies) return '';
+
+  return `<section class="lineup-matrix-group-v289 nhl-defense-goalies-group-v290">
+    <div class="lineup-matrix-group-head-v289">
+      <div>
+        <p class="eyebrow">Roster</p>
+        <h3>Defense & Goalies</h3>
+      </div>
+    </div>
+
+    <div class="nhl-defense-goalies-grid-v290">
+      ${defense
+        ? renderNhlDefenseBlockV290(defense, current)
+        : '<div class="nhl-defense-block-v290 empty"></div>'
+      }
+
+      ${goalies
+        ? renderNhlGoalieBlockV290(goalies, current)
+        : '<div class="nhl-goalie-block-v290 empty"></div>'
+      }
+    </div>
+  </section>`;
+}
+
+function renderNhlRosterBoardV290(slots, current) {
+  const slotMap = new Map(
+    slots.map((slot) => [normalizeLineupCodeV287(slot.key), slot])
+  );
+
+  const usedKeys = new Set(['LW','C','RW','D','G']);
+  const extras = slots.filter(
+    (slot) => !usedKeys.has(normalizeLineupCodeV287(slot.key))
+  );
+
+  const forwardHtml = renderNhlForwardsV290(slotMap, current);
+  const lowerHtml = renderNhlDefenseGoaliesV290(slotMap, current);
+
+  const extraGroups = extras.length
+    ? lineupMatrixGroupsV289(extras)
+        .map((group) => renderLineupMatrixGroupV289(group, current))
+        .join('')
+    : '';
+
+  return `${forwardHtml}${lowerHtml}${extraGroups}`;
+}
+
 function renderLineupMatrixGroupV289(group, current) {
   return `<section class="lineup-matrix-group-v289">
     <div class="lineup-matrix-group-head-v289">
@@ -619,9 +797,12 @@ function renderLineupPanelV287() {
       : ''}
 
     <div class="lineup-matrix-board-v289">
-      ${groups
-        .map((group) => renderLineupMatrixGroupV289(group, current))
-        .join('')}
+      ${lineupSportCodeV287() === 'NHL'
+        ? renderNhlRosterBoardV290(slots, current)
+        : groups
+            .map((group) => renderLineupMatrixGroupV289(group, current))
+            .join('')
+      }
     </div>
   </div>`;
 }
