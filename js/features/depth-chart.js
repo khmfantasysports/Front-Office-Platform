@@ -1,13 +1,18 @@
 'use strict';
 
-// RosterCap V2.82 — saved Front Office position-aware depth rendering.
+// RosterCap V2.84 — universal saved-position depth rendering.
 //
 // NHL keeps the established forward-line / defense-pair / goalie presentation.
-// NFL uses positional depth groups with multi-position eligibility.
+// Every supported sport can use the same positional depth contract.
+// NHL retains its specialized lines/pairs/goalies view where possible.
 // FLEX / SUPERFLEX / UTIL remain lineup-slot concepts and are intentionally not
 // represented as depth-position assignments in this file.
 
 const LEGACY_NHL_DEPTH_POSITIONS = ['LW','C','RW','D','G'];
+
+let depthPositionOrderEditModeV284 = false;
+let depthPositionDraftOrderV284 = [];
+let depthPositionOrderSavingV284 = false;
 
 function activeDepthSportCode() {
   const value = state?.frontOffice?.sport || 'NHL';
@@ -27,15 +32,19 @@ function activeDepthDefinitions() {
   const selected = window.RosterCapPositionConfig?.active?.() || [];
 
   if (Array.isArray(configured) && configured.length) {
-    const selectedSet = new Set(
-      selected.map((value) => String(value || '').trim().toUpperCase())
+    const byKey = new Map(
+      configured.map((definition) => [
+        String(definition.key || '').trim().toUpperCase(),
+        definition
+      ])
     );
 
-    const filtered = configured.filter((definition) =>
-      selectedSet.has(String(definition.key || '').trim().toUpperCase())
-    );
+    const ordered = selected
+      .map((value) => String(value || '').trim().toUpperCase())
+      .map((key) => byKey.get(key))
+      .filter(Boolean);
 
-    if (filtered.length) return filtered;
+    if (ordered.length) return ordered;
   }
 
   return LEGACY_NHL_DEPTH_POSITIONS.map((key) => ({
@@ -94,7 +103,7 @@ function playerDepthChartPosition(player) {
 function playerQualifiesForDepthPosition(player, position) {
   const key = String(position || '').trim().toUpperCase();
 
-  if (activeDepthSportCode() === 'NHL') {
+  if (activeDepthSportCode() === 'NHL' && LEGACY_NHL_DEPTH_POSITIONS.includes(key)) {
     return playerDepthChartPosition(player) === key;
   }
 
@@ -207,6 +216,11 @@ function renderAllNhlDepthChart(current) {
     )
   ).join('');
 
+  const extras = activeDepthDefinitions()
+    .filter((definition) => !LEGACY_NHL_DEPTH_POSITIONS.includes(definition.key))
+    .map((definition) => renderUniversalPositionDepthBlockV284(definition, current))
+    .join('');
+
   return `<div class="depth-lineup-all">
     <section class="depth-section depth-section-forwards">
       <div class="depth-section-head"><div><p class="eyebrow">Forwards</p><h4>Lines 1–4</h4></div></div>
@@ -222,50 +236,40 @@ function renderAllNhlDepthChart(current) {
         <div class="depth-goalies">${goalies}</div>
       </section>
     </div>
+    ${extras}
   </div>`;
 }
 
-function groupedDepthPlayerRow(player, index, current) {
-  const status = statusById(player.statusId);
-  const charge = effectivePlayerCharge(player, current.id);
-  const eligibility = player.eligiblePositions || player.position || '—';
-  const team = player.realTeam || '—';
+function renderUniversalPositionDepthBlockV284(definition, current) {
+  const players = resolvedDepthPlayers(definition.key);
+  const label = definition.label || definition.key;
+  const section = definition.section || 'Position';
 
-  return `<button class="depth-player-row" data-depth-open="${player.id}" type="button">
-    <span><strong>${escapeHtml(player.name)}</strong><small>${escapeHtml(eligibility)} · ${escapeHtml(team)} · ${escapeHtml(status?.name || 'Other')}</small></span>
-    <span><strong>#${index + 1}</strong><small>${charge === null ? '—' : formatMoney(charge)}</small></span>
-  </button>`;
+  const cards = players.length
+    ? players.map((player, index) =>
+        `<div class="depth-compact-card">${depthSlot(
+          player,
+          `${label} · Depth ${index + 1}`,
+          current
+        )}</div>`
+      ).join('')
+    : `<div class="depth-empty">No active-roster players qualify for ${escapeHtml(label)}.</div>`;
+
+  return `<section class="depth-section depth-section-card">
+    <div class="depth-section-head">
+      <div><p class="eyebrow">${escapeHtml(section)}</p><h4>${escapeHtml(label)}</h4></div>
+      <span>${players.length} player${players.length === 1 ? '' : 's'}</span>
+    </div>
+    <div class="depth-compact-grid">${cards}</div>
+  </section>`;
 }
 
 function renderAllGroupedDepthChart(current) {
-  const definitions = activeDepthDefinitions();
-  const sectionOrder = [
-    ...new Set(definitions.map((definition) => definition.section || 'Positions'))
-  ];
-
-  const sections = sectionOrder.map((section) => {
-    const sectionDefinitions = definitions.filter((definition) => definition.section === section);
-    if (!sectionDefinitions.length) return '';
-
-    const cards = sectionDefinitions.map((definition) => {
-      const players = resolvedDepthPlayers(definition.key);
-      const rows = players.length
-        ? players.map((player, index) => groupedDepthPlayerRow(player, index, current)).join('')
-        : '<div class="depth-empty">No qualifying players</div>';
-
-      return `<article class="depth-card">
-        <div class="depth-card-head"><span>${escapeHtml(definition.label || definition.key)}</span><strong>${players.length}</strong></div>
-        <div class="depth-player-list">${rows}</div>
-      </article>`;
-    }).join('');
-
-    return `<section class="depth-section depth-section-card">
-      <div class="depth-section-head"><div><p class="eyebrow">${escapeHtml(section)}</p><h4>Position depth</h4></div></div>
-      <div class="depth-grid">${cards}</div>
-    </section>`;
-  }).join('');
-
-  return `<div class="depth-lineup-all depth-lineup-nfl">${sections}</div>`;
+  return `<div class="depth-lineup-all depth-lineup-universal-v284">
+    ${activeDepthDefinitions()
+      .map((definition) => renderUniversalPositionDepthBlockV284(definition, current))
+      .join('')}
+  </div>`;
 }
 
 function usesCanonicalNhlDepthLayout() {
@@ -337,6 +341,117 @@ function renderSinglePositionDepth(position, current) {
   ).join('')}</div>`;
 }
 
+function beginDepthPositionOrderEditV284() {
+  depthPosition = 'ALL';
+  depthEditMode = false;
+  depthDraftOrder = [];
+  depthPositionDraftOrderV284 = [...activeDepthPositionKeys()];
+  depthPositionOrderEditModeV284 = true;
+  renderRoster();
+}
+
+function cancelDepthPositionOrderEditV284() {
+  depthPositionOrderEditModeV284 = false;
+  depthPositionDraftOrderV284 = [];
+  renderRoster();
+}
+
+function moveDepthPositionDraftV284(index, direction) {
+  const target = index + direction;
+  if (
+    index < 0
+    || target < 0
+    || index >= depthPositionDraftOrderV284.length
+    || target >= depthPositionDraftOrderV284.length
+  ) return;
+
+  const next = [...depthPositionDraftOrderV284];
+  [next[index], next[target]] = [next[target], next[index]];
+  depthPositionDraftOrderV284 = next;
+  renderRoster();
+}
+
+function renderDepthPositionOrderEditorV284() {
+  return `<div class="depth-order-list">${depthPositionDraftOrderV284.map((position, index) => {
+    const definition = activeDepthConfig()?.positions?.find(
+      (item) => String(item.key || '').toUpperCase() === position
+    );
+    const label = definition?.label || position;
+    const section = definition?.section || 'Position';
+
+    return `<div class="depth-order-row">
+      <span class="depth-order-rank">${index + 1}</span>
+      <span class="depth-order-player"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(section)}</span></span>
+      <span class="depth-order-actions">
+        <button class="btn btn-ghost btn-small" data-depth-position-move-index="${index}" data-depth-position-move-direction="-1" type="button" ${index === 0 ? 'disabled' : ''}>↑</button>
+        <button class="btn btn-ghost btn-small" data-depth-position-move-index="${index}" data-depth-position-move-direction="1" type="button" ${index === depthPositionDraftOrderV284.length - 1 ? 'disabled' : ''}>↓</button>
+      </span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+async function saveDepthPositionOrderV284() {
+  if (depthPositionOrderSavingV284 || !depthPositionDraftOrderV284.length) return;
+
+  depthPositionOrderSavingV284 = true;
+  renderRoster();
+
+  const orderedCodes = [...depthPositionDraftOrderV284];
+  const success = await runCloudAction(async () => {
+    const { error } = await db.rpc('save_front_office_position_options_v1', {
+      p_front_office_id: state.frontOffice.id,
+      p_position_codes: orderedCodes
+    });
+    if (error) throw error;
+
+    const existing = new Map(
+      (state.positionOptions || []).map((row) => [String(row.code || '').toUpperCase(), row])
+    );
+
+    state.positionOptions = orderedCodes.map((code, index) => ({
+      ...(existing.get(code) || {}),
+      code,
+      sortOrder:(index + 1) * 10,
+      isActive:true
+    }));
+
+    state.activity.unshift(activity('Updated depth position order'));
+  });
+
+  depthPositionOrderSavingV284 = false;
+  if (success) {
+    depthPositionOrderEditModeV284 = false;
+    depthPositionDraftOrderV284 = [];
+  }
+  renderRoster();
+}
+
+function bindUniversalDepthControlsV284() {
+  document.getElementById('editDepthPositionsBtnV284')?.addEventListener(
+    'click',
+    beginDepthPositionOrderEditV284
+  );
+
+  document.getElementById('cancelDepthPositionsBtnV284')?.addEventListener(
+    'click',
+    cancelDepthPositionOrderEditV284
+  );
+
+  document.getElementById('saveDepthPositionsBtnV284')?.addEventListener(
+    'click',
+    saveDepthPositionOrderV284
+  );
+
+  document.querySelectorAll('[data-depth-position-move-index]').forEach((button) => {
+    button.addEventListener('click', () => {
+      moveDepthPositionDraftV284(
+        Number(button.dataset.depthPositionMoveIndex),
+        Number(button.dataset.depthPositionMoveDirection)
+      );
+    });
+  });
+}
+
 function renderDepthChart(current) {
   const positionKeys = activeDepthPositionKeys();
 
@@ -346,35 +461,54 @@ function renderDepthChart(current) {
     depthDraftOrder = [];
   }
 
+  if (depthPosition !== 'ALL' && depthPositionOrderEditModeV284) {
+    depthPositionOrderEditModeV284 = false;
+    depthPositionDraftOrderV284 = [];
+  }
+
   const tabs = ['ALL', ...positionKeys]
-    .map((position) => `<button class="depth-position-tab ${depthPosition === position ? 'active' : ''}" data-depth-position="${position}" type="button">${position === 'ALL' ? 'All' : position}</button>`)
+    .map((position) => `<button class="depth-position-tab ${depthPosition === position ? 'active' : ''}" data-depth-position="${position}" type="button" ${depthPositionOrderEditModeV284 ? 'disabled' : ''}>${position === 'ALL' ? 'All' : position}</button>`)
     .join('');
 
   const canEdit = depthPosition !== 'ALL' && resolvedDepthPlayerIds(depthPosition).length > 0;
   const sport = activeDepthSportCode();
   const title = depthPosition === 'ALL'
-    ? sport === 'NFL'
-      ? 'Football depth chart'
-      : 'Depth chart'
+    ? sport === 'NHL'
+      ? 'Depth chart'
+      : `${sport} depth chart`
     : `${depthPosition} depth`;
 
   const copy = depthPosition === 'ALL'
-    ? sport === 'NHL' && usesCanonicalNhlDepthLayout()
-      ? 'Your preferred lines, defense pairs and goalie order.'
-      : 'Active players are grouped by the positions this Front Office uses. Open a position to set its preferred order.'
+    ? depthPositionOrderEditModeV284
+      ? 'Set the order your saved positions appear in Depth. This does not add or remove positions.'
+      : sport === 'NHL' && usesCanonicalNhlDepthLayout()
+        ? 'Your preferred lines, defense pairs and goalie order. Reorder positions to control the saved depth navigation.'
+        : 'Players use the same compact depth blocks across sports. Open a position to rank its players, or reorder the position sections.'
     : `Set your preferred ${depthPosition} order. Select Edit order to move players up or down.`;
 
-  const actions = depthPosition === 'ALL'
-    ? ''
-    : depthEditMode
+  let actions = '';
+
+  if (depthPosition === 'ALL') {
+    actions = depthPositionOrderEditModeV284
+      ? `<button id="cancelDepthPositionsBtnV284" class="btn btn-ghost btn-small" type="button" ${depthPositionOrderSavingV284 ? 'disabled' : ''}>Cancel</button><button id="saveDepthPositionsBtnV284" class="btn btn-primary btn-small" type="button" ${depthPositionOrderSavingV284 ? 'disabled' : ''}>${depthPositionOrderSavingV284 ? 'Saving…' : 'Save position order'}</button>`
+      : `<button id="editDepthPositionsBtnV284" class="btn btn-secondary btn-small" type="button" ${positionKeys.length > 1 ? '' : 'disabled'}>Reorder positions</button>`;
+  } else {
+    actions = depthEditMode
       ? `<button id="cancelDepthOrderBtn" class="btn btn-ghost btn-small" type="button" ${depthSaving ? 'disabled' : ''}>Cancel</button><button id="saveDepthOrderBtn" class="btn btn-primary btn-small" type="button" ${depthSaving ? 'disabled' : ''}>${depthSaving ? 'Saving…' : 'Save order'}</button>`
       : `<button id="editDepthOrderBtn" class="btn btn-secondary btn-small" type="button" ${canEdit ? '' : 'disabled'}>Edit order</button>`;
+  }
+
+  const content = depthPositionOrderEditModeV284
+    ? renderDepthPositionOrderEditorV284()
+    : depthPosition === 'ALL'
+      ? renderAllDepthChart(current)
+      : renderSinglePositionDepth(depthPosition, current);
 
   return `<div class="depth-lineup-shell">
     <div class="depth-position-tabs" aria-label="Depth chart position">${tabs}</div>
     <div class="depth-chart-toolbar"><div class="depth-chart-toolbar-copy"><h4>${escapeHtml(title)}</h4><p>${escapeHtml(copy)}</p></div><div class="depth-chart-actions">${actions}</div></div>
-    ${depthEditMode ? '<p class="depth-edit-note">Ordering is saved to this Front Office and will follow you across devices.</p>' : ''}
-    ${depthPosition === 'ALL' ? renderAllDepthChart(current) : renderSinglePositionDepth(depthPosition, current)}
+    ${depthEditMode || depthPositionOrderEditModeV284 ? '<p class="depth-edit-note">Ordering is saved to this Front Office and will follow you across devices.</p>' : ''}
+    ${content}
   </div>`;
 }
 
