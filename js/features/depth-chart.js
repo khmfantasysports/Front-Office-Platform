@@ -1,6 +1,6 @@
 'use strict';
 
-// RosterCap V2.84 — universal saved-position depth rendering.
+// RosterCap V2.85 — universal saved-position depth + sport-neutral role labels.
 //
 // NHL keeps the established forward-line / defense-pair / goalie presentation.
 // Every supported sport can use the same positional depth contract.
@@ -172,7 +172,12 @@ function depthSlot(player, positionLabel, current) {
 }
 
 function depthPositionRoleLabel(position, index) {
-  if (activeDepthSportCode() !== 'NHL') return `Depth ${index + 1}`;
+  if (activeDepthSportCode() !== 'NHL') {
+    if (index === 0) return 'Starter';
+    if (index === 1) return 'Backup';
+    return `Depth ${index + 1}`;
+  }
+
   if (position === 'D') return index < 6 ? `Pair ${Math.floor(index / 2) + 1}` : `Depth ${index + 1}`;
   if (position === 'G') return index === 0 ? 'Starter' : index === 1 ? 'Backup' : `Depth ${index + 1}`;
   return index < 4 ? `Line ${index + 1}` : `Depth ${index + 1}`;
@@ -249,7 +254,7 @@ function renderUniversalPositionDepthBlockV284(definition, current) {
     ? players.map((player, index) =>
         `<div class="depth-compact-card">${depthSlot(
           player,
-          `${label} · Depth ${index + 1}`,
+          `${label} · ${depthPositionRoleLabel(definition.key, index)}`,
           current
         )}</div>`
       ).join('')
@@ -317,7 +322,11 @@ function renderSinglePositionDepth(position, current) {
 
   if (activeDepthSportCode() !== 'NHL') {
     return `<div class="depth-compact-grid">${players.map((player, index) =>
-      `<div class="depth-compact-card">${depthSlot(player, `${position} · Depth ${index + 1}`, current)}</div>`
+      `<div class="depth-compact-card">${depthSlot(
+        player,
+        `${position} · ${depthPositionRoleLabel(position, index)}`,
+        current
+      )}</div>`
     ).join('')}</div>`;
   }
 
