@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.83 — configurable positions + user-owned Minors label
+// RosterCap V2.84 — universal positional depth + Front Office configuration
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -22,7 +22,7 @@
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.83';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.84';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -33,7 +33,7 @@ const ROSTERCAP_SPORTS = Object.freeze({
     suggestedTemplateKey: 'CURRENT_HOCKEY',
     player: Object.freeze({
       positions: Object.freeze(['C', 'LW', 'RW', 'F', 'D', 'G']),
-      defaultPositions: Object.freeze(['C', 'LW', 'RW', 'F', 'D', 'G']),
+      defaultPositions: Object.freeze(['LW', 'C', 'RW', 'D', 'G']),
       eligiblePlaceholder: 'C,LW',
       teamLabel: 'NHL team',
       teamPlaceholder: 'EDM'
@@ -128,9 +128,15 @@ const ROSTERCAP_SPORTS = Object.freeze({
       developmentRoster: 'Minors'
     }),
     depth: Object.freeze({
-      enabled: false,
-      presentation: 'GRID_ONLY',
-      positions: Object.freeze([])
+      enabled: true,
+      presentation: 'POSITION_GROUPS',
+      positions: Object.freeze([
+        Object.freeze({ key:'PG', label:'PG', section:'Guards', eligible:Object.freeze(['PG']) }),
+        Object.freeze({ key:'SG', label:'SG', section:'Guards', eligible:Object.freeze(['SG']) }),
+        Object.freeze({ key:'SF', label:'SF', section:'Forwards', eligible:Object.freeze(['SF']) }),
+        Object.freeze({ key:'PF', label:'PF', section:'Forwards', eligible:Object.freeze(['PF']) }),
+        Object.freeze({ key:'C', label:'C', section:'Centers', eligible:Object.freeze(['C']) })
+      ])
     })
   }),
   MLB: Object.freeze({
@@ -158,9 +164,23 @@ const ROSTERCAP_SPORTS = Object.freeze({
       developmentRoster: 'Minors'
     }),
     depth: Object.freeze({
-      enabled: false,
-      presentation: 'GRID_ONLY',
-      positions: Object.freeze([])
+      enabled: true,
+      presentation: 'POSITION_GROUPS',
+      positions: Object.freeze([
+        Object.freeze({ key:'C', label:'C', section:'Infield', eligible:Object.freeze(['C']) }),
+        Object.freeze({ key:'1B', label:'1B', section:'Infield', eligible:Object.freeze(['1B']) }),
+        Object.freeze({ key:'2B', label:'2B', section:'Infield', eligible:Object.freeze(['2B']) }),
+        Object.freeze({ key:'3B', label:'3B', section:'Infield', eligible:Object.freeze(['3B']) }),
+        Object.freeze({ key:'SS', label:'SS', section:'Infield', eligible:Object.freeze(['SS']) }),
+        Object.freeze({ key:'LF', label:'LF', section:'Outfield', eligible:Object.freeze(['LF']) }),
+        Object.freeze({ key:'CF', label:'CF', section:'Outfield', eligible:Object.freeze(['CF']) }),
+        Object.freeze({ key:'RF', label:'RF', section:'Outfield', eligible:Object.freeze(['RF']) }),
+        Object.freeze({ key:'OF', label:'OF', section:'Outfield', eligible:Object.freeze(['OF','LF','CF','RF']) }),
+        Object.freeze({ key:'DH', label:'DH', section:'Hitters', eligible:Object.freeze(['DH']) }),
+        Object.freeze({ key:'SP', label:'SP', section:'Pitching', eligible:Object.freeze(['SP']) }),
+        Object.freeze({ key:'RP', label:'RP', section:'Pitching', eligible:Object.freeze(['RP']) }),
+        Object.freeze({ key:'P', label:'P', section:'Pitching', eligible:Object.freeze(['P','SP','RP']) })
+      ])
     })
   })
 });
@@ -770,11 +790,8 @@ function syncCreateSportUiV279(options = {}) {
 
   const note = ensureSportEarlyAccessNoteV279();
   if (note) {
-    const supportsDepth = rosterCapSportSupportsDepth(sport);
     note.textContent = isRosterCapSportEarlyAccess(sport)
-      ? supportsDepth
-        ? `${sport} is available for early testing. Player entry, contracts, cap and positional depth ordering can be tested now; configurable lineup slots and import adapters are still being built.`
-        : `${sport} is available for early testing. Player entry, contracts, cap and the roster grid can be tested now; positional depth, lineup slots and import adapters are still being built.`
+      ? `${sport} is available for early testing. Player entry, contracts, cap and positional depth ordering can be tested now; configurable lineup slots and import adapters are still being built.`
       : 'These are editable starting values. Your saved Front Office settings remain authoritative.';
   }
 }
@@ -918,6 +935,10 @@ function installRosterEarlyAccessAdapterV279() {
 
     const depthButton = document.getElementById('rosterDepthModeBtn');
     if (depthButton) depthButton.classList.toggle('hidden', !supportsDepth);
+
+    if (typeof bindUniversalDepthControlsV284 === 'function') {
+      bindUniversalDepthControlsV284();
+    }
 
     return result;
   };
