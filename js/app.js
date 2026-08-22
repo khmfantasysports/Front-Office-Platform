@@ -1415,11 +1415,229 @@ function ensureDevelopmentLabelSettingV283() {
   });
 }
 
+function positionEditorSelectedCodesV285(container) {
+  return [...container.querySelectorAll(
+    'input[type="checkbox"][data-settings-position-code]'
+  )]
+    .filter((input) => input.checked)
+    .map((input) => String(input.dataset.settingsPositionCode || '').trim().toUpperCase())
+    .filter(Boolean);
+}
+
+function positionEditorUsageV285(codes) {
+  return (codes || [])
+    .map((code) => ({
+      code,
+      count:(state.players || []).filter(
+        (player) => String(player.position || '').trim().toUpperCase() === code
+      ).length
+    }))
+    .filter((item) => item.count > 0);
+}
+
+function syncPositionEditorSummaryV285(editor) {
+  if (!editor) return;
+
+  const selected = positionEditorSelectedCodesV285(editor);
+  const count = editor.querySelector('[data-position-settings-count]');
+  const warning = editor.querySelector('[data-position-settings-warning]');
+  const current = window.RosterCapPositionConfig?.active?.() || [];
+  const selectedSet = new Set(selected);
+  const removed = current.filter((code) => !selectedSet.has(code));
+  const usage = positionEditorUsageV285(removed);
+
+  if (count) {
+    count.textContent = `${selected.length} position${selected.length === 1 ? '' : 's'} selected`;
+    count.classList.toggle('warning', selected.length === 0);
+  }
+
+  if (warning) {
+    if (!usage.length) {
+      warning.classList.add('hidden');
+      warning.textContent = '';
+    } else {
+      warning.classList.remove('hidden');
+      warning.textContent =
+        `Removing ${usage.map((item) => `${item.code} (${item.count})`).join(', ')} will not change those players. Their saved positions are preserved.`;
+    }
+  }
+}
+
+async function savePositionSettingsV285(editor) {
+  if (!editor || !state.frontOffice) return;
+
+  const rawSelected = positionEditorSelectedCodesV285(editor);
+  if (!rawSelected.length) {
+    alert('Choose at least one player position.');
+    return;
+  }
+
+  const ordered = window.RosterCapPositionConfig?.orderedSelection?.(
+    rawSelected,
+    state.frontOffice.sport
+  ) || rawSelected;
+
+  const current = window.RosterCapPositionConfig?.active?.() || [];
+  const selectedSet = new Set(ordered);
+  const removed = current.filter((code) => !selectedSet.has(code));
+  const usage = positionEditorUsageV285(removed);
+
+  if (usage.length) {
+    const affected = usage.reduce((sum, item) => sum + item.count, 0);
+    const proceed = confirm(
+      `${affected} current player${affected === 1 ? '' : 's'} use a position you are turning off.\n\n`
+      + `Their player records will NOT be changed. The removed position will stop appearing in Add Player and Depth.\n\nContinue?`
+    );
+    if (!proceed) return;
+  }
+
+  const saveButton = editor.querySelector('[data-save-position-settings]');
+  if (saveButton?.disabled) return;
+
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving…';
+  }
+
+  try {
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.rpc('save_front_office_position_options_v1', {
+        p_front_office_id: state.frontOffice.id,
+        p_position_codes: ordered
+      });
+      if (error) throw error;
+
+      const existing = new Map(
+        (state.positionOptions || []).map((row) => [
+          String(row.code || '').trim().toUpperCase(),
+          row
+        ])
+      );
+
+      state.positionOptions = ordered.map((code, index) => ({
+        ...(existing.get(code) || {}),
+        code,
+        sortOrder:(index + 1) * 10,
+        isActive:true
+      }));
+    });
+
+    if (!success) return;
+
+    if (typeof depthPosition !== 'undefined') {
+      const active = new Set(ordered);
+      if (depthPosition !== 'ALL' && !active.has(depthPosition)) {
+        depthPosition = 'ALL';
+      }
+    }
+
+    if (typeof syncPlayerEditorForSportV279 === 'function') {
+      syncPlayerEditorForSportV279({
+        preserveCurrent:Boolean(typeof editingPlayerId !== 'undefined' && editingPlayerId)
+      });
+    }
+
+    renderRoster();
+    renderSettings();
+  } finally {
+    const currentButton = document.querySelector(
+      '#settingsView [data-save-position-settings]'
+    );
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Save positions';
+    }
+  }
+}
+
+function ensurePositionSettingsEditorV285() {
+  const page = document.querySelector('#settingsView .settings-accordion');
+  if (!page || page.querySelector('[data-settings-position-editor]')) return;
+
+  const sport = state.frontOffice?.sport || 'NHL';
+  const available = window.RosterCapPositionConfig?.available?.(sport) || [];
+  const active = window.RosterCapPositionConfig?.active?.() || [];
+  const activeSet = new Set(active);
+
+  const details = document.createElement('details');
+  details.className = 'settings-disclosure settings-position-editor-v285';
+  details.dataset.settingsPositionEditor = 'true';
+
+  details.innerHTML = `
+    <summary>
+      <span class="settings-disclosure-title">
+        <strong>Player Positions</strong>
+        <span>Choose which positions this Front Office uses.</span>
+      </span>
+    </summary>
+    <div class="settings-disclosure-body">
+      <div class="settings-position-editor-head-v285">
+        <div>
+          <strong>${escapeHtml(sport)} position catalog</strong>
+          <p>Selected positions control Add Player and Depth. Existing player data is never rewritten when a position is turned off.</p>
+        </div>
+        <span class="position-setup-count-v282" data-position-settings-count></span>
+      </div>
+
+      <div class="position-setup-options-v282 settings-position-options-v285">
+        ${available.map((code) => `
+          <label class="position-choice-v282">
+            <input
+              type="checkbox"
+              data-settings-position-code="${escapeHtml(code)}"
+              ${activeSet.has(code) ? 'checked' : ''}
+            >
+            <span>${escapeHtml(code)}</span>
+          </label>
+        `).join('')}
+      </div>
+
+      <div class="settings-position-warning-v285 hidden" data-position-settings-warning></div>
+
+      <div class="settings-position-order-note-v285">
+        Current Depth order:
+        <strong>${active.map((code) => escapeHtml(code)).join(' → ') || 'None'}</strong>
+        <span>Use Roster → Depth → All → Reorder positions to change the display order.</span>
+      </div>
+
+      <div class="settings-position-actions-v285">
+        <button class="btn btn-primary" data-save-position-settings type="button">
+          Save positions
+        </button>
+      </div>
+    </div>
+  `;
+
+  const teamLeague = page.querySelector(
+    'details[data-settings-section="team-league"]'
+  );
+
+  if (teamLeague) {
+    teamLeague.insertAdjacentElement('afterend', details);
+  } else {
+    page.prepend(details);
+  }
+
+  details.addEventListener('change', (event) => {
+    if (event.target.matches('[data-settings-position-code]')) {
+      syncPositionEditorSummaryV285(details);
+    }
+  });
+
+  details.querySelector('[data-save-position-settings]')?.addEventListener(
+    'click',
+    () => savePositionSettingsV285(details)
+  );
+
+  syncPositionEditorSummaryV285(details);
+}
+
 function compactSettingsPageV260() {
   const page = document.querySelector('#settingsView .settings-accordion');
   if (!page) return;
   syncSettingsSportTerminologyV281();
   ensureDevelopmentLabelSettingV283();
+  ensurePositionSettingsEditorV285();
   page.classList.add('settings-accordion-v260');
 }
 
