@@ -525,3 +525,122 @@ html, body { max-width: 100%; overflow-x: hidden; }
 .utility-menu-popover #deleteFrontOfficeBtn:hover {
   background:rgba(246,123,123,.11);
 }
+
+
+/* ============================================================
+   RosterCap V2.83 — Front Office configuration controls
+   ============================================================ */
+
+.position-setup-section-v282 {
+  display:grid;
+  gap:10px;
+}
+
+.position-setup-head-v282 {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.position-setup-head-v282 strong {
+  display:block;
+  color:var(--text);
+  font-size:.82rem;
+}
+
+.position-setup-head-v282 p {
+  margin:4px 0 0;
+  max-width:680px;
+  color:var(--muted);
+  font-size:.68rem;
+  line-height:1.42;
+}
+
+.position-setup-count-v282 {
+  flex:0 0 auto;
+  padding:5px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  color:#CFEAFF;
+  background:rgba(50,173,255,.05);
+  font-size:.60rem;
+  font-weight:850;
+  white-space:nowrap;
+}
+
+.position-setup-count-v282.warning {
+  color:var(--warning);
+  border-color:rgba(242,198,109,.34);
+  background:rgba(242,198,109,.055);
+}
+
+.position-setup-options-v282 {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.position-choice-v282 {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  min-height:36px;
+  padding:0;
+  color:var(--muted);
+  cursor:pointer;
+}
+
+.position-choice-v282 input {
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.position-choice-v282 span {
+  display:grid;
+  place-items:center;
+  min-width:48px;
+  min-height:34px;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#0B151E;
+  color:var(--muted);
+  font-size:.70rem;
+  font-weight:900;
+  transition:border-color .12s ease, background .12s ease, color .12s ease;
+}
+
+.position-choice-v282 input:checked + span {
+  border-color:rgba(50,173,255,.48);
+  background:rgba(50,173,255,.10);
+  color:#EAF6FF;
+}
+
+.position-choice-v282 input:focus-visible + span {
+  outline:2px solid rgba(50,173,255,.42);
+  outline-offset:2px;
+}
+
+@media (max-width:720px) {
+  .position-setup-head-v282 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  .position-setup-count-v282 {
+    justify-self:start;
+  }
+
+  .position-setup-options-v282 {
+    gap:6px;
+  }
+
+  .position-choice-v282 span {
+    min-width:45px;
+    min-height:34px;
+    padding:6px 9px;
+  }
+}
