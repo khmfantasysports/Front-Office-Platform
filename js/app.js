@@ -58,7 +58,7 @@ function workspaceSportCodeV281() {
 }
 
 function workspaceDevelopmentLabelV281() {
-  return workspaceNavigationSportConfig()?.terminology?.developmentRoster || 'Minors';
+  return window.RosterCapTerminology?.developmentLabel?.() || 'Minors';
 }
 
 function workspaceTeamLabelV281() {
@@ -145,10 +145,7 @@ function syncSettingsSportTerminologyV281() {
 
 
 function workspaceNavigationLabels() {
-  const sportConfig = workspaceNavigationSportConfig();
-  const developmentLabel =
-    sportConfig?.terminology?.developmentRoster
-    || 'Minors';
+  const developmentLabel = workspaceDevelopmentLabelV281();
 
   return {
     overview: 'Overview',
@@ -301,6 +298,15 @@ async function handleCreateFrontOffice(event) {
   const configuredSeasonCount =
     window.RosterCapLeagueConfig?.creationSeasonCount?.(sport);
 
+  const selectedPositions =
+    window.RosterCapPositionConfig?.selectedCreatePositions?.()
+    || [];
+
+  if (!selectedPositions.length) {
+    alert('Choose at least one player position for this Front Office.');
+    return;
+  }
+
   await runCloudAction(async () => {
     const { data, error } = await db.rpc('create_front_office_with_seasons_v1', {
       p_team_name: el('teamName').value.trim(),
@@ -313,6 +319,29 @@ async function handleCreateFrontOffice(event) {
       p_season_count: configuredSeasonCount ?? 7
     });
     if (error) throw error;
+
+    const { error: positionError } = await db.rpc(
+      'save_front_office_position_options_v1',
+      {
+        p_front_office_id: data,
+        p_position_codes: selectedPositions
+      }
+    );
+    if (positionError) throw positionError;
+
+    const developmentLabel =
+      window.RosterCapTerminology?.selectedCreateDevelopmentLabel?.()
+      || 'Minors';
+
+    const { error: labelError } = await db.rpc(
+      'save_front_office_development_label_v1',
+      {
+        p_front_office_id: data,
+        p_display_name: developmentLabel
+      }
+    );
+    if (labelError) throw labelError;
+
     await loadOffice(data);
   });
 }
@@ -1336,10 +1365,61 @@ function compactCapPageV260() {
   page.classList.add('cap-page-v260');
 }
 
+function ensureDevelopmentLabelSettingV283() {
+  const section = document.querySelector(
+    '#settingsView details[data-settings-section="team-league"] .settings-fields'
+  );
+  if (!section || section.querySelector('[data-office-development-label]')) return;
+
+  const label = document.createElement('label');
+  label.className = 'settings-development-label-v283';
+  label.textContent = 'Minors / secondary roster name';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.maxLength = 80;
+  input.value = workspaceDevelopmentLabelV281();
+  input.placeholder = 'Minors';
+  input.setAttribute('data-office-development-label', 'true');
+
+  label.appendChild(input);
+  section.appendChild(label);
+
+  input.addEventListener('change', async () => {
+    const value = String(input.value || '').trim() || 'Minors';
+
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.rpc(
+        'save_front_office_development_label_v1',
+        {
+          p_front_office_id: state.frontOffice.id,
+          p_display_name: value
+        }
+      );
+      if (error) throw error;
+
+      const developmentGroup = (state.rosterGroups || []).find((group) =>
+        group?.isDevelopment
+        || String(group?.key || '').toUpperCase() === 'FARM'
+      );
+      if (developmentGroup) developmentGroup.displayName = value;
+    });
+
+    if (!success) {
+      input.value = workspaceDevelopmentLabelV281();
+      return;
+    }
+
+    syncWorkspaceNavigation(activeView);
+    renderSettings();
+  });
+}
+
 function compactSettingsPageV260() {
   const page = document.querySelector('#settingsView .settings-accordion');
   if (!page) return;
   syncSettingsSportTerminologyV281();
+  ensureDevelopmentLabelSettingV283();
   page.classList.add('settings-accordion-v260');
 }
 
