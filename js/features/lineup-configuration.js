@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.87.2';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.87.3';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = false;
@@ -641,20 +641,21 @@ function renderLineupSettingsEditorV287() {
         ${draft.length
           ? draft.map((slot, index) => `
             <div class="lineup-settings-row-v287" data-lineup-settings-index="${index}">
-              <div class="lineup-settings-slot-copy-v287">
-                <strong>${escapeHtml(slot.displayName)}</strong>
-                ${
-                  uniqueCodesV287(slot.eligible).length === 1
-                  && uniqueCodesV287(slot.eligible)[0] === normalizeLineupCodeV287(slot.key)
-                    ? ''
-                    : `<span>${escapeHtml((slot.eligible || []).join(' / '))}</span>`
-                }
-              </div>
+              <div class="lineup-settings-card-top-v287">
+                <div class="lineup-settings-slot-copy-v287">
+                  <strong>${escapeHtml(slot.displayName)}</strong>
+                  ${
+                    uniqueCodesV287(slot.eligible).length === 1
+                    && uniqueCodesV287(slot.eligible)[0] === normalizeLineupCodeV287(slot.key)
+                      ? ''
+                      : `<span>${escapeHtml((slot.eligible || []).join(' / '))}</span>`
+                  }
+                </div>
 
-              <label class="lineup-settings-count-v287">
-                <span>Starters</span>
                 <input
+                  class="lineup-settings-count-input-v287"
                   aria-label="${escapeAttr(slot.displayName)} starter count"
+                  title="Starter count"
                   data-lineup-count-index="${index}"
                   type="number"
                   inputmode="numeric"
@@ -663,7 +664,7 @@ function renderLineupSettingsEditorV287() {
                   step="1"
                   value="${Number(slot.count || 1)}"
                 >
-              </label>
+              </div>
 
               <div class="lineup-settings-row-actions-v287" aria-label="${escapeAttr(slot.displayName)} controls">
                 <button class="btn btn-ghost btn-small" aria-label="Move ${escapeAttr(slot.displayName)} up" title="Move up" data-lineup-move-index="${index}" data-lineup-move-direction="-1" type="button" ${index === 0 ? 'disabled' : ''}>↑</button>
