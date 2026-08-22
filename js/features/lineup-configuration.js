@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.87.1';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.87.2';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = false;
@@ -19,6 +19,7 @@ let lineupEditModeV287 = false;
 let lineupSettingsDraftV287 = null;
 let lineupAssignmentSavingV287 = false;
 let lineupSettingsSavingV287 = false;
+let lineupSettingsOpenV287 = false;
 
 function lineupSportCodeV287() {
   return String(state?.frontOffice?.sport || 'NHL').trim().toUpperCase();
@@ -617,6 +618,7 @@ function renderLineupSettingsEditorV287() {
   details.className = 'settings-disclosure lineup-settings-v287';
   details.dataset.settingsSection = 'lineup-slots';
   details.dataset.settingsLineupEditor = 'true';
+  details.open = lineupSettingsOpenV287;
 
   details.innerHTML = `
     <summary>
@@ -711,11 +713,16 @@ function renderLineupSettingsEditorV287() {
     page.prepend(details);
   }
 
+  details.addEventListener('toggle', () => {
+    lineupSettingsOpenV287 = details.open;
+  });
+
   details.querySelectorAll('[data-lineup-count-index]').forEach((input) => {
     input.addEventListener('change', () => {
       const index = Number(input.dataset.lineupCountIndex);
       const value = Math.max(1, Math.min(30, Number(input.value || 1)));
       ensureLineupSettingsDraftV287()[index].count = value;
+      lineupSettingsOpenV287 = true;
       renderSettings();
     });
   });
@@ -726,6 +733,7 @@ function renderLineupSettingsEditorV287() {
         Number(button.dataset.lineupMoveIndex),
         Number(button.dataset.lineupMoveDirection)
       );
+      lineupSettingsOpenV287 = true;
       renderSettings();
     });
   });
@@ -736,6 +744,7 @@ function renderLineupSettingsEditorV287() {
         Number(button.dataset.lineupRemoveIndex),
         1
       );
+      lineupSettingsOpenV287 = true;
       renderSettings();
     });
   });
@@ -744,6 +753,7 @@ function renderLineupSettingsEditorV287() {
     const select = details.querySelector('[data-lineup-add-select]');
     if (!select?.value) return;
     addLineupDraftSlotV287(select.value);
+    lineupSettingsOpenV287 = true;
     renderSettings();
   });
 
@@ -772,6 +782,7 @@ async function saveLineupSettingsV287() {
   }));
 
   lineupSettingsSavingV287 = true;
+  lineupSettingsOpenV287 = true;
   renderSettings();
 
   try {
@@ -793,6 +804,7 @@ async function saveLineupSettingsV287() {
     if (!success) return;
   } finally {
     lineupSettingsSavingV287 = false;
+    lineupSettingsOpenV287 = true;
     renderSettings();
     renderRoster();
   }
@@ -820,6 +832,7 @@ async function resetLineupSettingsV287() {
 
   if (success) {
     lineupEditModeV287 = false;
+    lineupSettingsOpenV287 = true;
     renderSettings();
     renderRoster();
   }
