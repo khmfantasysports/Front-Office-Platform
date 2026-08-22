@@ -1,8 +1,8 @@
 'use strict';
 
 // Application bootstrap, global shell/navigation and top-level rendering.
-// V2.80: responsive workspace navigation is owned here; sport-foundation
-// supplies labels/configuration only.
+// V2.81: shell/navigation remains owned here. Sport-specific presentation
+// labels are applied after page render; sport-foundation supplies configuration.
 
 async function init() {
   if (!window.__ROSTERCAP_IDENTITY_LOADED__) {
@@ -52,6 +52,97 @@ function workspaceNavigationSportConfig() {
 
   return window.RosterCapSports?.get?.(sport) || null;
 }
+
+function workspaceSportCodeV281() {
+  return workspaceNavigationSportConfig()?.code || state?.frontOffice?.sport || 'NHL';
+}
+
+function workspaceDevelopmentLabelV281() {
+  return workspaceNavigationSportConfig()?.terminology?.developmentRoster || 'Minors';
+}
+
+function workspaceTeamLabelV281() {
+  return workspaceNavigationSportConfig()?.player?.teamLabel || `${workspaceSportCodeV281()} team`;
+}
+
+function setLabelLeadingTextV281(control, text) {
+  const label = control?.closest('label');
+  if (!label) return;
+
+  const node = [...label.childNodes].find(
+    (item) => item.nodeType === Node.TEXT_NODE && item.textContent.trim()
+  );
+
+  if (node) node.textContent = `${text}`;
+}
+
+function replaceGeneratedTextV281(root, fromText, toText) {
+  if (!root || !fromText || fromText === toText) return;
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+
+  nodes.forEach((node) => {
+    const parent = node.parentElement;
+    if (!parent || parent.closest('[contenteditable="true"]')) return;
+    if (['INPUT','TEXTAREA','OPTION'].includes(parent.tagName)) return;
+    if (node.textContent.includes(fromText)) {
+      node.textContent = node.textContent.split(fromText).join(toText);
+    }
+  });
+}
+
+function syncRosterSportTerminologyV281() {
+  const root = el('rosterView');
+  if (!root) return;
+
+  const sport = workspaceSportCodeV281();
+  const development = workspaceDevelopmentLabelV281();
+  const isNhl = sport === 'NHL';
+
+  const summaryCards = root.querySelectorAll('.roster-summary-grid-v252 > div');
+  const developmentCardLabel = summaryCards[1]?.querySelector('span');
+  if (developmentCardLabel) developmentCardLabel.textContent = development;
+
+  const teamFilter = el('rosterTeamFilter');
+  if (teamFilter) setLabelLeadingTextV281(teamFilter, `${sport} team`);
+
+  root.querySelectorAll('th.col-team').forEach((header) => {
+    header.textContent = sport;
+  });
+
+  const importButton = el('importRosterBtn');
+  if (importButton) {
+    importButton.textContent = isNhl ? 'Import Fantrax / CSV' : 'Import coming soon';
+    importButton.disabled = !isNhl;
+    importButton.title = isNhl ? '' : `${sport} import adapters are still being built.`;
+  }
+
+  const fantraxFilter = el('rosterFantraxFilter')?.closest('label');
+  if (fantraxFilter) fantraxFilter.classList.toggle('hidden', !isNhl);
+
+  const emptyCopy = root.querySelector('.empty-state p');
+  if (emptyCopy && !isNhl && /Fantrax/i.test(emptyCopy.textContent)) {
+    emptyCopy.textContent = 'Use Add Player above. Sport-specific roster import is coming soon.';
+  }
+}
+
+function syncSettingsSportTerminologyV281() {
+  const root = el('settingsView');
+  if (!root) return;
+
+  const development = workspaceDevelopmentLabelV281();
+  replaceGeneratedTextV281(root, 'Minors', development);
+
+  root.querySelectorAll('.settings-card-copy').forEach((copy) => {
+    copy.textContent = copy.textContent.replace(
+      'These are league settings, not NHL rules.',
+      'These are league settings, not sport defaults.'
+    );
+  });
+}
+
 
 function workspaceNavigationLabels() {
   const sportConfig = workspaceNavigationSportConfig();
@@ -1174,11 +1265,28 @@ function compactMinorsPageV260() {
   const page = document.querySelector('#farmView .farm-page-v228');
   if (!page) return;
 
-  // The Minors roster and called-up sections already carry their own counts.
+  const development = workspaceDevelopmentLabelV281();
+  const sport = workspaceSportCodeV281();
+  const isNhl = sport === 'NHL';
+
+  // The development roster and called-up sections already carry their own counts.
   page.querySelector('.farm-summary-grid-v228')?.remove();
 
+  const heading = page.querySelector('.farm-page-heading-v228 h3');
+  if (heading) heading.textContent = development;
+
   const copy = page.querySelector('.farm-page-heading-v228 .page-copy');
-  if (copy) copy.textContent = 'Prospects, Minors assignments and call-ups.';
+  if (copy) copy.textContent = `Prospects, ${development} assignments and moves to the active roster.`;
+
+  replaceGeneratedTextV281(page, 'Minors', development);
+  replaceGeneratedTextV281(page, 'No NHL team', `No ${sport} team`);
+
+  const importButton = page.querySelector('#importMinorsBtn');
+  if (importButton) {
+    importButton.textContent = isNhl ? 'Import Fantrax' : 'Import coming soon';
+    importButton.disabled = !isNhl;
+    importButton.title = isNhl ? '' : `${sport} import adapters are still being built.`;
+  }
 
   page.classList.add('farm-page-v260');
 }
@@ -1231,12 +1339,22 @@ function compactCapPageV260() {
 function compactSettingsPageV260() {
   const page = document.querySelector('#settingsView .settings-accordion');
   if (!page) return;
+  syncSettingsSportTerminologyV281();
   page.classList.add('settings-accordion-v260');
 }
 
 function installWorkspaceDensityPass() {
   if (workspaceDensityPassInstalled) return;
   workspaceDensityPassInstalled = true;
+
+  if (typeof renderRoster === 'function') {
+    const originalRenderRosterV281 = renderRoster;
+    renderRoster = function() {
+      const result = originalRenderRosterV281();
+      syncRosterSportTerminologyV281();
+      return result;
+    };
+  }
 
   if (typeof renderFarm === 'function') {
     const originalRenderFarmV260 = renderFarm;
@@ -1302,7 +1420,7 @@ function updatePlayerMoreDetailsSummaryV261() {
 
   summary.textContent = details.length
     ? details.join(' · ')
-    : 'NHL team · age · eligibility';
+    : `${workspaceTeamLabelV281()} · age · eligibility`;
 }
 
 function updatePlayerNotesSummaryV261() {
@@ -1357,7 +1475,7 @@ function ensurePlayerEditorPolishStructure() {
       const summary = document.createElement('summary');
       summary.innerHTML = `
         <span>More player details</span>
-        <small id="playerMoreDetailsSummaryV261">NHL team · age · eligibility</small>
+        <small id="playerMoreDetailsSummaryV261">Team · age · eligibility</small>
       `;
 
       const body = document.createElement('div');
