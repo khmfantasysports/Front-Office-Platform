@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.87';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.87.1';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = false;
@@ -641,14 +641,21 @@ function renderLineupSettingsEditorV287() {
             <div class="lineup-settings-row-v287" data-lineup-settings-index="${index}">
               <div class="lineup-settings-slot-copy-v287">
                 <strong>${escapeHtml(slot.displayName)}</strong>
-                <span>${escapeHtml(slot.key)} · ${escapeHtml((slot.eligible || []).join(' / '))}</span>
+                ${
+                  uniqueCodesV287(slot.eligible).length === 1
+                  && uniqueCodesV287(slot.eligible)[0] === normalizeLineupCodeV287(slot.key)
+                    ? ''
+                    : `<span>${escapeHtml((slot.eligible || []).join(' / '))}</span>`
+                }
               </div>
 
-              <label>
-                <span>Count</span>
+              <label class="lineup-settings-count-v287">
+                <span>Starters</span>
                 <input
+                  aria-label="${escapeAttr(slot.displayName)} starter count"
                   data-lineup-count-index="${index}"
                   type="number"
+                  inputmode="numeric"
                   min="1"
                   max="30"
                   step="1"
@@ -656,10 +663,10 @@ function renderLineupSettingsEditorV287() {
                 >
               </label>
 
-              <div class="lineup-settings-row-actions-v287">
-                <button class="btn btn-ghost btn-small" data-lineup-move-index="${index}" data-lineup-move-direction="-1" type="button" ${index === 0 ? 'disabled' : ''}>↑</button>
-                <button class="btn btn-ghost btn-small" data-lineup-move-index="${index}" data-lineup-move-direction="1" type="button" ${index === draft.length - 1 ? 'disabled' : ''}>↓</button>
-                <button class="btn btn-ghost btn-small lineup-remove-v287" data-lineup-remove-index="${index}" type="button">×</button>
+              <div class="lineup-settings-row-actions-v287" aria-label="${escapeAttr(slot.displayName)} controls">
+                <button class="btn btn-ghost btn-small" aria-label="Move ${escapeAttr(slot.displayName)} up" title="Move up" data-lineup-move-index="${index}" data-lineup-move-direction="-1" type="button" ${index === 0 ? 'disabled' : ''}>↑</button>
+                <button class="btn btn-ghost btn-small" aria-label="Move ${escapeAttr(slot.displayName)} down" title="Move down" data-lineup-move-index="${index}" data-lineup-move-direction="1" type="button" ${index === draft.length - 1 ? 'disabled' : ''}>↓</button>
+                <button class="btn btn-ghost btn-small lineup-remove-v287" aria-label="Remove ${escapeAttr(slot.displayName)}" title="Remove" data-lineup-remove-index="${index}" type="button">×</button>
               </div>
             </div>
           `).join('')
