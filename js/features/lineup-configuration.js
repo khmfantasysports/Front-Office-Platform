@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.88';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.89';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = true;
@@ -296,13 +296,40 @@ function lineupPlayerChargeLabelV288(player, current) {
   return charge === null || charge === undefined ? '—' : formatMoney(charge);
 }
 
-function lineupStarterLabelV288(slot, slotNumber) {
-  if (slot.slotCount <= 1) return slot.displayName;
-  return `${slot.displayName} ${slotNumber}`;
+function lineupStarterLabelV289(slot, slotNumber) {
+  const sport = lineupSportCodeV287();
+  const key = normalizeLineupCodeV287(slot?.key);
+
+  if (sport === 'NHL') {
+    if (['LW','C','RW','F'].includes(key)) {
+      return `Line ${slotNumber}`;
+    }
+
+    if (key === 'D') {
+      return `Pair ${Math.ceil(slotNumber / 2)}`;
+    }
+
+    if (key === 'G') {
+      if (slotNumber === 1) return 'Starter';
+      if (slotNumber === 2) return 'Backup';
+      return `Depth ${slotNumber}`;
+    }
+
+    if (key === 'FLEX' || key === 'UTIL') {
+      return slot.slotCount <= 1
+        ? slot.displayName
+        : `${slot.displayName} ${slotNumber}`;
+    }
+  }
+
+  return slot.slotCount <= 1
+    ? 'Starter'
+    : `Starter ${slotNumber}`;
 }
 
-function lineupDepthPlayersV288(slot) {
+function lineupDepthPlayersV289(slot) {
   const assigned = lineupAssignedPlayerIdsV287();
+
   const eligible = activeRosterPlayers()
     .filter((player) => playerQualifiesForLineupSlotV287(player, slot));
 
@@ -331,6 +358,7 @@ function lineupDepthPlayersV288(slot) {
     .sort((a,b) => {
       const aCharge = effectivePlayerCharge(a, current?.id) ?? -1;
       const bCharge = effectivePlayerCharge(b, current?.id) ?? -1;
+
       if (aCharge !== bCharge) return bCharge - aCharge;
       return a.name.localeCompare(b.name);
     })
@@ -342,124 +370,208 @@ function lineupDepthPlayersV288(slot) {
   return ordered;
 }
 
-function renderLineupStarterCardV288(slot, slotNumber, current) {
+function lineupPlayerChargeLabelV289(player, current) {
+  if (!player || !current) return '—';
+  const charge = effectivePlayerCharge(player, current.id);
+  return charge === null || charge === undefined
+    ? '—'
+    : formatMoney(charge);
+}
+
+function renderMatrixStarterCardV289(slot, slotNumber, current) {
   const assignment = lineupAssignmentForV287(slot.id, slotNumber);
   const player = assignment
     ? lineupPlayerByIdV287(assignment.playerId)
     : null;
 
-  const slotLabel = lineupStarterLabelV288(slot, slotNumber);
+  const label = lineupStarterLabelV289(slot, slotNumber);
+
+  if (lineupEditModeV287) {
+    const eligiblePlayers = eligibleLineupPlayersV287(slot, slotNumber);
+    const selectedPlayer = assignment?.playerId || '';
+
+    return `<label class="lineup-matrix-starter-editor-v289">
+      <span>${escapeHtml(label)}</span>
+      <select
+        aria-label="${escapeAttr(slot.displayName)} ${escapeAttr(label)}"
+        data-lineup-assignment-slot="${escapeAttr(slot.id)}"
+        data-lineup-assignment-number="${slotNumber}"
+        ${lineupAssignmentSavingV287 ? 'disabled' : ''}
+      >
+        <option value="">Open slot</option>
+        ${eligiblePlayers.map((candidate) => `
+          <option
+            value="${escapeAttr(candidate.id)}"
+            ${selectedPlayer === candidate.id ? 'selected' : ''}
+          >
+            ${escapeHtml(candidate.name)} · ${escapeHtml(candidate.position || '—')}
+          </option>
+        `).join('')}
+      </select>
+    </label>`;
+  }
 
   if (!player) {
-    return `<div class="lineup-starter-card-v288 empty">
-      <span class="lineup-starter-slot-v288">${escapeHtml(slotLabel)}</span>
+    return `<div class="lineup-matrix-player-v289 lineup-matrix-starter-v289 empty">
+      <span class="lineup-matrix-role-v289">${escapeHtml(label)}</span>
       <strong>Open</strong>
       <small>Starter slot</small>
     </div>`;
   }
 
   return `<button
-    class="lineup-starter-card-v288"
+    class="lineup-matrix-player-v289 lineup-matrix-starter-v289"
     data-lineup-player-open="${escapeAttr(player.id)}"
     type="button"
   >
-    <span class="lineup-starter-slot-v288">${escapeHtml(slotLabel)}</span>
+    <span class="lineup-matrix-role-v289">${escapeHtml(label)}</span>
     <strong>${escapeHtml(player.name)}</strong>
     <small>${escapeHtml(player.realTeam || '—')} · ${escapeHtml(player.position || '—')}</small>
-    <span class="lineup-starter-money-v288">${escapeHtml(lineupPlayerChargeLabelV288(player, current))}</span>
+    <span class="lineup-matrix-money-v289">${escapeHtml(lineupPlayerChargeLabelV289(player, current))}</span>
   </button>`;
 }
 
-function renderLineupStarterEditorV288(slot, slotNumber) {
-  const assignment = lineupAssignmentForV287(slot.id, slotNumber);
-  const eligiblePlayers = eligibleLineupPlayersV287(slot, slotNumber);
-  const selectedPlayer = assignment?.playerId || '';
-  const slotLabel = lineupStarterLabelV288(slot, slotNumber);
-
-  const options = [
-    '<option value="">Open slot</option>',
-    ...eligiblePlayers.map((player) => `
-      <option value="${escapeAttr(player.id)}" ${selectedPlayer === player.id ? 'selected' : ''}>
-        ${escapeHtml(player.name)} · ${escapeHtml(player.position || '—')}
-      </option>
-    `)
-  ].join('');
-
-  return `<label class="lineup-starter-editor-v288">
-    <span>${escapeHtml(slotLabel)}</span>
-    <select
-      aria-label="${escapeAttr(slotLabel)} starter"
-      data-lineup-assignment-slot="${escapeAttr(slot.id)}"
-      data-lineup-assignment-number="${slotNumber}"
-      ${lineupAssignmentSavingV287 ? 'disabled' : ''}
-    >
-      ${options}
-    </select>
-  </label>`;
-}
-
-function renderLineupDepthCardV288(player, index, current) {
+function renderMatrixDepthCardV289(player, index, current) {
   return `<button
-    class="lineup-depth-player-v288"
+    class="lineup-matrix-player-v289 lineup-matrix-depth-player-v289"
     data-lineup-player-open="${escapeAttr(player.id)}"
     type="button"
   >
-    <span class="lineup-depth-rank-v288">${index + 1}</span>
+    <span class="lineup-matrix-role-v289">Depth ${index + 1}</span>
     <strong>${escapeHtml(player.name)}</strong>
     <small>${escapeHtml(player.realTeam || '—')} · ${escapeHtml(player.position || '—')}</small>
-    <span class="lineup-depth-money-v288">${escapeHtml(lineupPlayerChargeLabelV288(player, current))}</span>
+    <span class="lineup-matrix-money-v289">${escapeHtml(lineupPlayerChargeLabelV289(player, current))}</span>
   </button>`;
 }
 
-function renderUnifiedLineupRowV288(slot, current) {
+function renderMatrixSlotColumnV289(slot, current) {
   const starters = [];
 
   for (let slotNumber = 1; slotNumber <= slot.slotCount; slotNumber += 1) {
     starters.push(
-      lineupEditModeV287
-        ? renderLineupStarterEditorV288(slot, slotNumber)
-        : renderLineupStarterCardV288(slot, slotNumber, current)
+      renderMatrixStarterCardV289(slot, slotNumber, current)
     );
   }
 
-  const depthPlayers = lineupDepthPlayersV288(slot);
+  const depthPlayers = lineupDepthPlayersV289(slot);
 
-  const depthHtml = depthPlayers.length
-    ? depthPlayers
-        .map((player, index) => renderLineupDepthCardV288(player, index, current))
-        .join('')
-    : `<div class="lineup-depth-empty-v288">No additional eligible players.</div>`;
-
-  const eligibility = lineupSlotEligibilityLabelV287(slot);
-
-  return `<section class="lineup-position-row-v288">
-    <div class="lineup-starter-column-v288">
-      <div class="lineup-position-heading-v288">
-        <div>
-          <p class="eyebrow">Starting</p>
-          <h4>${escapeHtml(slot.displayName)}</h4>
-        </div>
-        ${slot.slotCount > 1
-          ? `<span>${slot.slotCount}</span>`
-          : ''}
+  return `<section
+    class="lineup-matrix-column-v289"
+    data-lineup-matrix-slot="${escapeAttr(slot.key)}"
+  >
+    <div class="lineup-matrix-column-head-v289">
+      <div>
+        <h4>${escapeHtml(slot.displayName)}</h4>
+        ${(
+          uniqueCodesV287(slot.eligiblePositionCodes).length === 1
+          && uniqueCodesV287(slot.eligiblePositionCodes)[0] === normalizeLineupCodeV287(slot.key)
+        )
+          ? ''
+          : `<span>${escapeHtml(lineupSlotEligibilityLabelV287(slot))}</span>`
+        }
       </div>
 
-      <div class="lineup-starter-stack-v288">
-        ${starters.join('')}
-      </div>
+      <span>${slot.slotCount}</span>
     </div>
 
-    <div class="lineup-depth-column-v288">
-      <div class="lineup-depth-heading-v288">
-        <div>
-          <strong>Depth</strong>
-          <span>${escapeHtml(eligibility)}</span>
-        </div>
-        <small>${depthPlayers.length}</small>
-      </div>
+    <div class="lineup-matrix-starters-v289">
+      ${starters.join('')}
+    </div>
 
-      <div class="lineup-depth-grid-v288">
-        ${depthHtml}
+    <div class="lineup-matrix-depth-label-v289">
+      <span>Depth</span>
+      <small>${depthPlayers.length}</small>
+    </div>
+
+    <div class="lineup-matrix-depth-stack-v289">
+      ${depthPlayers.length
+        ? depthPlayers
+            .map((player, index) => renderMatrixDepthCardV289(player, index, current))
+            .join('')
+        : '<div class="lineup-matrix-depth-empty-v289">No additional eligible players.</div>'
+      }
+    </div>
+  </section>`;
+}
+
+function lineupMatrixGroupsV289(slots) {
+  const sport = lineupSportCodeV287();
+  const slotMap = new Map(
+    slots.map((slot) => [normalizeLineupCodeV287(slot.key), slot])
+  );
+
+  const groups = [];
+  const used = new Set();
+
+  const take = (label, keys) => {
+    const groupSlots = keys
+      .map((key) => slotMap.get(key))
+      .filter(Boolean);
+
+    groupSlots.forEach((slot) => used.add(slot.id));
+
+    if (groupSlots.length) {
+      groups.push({
+        label,
+        slots:groupSlots
+      });
+    }
+  };
+
+  if (sport === 'NHL') {
+    take('Forwards', ['LW','C','RW','F']);
+    take('Defense', ['D']);
+    take('Goalies', ['G']);
+    take('Flexible', ['FLEX','UTIL']);
+  } else if (sport === 'NFL') {
+    take('Offense', [
+      'QB','RB','WR','TE','FB',
+      'OL','OT','OG','C',
+      'FLEX','SUPERFLEX'
+    ]);
+    take('Defense', [
+      'DL','DE','DT','EDGE',
+      'LB','CB','S','DB','IDP'
+    ]);
+    take('Special Teams', ['K','P']);
+  } else if (sport === 'NBA') {
+    take('Starters', ['PG','SG','G','SF','PF','F','C','UTIL']);
+  } else if (sport === 'MLB') {
+    take('Infield', ['C','1B','2B','3B','SS','MI','CI','INF']);
+    take('Outfield / Hitting', ['LF','CF','RF','OF','DH','UTIL']);
+    take('Pitching', ['SP','RP','P']);
+  }
+
+  const remaining = slots.filter((slot) => !used.has(slot.id));
+
+  if (remaining.length) {
+    groups.push({
+      label:'Other',
+      slots:remaining
+    });
+  }
+
+  return groups;
+}
+
+function renderLineupMatrixGroupV289(group, current) {
+  return `<section class="lineup-matrix-group-v289">
+    <div class="lineup-matrix-group-head-v289">
+      <div>
+        <p class="eyebrow">Roster</p>
+        <h3>${escapeHtml(group.label)}</h3>
+      </div>
+      <span>${group.slots.length} position${group.slots.length === 1 ? '' : 's'}</span>
+    </div>
+
+    <div class="lineup-matrix-scroll-v289">
+      <div
+        class="lineup-matrix-grid-v289"
+        style="--lineup-matrix-columns:${group.slots.length}"
+      >
+        ${group.slots
+          .map((slot) => renderMatrixSlotColumnV289(slot, current))
+          .join('')}
       </div>
     </div>
   </section>`;
@@ -472,24 +584,26 @@ function renderLineupPanelV287() {
   const assigned = lineupAssignedCountV287();
 
   if (!slots.length) {
-    return `<div class="lineup-shell-v287 lineup-unified-v288">
+    return `<div class="lineup-shell-v287 lineup-matrix-shell-v289">
       <div class="lineup-toolbar-v287">
         <div>
           <p class="eyebrow">Roster Lineup</p>
           <h4>No starting slots configured</h4>
-          <p>Configure the starting positions this Front Office uses. The Roster page will then show starters on the left and eligible depth beside them.</p>
+          <p>Configure the starting positions this Front Office uses. Positions will run across the roster board, with eligible depth below each one.</p>
         </div>
         <button class="btn btn-primary btn-small" data-lineup-open-settings type="button">Configure lineup</button>
       </div>
     </div>`;
   }
 
-  return `<div class="lineup-shell-v287 lineup-unified-v288">
+  const groups = lineupMatrixGroupsV289(slots);
+
+  return `<div class="lineup-shell-v287 lineup-matrix-shell-v289">
     <div class="lineup-toolbar-v287 lineup-toolbar-unified-v288">
       <div>
         <p class="eyebrow">Roster Lineup</p>
         <h4>${assigned} / ${total} starters filled</h4>
-        <p>Starters run down the left. Eligible Active-roster depth is shown beside each position in saved depth order.</p>
+        <p>Positions run across. Starters are listed first and eligible unassigned depth continues down each position column.</p>
       </div>
 
       <div class="lineup-toolbar-actions-v287">
@@ -501,17 +615,18 @@ function renderLineupPanelV287() {
     </div>
 
     ${lineupEditModeV287
-      ? '<p class="lineup-edit-note-v287">Choose each starter from the eligible Active roster. A player can occupy only one starting slot.</p>'
+      ? '<p class="lineup-edit-note-v287">Choose each starter from the eligible Active roster. Once selected, that player disappears from every other available depth pool.</p>'
       : ''}
 
-    <div class="lineup-position-board-v288">
-      ${slots.map((slot) => renderUnifiedLineupRowV288(slot, current)).join('')}
+    <div class="lineup-matrix-board-v289">
+      ${groups
+        .map((group) => renderLineupMatrixGroupV289(group, current))
+        .join('')}
     </div>
   </div>`;
 }
 
 function setLineupViewActiveV287(active) {
-  // V2.88 intentionally exposes one Roster presentation only.
   lineupViewActiveV287 = true;
   if (active === false) lineupEditModeV287 = false;
 }
@@ -523,6 +638,7 @@ function decorateRosterWithLineupV287() {
   lineupViewActiveV287 = true;
 
   const switcher = root.querySelector('.roster-view-switch-v252');
+
   if (switcher) {
     switcher.classList.add('hidden');
     switcher.setAttribute('aria-hidden', 'true');
@@ -533,9 +649,10 @@ function decorateRosterWithLineupV287() {
   root.querySelector('.empty-state')?.classList.add('hidden');
 
   const pageCopy = root.querySelector('.roster-page-heading-copy-v252 .page-copy');
+
   if (pageCopy) {
     pageCopy.textContent =
-      'Manage starters and positional depth together in one roster view.';
+      'Manage starters and eligible positional depth together in one roster board.';
   }
 
   let lineupPanel = document.getElementById('lineupPanelV287');
