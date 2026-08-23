@@ -1635,12 +1635,51 @@ function compactAssetsPageV260() {
   });
 
   page.querySelectorAll('.asset-card').forEach((card) => {
-    card.classList.add('asset-card-v292');
+    card.classList.add('asset-card-v292', 'asset-card-v297');
+  });
+
+  // V2.97 — the Asset Manager's second filter rail is useful only when the
+  // current category contains more than one lifecycle status. For example,
+  // if every Draft Pick is Owned, showing "All 1 / Owned 1" is redundant.
+  const statusRail = page.querySelector('#assetStatusRailV270');
+  const statusEmpty = page.querySelector('#assetStatusEmptyV270');
+
+  if (statusRail) {
+    const concreteStatusButtons = [
+      ...statusRail.querySelectorAll('[data-asset-status-v270]')
+    ].filter((button) => button.dataset.assetStatusV270 !== 'ALL');
+
+    if (concreteStatusButtons.length <= 1) {
+      if (typeof assetStatusFilterV270 !== 'undefined') {
+        assetStatusFilterV270 = 'ALL';
+      }
+
+      statusRail.remove();
+      statusEmpty?.remove();
+
+      if (typeof applyAssetStatusFilterV270 === 'function') {
+        applyAssetStatusFilterV270();
+      }
+    } else {
+      statusRail.classList.add('asset-status-rail-v297');
+    }
+  }
+
+  page.querySelectorAll('.asset-year-group-v230').forEach((group) => {
+    group.classList.add('asset-year-group-v297');
+  });
+
+  page.querySelectorAll('.asset-year-label-v230').forEach((label) => {
+    label.classList.add('asset-year-label-v297');
+  });
+
+  page.querySelectorAll('.asset-section-head-v230').forEach((head) => {
+    head.classList.add('asset-section-head-v297');
   });
 
   decorateAssetsEmptyStateV292(page);
 
-  page.classList.add('assets-page-v260', 'assets-page-v292');
+  page.classList.add('assets-page-v260', 'assets-page-v292', 'assets-page-v297');
 }
 
 function compactCapPageV260() {
