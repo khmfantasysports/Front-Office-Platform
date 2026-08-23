@@ -2232,3 +2232,408 @@ Load after workspace-shared.css.
   }
   .season-rollover-confirm-actions .btn { width:100%; }
 }
+
+
+/* ============================================================================
+   RosterCap V2.92 — Minors positional depth + Assets polish
+   Presentation only.
+   ============================================================================ */
+
+/* Minors ------------------------------------------------------------------ */
+
+#farmView .farm-page-v292 {
+  gap:7px;
+}
+
+#farmView .farm-page-v292 .farm-page-heading-v228 {
+  margin-bottom:1px;
+}
+
+#farmView .farm-depth-panel-v292 {
+  min-width:0;
+  padding:8px;
+}
+
+#farmView .farm-depth-panel-v292 .farm-section-head-v228 {
+  align-items:flex-end;
+  padding:0 1px 5px;
+}
+
+#farmView .farm-depth-scroll-v292 {
+  width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding-bottom:2px;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(119,201,255,.22) transparent;
+  -webkit-overflow-scrolling:touch;
+}
+
+#farmView .farm-depth-board-v292 {
+  display:grid;
+  grid-template-columns:repeat(var(--farm-depth-columns),minmax(116px,1fr));
+  align-items:start;
+  gap:5px;
+  width:100%;
+  min-width:max(
+    100%,
+    calc(var(--farm-depth-columns) * 116px + (var(--farm-depth-columns) - 1) * 5px)
+  );
+}
+
+#farmView .farm-depth-column-v292 {
+  display:grid;
+  align-content:start;
+  gap:5px;
+  min-width:0;
+  padding:5px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0D1822;
+}
+
+#farmView .farm-depth-column-head-v292 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  min-height:24px;
+}
+
+#farmView .farm-depth-column-head-v292 strong {
+  color:#EAF5FC;
+  font-size:.68rem;
+  line-height:1;
+}
+
+#farmView .farm-depth-column-head-v292 span {
+  display:grid;
+  place-items:center;
+  min-width:20px;
+  height:20px;
+  padding:0 4px;
+  border:1px solid rgba(119,201,255,.18);
+  border-radius:999px;
+  color:#A8D8F7;
+  background:rgba(50,173,255,.05);
+  font-size:.45rem;
+  font-weight:900;
+}
+
+#farmView .farm-depth-stack-v292 {
+  display:grid;
+  gap:4px;
+}
+
+#farmView .farm-depth-player-card-v292 {
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr !important;
+  gap:4px !important;
+  min-width:0;
+  min-height:0;
+  padding:5px !important;
+  border-radius:8px !important;
+  background:#101C27;
+}
+
+#farmView .farm-depth-rank-v292 {
+  color:#8FCFFF;
+  font-size:.42rem;
+  font-weight:900;
+  letter-spacing:.04em;
+  line-height:1;
+  text-transform:uppercase;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-main {
+  display:grid;
+  gap:2px;
+  min-width:0;
+  padding:0;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 {
+  min-width:0;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 strong {
+  display:block;
+  overflow:hidden;
+  font-size:.59rem;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 small {
+  display:block;
+  overflow:hidden;
+  margin-top:1px;
+  font-size:.43rem;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 em {
+  display:block;
+  overflow:hidden;
+  margin-top:1px;
+  font-size:.40rem;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-cap {
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:4px;
+  min-width:0;
+  text-align:left;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-cap strong {
+  font-size:.52rem;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-cap small {
+  display:none;
+}
+
+#farmView .farm-depth-player-card-v292 [data-call-up] {
+  width:100%;
+  min-width:0;
+  min-height:27px;
+  padding:3px 5px;
+  border-radius:7px;
+  font-size:.50rem;
+}
+
+#farmView .farm-depth-empty-v292 {
+  display:grid;
+  place-items:center;
+  min-height:58px;
+  padding:7px;
+  border:1px dashed var(--border);
+  border-radius:8px;
+  color:var(--muted);
+  background:rgba(255,255,255,.01);
+  font-size:.45rem;
+  text-align:center;
+}
+
+/* Assets ------------------------------------------------------------------ */
+
+#assetsView .assets-page-v292 {
+  gap:7px;
+}
+
+#assetsView .assets-page-v292 .asset-hero-v292 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:10px;
+  padding:2px 0 4px;
+}
+
+#assetsView .assets-page-v292 .asset-hero-copy-v230 h3 {
+  margin:0;
+  font-size:1.10rem;
+  line-height:1.08;
+}
+
+#assetsView .assets-page-v292 .asset-hero-copy-v230 p:last-child {
+  margin-top:3px;
+  max-width:620px;
+  font-size:.64rem;
+  line-height:1.35;
+}
+
+#assetsView .assets-page-v292 .asset-add-btn-v230 {
+  min-height:34px;
+  padding:5px 10px;
+  border-radius:9px;
+  box-shadow:none;
+  font-size:.61rem;
+}
+
+#assetsView .assets-page-v292 .asset-tabs {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:0 0 2px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+
+#assetsView .assets-page-v292 .asset-tabs::-webkit-scrollbar {
+  display:none;
+}
+
+#assetsView .assets-page-v292 .asset-tab-v292 {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  flex:0 0 auto;
+  min-width:max-content;
+  min-height:29px;
+  padding:4px 8px;
+  border:1px solid var(--border) !important;
+  border-radius:999px !important;
+  background:#0D1822 !important;
+  color:#C3D0DB !important;
+  box-shadow:none !important;
+  font-size:.56rem;
+  white-space:nowrap;
+}
+
+#assetsView .assets-page-v292 .asset-tab-v292.active {
+  border-color:rgba(50,173,255,.55) !important;
+  background:rgba(50,173,255,.10) !important;
+  color:#E8F6FF !important;
+}
+
+#assetsView .assets-page-v292 .asset-tab-count-v260 {
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  background:rgba(255,255,255,.05);
+  color:#AFC0CD;
+  font-size:.46rem;
+}
+
+#assetsView .assets-page-v292 .asset-tab-v292.active .asset-tab-count-v260 {
+  background:rgba(50,173,255,.18);
+  color:#A9D9FF;
+}
+
+#assetsView .assets-page-v292 .asset-portfolio-v292 {
+  min-width:0;
+  padding:8px;
+  border-radius:11px;
+}
+
+#assetsView .asset-empty-state-v292 {
+  display:grid !important;
+  align-content:start;
+  gap:4px !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:14px 12px !important;
+  border:1px dashed var(--border) !important;
+  border-radius:10px !important;
+  background:rgba(255,255,255,.012) !important;
+  text-align:left !important;
+}
+
+#assetsView .asset-empty-state-v292 > * {
+  margin:0 !important;
+}
+
+#assetsView .asset-empty-state-v292 h2,
+#assetsView .asset-empty-state-v292 h3,
+#assetsView .asset-empty-state-v292 h4,
+#assetsView .asset-empty-state-v292 strong {
+  display:block;
+  color:var(--text);
+  font-size:.79rem !important;
+  line-height:1.15;
+}
+
+#assetsView .asset-empty-state-v292 p,
+#assetsView .asset-empty-state-v292 span:not(.asset-tab-count-v260) {
+  display:block;
+  max-width:560px;
+  color:var(--muted);
+  font-size:.60rem !important;
+  line-height:1.35;
+}
+
+#assetsView .assets-page-v292 .asset-grid-v292 {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:6px;
+}
+
+#assetsView .assets-page-v292 .asset-card-v292 {
+  min-width:0;
+  min-height:74px;
+  padding:7px;
+  border-radius:9px;
+  background:#0D1822;
+}
+
+#assetsView .assets-page-v292 .asset-card-v292 h5 {
+  font-size:.70rem;
+  line-height:1.15;
+}
+
+#assetsView .assets-page-v292 .asset-card-v292 .asset-card-meta {
+  font-size:.52rem;
+  line-height:1.25;
+}
+
+@media (max-width:720px) {
+  #farmView .farm-depth-board-v292 {
+    grid-template-columns:repeat(var(--farm-depth-columns),112px);
+    min-width:max-content;
+  }
+
+  #farmView .farm-depth-column-v292 {
+    width:112px;
+  }
+
+  #assetsView .assets-page-v292 .asset-hero-v292 {
+    grid-template-columns:1fr;
+    align-items:stretch;
+    gap:7px;
+  }
+
+  #assetsView .assets-page-v292 .asset-add-btn-v230 {
+    width:auto;
+    justify-self:start;
+  }
+
+  #assetsView .assets-page-v292 .asset-grid-v292 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:430px) {
+  #farmView .farm-depth-board-v292 {
+    grid-template-columns:repeat(var(--farm-depth-columns),106px);
+  }
+
+  #farmView .farm-depth-column-v292 {
+    width:106px;
+    padding:4px;
+  }
+
+  #farmView .farm-depth-player-card-v292 {
+    padding:4px !important;
+  }
+
+  #assetsView .assets-page-v292 .asset-hero-copy-v230 h3 {
+    font-size:1.04rem;
+  }
+
+  #assetsView .asset-empty-state-v292 {
+    padding:11px 10px !important;
+  }
+}
+
+@media (max-width:350px) {
+  #assetsView .assets-page-v292 .asset-grid-v292 {
+    grid-template-columns:1fr;
+  }
+}
