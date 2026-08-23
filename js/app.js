@@ -1435,6 +1435,65 @@ function farmPlayerColumnV292(player, positions) {
   return eligible.find((code) => positions.includes(code)) || 'OTHER';
 }
 
+function farmPlayerAgeLabelV2982(player) {
+  const rawAge = player?.ageSnapshot;
+
+  if (
+    rawAge === null
+    || rawAge === undefined
+    || String(rawAge).trim() === ''
+  ) {
+    return 'Age —';
+  }
+
+  const age = Number(rawAge);
+  if (!Number.isFinite(age) || age < 0) return 'Age —';
+
+  return `Age ${Math.round(age)}`;
+}
+
+function farmPlayerContractExpiryLabelV2982(player) {
+  if (!player?.contractEndSeasonId) return 'No end set';
+
+  const endSeason = (state?.seasons || []).find(
+    (season) => season.id === player.contractEndSeasonId
+  );
+
+  if (!endSeason?.startYear) return 'No end set';
+
+  return `Expires ${seasonLabel(endSeason.startYear)}`;
+}
+
+function decorateFarmPlayerDetailsV2982(card, player) {
+  if (!card || !player) return;
+
+  const copy = card.querySelector('.farm-player-copy-v228');
+  if (!copy) return;
+
+  let age = copy.querySelector('.farm-player-age-v2982');
+
+  if (!age) {
+    age = document.createElement('span');
+    age.className = 'farm-player-age-v2982';
+
+    const contractLine = copy.querySelector('em');
+    if (contractLine) copy.insertBefore(age, contractLine);
+    else copy.appendChild(age);
+  }
+
+  age.textContent = farmPlayerAgeLabelV2982(player);
+
+  let contractLine = copy.querySelector('em');
+
+  if (!contractLine) {
+    contractLine = document.createElement('em');
+    copy.appendChild(contractLine);
+  }
+
+  contractLine.classList.add('farm-player-contract-v2982');
+  contractLine.textContent = farmPlayerContractExpiryLabelV2982(player);
+}
+
 function renderFarmDepthBoardV292(page) {
   const lists = [...page.querySelectorAll('.farm-player-list-v228')];
   const list =
@@ -1448,6 +1507,12 @@ function renderFarmDepthBoardV292(page) {
   if (!panel) return;
 
   const cards = [...list.querySelectorAll('.farm-player-card-v228')];
+
+  cards.forEach((card) => {
+    const player = farmCardPlayerV292(card);
+    decorateFarmPlayerDetailsV2982(card, player);
+  });
+
   const positions = farmPositionOrderV292();
 
   if (!positions.length) return;
@@ -1568,7 +1633,12 @@ function compactMinorsPageV260() {
     importButton.title = isNhl ? '' : `${sport} import adapters are still being built.`;
   }
 
-  page.classList.add('farm-page-v260', 'farm-page-v292');
+  page.querySelectorAll('.farm-player-card-v228').forEach((card) => {
+    const player = farmCardPlayerV292(card);
+    decorateFarmPlayerDetailsV2982(card, player);
+  });
+
+  page.classList.add('farm-page-v260', 'farm-page-v292', 'farm-page-v2982');
   renderFarmDepthBoardV292(page);
 }
 
