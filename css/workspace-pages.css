@@ -3359,3 +3359,58 @@ Load after workspace-shared.css.
     white-space:normal;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V2.98.2 — Minors player age + contract expiry
+   ============================================================================ */
+
+#farmView .farm-page-v2982 .farm-player-age-v2982 {
+  display:block;
+  overflow:hidden;
+  margin-top:1px;
+  color:#8FA8B9;
+  font-size:.47rem;
+  font-style:normal;
+  font-weight:750;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-page-v2982 .farm-player-contract-v2982 {
+  display:block;
+  overflow:hidden;
+  margin-top:1px;
+  color:#86A1B3;
+  font-size:.47rem;
+  font-style:normal;
+  font-weight:750;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982 {
+  font-size:.39rem;
+  line-height:1.10;
+}
+
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 {
+  display:grid;
+  gap:1px;
+}
+
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 small,
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982 {
+  margin-top:0;
+}
+
+@media (max-width:430px) {
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982 {
+    font-size:.38rem;
+  }
+}
