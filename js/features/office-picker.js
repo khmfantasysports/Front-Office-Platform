@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.93 — Compact My Front Offices
+// RosterCap V2.95 — Compact My Front Offices + Logo Cache
 //
 // Frontend-only picker simplification:
 // - card content is identity-only: logo, sport, team name, league name
@@ -11,6 +11,211 @@
 // -----------------------------------------------------------------------------
 
 let officePickerPolishInstalledV268 = false;
+
+// -----------------------------------------------------------------------------
+// RosterCap V2.95 — Team logo signed-URL cache
+//
+// Supabase logo objects are private, so RosterCap needs a signed URL before an
+// <img> can load. Re-signing the same logo path on every picker/workspace load
+// adds a visible delay.
+//
+// V2.95:
+// - keeps a fast in-memory cache
+// - persists the cache in sessionStorage per authenticated user
+// - uses a six-day client TTL for seven-day Supabase signed URLs
+// - deduplicates simultaneous signing requests for the same path
+// - starts image preloading as soon as the signed URL is available
+//
+// Team logo replacements already receive a new timestamped storage path, so a
+// replacement naturally bypasses the old path cache.
+// -----------------------------------------------------------------------------
+
+const TEAM_LOGO_CACHE_VERSION_V295 = 'v1';
+const TEAM_LOGO_CACHE_TTL_MS_V295 = 6 * 24 * 60 * 60 * 1000;
+const teamLogoUrlMemoryV295 = new Map();
+const teamLogoUrlPendingV295 = new Map();
+const teamLogoPreloadsV295 = new Map();
+
+function teamLogoCacheUserIdV295() {
+  return String(session?.user?.id || 'signed-out');
+}
+
+function teamLogoCacheStorageKeyV295() {
+  return `rostercap-team-logo-cache-${TEAM_LOGO_CACHE_VERSION_V295}:${teamLogoCacheUserIdV295()}`;
+}
+
+function teamLogoMemoryKeyV295(path) {
+  return `${teamLogoCacheUserIdV295()}::${String(path || '')}`;
+}
+
+function readTeamLogoSessionCacheV295() {
+  try {
+    const raw = window.sessionStorage?.getItem(teamLogoCacheStorageKeyV295());
+    if (!raw) return {};
+
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function writeTeamLogoSessionCacheV295(cache) {
+  try {
+    window.sessionStorage?.setItem(
+      teamLogoCacheStorageKeyV295(),
+      JSON.stringify(cache || {})
+    );
+  } catch (error) {
+    // sessionStorage can be unavailable in restricted/private browser modes.
+    // The in-memory cache still provides same-page navigation speedups.
+  }
+}
+
+function cachedTeamLogoUrlV295(path) {
+  if (!path) return null;
+
+  const memoryKey = teamLogoMemoryKeyV295(path);
+  const now = Date.now();
+  const memoryEntry = teamLogoUrlMemoryV295.get(memoryKey);
+
+  if (
+    memoryEntry?.url
+    && Number(memoryEntry.expiresAt || 0) > now
+  ) {
+    return memoryEntry.url;
+  }
+
+  if (memoryEntry) {
+    teamLogoUrlMemoryV295.delete(memoryKey);
+  }
+
+  const sessionCache = readTeamLogoSessionCacheV295();
+  const sessionEntry = sessionCache[String(path)];
+
+  if (
+    sessionEntry?.url
+    && Number(sessionEntry.expiresAt || 0) > now
+  ) {
+    teamLogoUrlMemoryV295.set(memoryKey, sessionEntry);
+    return sessionEntry.url;
+  }
+
+  if (sessionEntry) {
+    delete sessionCache[String(path)];
+    writeTeamLogoSessionCacheV295(sessionCache);
+  }
+
+  return null;
+}
+
+function storeTeamLogoUrlV295(path, url) {
+  if (!path || !url) return;
+
+  const entry = {
+    url:String(url),
+    expiresAt:Date.now() + TEAM_LOGO_CACHE_TTL_MS_V295
+  };
+
+  teamLogoUrlMemoryV295.set(
+    teamLogoMemoryKeyV295(path),
+    entry
+  );
+
+  const sessionCache = readTeamLogoSessionCacheV295();
+  sessionCache[String(path)] = entry;
+  writeTeamLogoSessionCacheV295(sessionCache);
+}
+
+function preloadTeamLogoUrlV295(path, url) {
+  if (!path || !url || typeof Image !== 'function') return;
+
+  const key = teamLogoMemoryKeyV295(path);
+  if (teamLogoPreloadsV295.has(key)) return;
+
+  const image = new Image();
+  image.decoding = 'async';
+
+  const cleanup = () => {
+    window.setTimeout(() => {
+      teamLogoPreloadsV295.delete(key);
+    }, 1000);
+  };
+
+  image.addEventListener('load', cleanup, { once:true });
+  image.addEventListener('error', cleanup, { once:true });
+  image.src = url;
+
+  teamLogoPreloadsV295.set(key, image);
+}
+
+function invalidateTeamLogoCacheV295(path) {
+  if (!path) return;
+
+  teamLogoUrlMemoryV295.delete(
+    teamLogoMemoryKeyV295(path)
+  );
+
+  const sessionCache = readTeamLogoSessionCacheV295();
+  delete sessionCache[String(path)];
+  writeTeamLogoSessionCacheV295(sessionCache);
+}
+
+function clearTeamLogoCacheV295() {
+  const userPrefix = `${teamLogoCacheUserIdV295()}::`;
+
+  [...teamLogoUrlMemoryV295.keys()]
+    .filter((key) => key.startsWith(userPrefix))
+    .forEach((key) => teamLogoUrlMemoryV295.delete(key));
+
+  try {
+    window.sessionStorage?.removeItem(teamLogoCacheStorageKeyV295());
+  } catch (error) {
+    // No-op. Memory cache was already cleared.
+  }
+}
+
+if (typeof signedTeamLogoUrl === 'function') {
+  const uncachedSignedTeamLogoUrlV295 = signedTeamLogoUrl;
+
+  signedTeamLogoUrl = async function(path) {
+    if (!path) return null;
+
+    const cached = cachedTeamLogoUrlV295(path);
+
+    if (cached) {
+      preloadTeamLogoUrlV295(path, cached);
+      return cached;
+    }
+
+    const pendingKey = teamLogoMemoryKeyV295(path);
+
+    if (teamLogoUrlPendingV295.has(pendingKey)) {
+      return teamLogoUrlPendingV295.get(pendingKey);
+    }
+
+    const request = (async () => {
+      const signedUrl = await uncachedSignedTeamLogoUrlV295(path);
+
+      if (signedUrl) {
+        storeTeamLogoUrlV295(path, signedUrl);
+        preloadTeamLogoUrlV295(path, signedUrl);
+      }
+
+      return signedUrl;
+    })().finally(() => {
+      teamLogoUrlPendingV295.delete(pendingKey);
+    });
+
+    teamLogoUrlPendingV295.set(pendingKey, request);
+    return request;
+  };
+}
+
+window.RosterCapTeamLogoCache = Object.freeze({
+  clear:clearTeamLogoCacheV295,
+  invalidate:invalidateTeamLogoCacheV295
+});
 
 function defaultCreateSeasonLabelV277(date = new Date()) {
   const sport = el('sport')?.value || 'NHL';
