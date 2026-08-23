@@ -1,5 +1,5 @@
 /*
-RosterCap V2.97 — workspace-shared.css
+RosterCap V2.98.2 — workspace-shared.css
 
 Owns:
 - responsive workspace navigation presentation
@@ -71,7 +71,7 @@ development page can be called Minors or Development depending on the sport.
     max-width:148px;
     min-width:0;
     min-height:30px;
-    padding:4px 24px;
+    padding:4px 8px;
     border:1px solid var(--border);
     border-radius:8px;
     color:var(--text);
@@ -81,8 +81,8 @@ development page can be called Minors or Development depending on the sport.
     font-size:.67rem;
     font-weight:850;
     line-height:1.1;
-    text-align:center;
-    text-align-last:center;
+    text-align:left;
+    text-align-last:left;
   }
 
   #workspacePageSelect option {
@@ -109,9 +109,9 @@ development page can be called Minors or Development depending on the sport.
   #workspacePageSelect {
     max-width:150px;
     min-height:29px;
-    padding:4px 24px;
+    padding:4px 7px;
     font-size:.63rem;
-    text-align:center;
-    text-align-last:center;
+    text-align:left;
+    text-align-last:left;
   }
 }
