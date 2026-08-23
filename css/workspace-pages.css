@@ -2637,3 +2637,292 @@ Load after workspace-shared.css.
     grid-template-columns:1fr;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V2.94 — Transactions page polish
+   Presentation only; transaction persistence/workflows are unchanged.
+   ============================================================================ */
+
+#transactionsView .transactions-page-v294 {
+  gap:6px;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:8px;
+  margin:0;
+  padding:0 0 3px;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 > div {
+  min-width:0;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .eyebrow {
+  margin:0 0 2px;
+  font-size:.53rem;
+  letter-spacing:.12em;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+  margin:0;
+  font-size:1.02rem;
+  line-height:1.04;
+  letter-spacing:-.025em;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+  margin:3px 0 0;
+  max-width:620px;
+  color:var(--muted);
+  font-size:.59rem;
+  line-height:1.32;
+}
+
+#transactionsView .transactions-page-v294 #recordTransactionBtn {
+  min-width:0;
+  min-height:31px;
+  padding:4px 9px;
+  border-radius:8px;
+  box-shadow:none;
+  font-size:.58rem;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+/* Filters only render when at least one transaction exists. */
+#transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  min-width:0;
+  margin:0;
+  padding:1px 0 2px;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filters-v259 {
+  gap:4px;
+  padding:0 0 1px;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 {
+  min-height:26px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#0D1822;
+  font-size:.52rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 strong {
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  font-size:.46rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-status-v259 {
+  font-size:.49rem;
+}
+
+/* Empty state ------------------------------------------------------------ */
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+  display:grid;
+  align-content:start;
+  gap:4px;
+  min-height:0;
+  margin:2px 0 0;
+  padding:11px 12px;
+  border:1px dashed var(--border);
+  border-radius:10px;
+  background:rgba(255,255,255,.012);
+  text-align:left;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 > * {
+  margin:0;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 h4 {
+  color:var(--text);
+  font-size:.76rem;
+  line-height:1.15;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 p {
+  max-width:590px;
+  color:var(--muted);
+  font-size:.57rem;
+  line-height:1.34;
+}
+
+/* Populated ledger ------------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-list-v228 {
+  display:grid;
+  gap:4px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 {
+  padding:6px 7px;
+  border-radius:9px;
+  background:#0D1822;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-head-v228 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:6px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 .transaction-type {
+  font-size:.44rem;
+  line-height:1;
+  letter-spacing:.07em;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+  margin:2px 0 0;
+  font-size:.68rem;
+  line-height:1.16;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 p {
+  margin:2px 0 0;
+  font-size:.48rem;
+  line-height:1.15;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 {
+  gap:3px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 time {
+  font-size:.46rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 {
+  gap:3px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+  min-height:21px;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:.47rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-body-v228 {
+  display:grid;
+  gap:2px;
+  margin-top:4px;
+  padding-top:4px;
+  border-top:1px solid var(--border-soft);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 {
+  grid-template-columns:34px minmax(0,1fr);
+  gap:4px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-direction-v228 {
+  font-size:.40rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 > span:last-child {
+  gap:3px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 em {
+  padding:1px 4px;
+  border-radius:5px;
+  font-size:.47rem;
+  line-height:1.22;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228.financial strong {
+  font-size:.50rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-notes-v228 {
+  margin:4px 0 0;
+  font-size:.48rem;
+  line-height:1.25;
+}
+
+#transactionsView .transactions-page-v294 .draft-history-card {
+  box-shadow:inset 2px 0 0 rgba(50,173,255,.28);
+}
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v294 {
+    gap:5px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:7px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+    font-size:.96rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    font-size:.55rem;
+    line-height:1.28;
+  }
+
+  #transactionsView .transactions-page-v294 #recordTransactionBtn {
+    min-height:30px;
+    padding:4px 8px;
+    font-size:.55rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+    display:block;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-filters-v259 {
+    width:100%;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-status-v259 {
+    display:none;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 {
+    padding:5px 6px;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    max-width:245px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+    padding:10px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-filter-v259 {
+    min-height:25px;
+    padding-left:6px;
+    padding-right:6px;
+    font-size:.50rem;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+    font-size:.65rem;
+  }
+}
