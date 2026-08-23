@@ -188,7 +188,7 @@
   display:grid;
   align-content:start;
   gap:2px;
-  min-height:61px;
+  min-height:70px;
   padding:5px;
   color:var(--text);
   text-align:left;
@@ -233,6 +233,16 @@ button.lineup-matrix-player-v289 {
   color:var(--muted);
   font-size:.40rem;
   line-height:1.13;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.lineup-matrix-contract-v298 {
+  overflow:hidden;
+  color:#86A1B3;
+  font-size:.39rem;
+  font-weight:750;
+  line-height:1.12;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
@@ -364,7 +374,7 @@ button.lineup-matrix-player-v289 {
   }
 
   .lineup-matrix-player-v289 {
-    min-height:57px;
+    min-height:67px;
   }
 
   .lineup-matrix-column-head-v289 h4 {
@@ -632,7 +642,7 @@ button.lineup-matrix-player-v289 {
 
 
 /* ============================================================================
-   RosterCap V2.90 — NHL roster presentation
+   RosterCap V2.98.2 — NHL roster presentation
    Forwards fill the width; D pairs sit side-by-side; Goalies own third column.
    ============================================================================ */
 
