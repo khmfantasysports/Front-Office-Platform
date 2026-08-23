@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.90';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.98.2';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = true;
@@ -378,6 +378,44 @@ function lineupPlayerChargeLabelV289(player, current) {
     : formatMoney(charge);
 }
 
+function lineupPlayerContractExpiryLabelV298(player) {
+  if (!player?.contractEndSeasonId) return 'No end set';
+
+  const endSeason = (state?.seasons || []).find(
+    (season) => season.id === player.contractEndSeasonId
+  );
+
+  if (!endSeason?.startYear) return 'No end set';
+
+  return `Expires ${seasonLabel(endSeason.startYear)}`;
+}
+
+function lineupPlayerAgeLabelV2981(player) {
+  const rawAge = player?.ageSnapshot;
+
+  if (
+    rawAge === null
+    || rawAge === undefined
+    || String(rawAge).trim() === ''
+  ) {
+    return 'Age —';
+  }
+
+  const age = Number(rawAge);
+
+  if (!Number.isFinite(age) || age < 0) return 'Age —';
+
+  return `Age ${Math.round(age)}`;
+}
+
+function lineupPlayerMetaLabelV2981(player) {
+  return [
+    player?.realTeam || '—',
+    player?.position || '—',
+    lineupPlayerAgeLabelV2981(player)
+  ].join(' · ');
+}
+
 function renderMatrixStarterCardV289(slot, slotNumber, current) {
   const assignment = lineupAssignmentForV287(slot.id, slotNumber);
   const player = assignment
@@ -426,7 +464,8 @@ function renderMatrixStarterCardV289(slot, slotNumber, current) {
   >
     <span class="lineup-matrix-role-v289">${escapeHtml(label)}</span>
     <strong>${escapeHtml(player.name)}</strong>
-    <small>${escapeHtml(player.realTeam || '—')} · ${escapeHtml(player.position || '—')}</small>
+    <small>${escapeHtml(lineupPlayerMetaLabelV2981(player))}</small>
+    <span class="lineup-matrix-contract-v298">${escapeHtml(lineupPlayerContractExpiryLabelV298(player))}</span>
     <span class="lineup-matrix-money-v289">${escapeHtml(lineupPlayerChargeLabelV289(player, current))}</span>
   </button>`;
 }
@@ -439,7 +478,8 @@ function renderMatrixDepthCardV289(player, index, current) {
   >
     <span class="lineup-matrix-role-v289">Depth ${index + 1}</span>
     <strong>${escapeHtml(player.name)}</strong>
-    <small>${escapeHtml(player.realTeam || '—')} · ${escapeHtml(player.position || '—')}</small>
+    <small>${escapeHtml(lineupPlayerMetaLabelV2981(player))}</small>
+    <span class="lineup-matrix-contract-v298">${escapeHtml(lineupPlayerContractExpiryLabelV298(player))}</span>
     <span class="lineup-matrix-money-v289">${escapeHtml(lineupPlayerChargeLabelV289(player, current))}</span>
   </button>`;
 }
