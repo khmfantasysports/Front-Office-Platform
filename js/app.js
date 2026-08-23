@@ -1167,6 +1167,15 @@ function renderTransactionHistoryFilterBar(page) {
   const existingBar = page.querySelector('.tx-history-toolbar-v259');
   existingBar?.remove();
 
+  const totalTransactions = (state.transactions || []).length;
+
+  // An "All 0" filter adds visual weight without offering any action.
+  // The empty state is enough until the first transaction exists.
+  if (!totalTransactions) {
+    transactionHistoryFilter = 'ALL';
+    return;
+  }
+
   const counts = transactionHistoryTypeCounts();
   const types = transactionHistoryTypes();
 
@@ -1178,7 +1187,7 @@ function renderTransactionHistoryFilterBar(page) {
   }
 
   const toolbar = document.createElement('div');
-  toolbar.className = 'tx-history-toolbar-v259';
+  toolbar.className = 'tx-history-toolbar-v259 tx-history-toolbar-v294';
 
   const filters = document.createElement('div');
   filters.className = 'tx-history-filters-v259';
@@ -1188,7 +1197,7 @@ function renderTransactionHistoryFilterBar(page) {
   const filterTypes = ['ALL', ...types];
   filterTypes.forEach((type) => {
     const count = type === 'ALL'
-      ? (state.transactions || []).length
+      ? totalTransactions
       : (counts.get(type) || 0);
 
     const button = document.createElement('button');
@@ -1230,23 +1239,58 @@ function decorateTransactionHistory() {
   const page = document.querySelector('#transactionsView .transactions-page-v228');
   if (!page) return;
 
-  const copy = page.querySelector('.tx-page-heading-v228 .page-copy');
+  page.classList.add('transactions-page-v294');
+
+  const heading = page.querySelector('.tx-page-heading-v228');
+  heading?.classList.add('tx-page-heading-v294');
+
+  const copy = heading?.querySelector('.page-copy');
   if (copy) {
-    copy.textContent = 'Drafts, trades, signings and roster moves — all in one chronological history.';
+    copy.textContent =
+      'Trades, signings and roster moves in one chronological history.';
+  }
+
+  const recordButton = page.querySelector('#recordTransactionBtn');
+  if (recordButton) {
+    recordButton.textContent = '+ Record';
+    recordButton.title = 'Record Transaction';
+    recordButton.setAttribute('aria-label', 'Record Transaction');
   }
 
   const cards = [...page.querySelectorAll('.transaction-card-v228')];
+
+  page.classList.toggle('has-transaction-history-v294', cards.length > 0);
+  page.classList.toggle('empty-transaction-history-v294', cards.length === 0);
+
   cards.forEach((card) => {
     const tx = transactionHistoryCardTransaction(card);
     if (!tx) return;
 
     card.dataset.historyType = tx.type || 'Other';
+    card.classList.add('transaction-card-v294');
     moveTransactionHistoryActions(card);
     removeRedundantTransactionPlayerRow(card, tx);
   });
 
+  const emptyState = page.querySelector('.empty-state');
+  if (emptyState && !cards.length) {
+    emptyState.classList.add('tx-empty-state-v294');
+
+    const title = emptyState.querySelector('h4');
+    if (title) title.textContent = 'No transactions yet';
+
+    const emptyCopy = emptyState.querySelector('p');
+    if (emptyCopy) {
+      emptyCopy.textContent =
+        'Record a trade, signing, waiver, buyout, call-up or other roster move.';
+    }
+  }
+
   renderTransactionHistoryFilterBar(page);
-  applyTransactionHistoryFilter();
+
+  if (cards.length) {
+    applyTransactionHistoryFilter();
+  }
 }
 
 function installTransactionHistoryPolish() {
