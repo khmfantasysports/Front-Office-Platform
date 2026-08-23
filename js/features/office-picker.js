@@ -1,14 +1,13 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.68 — My Front Offices / landing polish
+// RosterCap V2.93 — Compact My Front Offices
 //
-// Frontend-only enhancement:
-// - enriches office cards with current season/cap + Active/Minors counts
-// - preserves the existing full loadOffice() path
-// - adds a Back action to New Front Office
-// - uses editable creation suggestions from the league-configuration foundation
-// - formats season labels by sport and development labels from saved Front Office configuration
+// Frontend-only picker simplification:
+// - card content is identity-only: logo, sport, team name, league name
+// - removes picker-only Season / Cap / Active / Minors enrichment reads
+// - opening a Front Office still uses the established loadOffice() path
+// - New Front Office / global shell behavior remains unchanged
 // -----------------------------------------------------------------------------
 
 let officePickerPolishInstalledV268 = false;
@@ -23,120 +22,6 @@ function defaultCreateSeasonLabelV277(date = new Date()) {
   const calendarYear = date.getFullYear();
   const startYear = month >= 6 ? calendarYear : calendarYear - 1;
   return `${startYear}-${String((startYear + 1) % 100).padStart(2, '0')}`;
-}
-
-function formatOfficePickerCapV268(value, currency = '') {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return 'Not set';
-
-  const amount = Number(value);
-  let formatted = '';
-
-  if (Math.abs(amount) >= 1000000000) {
-    formatted = `$${(amount / 1000000000).toFixed(1).replace(/\.0$/, '')}B`;
-  } else if (Math.abs(amount) >= 1000000) {
-    formatted = `$${(amount / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
-  } else if (Math.abs(amount) >= 1000) {
-    formatted = `$${Math.round(amount / 1000)}K`;
-  } else {
-    formatted = `$${Math.round(amount).toLocaleString()}`;
-  }
-
-  return currency ? `${formatted} ${currency}` : formatted;
-}
-
-function officePickerRosterValueV268(count, limit) {
-  const safeCount = Number.isFinite(Number(count)) ? Number(count) : 0;
-  if (limit === null || limit === undefined || !Number.isFinite(Number(limit))) {
-    return String(safeCount);
-  }
-  return `${safeCount} / ${Number(limit)}`;
-}
-
-async function enrichFrontOfficePickerListV268(offices) {
-  const officeIds = offices
-    .map((office) => office.front_office_id)
-    .filter(Boolean);
-
-  if (!officeIds.length) return offices;
-
-  const [seasonsResult, rosterResult, groupsResult] = await Promise.all([
-    db.from('front_office_seasons')
-      .select('front_office_id,season_start_year,salary_cap,is_current')
-      .in('front_office_id', officeIds)
-      .order('season_start_year'),
-    db.from('roster_entries')
-      .select('front_office_id,roster_group')
-      .in('front_office_id', officeIds)
-      .is('removed_at', null),
-    db.from('front_office_roster_groups')
-      .select('front_office_id,group_key,display_name,is_development,is_active')
-      .in('front_office_id', officeIds)
-      .eq('is_active', true)
-  ]);
-
-  if (seasonsResult.error) {
-    console.warn('Front Office picker season context could not load', seasonsResult.error);
-  }
-
-  if (rosterResult.error) {
-    console.warn('Front Office picker roster counts could not load', rosterResult.error);
-  }
-
-  if (groupsResult.error) {
-    console.warn('Front Office picker roster labels could not load', groupsResult.error);
-  }
-
-  const developmentLabels = new Map();
-  (groupsResult.data || []).forEach((group) => {
-    if (!group.is_development && String(group.group_key || '').toUpperCase() !== 'FARM') return;
-    developmentLabels.set(
-      group.front_office_id,
-      String(group.display_name || '').trim() || 'Minors'
-    );
-  });
-
-  const seasonsByOffice = new Map();
-  (seasonsResult.data || []).forEach((season) => {
-    if (!seasonsByOffice.has(season.front_office_id)) {
-      seasonsByOffice.set(season.front_office_id, []);
-    }
-    seasonsByOffice.get(season.front_office_id).push(season);
-  });
-
-  const rosterCounts = new Map();
-  (rosterResult.data || []).forEach((entry) => {
-    if (!rosterCounts.has(entry.front_office_id)) {
-      rosterCounts.set(entry.front_office_id, { active:0, minors:0 });
-    }
-
-    const counts = rosterCounts.get(entry.front_office_id);
-    const group = String(entry.roster_group || 'ACTIVE').toUpperCase();
-
-    if (group === 'FARM') counts.minors += 1;
-    else counts.active += 1;
-  });
-
-  return offices.map((office) => {
-    const seasons = seasonsByOffice.get(office.front_office_id) || [];
-    const currentSeason = seasons.find((season) => season.is_current) || seasons[0] || null;
-    const counts = rosterCounts.get(office.front_office_id) || { active:0, minors:0 };
-
-    return {
-      ...office,
-      picker_current_season_start_year:
-        currentSeason?.season_start_year === null || currentSeason?.season_start_year === undefined
-          ? null
-          : Number(currentSeason.season_start_year),
-      picker_current_salary_cap:
-        currentSeason?.salary_cap === null || currentSeason?.salary_cap === undefined
-          ? null
-          : Number(currentSeason.salary_cap),
-      picker_active_count: counts.active,
-      picker_minors_count: counts.minors,
-      picker_development_label:
-        developmentLabels.get(office.front_office_id) || 'Minors'
-    };
-  });
 }
 
 function renderOfficeListV268() {
@@ -160,42 +45,21 @@ function renderOfficeListV268() {
         <button class="btn btn-primary" type="button" data-create-office-v268>+ New Front Office</button>
       </div>`;
 
-    list.querySelector('[data-create-office-v268]')?.addEventListener('click', showCreateOffice);
+    list.querySelector('[data-create-office-v268]')
+      ?.addEventListener('click', showCreateOffice);
     return;
   }
 
-  list.innerHTML = frontOfficeList.map((office, index) => {
-    const updated = office.updated_at ? formatDateTime(office.updated_at) : 'Recently';
+  list.innerHTML = frontOfficeList.map((office) => {
     const teamAccent = normalizeTeamAccent(office.team_accent_color);
-    const season = office.picker_current_season_start_year
-      ? (
-          window.RosterCapLeagueConfig?.formatSeasonStart?.(
-            office.picker_current_season_start_year,
-            office.sport || 'NHL'
-          )
-          || seasonLabel(office.picker_current_season_start_year)
-        )
-      : 'Not set';
-    const cap = formatOfficePickerCapV268(
-      office.picker_current_salary_cap,
-      office.currency_code || ''
-    );
-    const active = officePickerRosterValueV268(
-      office.picker_active_count,
-      office.roster_limit
-    );
-    const minors = officePickerRosterValueV268(
-      office.picker_minors_count,
-      office.minors_limit
-    );
-    const developmentLabel = office.picker_development_label || 'Minors';
 
     return `
       <button
-        class="office-card office-card-v219 office-card-v231 office-card-v268"
+        class="office-card office-card-v219 office-card-v231 office-card-v268 office-card-v293"
         style="--office-team-accent:${teamAccent}"
         type="button"
         data-open-office="${office.front_office_id}"
+        aria-label="Open ${escapeAttr(office.team_name)} Front Office"
       >
         <span class="office-card-mark office-card-mark-v231">
           ${teamLogoInnerHtml({
@@ -206,38 +70,10 @@ function renderOfficeListV268() {
         </span>
 
         <span class="office-card-copy office-card-copy-v268">
-          <span class="office-card-topline">
-            <span class="office-card-chip-row-v268">
-              <span class="office-sport-chip">${escapeHtml(office.sport || 'NHL')}</span>
-              ${index === 0 ? '<span class="office-recent-chip-v268">Most recent</span>' : ''}
-            </span>
-            <span class="office-updated">Updated ${escapeHtml(updated)}</span>
-          </span>
-
+          <span class="office-sport-chip">${escapeHtml(office.sport || 'NHL')}</span>
           <strong class="office-card-team-v268">${escapeHtml(office.team_name)}</strong>
           <small class="office-card-league-v268">${escapeHtml(office.league_name)}</small>
-
-          <span class="office-card-context-v268" aria-label="Front Office summary">
-            <span>
-              <small>Season</small>
-              <strong>${escapeHtml(season)}</strong>
-            </span>
-            <span>
-              <small>Cap</small>
-              <strong>${escapeHtml(cap)}</strong>
-            </span>
-            <span>
-              <small>Active</small>
-              <strong>${escapeHtml(active)}</strong>
-            </span>
-            <span>
-              <small>${escapeHtml(developmentLabel)}</small>
-              <strong>${escapeHtml(minors)}</strong>
-            </span>
-          </span>
         </span>
-
-        <span class="office-open-v219 office-open-v268" aria-hidden="true">›</span>
       </button>`;
   }).join('');
 
@@ -284,14 +120,13 @@ function installOfficePickerPolishV268() {
   loadFrontOffices = async function(showPicker = true) {
     await runCloudAction(async () => {
       const { data, error } = await db.from('front_offices')
-        .select('front_office_id,team_name,league_name,sport,currency_code,roster_limit,minors_limit,team_logo_path,team_accent_color,updated_at')
+        .select('front_office_id,team_name,league_name,sport,team_logo_path,team_accent_color,updated_at')
         .eq('is_archived', false)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
 
-      const brandedOffices = await hydrateFrontOfficeBranding(data || []);
-      frontOfficeList = await enrichFrontOfficePickerListV268(brandedOffices);
+      frontOfficeList = await hydrateFrontOfficeBranding(data || []);
 
       if (showPicker) {
         state = emptyState();
