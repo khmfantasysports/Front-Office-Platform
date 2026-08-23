@@ -1320,6 +1320,180 @@ function assetTabCountV260(label) {
   return null;
 }
 
+function normalizeFarmPositionCodeV292(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function farmPlayerPositionCodesV292(player) {
+  return [...new Set([
+    normalizeFarmPositionCodeV292(player?.position),
+    ...String(player?.eligiblePositions || '')
+      .split(/[,;/|]+/)
+      .map(normalizeFarmPositionCodeV292)
+      .filter(Boolean)
+  ].filter(Boolean))];
+}
+
+function farmPositionOrderV292() {
+  const sport = workspaceSportCodeV281();
+  const configured = (
+    window.RosterCapPositionConfig?.active?.()
+    || []
+  )
+    .map(normalizeFarmPositionCodeV292)
+    .filter(Boolean);
+
+  if (sport === 'NHL') {
+    // Keep the classic five hockey columns together. On mobile the final
+    // Defense / Goalie columns are reached by horizontal swipe.
+    return ['LW','C','RW','D','G'];
+  }
+
+  if (configured.length) {
+    return [...new Set(configured)];
+  }
+
+  return [...new Set(
+    (state.players || [])
+      .filter((player) => player.rosterGroup === 'FARM')
+      .map((player) => normalizeFarmPositionCodeV292(player.position))
+      .filter(Boolean)
+  )];
+}
+
+function farmCardPlayerV292(card) {
+  if (!card) return null;
+
+  const cardName = String(
+    card.querySelector('.farm-player-copy-v228 strong')?.textContent
+    || card.querySelector('strong')?.textContent
+    || ''
+  ).trim();
+
+  if (!cardName) return null;
+
+  const normalizedName = cardName.toLocaleLowerCase();
+
+  return (state.players || []).find((player) =>
+    player.rosterGroup === 'FARM'
+    && String(player.name || '').trim().toLocaleLowerCase() === normalizedName
+  ) || null;
+}
+
+function farmPlayerColumnV292(player, positions) {
+  if (!player) return 'OTHER';
+
+  const primary = normalizeFarmPositionCodeV292(player.position);
+
+  if (positions.includes(primary)) return primary;
+
+  const eligible = farmPlayerPositionCodesV292(player);
+  return eligible.find((code) => positions.includes(code)) || 'OTHER';
+}
+
+function renderFarmDepthBoardV292(page) {
+  const lists = [...page.querySelectorAll('.farm-player-list-v228')];
+  const list =
+    lists.find((candidate) => candidate.querySelector('[data-call-up]'))
+    || lists[0]
+    || null;
+
+  if (!list || list.closest('.farm-depth-board-v292')) return;
+
+  const panel = list.closest('.farm-panel-v228') || list.parentElement;
+  if (!panel) return;
+
+  const cards = [...list.querySelectorAll('.farm-player-card-v228')];
+  const positions = farmPositionOrderV292();
+
+  if (!positions.length) return;
+
+  const assignedByPosition = new Map(
+    positions.map((position) => [position, []])
+  );
+  const otherCards = [];
+
+  cards.forEach((card) => {
+    const player = farmCardPlayerV292(card);
+    const column = farmPlayerColumnV292(player, positions);
+
+    if (assignedByPosition.has(column)) {
+      assignedByPosition.get(column).push(card);
+    } else {
+      otherCards.push(card);
+    }
+  });
+
+  const renderedPositions = [...positions];
+  if (otherCards.length) renderedPositions.push('OTHER');
+
+  const scroll = document.createElement('div');
+  scroll.className = 'farm-depth-scroll-v292';
+
+  const board = document.createElement('div');
+  board.className = 'farm-depth-board-v292';
+  board.style.setProperty(
+    '--farm-depth-columns',
+    String(Math.max(1, renderedPositions.length))
+  );
+
+  renderedPositions.forEach((position) => {
+    const columnCards =
+      position === 'OTHER'
+        ? otherCards
+        : assignedByPosition.get(position) || [];
+
+    const column = document.createElement('section');
+    column.className = 'farm-depth-column-v292';
+    column.dataset.farmDepthPosition = position;
+
+    const header = document.createElement('div');
+    header.className = 'farm-depth-column-head-v292';
+    header.innerHTML = `
+      <strong>${escapeHtml(position === 'OTHER' ? 'Other' : position)}</strong>
+      <span>${columnCards.length}</span>
+    `;
+
+    const stack = document.createElement('div');
+    stack.className = 'farm-depth-stack-v292';
+
+    if (!columnCards.length) {
+      const empty = document.createElement('div');
+      empty.className = 'farm-depth-empty-v292';
+      empty.textContent = 'No players';
+      stack.appendChild(empty);
+    } else {
+      columnCards.forEach((card, index) => {
+        card.classList.add('farm-depth-player-card-v292');
+
+        const existingRank = card.querySelector('.farm-depth-rank-v292');
+        existingRank?.remove();
+
+        const rank = document.createElement('span');
+        rank.className = 'farm-depth-rank-v292';
+        rank.textContent = `Depth ${index + 1}`;
+        card.prepend(rank);
+
+        stack.appendChild(card);
+      });
+    }
+
+    column.append(header, stack);
+    board.appendChild(column);
+  });
+
+  scroll.appendChild(board);
+  list.replaceWith(scroll);
+
+  panel.classList.add('farm-depth-panel-v292');
+
+  const panelHeading = panel.querySelector('.farm-section-head-v228 h3');
+  if (panelHeading) panelHeading.textContent = 'Depth by position';
+
+  const panelEyebrow = panel.querySelector('.farm-section-head-v228 .eyebrow');
+  if (panelEyebrow) panelEyebrow.textContent = `${workspaceDevelopmentLabelV281()} roster`;
+}
+
 function compactMinorsPageV260() {
   const page = document.querySelector('#farmView .farm-page-v228');
   if (!page) return;
@@ -1335,7 +1509,10 @@ function compactMinorsPageV260() {
   if (heading) heading.textContent = development;
 
   const copy = page.querySelector('.farm-page-heading-v228 .page-copy');
-  if (copy) copy.textContent = `Prospects, ${development} assignments and moves to the active roster.`;
+  if (copy) {
+    copy.textContent =
+      `Prospects and ${development} depth, organized by position.`;
+  }
 
   replaceGeneratedTextV281(page, 'Minors', development);
   replaceGeneratedTextV281(page, 'No NHL team', `No ${sport} team`);
@@ -1347,7 +1524,34 @@ function compactMinorsPageV260() {
     importButton.title = isNhl ? '' : `${sport} import adapters are still being built.`;
   }
 
-  page.classList.add('farm-page-v260');
+  page.classList.add('farm-page-v260', 'farm-page-v292');
+  renderFarmDepthBoardV292(page);
+}
+
+function decorateAssetsEmptyStateV292(page) {
+  const title = [...page.querySelectorAll('h2,h3,h4,strong')]
+    .find((element) =>
+      element.textContent.trim().toLocaleLowerCase() === 'no assets tracked'
+    );
+
+  if (!title) return;
+
+  const empty =
+    title.closest('.empty-state')
+    || title.parentElement;
+
+  if (!empty) return;
+
+  empty.classList.add('asset-empty-state-v292');
+
+  const copy =
+    empty.querySelector('p')
+    || title.nextElementSibling;
+
+  if (copy && copy !== title) {
+    copy.textContent =
+      'Draft picks, rights and other future assets will appear here.';
+  }
 }
 
 function compactAssetsPageV260() {
@@ -1357,22 +1561,42 @@ function compactAssetsPageV260() {
   const summary = page.querySelector('.asset-summary-grid-v230, .asset-summary-grid-v228, .asset-summary-strip');
   summary?.remove();
 
+  const hero = page.querySelector('.asset-hero-v230');
+  hero?.classList.add('asset-hero-v292');
+
   const copy = page.querySelector('.asset-hero-copy-v230 p:last-child');
   if (copy) copy.textContent = 'Draft picks, rights and future assets.';
 
   page.querySelectorAll('.asset-tab').forEach((button) => {
-    if (button.querySelector('.asset-tab-count-v260')) return;
+    if (!button.querySelector('.asset-tab-count-v260')) {
+      const count = assetTabCountV260(button.textContent);
 
-    const count = assetTabCountV260(button.textContent);
-    if (count === null) return;
+      if (count !== null) {
+        const badge = document.createElement('strong');
+        badge.className = 'asset-tab-count-v260';
+        badge.textContent = String(count);
+        button.appendChild(badge);
+      }
+    }
 
-    const badge = document.createElement('strong');
-    badge.className = 'asset-tab-count-v260';
-    badge.textContent = String(count);
-    button.appendChild(badge);
+    button.classList.add('asset-tab-v292');
   });
 
-  page.classList.add('assets-page-v260');
+  page
+    .querySelector('.asset-portfolio-panel-v230, .asset-portfolio-panel-v228')
+    ?.classList.add('asset-portfolio-v292');
+
+  page.querySelectorAll('.asset-grid').forEach((grid) => {
+    grid.classList.add('asset-grid-v292');
+  });
+
+  page.querySelectorAll('.asset-card').forEach((card) => {
+    card.classList.add('asset-card-v292');
+  });
+
+  decorateAssetsEmptyStateV292(page);
+
+  page.classList.add('assets-page-v260', 'assets-page-v292');
 }
 
 function compactCapPageV260() {
