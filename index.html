@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v3.01.2" name="application-name"/>
+<meta content="RosterCap v3.01.3" name="application-name"/>
 <meta content="RosterCap" name="apple-mobile-web-app-title"/>
 <meta content="#08131D" name="theme-color"/>
 <meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="description"/>
@@ -32,14 +32,14 @@
 <link href="./css/office-picker.css?v=20260822-v293-compact-cards" rel="stylesheet"/>
 <link href="./css/depth-chart.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/lineup-configuration.css?v=20260823-v2982-roster-minors-age-expiry" rel="stylesheet"/>
-<link href="./css/assets-landing.css?v=20260824-v3011-mobile-google-polish" rel="stylesheet"/>
+<link href="./css/assets-landing.css?v=20260824-v3013-footer-google-polish" rel="stylesheet"/>
 <link href="./css/asset-manager.css?v=20260820-v270-asset-manager" rel="stylesheet"/>
 <link href="./css/overview-cap.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
-<link href="./css/legal.css?v=20260824-v3012-footer-polish" rel="stylesheet"/>
+<link href="./css/legal.css?v=20260824-v3013-footer-google-polish" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="3.01.2">
+<body data-rostercap-version="3.01.3">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -258,16 +258,15 @@
 </main>
 <footer class="site-legal-footer-v301" aria-label="RosterCap information">
 <div class="site-legal-footer-inner-v301">
-<div class="site-legal-brand-v301">
-<img alt="" src="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain"/>
-<span><strong>RosterCap</strong><small>A KHM Fantasy Sports product</small></span>
-</div>
+<img class="site-legal-logo-v301" alt="RosterCap" src="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain"/>
+<div class="site-legal-footer-content-v301">
 <nav aria-label="Legal and product information" class="site-legal-nav-v301">
 <a href="./about/">About</a>
 <a href="./privacy/">Privacy</a>
 <a href="./terms/">Terms</a>
 </nav>
 <p>© 2026 KHM Fantasy Sports. RosterCap is an independent fantasy sports management tool.</p>
+</div>
 </div>
 </footer>
 </div>
@@ -542,7 +541,7 @@ window.__rostercapNormalizeGoogleButtonRenderer = function () {
     return originalRenderButton(container, {
       ...(options || {}),
       theme: 'filled_black',
-      shape: 'pill'
+      shape: 'rectangular'
     });
   };
 
