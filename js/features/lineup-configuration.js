@@ -11,7 +11,7 @@
 // FLEX / SUPERFLEX / UTIL are lineup-slot concepts here, not player positions.
 // ============================================================================
 
-const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.98.2';
+const ROSTERCAP_LINEUP_VERSION_V287 = 'V2.99.1';
 
 let lineupFeatureInstalledV287 = false;
 let lineupViewActiveV287 = true;
@@ -26,7 +26,13 @@ function lineupSportCodeV287() {
 }
 
 function normalizeLineupCodeV287(value) {
-  return String(value || '').trim().toUpperCase();
+  const code = String(value || '').trim().toUpperCase();
+
+  // Fantrax commonly abbreviates SUPERFLEX as SFX. Keep SUPERFLEX as the
+  // canonical RosterCap lineup-slot key while accepting SFX as an alias.
+  if (code === 'SFX') return 'SUPERFLEX';
+
+  return code;
 }
 
 function uniqueCodesV287(values) {
