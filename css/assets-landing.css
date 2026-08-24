@@ -1,5 +1,5 @@
 /* ============================================================
-   RosterCap V2.76 — Block-based signed-out landing
+   RosterCap V3.01.1 — Block-based signed-out landing
    FILE: css/assets-landing.css
    Scope: #authGate only
 
@@ -8,9 +8,8 @@
    - prevents authGate and My Front Offices from appearing together
    - keeps the block-based landing layout
    - removes the extra white Google-button shell
-   - designed to pair with data.js using:
-       theme: 'outline_dark'
-       shape: 'pill'
+   - V3.01.1 uses Google's filled-black control through the index loader
+   - mobile top spacing respects the iOS safe area
    ============================================================ */
 
 /* --------------------------------------------------------------------------
@@ -244,9 +243,12 @@
    The visible button is rendered by Google inside an iframe, so RosterCap
    should not create a second border, white shell, or fake button around it.
 
-   Pair with data.js:
-     theme: 'outline_dark'
+   V3.01.1 normalizes the Google-rendered control to:
+     theme: 'filled_black'
      shape: 'pill'
+
+   Google still owns the visible control inside its iframe; these rules only
+   keep the RosterCap host clean and prevent a second visual shell.
    -------------------------------------------------------------------------- */
 
 #authGate .google-identity-wrap {
@@ -258,7 +260,7 @@
   overflow:hidden !important;
   border:0 !important;
   border-radius:999px !important;
-  background:#131314 !important;
+  background:transparent !important;
   box-shadow:none !important;
 }
 
@@ -272,13 +274,15 @@
   overflow:hidden !important;
   border:0 !important;
   border-radius:999px !important;
-  background:#131314 !important;
+  background:transparent !important;
   box-shadow:none !important;
 }
 
 #authGate #googleSignInButton iframe {
   display:block !important;
+  width:100% !important;
   max-width:100% !important;
+  min-height:44px !important;
   margin:0 !important;
   padding:0 !important;
   border:0 !important;
@@ -331,7 +335,9 @@
   }
 
   #appHeader.hidden + main #authGate.landing-shell-v275:not(.hidden) {
-    margin-top:6px !important;
+    /* Clears the iPhone status/Dynamic Island area in full-screen/PWA modes,
+       while keeping the normal Safari landing spacing compact. */
+    margin-top:max(10px,env(safe-area-inset-top)) !important;
   }
 
   #authGate .landing-hero-v275 {
