@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v3.00" name="application-name"/>
+<meta content="RosterCap v3.01" name="application-name"/>
 <meta content="RosterCap" name="apple-mobile-web-app-title"/>
 <meta content="#08131D" name="theme-color"/>
 <meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="description"/>
@@ -37,8 +37,9 @@
 <link href="./css/overview-cap.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
+<link href="./css/legal.css?v=20260824-v301-khm-legal" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="3.00">
+<body data-rostercap-version="3.01">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -86,6 +87,13 @@
 <div class="utility-menu-divider"></div>
 <span class="utility-menu-section-label">Account</span>
 <button class="btn btn-ghost" id="signOutBtn" type="button">Sign out</button>
+<div class="utility-menu-divider"></div>
+<span class="utility-menu-section-label">RosterCap</span>
+<div class="utility-legal-links-v301" aria-label="RosterCap legal links">
+<a href="./privacy/" target="_blank" rel="noopener">Privacy</a>
+<a href="./terms/" target="_blank" rel="noopener">Terms</a>
+<a href="./about/" target="_blank" rel="noopener">About</a>
+</div>
 </div>
 </details>
 </div>
@@ -120,6 +128,7 @@
 <div class="google-identity-wrap">
 <div aria-label="Continue with Google" id="googleSignInButton"></div>
 </div>
+<p class="landing-legal-notice-v301">By continuing with Google, you agree to the <a href="./terms/">Terms of Use</a> and acknowledge the <a href="./privacy/">Privacy Policy</a>.</p>
 <div class="landing-security"><span class="security-dot"></span><span>Your team data stays private to your authenticated RosterCap account.</span></div>
 <div class="auth-error hidden" id="authError"></div>
 </div>
@@ -247,6 +256,20 @@
 <section class="view-panel hidden" id="settingsView"></section>
 </section>
 </main>
+<footer class="site-legal-footer-v301" aria-label="RosterCap information">
+<div class="site-legal-footer-inner-v301">
+<div class="site-legal-brand-v301">
+<img alt="" src="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain"/>
+<span><strong>RosterCap</strong><small>A KHM Fantasy Sports product</small></span>
+</div>
+<nav aria-label="Legal and product information" class="site-legal-nav-v301">
+<a href="./about/">About</a>
+<a href="./privacy/">Privacy</a>
+<a href="./terms/">Terms</a>
+</nav>
+<p>© 2026 KHM Fantasy Sports. RosterCap is an independent fantasy sports management tool.</p>
+</div>
+</footer>
 </div>
 <dialog class="drawer-dialog" id="playerDialog">
 <form class="drawer-card" id="playerForm" method="dialog">
