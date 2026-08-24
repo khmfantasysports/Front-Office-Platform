@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v3.01.3" name="application-name"/>
+<meta content="RosterCap v3.01.4" name="application-name"/>
 <meta content="RosterCap" name="apple-mobile-web-app-title"/>
 <meta content="#08131D" name="theme-color"/>
 <meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="description"/>
@@ -32,14 +32,14 @@
 <link href="./css/office-picker.css?v=20260822-v293-compact-cards" rel="stylesheet"/>
 <link href="./css/depth-chart.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/lineup-configuration.css?v=20260823-v2982-roster-minors-age-expiry" rel="stylesheet"/>
-<link href="./css/assets-landing.css?v=20260824-v3013-footer-google-polish" rel="stylesheet"/>
+<link href="./css/assets-landing.css?v=20260824-v3014-google-dark-pill" rel="stylesheet"/>
 <link href="./css/asset-manager.css?v=20260820-v270-asset-manager" rel="stylesheet"/>
 <link href="./css/overview-cap.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
 <link href="./css/legal.css?v=20260824-v3013-footer-google-polish" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="3.01.3">
+<body data-rostercap-version="3.01.4">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -527,30 +527,13 @@
 window.__ROSTERCAP_GOOGLE_GIS_READY__ = false;
 
 /*
- * V3.01.1
- * Keep the existing RosterCap/Supabase sign-in flow, but normalize the
- * Google-rendered control to Google's filled-black treatment on every
- * browser. The current data.js continues to own authentication/session logic.
+ * V3.01.4
+ * Google Identity Services owns the visible sign-in control.
+ * Do not monkeypatch renderButton(): js/data.js already requests Google's
+ * supported dark pill configuration and owns the credential callback.
  */
-window.__rostercapNormalizeGoogleButtonRenderer = function () {
-  const identity = window.google?.accounts?.id;
-  if (!identity?.renderButton || identity.__rostercapFilledBlackPatched) return;
-
-  const originalRenderButton = identity.renderButton.bind(identity);
-  identity.renderButton = function (container, options) {
-    return originalRenderButton(container, {
-      ...(options || {}),
-      theme: 'filled_black',
-      shape: 'rectangular'
-    });
-  };
-
-  identity.__rostercapFilledBlackPatched = true;
-};
-
 window.__rostercapOnGoogleGISLoad = function () {
   window.__ROSTERCAP_GOOGLE_GIS_READY__ = true;
-  window.__rostercapNormalizeGoogleButtonRenderer();
 
   if (typeof window.initializeGoogleIdentity === 'function') {
     window.initializeGoogleIdentity();
