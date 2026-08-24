@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v2.98.2" name="application-name"/>
+<meta content="RosterCap v2.99" name="application-name"/>
 <link href="./css/base.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/shell.css?v=20260821-v286-navigation-polish" rel="stylesheet"/>
 <link href="./css/workspace.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
@@ -20,7 +20,7 @@
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="2.98.2">
+<body data-rostercap-version="2.99">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -357,14 +357,14 @@
 <button aria-label="Close" class="icon-btn" id="closeImportDialog" type="button">×</button>
 </header>
 <div class="modal-body">
-<p class="muted">Fantrax Team Roster exports are detected automatically, including separate Skaters and Goalies sections. Rows marked Min, Minor or Minors are routed to Minors automatically. Generic CSV import remains supported.</p>
+<p class="muted">RosterCap detects RosterCap backups and Fantrax Team Roster exports for NHL, NFL, NBA and MLB. Fantrax sections, positions, statuses and Minors are mapped for the current Front Office sport. Generic CSV import remains supported.</p>
 <label class="file-drop">
 <span>Select CSV file</span>
 <input accept=".csv,text/csv" id="csvFile" type="file"/>
 </label>
 <label class="import-options">
 <input checked="" id="importSalaryToggle" type="checkbox"/>
-<span>Update current-season salary from the import<small>Future salaries, cap overrides, contract end, notes and adjustments are never overwritten by a Fantrax roster import.</small></span>
+<span>Update current-season salary when Fantrax supplies it<small>If the file has no Salary column, existing salary is preserved. Future salaries, cap overrides, contract end, notes and adjustments are never overwritten by a Fantrax roster import.</small></span>
 </label>
 <div class="import-preview hidden" id="importPreview"></div>
 </div>
@@ -504,7 +504,7 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/features/depth-chart.js?v=20260821-v285-position-editor"></script>
 <script src="./js/pages/roster.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/features/player-editor.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/features/import.js?v=20260819-v245-identity-css-bundle"></script>
+<script src="./js/features/import.js?v=20260823-v299-multisport-csv"></script>
 <script src="./js/pages/minors.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/pages/assets.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/features/asset-manager.js?v=20260820-v270-asset-manager"></script>
@@ -512,10 +512,10 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/features/transaction-contracts.js?v=20260822-v2961-contract-percentage"></script>
 <script src="./js/pages/cap.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/pages/settings.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/features/sport-foundation.js?v=20260821-v285-position-editor"></script>
+<script src="./js/features/sport-foundation.js?v=20260823-v299-multisport-csv"></script>
 <script src="./js/features/lineup-configuration.js?v=20260823-v2982-roster-minors-age-expiry"></script>
 <script src="./js/features/office-picker.js?v=20260822-v295-logo-cache"></script>
 <script src="./js/features/season-rollover.js?v=20260820-v267-season-rollover"></script>
-<script src="./js/app.js?v=20260823-v2982-roster-minors-age-expiry"></script>
+<script src="./js/app.js?v=20260823-v299-multisport-csv"></script>
 </body>
 </html>
