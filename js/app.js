@@ -114,17 +114,17 @@ function syncRosterSportTerminologyV281() {
 
   const importButton = el('importRosterBtn');
   if (importButton) {
-    importButton.textContent = isNhl ? 'Import Fantrax / CSV' : 'Import coming soon';
-    importButton.disabled = !isNhl;
-    importButton.title = isNhl ? '' : `${sport} import adapters are still being built.`;
+    importButton.textContent = 'Import Fantrax / CSV';
+    importButton.disabled = false;
+    importButton.title = `Import a ${sport} Fantrax Team Roster, RosterCap backup or generic CSV.`;
   }
 
   const fantraxFilter = el('rosterFantraxFilter')?.closest('label');
-  if (fantraxFilter) fantraxFilter.classList.toggle('hidden', !isNhl);
+  if (fantraxFilter) fantraxFilter.classList.remove('hidden');
 
   const emptyCopy = root.querySelector('.empty-state p');
-  if (emptyCopy && !isNhl && /Fantrax/i.test(emptyCopy.textContent)) {
-    emptyCopy.textContent = 'Use Add Player above. Sport-specific roster import is coming soon.';
+  if (emptyCopy && /Fantrax|coming soon/i.test(emptyCopy.textContent)) {
+    emptyCopy.textContent = 'Use Add Player or import a Fantrax / CSV roster.';
   }
 }
 
@@ -459,7 +459,7 @@ function resetApp() {
   showOfficePicker();
 }
 
-const ROSTERCAP_ROSTER_BACKUP_VERSION = 'ROSTERCAP_ROSTER_BACKUP_V1';
+const ROSTERCAP_ROSTER_BACKUP_VERSION = 'ROSTERCAP_ROSTER_BACKUP_V2';
 
 function rosterBackupDepthAssignments(playerId) {
   const assignments = [];
@@ -473,15 +473,35 @@ function rosterBackupDepthAssignments(playerId) {
   return assignments.join('|');
 }
 
+function rosterBackupGroupDisplayNameV299(groupKey) {
+  const key = String(groupKey || 'ACTIVE').trim().toUpperCase();
+
+  const configured = (state.rosterGroups || []).find((group) =>
+    String(group?.key || '').trim().toUpperCase() === key
+  );
+
+  if (configured?.displayName) return configured.displayName;
+
+  if (key === 'FARM') {
+    return window.RosterCapTerminology?.developmentLabel?.() || 'Minors';
+  }
+
+  return 'Active roster';
+}
+
 function exportRosterCsv() {
   if (!state.frontOffice) return;
 
-  const sortedSeasons = [...state.seasons].sort((a,b) => a.startYear - b.startYear);
+  const sortedSeasons = [...state.seasons]
+    .sort((a,b) => a.startYear - b.startYear);
+
   const generatedAt = new Date().toISOString();
+  const sport = String(state.frontOffice.sport || 'NHL').trim().toUpperCase();
 
   const headers = [
     'RosterCap Backup Version',
     'Backup Generated At',
+    'Backup Sport',
     'Backup Team',
     'Backup League',
     'RosterCap Player ID',
@@ -489,11 +509,12 @@ function exportRosterCsv() {
     'Player',
     'Pos',
     'Eligible',
-    'NHL Team',
+    'Team',
     'Age',
     'Age As Of',
     'Status',
     'Prospect',
+    'Roster Group Key',
     'Roster Location',
     ...sortedSeasons.flatMap((season) => [
       `${seasonLabel(season.startYear)} Salary`,
@@ -504,39 +525,45 @@ function exportRosterCsv() {
     'Notes'
   ];
 
-  const rows = state.players.map((player) => [
-    ROSTERCAP_ROSTER_BACKUP_VERSION,
-    generatedAt,
-    state.frontOffice.teamName || '',
-    state.frontOffice.leagueName || '',
-    player.id || '',
-    player.fantraxId || '',
-    player.name,
-    player.position,
-    player.eligiblePositions || player.position || '',
-    player.realTeam || '',
-    player.ageSnapshot ?? '',
-    player.ageAsOf || '',
-    statusById(player.statusId)?.name || '',
-    player.isProspect ? 'Yes' : 'No',
-    player.rosterGroup === 'FARM' ? 'Minors' : 'Active',
-    ...sortedSeasons.flatMap((season) => {
-      const row = player.salaries?.[season.id] || {};
-      return [row.salary ?? '', row.capOverride ?? ''];
-    }),
-    player.contractEndSeasonId
-      ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear)
-      : '',
-    rosterBackupDepthAssignments(player.id),
-    player.notes || ''
-  ]);
+  const rows = state.players.map((player) => {
+    const groupKey = String(player.rosterGroup || 'ACTIVE').trim().toUpperCase();
+
+    return [
+      ROSTERCAP_ROSTER_BACKUP_VERSION,
+      generatedAt,
+      sport,
+      state.frontOffice.teamName || '',
+      state.frontOffice.leagueName || '',
+      player.id || '',
+      player.fantraxId || '',
+      player.name,
+      player.position,
+      player.eligiblePositions || player.position || '',
+      player.realTeam || '',
+      player.ageSnapshot ?? '',
+      player.ageAsOf || '',
+      statusById(player.statusId)?.name || '',
+      player.isProspect ? 'Yes' : 'No',
+      groupKey,
+      rosterBackupGroupDisplayNameV299(groupKey),
+      ...sortedSeasons.flatMap((season) => {
+        const row = player.salaries?.[season.id] || {};
+        return [row.salary ?? '', row.capOverride ?? ''];
+      }),
+      player.contractEndSeasonId
+        ? seasonLabel(seasonById(player.contractEndSeasonId)?.startYear)
+        : '',
+      rosterBackupDepthAssignments(player.id),
+      player.notes || ''
+    ];
+  });
 
   const csv = [headers, ...rows]
     .map((row) => row.map(csvEscape).join(','))
     .join('\n');
 
   downloadText(
-    `${safeFileName(state.frontOffice.teamName)}-rostercap-roster-backup-${todayIsoDate()}.csv`,
+    `${safeFileName(state.frontOffice.teamName)}-${sport.toLowerCase()}-rostercap-roster-backup-${todayIsoDate()}.csv`,
     csv,
     'text/csv'
   );
@@ -1628,9 +1655,9 @@ function compactMinorsPageV260() {
 
   const importButton = page.querySelector('#importMinorsBtn');
   if (importButton) {
-    importButton.textContent = isNhl ? 'Import Fantrax' : 'Import coming soon';
-    importButton.disabled = !isNhl;
-    importButton.title = isNhl ? '' : `${sport} import adapters are still being built.`;
+    importButton.textContent = 'Import Fantrax';
+    importButton.disabled = false;
+    importButton.title = `Import a ${sport} Fantrax Team Roster. Rows marked Min/Minors are routed here automatically.`;
   }
 
   page.querySelectorAll('.farm-player-card-v228').forEach((card) => {
