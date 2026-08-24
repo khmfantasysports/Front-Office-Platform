@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.85 — editable position catalog + universal depth terminology
+// RosterCap V2.99 — multi-sport CSV-ready sport foundation
 //
 // Architecture:
 // - Sport provides templates/options, not permanent platform rules.
@@ -16,13 +16,13 @@
 // This release intentionally does NOT:
 // - change Supabase tables, columns, RPC signatures or RLS
 // - make any sport's suggested roster/cap values permanent rules
-// - enable sport-specific import adapters for NFL/NBA/MLB
+// - change the multi-sport Fantrax adapter contracts owned by import.js
 // - treat positional depth as FLEX / SUPERFLEX / UTIL lineup assignment
 // - change transaction formulas
 // - change existing NHL behavior
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.85';
+const ROSTERCAP_SPORT_FOUNDATION_VERSION = 'V2.99';
 
 const ROSTERCAP_SPORTS = Object.freeze({
   NHL: Object.freeze({
@@ -818,7 +818,7 @@ function syncCreateSportUiV279(options = {}) {
   const note = ensureSportEarlyAccessNoteV279();
   if (note) {
     note.textContent = isRosterCapSportEarlyAccess(sport)
-      ? `${sport} is available for early testing. Player entry, contracts, cap and positional depth ordering can be tested now; configurable lineup slots and import adapters are still being built.`
+      ? `${sport} is available for early testing. Player entry, Fantrax/CSV import, contracts, cap, configurable starting lineups and positional depth can be tested now.`
       : 'These are editable starting values. Your saved Front Office settings remain authoritative.';
   }
 }
