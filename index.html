@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v3.01.4" name="application-name"/>
+<meta content="RosterCap v3.01.5" name="application-name"/>
 <meta content="RosterCap" name="apple-mobile-web-app-title"/>
 <meta content="#08131D" name="theme-color"/>
 <meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="description"/>
@@ -32,14 +32,14 @@
 <link href="./css/office-picker.css?v=20260822-v293-compact-cards" rel="stylesheet"/>
 <link href="./css/depth-chart.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/lineup-configuration.css?v=20260823-v2982-roster-minors-age-expiry" rel="stylesheet"/>
-<link href="./css/assets-landing.css?v=20260824-v3014-google-dark-pill" rel="stylesheet"/>
+<link href="./css/assets-landing.css?v=20260824-v3015-google-white" rel="stylesheet"/>
 <link href="./css/asset-manager.css?v=20260820-v270-asset-manager" rel="stylesheet"/>
 <link href="./css/overview-cap.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
 <link href="./css/legal.css?v=20260824-v3013-footer-google-polish" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="3.01.4">
+<body data-rostercap-version="3.01.5">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -527,13 +527,30 @@
 window.__ROSTERCAP_GOOGLE_GIS_READY__ = false;
 
 /*
- * V3.01.4
- * Google Identity Services owns the visible sign-in control.
- * Do not monkeypatch renderButton(): js/data.js already requests Google's
- * supported dark pill configuration and owns the credential callback.
+ * V3.01.5
+ * Keep the existing Google Identity Services / Supabase credential flow.
+ * Presentation only: use Google's standard white "outline" pill so the
+ * control reads cleanly against RosterCap's dark sign-in card.
  */
+window.__rostercapApplyGoogleWhiteButtonTheme = function () {
+  const identity = window.google?.accounts?.id;
+  if (!identity?.renderButton || identity.__rostercapWhiteThemePatched) return;
+
+  const originalRenderButton = identity.renderButton.bind(identity);
+  identity.renderButton = function (container, options) {
+    return originalRenderButton(container, {
+      ...(options || {}),
+      theme: 'outline',
+      shape: 'pill'
+    });
+  };
+
+  identity.__rostercapWhiteThemePatched = true;
+};
+
 window.__rostercapOnGoogleGISLoad = function () {
   window.__ROSTERCAP_GOOGLE_GIS_READY__ = true;
+  window.__rostercapApplyGoogleWhiteButtonTheme();
 
   if (typeof window.initializeGoogleIdentity === 'function') {
     window.initializeGoogleIdentity();
@@ -547,7 +564,7 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/core.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/utils.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/domain.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/data.js?v=20260821-v276-google-dark"></script>
+<script src="./js/data.js?v=20260824-v3015-google-white"></script>
 <script src="./js/pages/overview.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/features/depth-chart.js?v=20260821-v285-position-editor"></script>
 <script src="./js/pages/roster.js?v=20260819-v245-identity-css-bundle"></script>
