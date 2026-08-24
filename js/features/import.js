@@ -21,7 +21,7 @@
 //   remain protected from Fantrax imports.
 // ============================================================================
 
-const ROSTERCAP_IMPORT_VERSION_V299 = 'V2.99';
+const ROSTERCAP_IMPORT_VERSION_V299 = 'V2.99.1';
 const ROSTERCAP_BACKUP_V1 = 'ROSTERCAP_ROSTER_BACKUP_V1';
 const ROSTERCAP_BACKUP_V2 = 'ROSTERCAP_ROSTER_BACKUP_V2';
 
@@ -716,6 +716,121 @@ function isFantraxSlotOnlyTokenV299(token, sport) {
   return false;
 }
 
+function fantraxLineupSlotKeyV299(rawPos, sport) {
+  const value = String(rawPos || '').trim().toUpperCase();
+
+  if (sport === 'NFL') {
+    if (['SFX','SUPERFLEX','SUPER FLEX'].includes(value)) return 'SUPERFLEX';
+    if (['RWT','FLEX','FLX'].includes(value)) return 'FLEX';
+    if (value === 'ID') return 'IDP';
+  }
+
+  return '';
+}
+
+function fantraxSlotPositionChoicesV299(slotKey, sport) {
+  const key = String(slotKey || '').trim().toUpperCase();
+
+  if (sport === 'NFL' && key === 'SUPERFLEX') {
+    return ['QB','RB','WR','TE'];
+  }
+
+  if (sport === 'NFL' && key === 'FLEX') {
+    return ['RB','WR','TE'];
+  }
+
+  return [];
+}
+
+function refreshFantraxRowValidityV299(row) {
+  if (!row || row.sourceType !== 'FANTRAX') return row;
+
+  const identityReady = Boolean(row.name && row.sourceId);
+  const statusReady = Boolean(row.statusId);
+  const positionReady = Boolean(row.position && row.eligiblePositions);
+
+  row.valid = identityReady && statusReady && positionReady;
+
+  if (row.requiresPositionResolution && !row.position) {
+    const slotLabel = row.fantraxLineupSlotKey === 'SUPERFLEX'
+      ? 'Superflex'
+      : (row.fantraxLineupSlotKey || row.fantraxPosRaw || 'lineup slot');
+
+    row.warning =
+      `Fantrax supplied ${slotLabel} instead of the player position. `
+      + 'Choose the underlying position.';
+  } else {
+    row.requiresPositionResolution = false;
+    row.warning = [
+      row.positionWarning || '',
+      row.statusWarning || '',
+      row.settingsWarning || ''
+    ].filter(Boolean).join(' ');
+  }
+
+  return row;
+}
+
+function resolveFantraxPlayerPositionV299(row, position) {
+  if (!row || row.sourceType !== 'FANTRAX') return;
+
+  const sport = pendingImportMeta?.sport || activeImportSportV299();
+  const catalog = new Set(importAvailablePositionCodesV299(sport));
+  const normalized = String(position || '').trim().toUpperCase();
+
+  if (!normalized || !catalog.has(normalized)) {
+    row.position = '';
+    row.eligiblePositions = '';
+    row.requiresPositionResolution = true;
+    refreshFantraxRowValidityV299(row);
+    return;
+  }
+
+  row.position = normalized;
+
+  const sourceEligible = fantraxPositionTokensV299(
+    row.fantraxEligibleRaw,
+    sport
+  ).filter((token) => catalog.has(token));
+
+  row.eligiblePositions = [...new Set([
+    normalized,
+    ...sourceEligible
+  ])].join(',');
+
+  row.positionWarning = '';
+  row.requiresPositionResolution = false;
+  refreshFantraxRowValidityV299(row);
+}
+
+function importPositionCellMarkupV299(row) {
+  if (!row.requiresPositionResolution) {
+    return escapeHtml(row.position || '—');
+  }
+
+  const choices = Array.isArray(row.positionChoices)
+    ? row.positionChoices
+    : [];
+
+  return `<label class="import-position-resolver-v2991">
+    <span class="sr-only">Choose ${escapeHtml(row.name || 'player')} position</span>
+    <select
+      data-import-position-row="${row.sourceRow}"
+      aria-label="Choose ${escapeAttr(row.name || 'player')} position"
+    >
+      <option value="">Choose position…</option>
+      ${choices.map((position) => `
+        <option value="${escapeAttr(position)}">${escapeHtml(position)}</option>
+      `).join('')}
+    </select>
+    <small>${escapeHtml(
+      row.fantraxLineupSlotKey === 'SUPERFLEX'
+        ? 'SFX → Superflex slot'
+        : (row.fantraxLineupSlotKey || 'Fantrax slot')
+    )}</small>
+  </label>`;
+}
+
 function chooseFantraxPrimaryPositionV299(
   sport,
   rawPos,
@@ -818,11 +933,8 @@ function fantraxPositionWarningV299(
     const pos = String(rawPos || '').trim() || 'blank';
     const eligible = String(rawEligible || '').trim() || 'blank';
 
-    if (sport === 'NFL' && /^(?:SFX|SUPERFLEX)$/i.test(pos)) {
-      return (
-        `Fantrax exported the lineup slot ${pos} without a real player position `
-        + `(Eligible: ${eligible}). RosterCap will not guess a SUPERFLEX player's position.`
-      );
+    if (sport === 'NFL' && /^(?:SFX|SUPERFLEX|SUPER FLEX)$/i.test(pos)) {
+      return '';
     }
 
     return (
@@ -941,10 +1053,20 @@ function parseFantraxTeamRoster(rows) {
       ? nullableNumber(String(record.Salary || '').replace(/[$,]/g, ''))
       : null;
 
-    const warnings = [
-      positionWarning,
-      statusResult.warning
-    ].filter(Boolean);
+    const lineupSlotKey = fantraxLineupSlotKeyV299(rawPos, sport);
+    const positionChoices = fantraxSlotPositionChoicesV299(
+      lineupSlotKey,
+      sport
+    );
+
+    const requiresPositionResolution = Boolean(
+      sport === 'NFL'
+      && lineupSlotKey === 'SUPERFLEX'
+      && !position
+      && positionChoices.length
+    );
+
+    let settingsWarning = '';
 
     const activePositions = new Set(importActivePositionCodesV299());
     if (
@@ -952,14 +1074,11 @@ function parseFantraxTeamRoster(rows) {
       && activePositions.size
       && !activePositions.has(position)
     ) {
-      // Non-blocking: saved player data is allowed to use a sport position that
-      // is currently hidden from the Front Office position selector.
-      warnings.push(
-        `${position} is not currently enabled in this Front Office's Position Settings.`
-      );
+      settingsWarning =
+        `${position} is not currently enabled in this Front Office's Position Settings.`;
     }
 
-    output.push({
+    const importRow = {
       sourceRow: i + 1,
       sourceType: 'FANTRAX',
       sourceId,
@@ -970,6 +1089,9 @@ function parseFantraxTeamRoster(rows) {
       ageSnapshot,
       statusId: statusResult.statusId,
       statusRaw,
+      statusWarning: statusResult.warning || '',
+      positionWarning: positionWarning || '',
+      settingsWarning,
       isProspect: isMinors ? true : Boolean(existing?.isProspect),
       rosterGroup: isMinors ? 'FARM' : 'ACTIVE',
       isMinors,
@@ -979,18 +1101,18 @@ function parseFantraxTeamRoster(rows) {
       section: currentSection || 'Players',
       fantraxPosRaw: rawPos,
       fantraxEligibleRaw: rawEligible,
+      fantraxLineupSlotKey: lineupSlotKey,
+      positionChoices,
+      requiresPositionResolution,
       fantraxContractRaw: String(record.Contract || '').trim(),
       existingPlayerId: existing?.id || null,
       action: existing ? 'Update' : 'Add',
-      valid: Boolean(
-        name
-        && sourceId
-        && position
-        && eligiblePositions
-        && statusResult.statusId
-      ),
-      warning: warnings.join(' ')
-    });
+      valid: false,
+      warning: ''
+    };
+
+    refreshFantraxRowValidityV299(importRow);
+    output.push(importRow);
 
     const sectionName = currentSection || 'Players';
     sectionCounts[sectionName] = (sectionCounts[sectionName] || 0) + 1;
@@ -1407,7 +1529,7 @@ function importSafetyMarkupV299(fantrax, backup = false) {
     return `<div class="import-safety-panel">
       <div>
         <span class="import-safety-icon">✓</span>
-        <span><strong>What this Fantrax ${escapeHtml(sport)} import updates</strong><small>Player identity, real player position/eligibility, ${escapeHtml(sport)} team, age, roster status, Fantrax link and Active/${escapeHtml(importDevelopmentLabelV299())} location. ${escapeHtml(salaryText)}</small></span>
+        <span><strong>What this Fantrax ${escapeHtml(sport)} import updates</strong><small>Player identity, real player position/eligibility, ${escapeHtml(sport)} team, age, roster status, Fantrax link and Active/${escapeHtml(importDevelopmentLabelV299())} location. NFL SFX is treated as the Superflex lineup allocation; if Fantrax omits the underlying position, the import review asks the user to choose QB/RB/WR/TE. ${escapeHtml(salaryText)}</small></span>
       </div>
       <div>
         <span class="import-safety-icon protected">◆</span>
@@ -1482,7 +1604,7 @@ function renderImportPreview() {
     return `<tr class="${row.valid ? '' : 'import-invalid-row'}">
       <td>${row.sourceRow}</td>
       <td><strong>${escapeHtml(row.name || 'Missing name')}</strong>${existing ? '<small class="import-row-note">Matched existing</small>' : '<small class="import-row-note">New player</small>'}</td>
-      <td>${escapeHtml(row.position || '—')}</td>
+      <td>${importPositionCellMarkupV299(row)}</td>
       <td>${escapeHtml(row.realTeam || '—')}</td>
       <td>${escapeHtml(statusById(row.statusId)?.name || row.statusRaw || 'Unmapped')}</td>
       <td>${importLocationPreviewMarkup(row)}</td>
@@ -1529,8 +1651,19 @@ function renderImportPreview() {
     ? `<div class="import-review-warning"><strong>Backup compatibility notice</strong><span>${escapeHtml(pendingImportMeta.backupWarnings.join(' '))}</span></div>`
     : '';
 
+  const unresolvedPositionRows = pendingImport.filter(
+    (row) => row.requiresPositionResolution
+  ).length;
+
   const invalidNote = invalid
-    ? `<div class="import-review-warning"><strong>${invalid} row${invalid === 1 ? '' : 's'} will be skipped.</strong><span>${backup ? 'Restore requires matching sport, season columns, group keys and roster-status names.' : 'RosterCap will not guess an unsupported player position or roster status. Review the flagged source rows.'}</span></div>`
+    ? `<div class="import-review-warning"><strong>${invalid} row${invalid === 1 ? '' : 's'} need${invalid === 1 ? 's' : ''} review.</strong><span>${backup
+        ? 'Restore requires matching sport, season columns, group keys and roster-status names.'
+        : (
+            unresolvedPositionRows
+              ? `${unresolvedPositionRows} Fantrax lineup-slot row${unresolvedPositionRows === 1 ? '' : 's'} can be resolved above by choosing the underlying player position. Unsupported rows remain skipped until corrected.`
+              : 'RosterCap will not guess an unsupported player position or roster status. Review the flagged source rows.'
+          )
+      }</span></div>`
     : '';
 
   const preview = el('importPreview');
@@ -1550,6 +1683,20 @@ function renderImportPreview() {
     </div>
     ${rowLimitNote}
   `;
+
+  preview.querySelectorAll('[data-import-position-row]').forEach((select) => {
+    select.addEventListener('change', () => {
+      const sourceRow = Number(select.dataset.importPositionRow);
+      const row = pendingImport.find(
+        (candidate) => Number(candidate.sourceRow) === sourceRow
+      );
+
+      if (!row) return;
+
+      resolveFantraxPlayerPositionV299(row, select.value);
+      renderImportPreview();
+    });
+  });
 
   const applyButton = el('applyImportBtn');
   applyButton.disabled = valid.length === 0;
