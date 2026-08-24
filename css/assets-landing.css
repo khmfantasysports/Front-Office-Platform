@@ -1,5 +1,5 @@
 /* ============================================================
-   RosterCap V3.01.3 — Block-based signed-out landing
+   RosterCap V3.01.5 — Block-based signed-out landing
    FILE: css/assets-landing.css
    Scope: #authGate only
 
@@ -240,18 +240,11 @@
    Google Identity Services
    --------------------------------------------------------------------------
 
-   The visible button is rendered by Google inside an iframe, so RosterCap
-   should not create a second border, white shell, or fake button around it.
-
-   V3.01.1 normalizes the Google-rendered control to:
-     theme: 'filled_black'
-     shape: 'rectangular'
-
-   Google still owns the visible control inside its iframe; these rules only
-   keep the RosterCap host clean and prevent a second visual shell.
-
-   V3.01.3 uses Google's rectangular filled-black treatment so the white
-   Google logo tile stays contained instead of reading as a protruding pill.
+   V3.01.5:
+   - Google renders its standard white outline button.
+   - Keep the RosterCap host white as well so no contrasting shell can peek
+     around Google's iframe on iOS.
+   - Authentication/session behavior is unchanged.
    -------------------------------------------------------------------------- */
 
 #authGate .google-identity-wrap {
@@ -262,8 +255,8 @@
   padding:0 !important;
   overflow:hidden !important;
   border:0 !important;
-  border-radius:10px !important;
-  background:transparent !important;
+  border-radius:999px !important;
+  background:#FFFFFF !important;
   box-shadow:none !important;
 }
 
@@ -276,21 +269,19 @@
   padding:0 !important;
   overflow:hidden !important;
   border:0 !important;
-  border-radius:10px !important;
-  background:transparent !important;
+  border-radius:999px !important;
+  background:#FFFFFF !important;
   box-shadow:none !important;
 }
 
 #authGate #googleSignInButton iframe {
   display:block !important;
-  width:100% !important;
   max-width:100% !important;
-  min-height:44px !important;
   margin:0 !important;
   padding:0 !important;
   border:0 !important;
-  border-radius:10px !important;
-  background:transparent !important;
+  border-radius:999px !important;
+  background:#FFFFFF !important;
   box-shadow:none !important;
 }
 
