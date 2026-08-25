@@ -1,0 +1,470 @@
+/* ============================================================================
+   RosterCap V3.06.0 — Draft & Assets Hub
+   ============================================================================ */
+
+#assetsView .draft-assets-hub-v3060 {
+  gap:9px;
+}
+
+#assetsView .draft-assets-hub-v3060 .asset-hero-v230 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:9px;
+  align-items:start;
+}
+
+#assetsView .draft-assets-hub-v3060 .asset-hero-copy-v230 h3 {
+  font-size:1.08rem;
+}
+
+#assetsView .draft-assets-hub-v3060 .asset-hero-copy-v230 p:last-child {
+  max-width:620px;
+}
+
+#assetsView .draft-hub-actions-v3060 {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  width:100%;
+}
+
+#assetsView .draft-hub-actions-v3060 > .btn,
+#assetsView .draft-actions-menu-v3060 > summary {
+  width:100%;
+  min-height:36px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.63rem;
+  font-weight:850;
+}
+
+#assetsView .draft-actions-menu-v3060 {
+  position:relative;
+  width:100%;
+}
+
+#assetsView .draft-actions-menu-v3060 > summary {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  list-style:none;
+  cursor:pointer;
+}
+
+#assetsView .draft-actions-menu-v3060 > summary::-webkit-details-marker {
+  display:none;
+}
+
+#assetsView .draft-actions-popover-v3060 {
+  position:absolute;
+  z-index:20;
+  top:calc(100% + 5px);
+  right:0;
+  width:min(230px,80vw);
+  padding:5px;
+  border:1px solid rgba(119,201,255,.18);
+  border-radius:10px;
+  background:#0B1721;
+  box-shadow:0 14px 30px rgba(0,0,0,.30);
+}
+
+#assetsView .draft-actions-popover-v3060 button {
+  display:block;
+  width:100%;
+  min-height:34px;
+  padding:6px 8px;
+  border:0;
+  border-radius:7px;
+  color:#BFD5E3;
+  background:transparent;
+  text-align:left;
+  font:inherit;
+  font-size:.58rem;
+  font-weight:800;
+  cursor:pointer;
+}
+
+#assetsView .draft-actions-popover-v3060 button:hover,
+#assetsView .draft-actions-popover-v3060 button:focus-visible {
+  color:#E7F5FD;
+  background:rgba(119,201,255,.08);
+}
+
+/* Draft capital summary ---------------------------------------------------- */
+
+#assetsView .draft-capital-summary-v3060 {
+  padding:9px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:11px;
+  background:linear-gradient(180deg,rgba(13,25,35,.92),rgba(9,18,26,.92));
+}
+
+#assetsView .draft-capital-summary-head-v3060 {
+  margin-bottom:7px;
+}
+
+#assetsView .draft-capital-summary-head-v3060 .eyebrow {
+  margin:0 0 2px;
+  color:#8FCFFF;
+  font-size:.52rem;
+}
+
+#assetsView .draft-capital-summary-head-v3060 h4 {
+  margin:0;
+  color:#DCECF6;
+  font-size:.72rem;
+}
+
+#assetsView .draft-capital-years-v3060 {
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  scrollbar-width:thin;
+}
+
+#assetsView .draft-capital-year-v3060 {
+  min-width:100px;
+  padding:7px 9px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:rgba(255,255,255,.016);
+}
+
+#assetsView .draft-capital-year-v3060 span,
+#assetsView .draft-capital-year-v3060 strong,
+#assetsView .draft-capital-year-v3060 small {
+  display:block;
+}
+
+#assetsView .draft-capital-year-v3060 span {
+  color:#8FCFFF;
+  font-size:.54rem;
+  font-weight:900;
+}
+
+#assetsView .draft-capital-year-v3060 strong {
+  margin-top:2px;
+  color:#DCECF6;
+  font-size:.65rem;
+}
+
+#assetsView .draft-capital-year-v3060 small {
+  margin-top:2px;
+  color:#718899;
+  font-size:.49rem;
+}
+
+#assetsView .draft-capital-empty-v3060,
+#assetsView .draft-hub-empty-v3060 {
+  padding:10px;
+  border:1px dashed rgba(119,201,255,.13);
+  border-radius:9px;
+  color:#7C93A3;
+  background:rgba(255,255,255,.012);
+}
+
+#assetsView .draft-capital-empty-v3060 strong,
+#assetsView .draft-hub-empty-v3060 strong,
+#assetsView .draft-capital-empty-v3060 span,
+#assetsView .draft-hub-empty-v3060 span {
+  display:block;
+}
+
+#assetsView .draft-capital-empty-v3060 strong,
+#assetsView .draft-hub-empty-v3060 strong {
+  color:#BFD5E3;
+  font-size:.62rem;
+}
+
+#assetsView .draft-capital-empty-v3060 span,
+#assetsView .draft-hub-empty-v3060 span {
+  margin-top:3px;
+  font-size:.53rem;
+  line-height:1.35;
+}
+
+/* Category tabs ------------------------------------------------------------ */
+
+#assetsView .draft-hub-tabs-v3060 {
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+
+/* Draft hub panels --------------------------------------------------------- */
+
+#assetsView .draft-hub-below-v3060 {
+  display:grid;
+  gap:8px;
+  margin-top:8px;
+}
+
+#assetsView .draft-hub-panel-v3060 {
+  padding:9px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(13,25,35,.92),rgba(9,18,26,.92));
+}
+
+#assetsView .draft-hub-section-head-v3060 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:9px;
+  margin-bottom:7px;
+}
+
+#assetsView .draft-hub-section-head-v3060 .eyebrow {
+  margin:0 0 2px;
+  color:#88A8BC;
+  font-size:.52rem;
+}
+
+#assetsView .draft-hub-section-head-v3060 h4 {
+  margin:0;
+  color:#DCECF6;
+  font-size:.73rem;
+}
+
+#assetsView .draft-hub-text-action-v3060 {
+  min-height:27px;
+  padding:4px 7px;
+  border:1px solid rgba(119,201,255,.14);
+  border-radius:999px;
+  color:#83CFFF;
+  background:rgba(50,173,255,.035);
+  font-size:.53rem;
+  font-weight:850;
+  cursor:pointer;
+}
+
+/* Recent activity ---------------------------------------------------------- */
+
+#assetsView .draft-activity-list-v3060 {
+  display:grid;
+  gap:5px;
+}
+
+#assetsView .draft-activity-row-v3060 {
+  display:grid;
+  grid-template-columns:8px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  width:100%;
+  min-height:43px;
+  padding:7px 8px;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:8px;
+  color:inherit;
+  background:rgba(255,255,255,.012);
+  text-align:left;
+  cursor:pointer;
+}
+
+#assetsView .draft-activity-row-v3060:hover,
+#assetsView .draft-activity-row-v3060:focus-visible {
+  border-color:rgba(119,201,255,.22);
+  background:rgba(119,201,255,.035);
+}
+
+#assetsView .draft-activity-mark-v3060 {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#6EC7F5;
+}
+
+#assetsView .draft-activity-row-v3060.in .draft-activity-mark-v3060 {
+  background:#6AD8B8;
+}
+
+#assetsView .draft-activity-row-v3060.out .draft-activity-mark-v3060 {
+  background:#E4B86C;
+}
+
+#assetsView .draft-activity-row-v3060.used .draft-activity-mark-v3060 {
+  background:#9ABEF7;
+}
+
+#assetsView .draft-activity-row-v3060 strong,
+#assetsView .draft-activity-row-v3060 small {
+  display:block;
+}
+
+#assetsView .draft-activity-row-v3060 strong {
+  overflow:hidden;
+  color:#D4E6F1;
+  font-size:.62rem;
+  line-height:1.22;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetsView .draft-activity-row-v3060 small {
+  margin-top:2px;
+  overflow:hidden;
+  color:#758C9C;
+  font-size:.52rem;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Draft history ------------------------------------------------------------ */
+
+#assetsView .draft-history-count-v3060 {
+  color:#7F95A5;
+  font-size:.53rem;
+}
+
+#assetsView .draft-history-groups-v3060 {
+  display:grid;
+  gap:5px;
+}
+
+#assetsView .draft-history-year-v3060 {
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:9px;
+  background:rgba(255,255,255,.012);
+}
+
+#assetsView .draft-history-year-v3060 > summary {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:36px;
+  padding:7px 9px;
+  list-style:none;
+  cursor:pointer;
+}
+
+#assetsView .draft-history-year-v3060 > summary::-webkit-details-marker {
+  display:none;
+}
+
+#assetsView .draft-history-year-v3060 > summary span {
+  color:#8FCFFF;
+  font-size:.62rem;
+  font-weight:900;
+}
+
+#assetsView .draft-history-year-v3060 > summary strong {
+  color:#7F95A5;
+  font-size:.52rem;
+}
+
+#assetsView .draft-history-list-v3060 {
+  display:grid;
+  gap:1px;
+  padding:0 6px 6px;
+}
+
+#assetsView .draft-history-row-v3060 {
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  width:100%;
+  min-height:42px;
+  padding:6px 7px;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.04);
+  color:inherit;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+}
+
+#assetsView .draft-history-row-v3060:hover,
+#assetsView .draft-history-row-v3060:focus-visible {
+  background:rgba(119,201,255,.035);
+}
+
+#assetsView .draft-history-round-v3060 {
+  color:#8FCFFF;
+  font-size:.52rem;
+  font-weight:900;
+}
+
+#assetsView .draft-history-copy-v3060 strong,
+#assetsView .draft-history-copy-v3060 small {
+  display:block;
+}
+
+#assetsView .draft-history-copy-v3060 strong {
+  overflow:hidden;
+  color:#D4E6F1;
+  font-size:.61rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetsView .draft-history-copy-v3060 small {
+  margin-top:2px;
+  overflow:hidden;
+  color:#748A9A;
+  font-size:.51rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+@media (min-width:760px) {
+  #assetsView .draft-assets-hub-v3060 .asset-hero-v230 {
+    grid-template-columns:minmax(0,1fr) minmax(280px,330px);
+    align-items:end;
+    gap:14px;
+  }
+
+  #assetsView .draft-hub-below-v3060 {
+    grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+    align-items:start;
+  }
+}
+
+@media (max-width:720px) {
+  #assetsView .draft-assets-hub-v3060 .asset-hero-v230 {
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  #assetsView .draft-hub-actions-v3060 {
+    gap:6px;
+  }
+
+  #assetsView .draft-hub-actions-v3060 > .btn,
+  #assetsView .draft-actions-menu-v3060 > summary {
+    min-height:35px;
+    padding:5px 8px;
+    font-size:.61rem;
+  }
+
+  #assetsView .draft-capital-summary-v3060,
+  #assetsView .draft-hub-panel-v3060 {
+    padding:8px;
+  }
+
+  #assetsView .draft-capital-year-v3060 {
+    min-width:94px;
+    padding:6px 8px;
+  }
+
+  #assetsView .draft-activity-row-v3060 {
+    min-height:41px;
+  }
+}
+
+@media (max-width:390px) {
+  #assetsView .draft-hub-actions-v3060 {
+    gap:5px;
+  }
+
+  #assetsView .draft-hub-actions-v3060 > .btn,
+  #assetsView .draft-actions-menu-v3060 > summary {
+    font-size:.58rem;
+  }
+
+  #assetsView .draft-history-row-v3060 {
+    grid-template-columns:52px minmax(0,1fr);
+  }
+}
