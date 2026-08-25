@@ -3537,3 +3537,76 @@ Load after workspace-shared.css.
     text-align:center !important;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.02.2 — Minors desktop single-stack centering
+   ---------------------------------------------------------------------------
+   The desktop Minors card inherited a multi-column player-main layout.
+   Previous text-align rules centered text inside that left column rather than
+   across the full card. Force the depth-card player-main into one vertical
+   flex stack on desktop.
+   ============================================================================ */
+
+@media (min-width:760px) {
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-main {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    width:100% !important;
+    min-width:0 !important;
+    gap:3px !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    gap:3px !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals > strong,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > small,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > em {
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap {
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 auto !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap > strong {
+    display:block !important;
+    width:auto !important;
+    margin:0 auto !important;
+    text-align:center !important;
+  }
+}
