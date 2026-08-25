@@ -1470,13 +1470,13 @@ function farmPlayerAgeLabelV2982(player) {
     || rawAge === undefined
     || String(rawAge).trim() === ''
   ) {
-    return 'Age —';
+    return '—';
   }
 
   const age = Number(rawAge);
-  if (!Number.isFinite(age) || age < 0) return 'Age —';
+  if (!Number.isFinite(age) || age < 0) return '—';
 
-  return `Age ${Math.round(age)}`;
+  return String(Math.round(age));
 }
 
 function farmPlayerContractExpiryLabelV2982(player) {
@@ -1497,18 +1497,24 @@ function decorateFarmPlayerDetailsV2982(card, player) {
   const copy = card.querySelector('.farm-player-copy-v228');
   if (!copy) return;
 
-  let age = copy.querySelector('.farm-player-age-v2982');
+  // V3.04.4:
+  // Minors already communicates the player's development/prospect context.
+  // Use the compact identity row for position, team and bare age number:
+  // "LW · CBJ · 20"
+  const identity = copy.querySelector('small');
+  if (identity) {
+    const position = String(player.position || '—').trim() || '—';
+    const team = String(
+      player.realTeam || `No ${workspaceSportCodeV281()} team`
+    ).trim();
+    const age = farmPlayerAgeLabelV2982(player);
 
-  if (!age) {
-    age = document.createElement('span');
-    age.className = 'farm-player-age-v2982';
-
-    const contractLine = copy.querySelector('em');
-    if (contractLine) copy.insertBefore(age, contractLine);
-    else copy.appendChild(age);
+    identity.textContent = `${position} · ${team} · ${age}`;
   }
 
-  age.textContent = farmPlayerAgeLabelV2982(player);
+  // Age is now part of the compact identity line, so remove the older
+  // dedicated Age row if one was created by an earlier render.
+  copy.querySelector('.farm-player-age-v2982')?.remove();
 
   let contractLine = copy.querySelector('em');
 
