@@ -1,5 +1,5 @@
 /* ============================================================================
-   RosterCap V3.06.0 — Draft & Assets Hub
+   RosterCap V3.06.2 — Draft & Assets Hub
    ============================================================================ */
 
 #assetsView .draft-assets-hub-v3060 {
@@ -466,5 +466,110 @@
 
   #assetsView .draft-history-row-v3060 {
     grid-template-columns:52px minmax(0,1fr);
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.06.2 — Draft & Assets final polish
+   ============================================================================ */
+
+/* Shallower current-capital summary. */
+#assetsView .draft-capital-summary-v3060 {
+  padding:7px 8px;
+}
+
+#assetsView .draft-capital-summary-head-v3060 {
+  margin-bottom:5px;
+}
+
+#assetsView .draft-capital-summary-head-v3060 .eyebrow {
+  margin:0;
+}
+
+#assetsView .draft-capital-summary-head-v3060 h4 {
+  display:none;
+}
+
+#assetsView .draft-capital-years-v3060 {
+  gap:5px;
+  padding-bottom:0;
+}
+
+#assetsView .draft-capital-year-v3060 {
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  min-width:max-content;
+  padding:5px 8px;
+}
+
+#assetsView .draft-capital-year-v3060 span,
+#assetsView .draft-capital-year-v3060 strong,
+#assetsView .draft-capital-year-v3060 small {
+  display:inline;
+  margin:0;
+}
+
+#assetsView .draft-capital-year-v3060 span {
+  font-size:.55rem;
+}
+
+#assetsView .draft-capital-year-v3060 strong {
+  font-size:.59rem;
+}
+
+#assetsView .draft-capital-year-v3060 small {
+  font-size:.47rem;
+}
+
+/* Compact empty activity/history states. */
+#assetsView .draft-hub-panel-empty-v3062 {
+  padding:7px 8px 8px;
+}
+
+#assetsView .draft-hub-panel-empty-v3062 .draft-hub-section-head-v3060 {
+  margin-bottom:3px;
+}
+
+#assetsView .draft-hub-empty-line-v3062 {
+  margin:0;
+  color:#738A9A;
+  font-size:.52rem;
+  line-height:1.35;
+}
+
+#assetsView .draft-hub-empty-line-v3062 strong {
+  color:#BFD5E3;
+  font-weight:850;
+}
+
+/* Inventory heading no longer needs room for a total-count bubble. */
+#assetsView .draft-assets-hub-v3060 .asset-section-head-v230 {
+  min-height:24px;
+}
+
+/* Keep the two empty panels visually light when side-by-side on desktop. */
+@media (min-width:760px) {
+  #assetsView .draft-hub-panel-empty-v3062 {
+    min-height:0;
+  }
+}
+
+@media (max-width:720px) {
+  #assetsView .draft-capital-summary-v3060 {
+    padding:7px;
+  }
+
+  #assetsView .draft-capital-year-v3060 {
+    padding:5px 7px;
+  }
+
+  #assetsView .draft-hub-panel-empty-v3062 {
+    padding:7px;
+  }
+
+  #assetsView .draft-hub-empty-line-v3062 {
+    font-size:.51rem;
   }
 }
