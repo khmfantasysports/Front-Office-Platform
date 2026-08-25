@@ -1,7 +1,7 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V3.06.0 — Draft & Assets Hub
+// RosterCap V3.06.2 — Draft & Assets Hub final polish
 //
 // Additive presentation/navigation layer over the established Assets,
 // structured Trade and Draft-selection contracts.
@@ -207,7 +207,7 @@ function draftHubYearSummaryMarkupV3060() {
         return `<div class="draft-capital-year-v3060">
           <span>${escapeHtml(year)}</span>
           <strong>${rows.length} ${rows.length === 1 ? 'pick' : 'picks'}</strong>
-          ${conditional ? `<small>${conditional} conditional</small>` : '<small>current</small>'}
+          ${conditional ? `<small>${conditional} conditional</small>` : ''}
         </div>`;
       }).join('')}
   </div>`;
@@ -217,15 +217,12 @@ function draftHubRecentMarkupV3060() {
   const rows = draftHubRecentActivityV3060();
 
   if (!rows.length) {
-    return `<section class="draft-hub-panel-v3060 draft-activity-panel-v3060">
+    return `<section class="draft-hub-panel-v3060 draft-activity-panel-v3060 draft-hub-panel-empty-v3062">
       <div class="draft-hub-section-head-v3060">
         <div><p class="eyebrow">Draft activity</p><h4>Recent movement</h4></div>
         <button class="draft-hub-text-action-v3060" data-draft-hub-transactions type="button">Transactions →</button>
       </div>
-      <div class="draft-hub-empty-v3060">
-        <strong>No draft activity yet</strong>
-        <span>Draft selections and pick trades will appear here automatically.</span>
-      </div>
+      <p class="draft-hub-empty-line-v3062"><strong>No draft activity yet.</strong> Draft selections and pick trades will appear here.</p>
     </section>`;
   }
 
@@ -248,14 +245,11 @@ function draftHubHistoryMarkupV3060() {
   const groups = draftHubHistoryGroupsV3060();
 
   if (!groups.length) {
-    return `<section class="draft-hub-panel-v3060 draft-history-panel-v3060" id="draftHistoryV3060">
+    return `<section class="draft-hub-panel-v3060 draft-history-panel-v3060 draft-hub-panel-empty-v3062" id="draftHistoryV3060">
       <div class="draft-hub-section-head-v3060">
         <div><p class="eyebrow">Draft history</p><h4>Past drafts</h4></div>
       </div>
-      <div class="draft-hub-empty-v3060">
-        <strong>No recorded draft selections yet</strong>
-        <span>Use Draft Actions → Record Draft Selection when you make a pick.</span>
-      </div>
+      <p class="draft-hub-empty-line-v3062"><strong>No past drafts recorded yet.</strong> Draft selections will build this history automatically.</p>
     </section>`;
   }
 
@@ -412,7 +406,7 @@ function decorateDraftAssetsHubV3060() {
       summary.className = 'draft-capital-summary-v3060';
       summary.innerHTML = `
         <div class="draft-capital-summary-head-v3060">
-          <div><p class="eyebrow">Current draft capital</p><h4>${draftHubCurrentCapitalV3060().length} current ${draftHubCurrentCapitalV3060().length === 1 ? 'pick' : 'picks'}</h4></div>
+          <p class="eyebrow">Current draft capital</p>
         </div>
         ${draftHubYearSummaryMarkupV3060()}
       `;
@@ -423,6 +417,10 @@ function decorateDraftAssetsHubV3060() {
       .find((panel) => panel.querySelector('.asset-section-head-v230 h4')?.textContent.trim() === 'Draft Picks');
     const panelTitle = draftPanel?.querySelector('.asset-section-head-v230 h4');
     if (panelTitle) panelTitle.textContent = 'Draft Pick Inventory';
+
+    // V3.06.2: the year row already supplies the useful pick count.
+    // Remove the duplicate total-count bubble from the inventory heading.
+    draftPanel?.querySelector('.asset-section-head-v230 > span')?.remove();
 
     const anchor = page.querySelector('.asset-sections-v230') || page.querySelector('.asset-empty-v230') || page.querySelector('#assetStatusEmptyV270');
     if (anchor) {
