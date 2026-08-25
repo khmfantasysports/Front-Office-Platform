@@ -2340,19 +2340,25 @@ Load after workspace-shared.css.
 }
 
 #farmView .farm-depth-rank-v292 {
-  width:100%;
+  display:inline-block;
+  width:auto;
+  max-width:100%;
+  justify-self:center;
+  padding:0 2px 3px;
+  border-bottom:1px solid rgba(143,207,255,.32);
   color:#8FCFFF;
   font-size:.42rem;
   font-weight:900;
   letter-spacing:.04em;
   line-height:1;
-  text-align:left;
+  text-align:center;
   text-transform:uppercase;
 }
 
 #farmView .farm-depth-player-card-v292 .farm-player-main {
   display:grid;
-  gap:2px;
+  justify-items:center;
+  gap:3px;
   min-width:0;
   padding:0;
   text-align:center;
@@ -3434,3 +3440,34 @@ Load after workspace-shared.css.
    Depth labels remain top-left; player identity, contract metadata and salary
    are centered and slightly enlarged for mobile readability.
    ============================================================================ */
+
+
+/* ============================================================================
+   RosterCap V3.02.0 — Centered Minors labels + desktop alignment
+   ============================================================================ */
+
+@media (min-width:760px) {
+  #farmView .farm-depth-player-card-v292 {
+    justify-items:center;
+    text-align:center;
+  }
+
+  #farmView .farm-depth-rank-v292 {
+    justify-self:center;
+    text-align:center;
+  }
+
+  #farmView .farm-depth-player-card-v292 .farm-player-main,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 strong,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 small,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 em,
+  #farmView .farm-depth-player-card-v292 .farm-player-cap {
+    width:100%;
+    text-align:center;
+  }
+
+  #farmView .farm-depth-player-card-v292 .farm-player-cap {
+    justify-content:center;
+  }
+}
