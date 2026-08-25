@@ -1015,3 +1015,95 @@ button.lineup-matrix-player-v289 {
     font-size:.59rem;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.04.2 — Roster Lineup actions row
+   ---------------------------------------------------------------------------
+   Match the polished Roster header rhythm:
+   full-width copy first, then equal-width Configure / Edit starters controls.
+   ============================================================================ */
+
+#rosterView .lineup-toolbar-v287 {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  align-items:start;
+}
+
+#rosterView .lineup-toolbar-v287 > div:first-child {
+  grid-column:1;
+  width:100%;
+  min-width:0;
+}
+
+#rosterView .lineup-toolbar-actions-v287 {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-column:1;
+  gap:7px;
+  width:100%;
+  align-self:stretch;
+  justify-self:stretch;
+}
+
+#rosterView .lineup-toolbar-actions-v287 .btn {
+  width:100%;
+  min-width:0;
+  min-height:36px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.63rem;
+  font-weight:850;
+}
+
+@media (min-width:760px) {
+  #rosterView .lineup-toolbar-v287 {
+    grid-template-columns:minmax(0,1fr);
+    gap:9px;
+  }
+
+  #rosterView .lineup-toolbar-actions-v287 {
+    max-width:none;
+  }
+}
+
+@media (max-width:720px) {
+  #rosterView .lineup-toolbar-v287 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  #rosterView .lineup-toolbar-v287 > div:first-child {
+    grid-column:1;
+  }
+
+  #rosterView .lineup-toolbar-actions-v287 {
+    grid-column:1;
+    width:100%;
+    gap:6px;
+  }
+
+  #rosterView .lineup-toolbar-actions-v287 .btn {
+    width:100%;
+    min-width:0;
+    min-height:35px;
+    padding:6px 9px;
+    font-size:.61rem;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .lineup-toolbar-actions-v287 {
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+  }
+
+  #rosterView .lineup-toolbar-actions-v287 .btn {
+    min-height:34px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.59rem;
+  }
+}
