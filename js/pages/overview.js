@@ -136,7 +136,6 @@ function renderOverview() {
   const minorsOpen = minorsLimit === null || minorsLimit === undefined ? null : minorsLimit - minorsCount;
   const rosterLimit = state.frontOffice.rosterLimit;
   const openRosterSpots = rosterLimit === null || rosterLimit === undefined ? null : rosterLimit - activeCount;
-  const expiring = state.players.filter((player) => player.contractEndSeasonId === season.id).length;
   const missingPlayers = calc.missingPlayerIds
     .map((id) => state.players.find((player) => player.id === id))
     .filter(Boolean);
@@ -159,15 +158,15 @@ function renderOverview() {
     const barWidth = commitment === 0 ? 3 : Math.max(7, Math.round((commitment / maxCommitment) * 100));
     const remaining = seasonCalc.complete && seasonCalc.salaryCap !== null ? seasonCalc.capSpace : null;
     const isCurrent = item.id === season.id;
+    const footerParts = [];
+    if (seasonDeadCap) footerParts.push(`<span>Dead ${formatMoney(seasonDeadCap)}</span>`);
+    footerParts.push(`<span>${remaining === null ? 'Cap TBD' : `${formatMoney(remaining)} left`}</span>`);
     return `<article class="overview-outlook-card ${isCurrent ? 'current' : ''}">
       <div class="overview-outlook-season"><strong>${seasonLabel(item.startYear)}</strong>${isCurrent ? '<span>Current</span>' : ''}</div>
       <div class="overview-outlook-value">${formatMoney(commitment)}</div>
       <div class="overview-outlook-caption">Cap Used</div>
       <div class="overview-outlook-track"><span style="width:${barWidth}%"></span></div>
-      <div class="overview-outlook-footer">
-        <span>${seasonDeadCap ? `Dead ${formatMoney(seasonDeadCap)}` : 'No Dead Cap'}</span>
-        <span>${remaining === null ? 'Cap TBD' : `${formatMoney(remaining)} left`}</span>
-      </div>
+      <div class="overview-outlook-footer ${seasonDeadCap ? '' : 'single'}">${footerParts.join('')}</div>
     </article>`;
   }).join('');
 
@@ -222,13 +221,7 @@ function renderOverview() {
 
         <div class="overview-progress-v227">
           <div class="cap-bar" aria-label="Cap used versus salary cap"><div class="cap-bar-fill" style="width:${displayPct}%"></div></div>
-          <div class="overview-progress-meta-v227"><span><strong>${Math.round(rawPct)}%</strong> used</span><span>${calc.complete ? `${formatMoney(capUsed)} of ${salaryCap === null ? '—' : formatMoney(salaryCap)}` : `${formatMoney(calc.knownCapUsed)} known`}</span></div>
-        </div>
-
-        <div class="overview-finance-strip-v227">
-          <div><span>Cap Used</span><strong>${calc.complete ? formatMoney(capUsed) : `${formatMoney(calc.knownCapUsed)} known`}</strong></div>
-          <div><span>Roster Cap</span><strong>${formatMoney(calc.knownRosterCap)}</strong></div>
-          <div><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong></div>
+          <div class="overview-progress-meta-v227"><span><strong>${Math.round(rawPct)}%</strong> used</span><span>${calc.complete ? `${formatMoney(capUsed)} used` : `${formatMoney(calc.knownCapUsed)} known`}</span></div>
         </div>
       </section>
 
@@ -237,10 +230,9 @@ function renderOverview() {
           <p class="eyebrow">Team snapshot</p>
           <button id="overviewOpenRosterBtn" class="overview-text-action" type="button">Open Roster →</button>
         </div>
-        <div class="overview-snapshot-grid-v227">
+        <div class="overview-snapshot-grid-v227 overview-snapshot-grid-v3031">
           <div class="overview-snapshot-item"><span>Active</span><strong>${escapeHtml(rosterMeta)}</strong><small>${escapeHtml(openSpotText)}</small></div>
           <div class="overview-snapshot-item ${minorsOver ? 'warning' : ''}"><span>Minors</span><strong>${minorsLimit === null || minorsLimit === undefined ? minorsCount : `${minorsCount} / ${minorsLimit}`}</strong><small>${minorsLimit === null || minorsLimit === undefined ? 'no limit set' : minorsOver ? `${Math.abs(minorsOpen)} over` : `${minorsOpen} open`}</small></div>
-          <div class="overview-snapshot-item"><span>Expiring</span><strong>${expiring}</strong><small>this season</small></div>
           <div class="overview-snapshot-item"><span>Dead Cap</span><strong>${formatMoney(deadCap)}</strong><small>${deadCap ? 'on the books' : 'none'}</small></div>
         </div>
       </section>
