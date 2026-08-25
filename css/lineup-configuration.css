@@ -923,3 +923,95 @@ button.lineup-matrix-player-v289 {
     text-align:center;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.04.0 — Compact Roster Lineup toolbar
+   Actual roster/player-card presentation below this toolbar is untouched.
+   ============================================================================ */
+
+#rosterView .lineup-toolbar-v287 {
+  gap:10px;
+  padding:9px 10px;
+  border-color:rgba(119,201,255,.11);
+  border-radius:11px;
+  background:linear-gradient(180deg,rgba(13,25,35,.93),rgba(9,18,26,.93));
+}
+
+#rosterView .lineup-toolbar-v287 .eyebrow {
+  margin-bottom:2px;
+  font-size:.54rem;
+}
+
+#rosterView .lineup-toolbar-v287 h4 {
+  margin:1px 0 2px;
+  font-size:.79rem;
+  line-height:1.16;
+}
+
+#rosterView .lineup-toolbar-v287 p:not(.eyebrow) {
+  max-width:650px;
+  color:#7E94A4;
+  font-size:.57rem;
+  line-height:1.36;
+}
+
+#rosterView .lineup-toolbar-actions-v287 {
+  gap:5px;
+  align-self:center;
+}
+
+#rosterView .lineup-toolbar-actions-v287 .btn {
+  min-height:34px;
+  min-width:104px;
+  padding:5px 10px;
+  border-radius:9px;
+  font-size:.62rem;
+}
+
+@media (max-width:720px) {
+  #rosterView .lineup-toolbar-v287 {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:start;
+    gap:7px 9px;
+    padding:9px;
+  }
+
+  #rosterView .lineup-toolbar-v287 > div:first-child {
+    grid-column:1 / -1;
+  }
+
+  #rosterView .lineup-toolbar-v287 h4 {
+    font-size:.76rem;
+  }
+
+  #rosterView .lineup-toolbar-v287 p:not(.eyebrow) {
+    font-size:.55rem;
+    line-height:1.34;
+  }
+
+  #rosterView .lineup-toolbar-actions-v287 {
+    grid-column:2;
+    justify-self:end;
+    width:auto;
+    gap:5px;
+  }
+
+  #rosterView .lineup-toolbar-actions-v287 .btn {
+    flex:0 0 auto;
+    min-width:102px;
+    min-height:34px;
+    padding:5px 8px;
+    font-size:.60rem;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .lineup-toolbar-actions-v287 .btn {
+    min-width:96px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.59rem;
+  }
+}
