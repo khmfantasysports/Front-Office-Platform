@@ -2340,11 +2340,13 @@ Load after workspace-shared.css.
 }
 
 #farmView .farm-depth-rank-v292 {
+  width:100%;
   color:#8FCFFF;
   font-size:.42rem;
   font-weight:900;
   letter-spacing:.04em;
   line-height:1;
+  text-align:left;
   text-transform:uppercase;
 }
 
@@ -2353,17 +2355,21 @@ Load after workspace-shared.css.
   gap:2px;
   min-width:0;
   padding:0;
+  text-align:center;
 }
 
 #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 {
   min-width:0;
+  text-align:center;
 }
 
 #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 strong {
   display:block;
   overflow:hidden;
-  font-size:.59rem;
-  line-height:1.12;
+  width:100%;
+  font-size:.62rem;
+  line-height:1.14;
+  text-align:center;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
@@ -2371,9 +2377,11 @@ Load after workspace-shared.css.
 #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 small {
   display:block;
   overflow:hidden;
-  margin-top:1px;
-  font-size:.43rem;
-  line-height:1.12;
+  width:100%;
+  margin-top:2px;
+  font-size:.46rem;
+  line-height:1.18;
+  text-align:center;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
@@ -2381,9 +2389,11 @@ Load after workspace-shared.css.
 #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 em {
   display:block;
   overflow:hidden;
-  margin-top:1px;
-  font-size:.40rem;
-  line-height:1.12;
+  width:100%;
+  margin-top:2px;
+  font-size:.43rem;
+  line-height:1.16;
+  text-align:center;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
@@ -2391,14 +2401,16 @@ Load after workspace-shared.css.
 #farmView .farm-depth-player-card-v292 .farm-player-cap {
   display:flex;
   align-items:baseline;
-  justify-content:space-between;
+  justify-content:center;
   gap:4px;
   min-width:0;
-  text-align:left;
+  text-align:center;
 }
 
 #farmView .farm-depth-player-card-v292 .farm-player-cap strong {
-  font-size:.52rem;
+  font-size:.56rem;
+  line-height:1.12;
+  text-align:center;
 }
 
 #farmView .farm-depth-player-card-v292 .farm-player-cap small {
@@ -3414,3 +3426,11 @@ Load after workspace-shared.css.
     font-size:.38rem;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.01.9 — Centered Minors player-card information
+   Presentation only.
+   Depth labels remain top-left; player identity, contract metadata and salary
+   are centered and slightly enlarged for mobile readability.
+   ============================================================================ */
