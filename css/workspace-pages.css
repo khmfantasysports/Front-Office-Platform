@@ -4394,3 +4394,239 @@ Load after workspace-shared.css.
     padding-right:4px;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.04.0 — Roster top polish
+   Presentation only. Player roster board and roster logic are untouched.
+   ============================================================================ */
+
+#rosterView .roster-page {
+  gap:8px;
+}
+
+#rosterView .roster-page-heading-v252 {
+  align-items:flex-start;
+  gap:12px;
+}
+
+#rosterView .roster-page-heading-copy-v252 .eyebrow {
+  margin-bottom:3px;
+}
+
+#rosterView .roster-page-heading-copy-v252 h3 {
+  font-size:1.12rem;
+  line-height:1.08;
+}
+
+#rosterView .roster-page-heading-copy-v252 .page-copy {
+  margin-top:5px;
+  max-width:580px;
+  color:#8298A8;
+  font-size:.67rem;
+  line-height:1.42;
+}
+
+/* Compact stacked actions. */
+#rosterView .roster-header-actions-v252 {
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:flex-start;
+  gap:6px;
+  width:154px;
+  flex:0 0 154px;
+}
+
+#rosterView .roster-header-actions-v252 #addPlayerBtn {
+  order:1;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu {
+  order:2;
+  width:100%;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary,
+#rosterView .roster-header-actions-v252 > .btn {
+  width:100%;
+  min-height:36px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.65rem;
+  font-weight:850;
+}
+
+#rosterView .roster-header-actions-v252 #addPlayerBtn {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary {
+  border-color:rgba(119,201,255,.15);
+  background:rgba(255,255,255,.018);
+}
+
+#rosterView .roster-header-actions-v252 .tools-popover {
+  right:0;
+  left:auto;
+  min-width:190px;
+}
+
+/* Independent summary tiles. */
+#rosterView .roster-summary-grid-v252 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#rosterView .roster-summary-grid-v252 > div {
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid rgba(119,201,255,.105);
+  border-radius:10px;
+  background:linear-gradient(180deg,rgba(14,27,38,.90),rgba(10,20,29,.90));
+  text-align:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.015);
+}
+
+#rosterView .roster-summary-grid-v252 > div:last-child,
+#rosterView .roster-summary-grid-v252 > div:nth-child(2n),
+#rosterView .roster-summary-grid-v252 > div:nth-last-child(-n+2) {
+  border-right:1px solid rgba(119,201,255,.105);
+  border-bottom:1px solid rgba(119,201,255,.105);
+}
+
+#rosterView .roster-summary-grid-v252 > div.warning {
+  border-color:rgba(242,198,109,.20);
+  background:linear-gradient(180deg,rgba(242,198,109,.045),rgba(10,20,29,.90));
+}
+
+#rosterView .roster-summary-grid-v252 > div.good {
+  border-color:rgba(82,215,194,.16);
+  background:linear-gradient(180deg,rgba(82,215,194,.035),rgba(10,20,29,.90));
+}
+
+#rosterView .roster-summary-grid-v252 span {
+  color:#8095A5;
+  font-size:.50rem;
+  letter-spacing:.055em;
+  text-align:center;
+}
+
+#rosterView .roster-summary-grid-v252 strong {
+  margin-top:3px;
+  color:#D7EAF5;
+  font-size:.82rem;
+  line-height:1.12;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+
+#rosterView .roster-summary-grid-v252 small {
+  margin-top:3px;
+  color:#718899;
+  font-size:.51rem;
+  line-height:1.22;
+  text-align:center;
+}
+
+@media (max-width:720px) {
+  #rosterView .roster-page-heading-v252 {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px 10px;
+    align-items:start;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 {
+    grid-column:1 / -1;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 h3 {
+    font-size:1.08rem;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 .page-copy {
+    max-width:none;
+    font-size:.65rem;
+    line-height:1.40;
+  }
+
+  #rosterView .roster-header-actions-v252 {
+    grid-column:2;
+    justify-self:end;
+    width:148px;
+    flex-basis:auto;
+    gap:5px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu,
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    width:100%;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    min-height:35px;
+    padding:6px 9px;
+    font-size:.64rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 {
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+  }
+
+  #rosterView .roster-summary-grid-v252 > div {
+    padding:7px 6px;
+  }
+
+  #rosterView .roster-summary-grid-v252 span {
+    font-size:.49rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 strong {
+    font-size:.77rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 small {
+    font-size:.50rem;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .roster-header-actions-v252 {
+    width:142px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    min-height:34px;
+    font-size:.62rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 {
+    border-radius:0;
+  }
+
+  #rosterView .roster-summary-grid-v252 > div {
+    padding:7px 5px;
+  }
+
+  #rosterView .roster-summary-grid-v252 span {
+    font-size:.47rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 strong {
+    font-size:.74rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 small {
+    font-size:.48rem;
+  }
+}
