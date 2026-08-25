@@ -4630,3 +4630,112 @@ Load after workspace-shared.css.
     font-size:.48rem;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.04.1 — Roster header actions side-by-side
+   ============================================================================ */
+
+#rosterView .roster-page-heading-v252 {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+}
+
+#rosterView .roster-page-heading-copy-v252 {
+  width:100%;
+}
+
+#rosterView .roster-header-actions-v252 {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  width:100%;
+  max-width:none;
+  flex:initial;
+}
+
+#rosterView .roster-header-actions-v252 #addPlayerBtn,
+#rosterView .roster-header-actions-v252 .tools-menu {
+  order:initial;
+  width:100%;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary,
+#rosterView .roster-header-actions-v252 > .btn {
+  width:100%;
+  min-height:37px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.65rem;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#rosterView .roster-header-actions-v252 .tools-popover {
+  left:0;
+  right:auto;
+  min-width:190px;
+}
+
+@media (min-width:760px) {
+  #rosterView .roster-page-heading-v252 {
+    grid-template-columns:minmax(0,1fr) minmax(280px,340px);
+    align-items:end;
+    gap:14px;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 {
+    grid-column:1;
+  }
+
+  #rosterView .roster-header-actions-v252 {
+    grid-column:2;
+    align-self:end;
+  }
+}
+
+@media (max-width:720px) {
+  #rosterView .roster-page-heading-v252 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 {
+    grid-column:1;
+  }
+
+  #rosterView .roster-header-actions-v252 {
+    grid-column:1;
+    justify-self:stretch;
+    width:100%;
+    gap:6px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu,
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    width:100%;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .roster-header-actions-v252 {
+    grid-template-columns:1fr 1fr;
+    width:100%;
+    gap:5px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    min-height:35px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.61rem;
+  }
+}
