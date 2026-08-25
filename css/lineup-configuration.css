@@ -191,7 +191,7 @@
   min-height:70px;
   padding:5px;
   color:var(--text);
-  text-align:left;
+  text-align:center;
 }
 
 button.lineup-matrix-player-v289 {
@@ -209,49 +209,64 @@ button.lineup-matrix-player-v289 {
 
 .lineup-matrix-role-v289 {
   overflow:hidden;
+  width:100%;
   color:#8FCFFF;
   font-size:.43rem;
   font-weight:900;
   letter-spacing:.04em;
   line-height:1.1;
+  text-align:left;
   text-transform:uppercase;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
 .lineup-matrix-player-v289 strong {
+  display:block;
   overflow:hidden;
+  width:100%;
   color:var(--text);
-  font-size:.58rem;
-  line-height:1.1;
+  font-size:.61rem;
+  line-height:1.12;
+  text-align:center;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
 .lineup-matrix-player-v289 small {
+  display:block;
   overflow:hidden;
+  width:100%;
   color:var(--muted);
-  font-size:.40rem;
-  line-height:1.13;
+  font-size:.44rem;
+  line-height:1.18;
+  text-align:center;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
 .lineup-matrix-contract-v298 {
+  display:block;
   overflow:hidden;
+  width:100%;
   color:#86A1B3;
-  font-size:.39rem;
+  font-size:.42rem;
   font-weight:750;
-  line-height:1.12;
+  line-height:1.16;
+  text-align:center;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
 .lineup-matrix-money-v289 {
+  display:block;
+  width:100%;
   margin-top:auto;
   color:#C9DFEC;
-  font-size:.45rem;
+  font-size:.49rem;
   font-weight:850;
+  line-height:1.12;
+  text-align:center;
 }
 
 .lineup-matrix-starter-editor-v289 {
@@ -382,7 +397,19 @@ button.lineup-matrix-player-v289 {
   }
 
   .lineup-matrix-player-v289 strong {
-    font-size:.55rem;
+    font-size:.58rem;
+  }
+
+  .lineup-matrix-player-v289 small {
+    font-size:.43rem;
+  }
+
+  .lineup-matrix-contract-v298 {
+    font-size:.41rem;
+  }
+
+  .lineup-matrix-money-v289 {
+    font-size:.47rem;
   }
 }
 
@@ -855,3 +882,11 @@ button.lineup-matrix-player-v289 {
     grid-column:span 1;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.01.9 — Centered player-card information
+   Presentation only.
+   Line/Depth labels remain top-left; player identity and contract information
+   are centered for easier scanning on narrow roster cards.
+   ============================================================================ */
