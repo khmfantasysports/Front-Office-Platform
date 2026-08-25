@@ -3471,3 +3471,69 @@ Load after workspace-shared.css.
     justify-content:center;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.02.1 — Minors desktop centering hardening
+   ---------------------------------------------------------------------------
+   V2.98.2 injects Age / Contract rows after the original Minors markup.
+   Explicitly center every visible information element on desktop so the
+   wider positional cards remain balanced.
+   ============================================================================ */
+
+@media (min-width:760px) {
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 {
+    justify-items:stretch !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-depth-rank-v292 {
+    justify-self:center !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-main {
+    width:100% !important;
+    justify-items:stretch !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 {
+    display:grid !important;
+    width:100% !important;
+    justify-items:center !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals {
+    display:grid !important;
+    width:100% !important;
+    justify-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals > strong,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > small,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > em {
+    display:block !important;
+    width:100% !important;
+    justify-self:stretch !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap {
+    display:flex !important;
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap strong {
+    width:auto !important;
+    text-align:center !important;
+  }
+}
