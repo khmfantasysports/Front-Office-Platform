@@ -4300,3 +4300,97 @@ Load after workspace-shared.css.
     padding:8px 5px;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.03.1 — Overview de-duplication + compact cap hero
+   ============================================================================ */
+
+#overviewView .overview-v255 .overview-hero-v227 {
+  padding:14px 16px 13px;
+}
+
+#overviewView .overview-v255 .overview-hero-v227::after {
+  left:16px;
+  right:16px;
+}
+
+#overviewView .overview-v255 .overview-primary-number {
+  font-size:clamp(1.95rem,4.5vw,3rem);
+}
+
+#overviewView .overview-v255 .overview-primary-label {
+  margin-top:5px;
+  font-size:.63rem;
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 {
+  min-width:126px;
+  padding:8px 10px;
+}
+
+#overviewView .overview-v255 .overview-progress-v227 {
+  margin-top:12px;
+}
+
+#overviewView .overview-v255 .overview-progress-meta-v227 {
+  margin-top:6px;
+}
+
+/* V3.03.1 removes the redundant Cap Used / Roster Cap / Dead Cap strip from
+   the Overview markup. Keep this defensive rule for stale cached markup. */
+#overviewView .overview-v255 .overview-finance-strip-v227 {
+  display:none !important;
+}
+
+#overviewView .overview-snapshot-grid-v3031 {
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+
+#overviewView .overview-outlook-footer.single {
+  justify-content:flex-end;
+}
+
+@media (min-width:980px) {
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:16px 19px 14px;
+  }
+}
+
+@media (max-width:720px) {
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:10px 11px 11px;
+  }
+
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.72rem;
+  }
+
+  #overviewView .overview-v255 .overview-primary-label {
+    font-size:.57rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    min-width:101px;
+    padding:6px 8px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 {
+    margin-top:9px;
+  }
+
+  #overviewView .overview-snapshot-grid-v3031 {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.64rem;
+  }
+
+  #overviewView .overview-snapshot-grid-v3031 .overview-snapshot-item {
+    padding-left:4px;
+    padding-right:4px;
+  }
+}
