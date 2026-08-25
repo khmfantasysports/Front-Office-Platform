@@ -98,9 +98,7 @@ function renderOverviewContractWatch(intel) {
 
   const priority = gapCount
     ? `<span class="contract-watch-priority warning"><strong>${gapCount} future salar${gapCount === 1 ? 'y gap' : 'y gaps'}</strong><small>Inside entered contract terms</small></span>`
-    : currentCount
-      ? `<span class="contract-watch-priority neutral"><strong>${currentCount} expiring this season</strong><small>Review before rollover</small></span>`
-      : `<span class="contract-watch-priority good"><strong>Contract data looks current</strong><small>No future salary gaps found</small></span>`;
+    : '';
 
   return `<section class="overview-panel-v227 contract-watch-v246">
     <div class="overview-section-head-v227">
@@ -113,7 +111,7 @@ function renderOverviewContractWatch(intel) {
       <div class="${gapCount ? 'warning' : ''}"><span>Salary gaps</span><strong>${gapCount}</strong><small>future entered terms</small></div>
       <div><span>Minors deals</span><strong>${minorsCount}</strong><small>with contract data</small></div>
     </div>
-    <div class="contract-watch-footer-v246">${priority}</div>
+    ${priority ? `<div class="contract-watch-footer-v246">${priority}</div>` : ''}
   </section>`;
 }
 
@@ -158,13 +156,19 @@ function renderOverview() {
     const barWidth = commitment === 0 ? 3 : Math.max(7, Math.round((commitment / maxCommitment) * 100));
     const remaining = seasonCalc.complete && seasonCalc.salaryCap !== null ? seasonCalc.capSpace : null;
     const isCurrent = item.id === season.id;
+    const commitmentLabel = seasonCalc.complete ? 'Cap Used' : 'Known Cap Used';
+    const capStatusLabel = seasonCalc.salaryCap === null
+      ? 'Cap TBD'
+      : seasonCalc.complete
+        ? `${formatMoney(remaining)} left`
+        : `Cap ${formatMoney(seasonCalc.salaryCap)}`;
     const footerParts = [];
     if (seasonDeadCap) footerParts.push(`<span>Dead ${formatMoney(seasonDeadCap)}</span>`);
-    footerParts.push(`<span>${remaining === null ? 'Cap TBD' : `${formatMoney(remaining)} left`}</span>`);
+    footerParts.push(`<span>${capStatusLabel}</span>`);
     return `<article class="overview-outlook-card ${isCurrent ? 'current' : ''}">
       <div class="overview-outlook-season"><strong>${seasonLabel(item.startYear)}</strong>${isCurrent ? '<span>Current</span>' : ''}</div>
       <div class="overview-outlook-value">${formatMoney(commitment)}</div>
-      <div class="overview-outlook-caption">Cap Used</div>
+      <div class="overview-outlook-caption">${commitmentLabel}</div>
       <div class="overview-outlook-track"><span style="width:${barWidth}%"></span></div>
       <div class="overview-outlook-footer ${seasonDeadCap ? '' : 'single'}">${footerParts.join('')}</div>
     </article>`;
