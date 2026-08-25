@@ -5135,3 +5135,33 @@ Load after workspace-shared.css.
     font-size:.67rem;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.05.1 — Remove redundant draft-round badges
+   ============================================================================ */
+
+#assetsView .asset-year-group-v230 .asset-round-badge,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-round-badge {
+  display:none !important;
+}
+
+#assetsView .asset-year-group-v230 .asset-pick-main,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-pick-main {
+  display:block;
+  width:100%;
+  min-width:0;
+}
+
+#assetsView .asset-year-group-v230 .asset-pick-main > div,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-pick-main > div {
+  width:100%;
+  min-width:0;
+}
+
+#assetsView .asset-year-group-v230 .asset-card h5,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card h5,
+#assetsView .asset-year-group-v230 .asset-card-meta,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card-meta {
+  width:100%;
+}
