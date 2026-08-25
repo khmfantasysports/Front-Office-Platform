@@ -5165,3 +5165,328 @@ Load after workspace-shared.css.
 #assetsView .assets-page-v260 .asset-year-group-v230 .asset-card-meta {
   width:100%;
 }
+
+
+/* ============================================================================
+   RosterCap V3.07.0 — Cap page polish
+   Presentation only. Cap calculations and behavior are unchanged.
+   ============================================================================ */
+
+#capView .cap-page-v262 {
+  gap:8px;
+}
+
+/* Current cap position ----------------------------------------------------- */
+
+#capView .cap-page-v262 .cap-hero-v228 {
+  padding:10px 11px 9px;
+  border-radius:13px;
+}
+
+#capView .cap-page-v262 .cap-hero-primary-v228 {
+  font-size:1.68rem;
+  line-height:.98;
+}
+
+#capView .cap-page-v262 .cap-hero-primary-label-v228 {
+  margin-top:4px;
+  font-size:.64rem;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 {
+  min-width:112px;
+  padding:7px 8px 26px;
+  border-radius:10px;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 > span {
+  font-size:.49rem;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 > strong {
+  margin-top:3px;
+  font-size:.78rem;
+}
+
+#capView .cap-page-v262 .cap-edit-settings-v262 {
+  right:6px;
+  bottom:5px;
+  min-height:19px;
+  padding:2px 6px;
+  font-size:.46rem;
+}
+
+#capView .cap-page-v262 .cap-hero-progress-v228 {
+  margin-top:8px;
+}
+
+#capView .cap-page-v262 .cap-hero-progress-v228 .cap-bar {
+  height:6px;
+}
+
+#capView .cap-page-v262 .cap-hero-progress-v228 > div:last-child {
+  margin-top:6px;
+  font-size:.57rem;
+}
+
+/* The progress line already communicates current Cap Used, and Dead Cap has
+   its own canonical section below. Remove the repeated three-metric strip. */
+#capView .cap-page-v262 .cap-hero-strip-v228 {
+  display:none !important;
+}
+
+/* Cap outlook ------------------------------------------------------------- */
+
+#capView .cap-page-v262 .cap-panel-v228 {
+  padding:8px;
+  border-radius:12px;
+}
+
+#capView .cap-page-v262 .cap-outlook-scroll-v228 {
+  padding-bottom:2px;
+}
+
+#capView .cap-page-v262 .cap-outlook-grid-v228 {
+  gap:5px;
+}
+
+#capView .cap-page-v262 .cap-season-card-v228 {
+  min-height:0;
+  padding:7px 8px;
+  border-radius:10px;
+}
+
+#capView .cap-page-v262 .cap-season-top-v228 strong {
+  font-size:.68rem;
+}
+
+#capView .cap-page-v262 .cap-season-top-v228 > span {
+  padding:2px 5px;
+  font-size:.43rem;
+}
+
+#capView .cap-page-v262 .cap-season-used-v228 {
+  margin-top:6px;
+  font-size:.80rem;
+}
+
+#capView .cap-page-v262 .cap-season-label-v228 {
+  margin-top:2px;
+  font-size:.48rem;
+}
+
+#capView .cap-page-v262 .cap-season-track-v228 {
+  height:5px;
+  margin-top:6px;
+}
+
+/* Roster + Dead are breakdown values available in Cap Detail below.
+   Removing these small boxes prevents truncation and makes outlook a true
+   high-level seven-season view. */
+#capView .cap-page-v262 .cap-season-metrics-v228 {
+  display:none !important;
+}
+
+#capView .cap-page-v262 .cap-season-footer-v228 {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:2px;
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid rgba(255,255,255,.045);
+  font-size:.46rem;
+  line-height:1.2;
+}
+
+#capView .cap-page-v262 .cap-season-footer-v228 > span {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#capView .cap-page-v262 .cap-season-footer-v228 > span:last-child {
+  color:#8EA3B2;
+}
+
+/* Contract intelligence --------------------------------------------------- */
+
+#capView .contract-intelligence-v262 {
+  padding:8px;
+  border-radius:12px;
+}
+
+#capView .contract-intelligence-v262 .contract-intelligence-head {
+  margin-bottom:5px;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary {
+  gap:5px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary > div {
+  min-width:0;
+  padding:7px 6px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:rgba(255,255,255,.014);
+  text-align:center;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary > div.warning {
+  border-color:rgba(242,198,109,.24);
+  background:rgba(242,198,109,.035);
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary span {
+  font-size:.49rem;
+  text-align:center;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary strong {
+  margin-top:3px;
+  font-size:.78rem;
+  text-align:center;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary small {
+  margin-top:3px;
+  font-size:.49rem;
+  line-height:1.25;
+  text-align:center;
+}
+
+#capView .contract-intel-main-details-v262,
+#capView .contract-intelligence-v262 .contract-intel-disclosure {
+  border-color:rgba(119,201,255,.09);
+  background:rgba(8,17,25,.58);
+}
+
+#capView .contract-intel-main-details-v262 > summary,
+#capView .contract-intelligence-v262 .contract-intel-disclosure > summary {
+  min-height:34px;
+  padding:6px 8px;
+}
+
+#capView .contract-intel-main-details-v262 > summary strong,
+#capView .contract-intelligence-v262 .contract-intel-disclosure > summary strong {
+  font-size:.61rem;
+}
+
+#capView .contract-intel-main-details-v262 > summary small,
+#capView .contract-intelligence-v262 .contract-intel-disclosure > summary small {
+  font-size:.49rem;
+}
+
+/* Dead Cap + bottom disclosures ------------------------------------------ */
+
+#capView .cap-dead-zero-v262,
+#capView .cap-dead-active-v262 {
+  border-radius:11px;
+}
+
+#capView .cap-detail-disclosure-v228,
+#capView .cap-history-disclosure {
+  border-radius:9px;
+  background:rgba(10,20,29,.78);
+}
+
+#capView .cap-detail-disclosure-v228 > summary,
+#capView .cap-history-disclosure > summary {
+  min-height:38px;
+  padding:7px 9px;
+}
+
+/* Desktop ---------------------------------------------------------------- */
+
+@media (min-width:980px) {
+  #capView .cap-page-v262 .cap-outlook-grid-v228 {
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    min-width:0;
+  }
+
+  #capView .cap-page-v262 .cap-season-card-v228 {
+    min-width:0;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+
+/* Mobile ----------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #capView .cap-page-v262 {
+    gap:7px;
+  }
+
+  #capView .cap-page-v262 .cap-hero-v228 {
+    padding:9px 10px 8px;
+  }
+
+  #capView .cap-page-v262 .cap-hero-primary-v228 {
+    font-size:1.56rem;
+  }
+
+  #capView .cap-page-v262 .cap-hero-limit-v228 {
+    min-width:105px;
+    padding:6px 7px 25px;
+  }
+
+  #capView .cap-page-v262 .cap-hero-limit-v228 > strong {
+    font-size:.74rem;
+  }
+
+  #capView .cap-page-v262 .cap-outlook-grid-v228 {
+    gap:5px;
+  }
+
+  #capView .cap-page-v262 .cap-season-card-v228 {
+    padding:7px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary {
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary > div {
+    padding:7px 5px;
+  }
+
+  /* This supporting sentence is the element visibly truncating in the
+     screenshot; the title is enough on phone and the detail is inside. */
+  #capView .contract-intel-main-details-v262 > summary small {
+    display:none;
+  }
+
+  #capView .contract-intel-main-details-v262 > summary > span {
+    padding-right:10px;
+  }
+}
+
+@media (max-width:390px) {
+  #capView .cap-page-v262 .cap-hero-primary-v228 {
+    font-size:1.48rem;
+  }
+
+  #capView .cap-page-v262 .cap-hero-limit-v228 {
+    min-width:101px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary > div {
+    padding:6px 5px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary span {
+    font-size:.47rem;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary small {
+    font-size:.47rem;
+  }
+}
