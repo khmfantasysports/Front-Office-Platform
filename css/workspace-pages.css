@@ -3610,3 +3610,693 @@ Load after workspace-shared.css.
     text-align:center !important;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.03.0 — Overview dashboard polish
+   Presentation only. No data/model/behavior changes.
+   ============================================================================ */
+
+#overviewView .overview-v227.overview-v255 {
+  gap:10px;
+}
+
+/* --------------------------------------------------------------------------
+   Primary cap-position hero
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-v255 .overview-hero-v227 {
+  position:relative;
+  overflow:hidden;
+  padding:18px 19px 16px;
+  border-color:rgba(119,201,255,.20);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 92% 4%,rgba(50,173,255,.10),transparent 34%),
+    linear-gradient(180deg,rgba(15,29,41,.96),rgba(10,20,29,.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 8px 24px rgba(0,0,0,.10);
+}
+
+#overviewView .overview-v255 .overview-hero-v227::after {
+  content:"";
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(119,201,255,.16),transparent);
+  pointer-events:none;
+}
+
+#overviewView .overview-v255 .overview-hero-top {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:18px;
+}
+
+#overviewView .overview-v255 .overview-hero-top .eyebrow {
+  margin-bottom:7px;
+  color:#88B9D8;
+  font-size:.61rem;
+  letter-spacing:.075em;
+}
+
+#overviewView .overview-v255 .overview-primary-number {
+  font-size:clamp(2.25rem,5.2vw,3.45rem);
+  font-weight:950;
+  line-height:.96;
+  letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+}
+
+#overviewView .overview-v255 .overview-primary-label {
+  margin-top:7px;
+  color:#9EB3C2;
+  font-size:.68rem;
+  font-weight:850;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 {
+  min-width:138px;
+  padding:10px 12px;
+  border:1px solid rgba(119,201,255,.16);
+  border-radius:11px;
+  background:rgba(6,14,21,.42);
+  text-align:right;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 span {
+  color:#7891A3;
+  font-size:.53rem;
+  font-weight:850;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 strong {
+  display:block;
+  margin-top:4px;
+  color:#D9ECF8;
+  font-size:.94rem;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+
+#overviewView .overview-v255 .overview-progress-v227 {
+  margin-top:16px;
+}
+
+#overviewView .overview-v255 .overview-progress-v227 .cap-bar {
+  height:7px;
+  border:1px solid rgba(255,255,255,.035);
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.18);
+}
+
+#overviewView .overview-v255 .overview-progress-v227 .cap-bar-fill {
+  box-shadow:0 0 14px rgba(50,173,255,.15);
+}
+
+#overviewView .overview-v255 .overview-progress-meta-v227 {
+  margin-top:7px;
+  color:#7990A1;
+  font-size:.59rem;
+}
+
+#overviewView .overview-v255 .overview-progress-meta-v227 strong {
+  color:#BFD8E8;
+  font-weight:900;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:13px;
+  padding-top:0;
+  border-top:0;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 > div {
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+  text-align:center;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 > div + div {
+  border-left:1px solid rgba(255,255,255,.055);
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 span {
+  display:block;
+  overflow:hidden;
+  color:#738A9B;
+  font-size:.51rem;
+  font-weight:850;
+  letter-spacing:.05em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 strong {
+  display:block;
+  margin-top:4px;
+  overflow:hidden;
+  color:#CFE4F1;
+  font-size:.82rem;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Shared panel treatment
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-compact-panel-v255,
+#overviewView .overview-panel-v227,
+#overviewView .contract-watch-v246 {
+  border-color:rgba(119,201,255,.11);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(13,25,35,.92),rgba(9,18,26,.92));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+}
+
+#overviewView .overview-compact-panel-v255 {
+  padding:11px 12px 12px;
+}
+
+#overviewView .overview-section-head-v227,
+#overviewView .overview-section-head-compact-v255 {
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+#overviewView .overview-section-head-v227 .eyebrow,
+#overviewView .overview-section-head-compact-v255 .eyebrow {
+  color:#87A7BB;
+  font-size:.58rem;
+  letter-spacing:.065em;
+}
+
+#overviewView .overview-section-head-v227 h3 {
+  margin-top:3px;
+  color:#D8EAF5;
+  font-size:.92rem;
+}
+
+#overviewView .overview-text-action {
+  min-height:26px;
+  padding:4px 8px;
+  border:1px solid rgba(119,201,255,.13);
+  border-radius:999px;
+  color:#83CFFF;
+  background:rgba(50,173,255,.035);
+  font-size:.56rem;
+  font-weight:850;
+  text-decoration:none;
+}
+
+#overviewView .overview-text-action:hover,
+#overviewView .overview-text-action:focus-visible {
+  border-color:rgba(119,201,255,.28);
+  color:#CDEEFF;
+  background:rgba(50,173,255,.075);
+}
+
+/* --------------------------------------------------------------------------
+   Team snapshot
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-snapshot-v227 .overview-snapshot-grid-v227 {
+  gap:7px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+  min-width:0;
+  padding:10px 10px 9px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+  text-align:center;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item.warning {
+  border-color:rgba(242,198,109,.25);
+  background:rgba(242,198,109,.035);
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item > span {
+  color:#758D9E;
+  font-size:.52rem;
+  font-weight:850;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+  margin-top:4px;
+  color:#D7EAF5;
+  font-size:1rem;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item small {
+  margin-top:3px;
+  color:#708798;
+  font-size:.56rem;
+}
+
+/* --------------------------------------------------------------------------
+   Contract watch
+   -------------------------------------------------------------------------- */
+
+#overviewView .contract-watch-v246 {
+  padding:11px 12px 12px;
+}
+
+#overviewView .contract-watch-v246 .overview-section-head-v227 {
+  margin-bottom:8px;
+}
+
+#overviewView .contract-watch-metrics-v246 {
+  gap:7px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#overviewView .contract-watch-metrics-v246 > div {
+  min-width:0;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+  text-align:center;
+}
+
+#overviewView .contract-watch-metrics-v246 > div:last-child {
+  border-right:1px solid rgba(255,255,255,.06);
+}
+
+#overviewView .contract-watch-metrics-v246 > div.warning {
+  border-color:rgba(242,198,109,.25);
+  background:rgba(242,198,109,.04);
+}
+
+#overviewView .contract-watch-metrics-v246 > div > span {
+  font-size:.51rem;
+  letter-spacing:.05em;
+}
+
+#overviewView .contract-watch-metrics-v246 > div > strong {
+  margin-top:4px;
+  font-size:.94rem;
+}
+
+#overviewView .contract-watch-metrics-v246 > div > small {
+  margin-top:3px;
+  font-size:.54rem;
+}
+
+#overviewView .contract-watch-footer-v246 {
+  margin-top:7px;
+}
+
+#overviewView .contract-watch-priority {
+  min-height:42px;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+#overviewView .contract-watch-priority::before {
+  width:20px;
+  height:20px;
+  border-radius:7px;
+}
+
+#overviewView .contract-watch-priority > strong {
+  font-size:.66rem;
+}
+
+#overviewView .contract-watch-priority > small {
+  font-size:.54rem;
+}
+
+/* --------------------------------------------------------------------------
+   Seven-season cap outlook
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-outlook-scroll {
+  margin-left:-2px;
+  margin-right:-2px;
+  padding:1px 2px 5px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:7px;
+  min-width:760px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-card {
+  min-height:113px;
+  padding:9px 9px 8px;
+  border-color:rgba(255,255,255,.06);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-card.current {
+  border-color:rgba(82,215,194,.32);
+  background:
+    linear-gradient(180deg,rgba(82,215,194,.065),rgba(255,255,255,.015));
+  box-shadow:inset 0 2px 0 rgba(82,215,194,.30);
+}
+
+#overviewView .overview-outlook-season strong {
+  font-size:.66rem;
+}
+
+#overviewView .overview-outlook-season span {
+  padding:2px 5px;
+  border:1px solid rgba(82,215,194,.16);
+  background:rgba(82,215,194,.07);
+  color:#84E0D0;
+  font-size:.43rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-value {
+  margin-top:8px;
+  color:#D2E5F1;
+  font-size:.88rem;
+  font-weight:950;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-caption {
+  margin-top:2px;
+  color:#718899;
+  font-size:.48rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-track {
+  height:5px;
+  margin-top:8px;
+  background:rgba(255,255,255,.05);
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-footer {
+  margin-top:6px;
+  color:#758A99;
+  font-size:.46rem;
+}
+
+/* --------------------------------------------------------------------------
+   Attention + recent activity
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-bottom-grid-v227 {
+  gap:10px;
+  align-items:stretch;
+}
+
+#overviewView .overview-bottom-grid-v227 > .overview-panel-v227 {
+  min-width:0;
+  height:100%;
+  padding:11px 12px 12px;
+}
+
+#overviewView .overview-attention-list,
+#overviewView .overview-activity-list {
+  gap:6px;
+}
+
+#overviewView .overview-attention-row,
+#overviewView .overview-activity-row {
+  min-height:48px;
+  padding:8px 9px;
+  border-color:rgba(255,255,255,.055);
+  border-radius:9px;
+  background:rgba(255,255,255,.015);
+}
+
+#overviewView .overview-attention-row {
+  grid-template-columns:27px minmax(0,1fr);
+  gap:8px;
+}
+
+#overviewView .overview-attention-icon {
+  width:27px;
+  height:27px;
+  border-radius:8px;
+  font-size:.68rem;
+}
+
+#overviewView .overview-attention-row strong,
+#overviewView .overview-activity-row strong {
+  color:#D1E2ED;
+  font-size:.69rem;
+}
+
+#overviewView .overview-attention-row small,
+#overviewView .overview-activity-row small {
+  margin-top:3px;
+  color:#748A9A;
+  font-size:.56rem;
+}
+
+#overviewView .overview-activity-row {
+  grid-template-columns:9px minmax(0,1fr);
+  gap:9px;
+}
+
+#overviewView .overview-activity-dot {
+  width:7px;
+  height:7px;
+  box-shadow:0 0 0 4px rgba(50,173,255,.045);
+}
+
+/* --------------------------------------------------------------------------
+   Desktop: take advantage of extra width instead of simply stretching cards.
+   -------------------------------------------------------------------------- */
+
+@media (min-width:980px) {
+  #overviewView .overview-v227.overview-v255 {
+    gap:11px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:20px 22px 18px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 {
+    gap:8px;
+  }
+
+  #overviewView .overview-compact-panel-v255,
+  #overviewView .contract-watch-v246,
+  #overviewView .overview-bottom-grid-v227 > .overview-panel-v227 {
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+    min-width:0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile: retain density, but make small text and metric separation clearer.
+   -------------------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #overviewView .overview-v227.overview-v255 {
+    gap:7px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:12px;
+    border-radius:13px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-top {
+    gap:10px;
+  }
+
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.95rem;
+  }
+
+  #overviewView .overview-v255 .overview-primary-label {
+    margin-top:5px;
+    font-size:.60rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    min-width:108px;
+    padding:7px 8px;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 span {
+    font-size:.48rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 strong {
+    margin-top:3px;
+    font-size:.76rem;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 {
+    margin-top:11px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 .cap-bar {
+    height:6px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-meta-v227 {
+    margin-top:6px;
+    font-size:.55rem;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 {
+    gap:5px;
+    margin-top:9px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 > div {
+    padding:7px 5px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 span {
+    font-size:.46rem;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 strong {
+    margin-top:3px;
+    font-size:.70rem;
+  }
+
+  #overviewView .overview-compact-panel-v255,
+  #overviewView .contract-watch-v246 {
+    padding:9px;
+    border-radius:12px;
+  }
+
+  #overviewView .overview-section-head-v227,
+  #overviewView .overview-section-head-compact-v255 {
+    margin-bottom:6px;
+  }
+
+  #overviewView .overview-text-action {
+    min-height:24px;
+    padding:3px 7px;
+    font-size:.54rem;
+  }
+
+  #overviewView .overview-snapshot-v227 .overview-snapshot-grid-v227,
+  #overviewView .contract-watch-metrics-v246 {
+    gap:5px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item,
+  #overviewView .contract-watch-metrics-v246 > div {
+    padding:8px 6px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+    font-size:.82rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item small,
+  #overviewView .contract-watch-metrics-v246 > div > small {
+    font-size:.52rem;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div {
+    border-right:1px solid rgba(255,255,255,.06);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div:nth-child(2n) {
+    border-right:1px solid rgba(255,255,255,.06);
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div:nth-last-child(-n+2) {
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+    grid-template-columns:repeat(7,108px);
+    min-width:max-content;
+    gap:5px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-card {
+    min-height:106px;
+    padding:8px;
+  }
+
+  #overviewView .overview-bottom-grid-v227 {
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  #overviewView .overview-bottom-grid-v227 > .overview-panel-v227 {
+    padding:9px;
+  }
+
+  #overviewView .overview-attention-row,
+  #overviewView .overview-activity-row {
+    min-height:44px;
+    padding:7px 8px;
+  }
+
+  #overviewView .overview-attention-row strong,
+  #overviewView .overview-activity-row strong {
+    font-size:.66rem;
+  }
+
+  #overviewView .overview-attention-row small,
+  #overviewView .overview-activity-row small {
+    font-size:.54rem;
+    white-space:normal;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.82rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    min-width:100px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 strong {
+    font-size:.66rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+    padding:8px 5px;
+  }
+}
