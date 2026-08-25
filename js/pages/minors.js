@@ -36,9 +36,21 @@ async function quickCallUp(playerId) {
 function minorContractSignalMarkup(player) {
   const signals = playerContractSignals(player);
   const items = [];
-  if (signals.expiresCurrent) items.push('<span class="contract-signal-badge expiry">Expires this season</span>');
-  else if (signals.expiresNext) items.push('<span class="contract-signal-badge next">Expires next</span>');
-  if (signals.hasFutureGap) items.push(`<span class="contract-signal-badge warning">${signals.missingFuture.length} future gap${signals.missingFuture.length === 1 ? '' : 's'}</span>`);
+
+  // V3.01.7:
+  // Minors cards already show the saved contract end as a normal metadata line.
+  // Keep only immediate expiry/future-gap warnings here; do not duplicate next
+  // season expiry with an additional "Expires next" badge.
+  if (signals.expiresCurrent) {
+    items.push('<span class="contract-signal-badge expiry">Expires this season</span>');
+  }
+
+  if (signals.hasFutureGap) {
+    items.push(
+      `<span class="contract-signal-badge warning">${signals.missingFuture.length} future gap${signals.missingFuture.length === 1 ? '' : 's'}</span>`
+    );
+  }
+
   return items.join('');
 }
 
