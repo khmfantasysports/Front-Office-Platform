@@ -7209,3 +7209,238 @@ Load after workspace-shared.css.
     white-space:nowrap;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.11.3 — Decision Centre inner-content fit
+
+   V3.11.2 constrained the outer dialog/card correctly. The remaining iPhone
+   overflow came from the modal body/content layer: generic modal sizing can
+   make a 100%-wide content box plus horizontal padding exceed the card width.
+
+   This version makes every Decision Centre content layer border-box and
+   explicitly width-contained.
+   ============================================================================ */
+
+/* Critical fix: padding belongs INSIDE the available card width. */
+.decision-centre-dialog-v310 .decision-centre-body-v310,
+.decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+  box-sizing:border-box !important;
+  inline-size:100% !important;
+  width:100% !important;
+  max-inline-size:100% !important;
+  max-width:100% !important;
+  min-inline-size:0 !important;
+  min-width:0 !important;
+}
+
+/* Every large content panel must size from the body's content box, never from
+   its own min-content width. */
+.decision-centre-dialog-v310 .decision-player-hero-v310,
+.decision-centre-dialog-v310 .decision-options-v310,
+.decision-centre-dialog-v310 .decision-summary-grid-v310,
+.decision-centre-dialog-v310 .decision-actions-grid-v310,
+.decision-centre-dialog-v310 .decision-action-card-v310,
+.decision-centre-dialog-v310 .decision-contract-strip-v310,
+.decision-centre-dialog-v310 .decision-strip-head-v310,
+.decision-centre-dialog-v310 .decision-player-heading-v310,
+.decision-centre-dialog-v310 .decision-options-heading-v310 {
+  box-sizing:border-box !important;
+  inline-size:100%;
+  width:100%;
+  max-inline-size:100%;
+  max-width:100%;
+  min-inline-size:0;
+  min-width:0;
+}
+
+/* Flex/grid children must be allowed to shrink. */
+.decision-centre-dialog-v310 .decision-player-heading-v310 > *,
+.decision-centre-dialog-v310 .decision-options-heading-v310 > *,
+.decision-centre-dialog-v310 .decision-action-copy-v310,
+.decision-centre-dialog-v310 .decision-static-status-v310,
+.decision-centre-dialog-v310 .decision-impact-v310,
+.decision-centre-dialog-v310 .decision-impact-total-v310,
+.decision-centre-dialog-v310 .decision-relief-v310 {
+  min-width:0;
+  max-width:100%;
+}
+
+/* Normal prose should wrap instead of widening its card. */
+.decision-centre-dialog-v310 .decision-action-copy-v310 h4,
+.decision-centre-dialog-v310 .decision-action-copy-v310 p,
+.decision-centre-dialog-v310 .decision-options-heading-v310 h3,
+.decision-centre-dialog-v310 .decision-options-heading-v310 > span,
+.decision-centre-dialog-v310 .decision-player-heading-v310 h3,
+.decision-centre-dialog-v310 .decision-player-heading-v310 p,
+.decision-centre-dialog-v310 .decision-static-status-v310 strong,
+.decision-centre-dialog-v310 .decision-impact-v310 p {
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+/* Keep the summary cells from using their contents as a minimum width. */
+.decision-centre-dialog-v310 .decision-summary-grid-v310 > div {
+  box-sizing:border-box;
+  min-width:0 !important;
+  max-width:100%;
+}
+
+.decision-centre-dialog-v310 .decision-summary-grid-v310 strong,
+.decision-centre-dialog-v310 .decision-summary-grid-v310 small,
+.decision-centre-dialog-v310 .decision-summary-grid-v310 span {
+  min-width:0;
+  max-width:100%;
+}
+
+/* -------------------------------------------------------------------------
+   Mobile Decision Centre
+   ------------------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  /* Explicit body padding, border-box constrained. This avoids inheriting a
+     modal-body width/padding combination that can overflow on Safari. */
+  .decision-centre-dialog-v310 .decision-centre-body-v310 {
+    padding:10px !important;
+  }
+
+  .decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+    padding:10px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-player-hero-v310,
+  .decision-centre-dialog-v310 .decision-options-v310 {
+    padding:11px !important;
+    border-radius:14px;
+  }
+
+  /* Two-column summary remains compact but cannot exceed the panel. */
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  /* Do not present a clipped fourth season as the default state.
+     On phones the entered horizon wraps into a contained two-column grid. */
+  .decision-centre-dialog-v310 .decision-contract-strip-v310 {
+    display:grid !important;
+    grid-auto-flow:row !important;
+    grid-auto-columns:auto !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:7px !important;
+    padding:1px !important;
+    overflow:visible !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-season-v310 {
+    box-sizing:border-box;
+    width:100%;
+    min-width:0 !important;
+    max-width:100%;
+    padding:9px 7px;
+  }
+
+  .decision-centre-dialog-v310 .decision-strip-head-v310 small {
+    display:none;
+  }
+
+  /* Action cards are strictly single-column on mobile. */
+  .decision-centre-dialog-v310 .decision-actions-grid-v310 {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:8px;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-card-v310 {
+    padding:11px !important;
+    gap:9px;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-copy-v310 p:not(.eyebrow) {
+    font-size:.67rem;
+    line-height:1.38;
+  }
+
+  .decision-centre-dialog-v310 .decision-static-status-v310,
+  .decision-centre-dialog-v310 .decision-impact-total-v310,
+  .decision-centre-dialog-v310 .decision-relief-v310 {
+    box-sizing:border-box;
+    width:100%;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   iPhone width
+   ------------------------------------------------------------------------- */
+
+@media (max-width:430px) {
+  .decision-centre-dialog-v310 .decision-centre-body-v310,
+  .decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+    padding:8px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-player-hero-v310,
+  .decision-centre-dialog-v310 .decision-options-v310 {
+    padding:10px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 > div {
+    padding:9px 6px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 span {
+    font-size:.55rem;
+    letter-spacing:.07em;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 strong {
+    font-size:.78rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 small {
+    font-size:.55rem;
+    line-height:1.22;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-strip-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-season-v310 span {
+    font-size:.58rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-season-v310 strong {
+    font-size:.72rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-options-heading-v310 h3 {
+    font-size:.95rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-copy-v310 h4 {
+    font-size:.87rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-copy-v310 p:not(.eyebrow) {
+    font-size:.64rem;
+  }
+
+  /* Long status rows can stack rather than forcing horizontal width. */
+  .decision-centre-dialog-v310 .decision-static-status-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:3px;
+  }
+
+  .decision-centre-dialog-v310 .decision-static-status-v310 strong {
+    width:100%;
+    text-align:left;
+  }
+}
+
+/* Very narrow phones: horizon becomes one clean column rather than clipping. */
+@media (max-width:350px) {
+  .decision-centre-dialog-v310 .decision-contract-strip-v310 {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
