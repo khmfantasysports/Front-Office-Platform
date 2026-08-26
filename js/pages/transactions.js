@@ -39,6 +39,11 @@ function renderStructuredTradeSelectors() {
 
   const reacquireAssets = (state.assets || []).filter((asset) => !asset.archivedAt && asset.status === 'TRADED_AWAY');
   el('tradeIncomingExistingAssets').innerHTML = reacquireAssets.length ? reacquireAssets.map((asset) => `<label class="trade-choice"><input type="checkbox" data-trade-in-existing-asset="${asset.id}" /><span class="trade-choice-main"><strong>${escapeHtml(asset.label)}</strong><small>${escapeHtml(assetTypeLabel(asset.type))} · currently Traded Away</small></span><span class="trade-choice-value">IN</span></label>`).join('') : '<div class="trade-empty">No previously traded assets to reacquire.</div>';
+
+  document.querySelectorAll('[data-trade-out-player]').forEach((input) => {
+    input.addEventListener('change', () => syncTradeRetentionControlsV3115({ recalculate:true }));
+  });
+  syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
 function tradeSalaryInputs(index) {
@@ -96,6 +101,7 @@ function resetStructuredTradeControls() {
   el('tradeEditLock').classList.add('hidden');
   el('addTradeIncomingPlayerBtn').classList.remove('hidden');
   el('addTradeIncomingAssetBtn').classList.remove('hidden');
+  resetTradeRetentionDraftV3115();
   renderStructuredTradeSelectors();
 }
 
@@ -111,6 +117,7 @@ function renderStructuredTradeEditSummary(transactionId) {
   el('tradeEditLock').classList.remove('hidden');
   el('addTradeIncomingPlayerBtn').classList.add('hidden');
   el('addTradeIncomingAssetBtn').classList.add('hidden');
+  syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
 function collectStructuredTradePayload() {
@@ -219,7 +226,7 @@ function renderTransactions() {
 
 function transactionTypeConfig(type) {
   const configs = {
-    'Trade': { help:'Select the actual players and assets moving in/out. Incoming players and picks become real Front Office records when the trade is saved.', counterparty:true, structuredTrade:true, autoSummary:true, financial:'manual' },
+    'Trade': { help:'Select the actual players and assets moving in/out. Incoming players and picks become real Front Office records when the trade is saved. Salary retention can be calculated from an outgoing player below.', counterparty:true, structuredTrade:true, autoSummary:true, financial:'manual' },
     'Signing': { help:'Record a signing. Salary and contract terms should be maintained on the player record.', player:'optional', summary:true },
     'Extension': { help:'Choose the player being extended. Their current contract salary appears below for reference.', player:'required', autoSummary:true },
     'Call Up': { help:'Choose a prospect currently in Minors. The roster move is handled automatically.', player:'required', rosterStatus:true, autoSummary:true, action:'CALL_UP' },
@@ -282,6 +289,330 @@ function transactionPlayerSalaryRows(player) {
   });
 }
 
+
+// ============================================================================
+// RosterCap V3.11.5 — Trade salary retention calculator
+//
+// Retention belongs to the structured Trade flow. The selected player must be
+// one of the outgoing players. The structured-trade RPC removes that player,
+// while the existing transaction adjustment rows retain only the calculated
+// percentage of each remaining salary season on the Front Office cap.
+// ============================================================================
+
+const ROSTERCAP_TRADE_RETENTION_VERSION_V3115 = '3.11.5';
+
+function retentionRoundV3115(value) {
+  return Math.round(Number(value || 0) * 100) / 100;
+}
+
+function tradeRetentionOutgoingPlayerIdsV3115() {
+  return [...document.querySelectorAll('[data-trade-out-player]:checked')]
+    .map((input) => input.dataset.tradeOutPlayer)
+    .filter(Boolean);
+}
+
+function tradeRetentionOutgoingPlayersV3115() {
+  const ids = new Set(tradeRetentionOutgoingPlayerIdsV3115());
+  return (state.players || []).filter((player) => ids.has(player.id));
+}
+
+function calculateTradeRetentionRowsV3115(player, percent) {
+  const pct = Number(percent);
+  if (!player || !Number.isFinite(pct) || pct <= 0 || pct > 100) return [];
+
+  return transactionPlayerSalaryRows(player)
+    .filter((row) =>
+      row.insideContract
+      && row.salary !== null
+      && row.salary !== undefined
+    )
+    .map((row) => ({
+      seasonId:row.season.id,
+      salary:Number(row.salary || 0),
+      amount:retentionRoundV3115(Number(row.salary || 0) * (pct / 100))
+    }))
+    .filter((row) => row.amount !== 0);
+}
+
+function clearTransactionFinancialRowsV3115() {
+  document.querySelectorAll('[data-transaction-adjustment-season]').forEach((input) => {
+    input.value = '';
+  });
+}
+
+function ensureTradeRetentionControlsV3115() {
+  const manualFields = el('transactionManualFinancialFields');
+  if (!manualFields || el('transactionRetentionPlayerV3115')) return;
+
+  const descriptionLabel = el('transactionAdjustmentDescription')?.closest('label');
+
+  const playerLabel = document.createElement('label');
+  playerLabel.id = 'transactionRetentionPlayerFieldV3115';
+  playerLabel.className = 'hidden';
+  playerLabel.innerHTML = `
+    <span>Retained player</span>
+    <select id="transactionRetentionPlayerV3115">
+      <option value="">Select outgoing player…</option>
+    </select>
+  `;
+
+  const percentLabel = document.createElement('label');
+  percentLabel.id = 'transactionRetentionPercentFieldV3115';
+  percentLabel.className = 'hidden';
+  percentLabel.innerHTML = `
+    <span>Retained salary %</span>
+    <input
+      id="transactionRetentionPercentV3115"
+      inputmode="decimal"
+      max="100"
+      min="0"
+      placeholder="e.g. 50"
+      step="0.01"
+      type="number"
+    />
+  `;
+
+  const note = document.createElement('div');
+  note.id = 'transactionRetentionNoteV3115';
+  note.className = 'transaction-smart-note full-width hidden';
+
+  if (descriptionLabel) {
+    manualFields.insertBefore(playerLabel, descriptionLabel);
+    manualFields.insertBefore(percentLabel, descriptionLabel);
+    manualFields.insertBefore(note, descriptionLabel);
+  } else {
+    manualFields.prepend(note);
+    manualFields.prepend(percentLabel);
+    manualFields.prepend(playerLabel);
+  }
+
+  el('transactionRetentionPlayerV3115')?.addEventListener('change', () => {
+    applyTradeRetentionCalculationV3115();
+  });
+
+  el('transactionRetentionPercentV3115')?.addEventListener('input', () => {
+    applyTradeRetentionCalculationV3115();
+  });
+
+  document.documentElement.dataset.rostercapTradeRetention =
+    ROSTERCAP_TRADE_RETENTION_VERSION_V3115;
+}
+
+function resetTradeRetentionDraftV3115() {
+  ensureTradeRetentionControlsV3115();
+
+  const playerSelect = el('transactionRetentionPlayerV3115');
+  const percentInput = el('transactionRetentionPercentV3115');
+  const note = el('transactionRetentionNoteV3115');
+
+  if (playerSelect) {
+    playerSelect.innerHTML = '<option value="">Select outgoing player…</option>';
+    playerSelect.value = '';
+  }
+  if (percentInput) percentInput.value = '';
+  if (note) {
+    note.textContent = '';
+    note.classList.add('hidden');
+  }
+}
+
+function tradeRetentionMessageV3115(player, percent, rows) {
+  if (!player) return 'Select an outgoing player first.';
+  if (!rows.length) {
+    return 'No entered salary rows are available inside this player’s remaining contract term.';
+  }
+
+  const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+  const seasonCount = rows.length;
+
+  return `${Number(percent).toLocaleString(undefined,{maximumFractionDigits:2})}% of ${player.name} · ${seasonCount} ${seasonCount === 1 ? 'season' : 'seasons'} · ${formatMoney(total)} retained total. The outgoing player is removed by the trade; only these retained amounts remain on Cap.`;
+}
+
+function applyTradeRetentionCalculationV3115() {
+  ensureTradeRetentionControlsV3115();
+
+  if (el('transactionType')?.value !== 'Trade' || editingTransactionId) return;
+
+  const playerId = el('transactionRetentionPlayerV3115')?.value || '';
+  const percent = nullableNumber(el('transactionRetentionPercentV3115')?.value);
+  const player = (state.players || []).find((item) => item.id === playerId) || null;
+  const note = el('transactionRetentionNoteV3115');
+
+  if (percent === null || percent === 0) {
+    clearTransactionFinancialRowsV3115();
+    if (note) {
+      note.textContent = player
+        ? 'Enter a retained percentage to calculate the season-by-season amount.'
+        : 'Select an outgoing player, then enter the percentage your team retains.';
+      note.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (!Number.isFinite(Number(percent)) || percent < 0 || percent > 100) {
+    clearTransactionFinancialRowsV3115();
+    if (note) {
+      note.textContent = 'Retained salary percentage must be between 0 and 100.';
+      note.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (!player) {
+    clearTransactionFinancialRowsV3115();
+    if (note) {
+      note.textContent = 'Select one of the checked outgoing players to calculate retention.';
+      note.classList.remove('hidden');
+    }
+    return;
+  }
+
+  const outgoingIds = new Set(tradeRetentionOutgoingPlayerIdsV3115());
+  if (!outgoingIds.has(player.id)) {
+    clearTransactionFinancialRowsV3115();
+    if (note) {
+      note.textContent = 'The retained player must still be selected as an outgoing player in this trade.';
+      note.classList.remove('hidden');
+    }
+    return;
+  }
+
+  const rows = calculateTradeRetentionRowsV3115(player, percent);
+  clearTransactionFinancialRowsV3115();
+
+  rows.forEach((row) => {
+    const input = document.querySelector(
+      `[data-transaction-adjustment-season="${CSS.escape(row.seasonId)}"]`
+    );
+    if (input) input.value = String(row.amount);
+  });
+
+  const description = el('transactionAdjustmentDescription');
+  if (description) {
+    description.value =
+      `${player.name} · ${Number(percent).toLocaleString(undefined,{maximumFractionDigits:2})}% retained salary`;
+  }
+
+  if (note) {
+    note.textContent = tradeRetentionMessageV3115(player, percent, rows);
+    note.classList.remove('hidden');
+  }
+}
+
+function syncTradeRetentionControlsV3115(options = {}) {
+  ensureTradeRetentionControlsV3115();
+
+  const isTrade = el('transactionType')?.value === 'Trade';
+  const editingTrade = Boolean(isTrade && editingTransactionId);
+  const playerField = el('transactionRetentionPlayerFieldV3115');
+  const percentField = el('transactionRetentionPercentFieldV3115');
+  const note = el('transactionRetentionNoteV3115');
+  const playerSelect = el('transactionRetentionPlayerV3115');
+
+  const showCalculator = Boolean(isTrade && !editingTrade);
+  playerField?.classList.toggle('hidden', !showCalculator);
+  percentField?.classList.toggle('hidden', !showCalculator);
+  note?.classList.toggle('hidden', !isTrade);
+
+  if (!isTrade) return;
+
+  if (editingTrade) {
+    if (note) {
+      note.textContent =
+        'Structured trade players are already locked. Existing retained salary rows can still be edited by season below.';
+      note.classList.remove('hidden');
+    }
+    return;
+  }
+
+  const outgoingPlayers = tradeRetentionOutgoingPlayersV3115();
+  const priorValue = playerSelect?.value || '';
+
+  if (playerSelect) {
+    playerSelect.innerHTML = `<option value="">Select outgoing player…</option>${outgoingPlayers.map((player) =>
+      `<option value="${escapeAttr(player.id)}">${escapeHtml(player.name)}</option>`
+    ).join('')}`;
+
+    const stillAvailable = outgoingPlayers.some((player) => player.id === priorValue);
+    if (stillAvailable) playerSelect.value = priorValue;
+    else if (outgoingPlayers.length === 1) playerSelect.value = outgoingPlayers[0].id;
+    else playerSelect.value = '';
+  }
+
+  if (note && !outgoingPlayers.length) {
+    note.textContent = 'Check an outgoing player above to enable salary retention.';
+    note.classList.remove('hidden');
+  } else if (note && outgoingPlayers.length && !playerSelect?.value) {
+    note.textContent = 'Choose which outgoing player has salary retained.';
+    note.classList.remove('hidden');
+  }
+
+  if (options.recalculate !== false) applyTradeRetentionCalculationV3115();
+}
+
+function validateTradeRetentionV3115(structuredTrade) {
+  if (editingTransactionId || el('transactionType')?.value !== 'Trade') return true;
+
+  const percent = nullableNumber(el('transactionRetentionPercentV3115')?.value);
+  if (percent === null || percent === 0) return true;
+
+  if (!Number.isFinite(Number(percent)) || percent < 0 || percent > 100) {
+    alert('Retained salary percentage must be between 0 and 100.');
+    return false;
+  }
+
+  const playerId = el('transactionRetentionPlayerV3115')?.value || '';
+  if (!playerId) {
+    alert('Choose which outgoing player has salary retained.');
+    return false;
+  }
+
+  if (!structuredTrade?.outPlayerIds?.includes(playerId)) {
+    alert('The retained player must be included in the outgoing side of the trade.');
+    return false;
+  }
+
+  const player = (state.players || []).find((item) => item.id === playerId) || null;
+  const calculatedRows = calculateTradeRetentionRowsV3115(player, percent);
+  if (!calculatedRows.length) {
+    alert('The retained player has no entered salary rows inside the remaining contract term.');
+    return false;
+  }
+
+  const expectedBySeason = new Map(
+    calculatedRows.map((row) => [row.seasonId, Number(row.amount || 0)])
+  );
+
+  const enteredRows = [...document.querySelectorAll('[data-transaction-adjustment-season]')]
+    .map((input) => ({
+      seasonId:input.dataset.transactionAdjustmentSeason,
+      amount:nullableNumber(input.value)
+    }))
+    .filter((row) => row.amount !== null && row.amount !== 0);
+
+  const enteredBySeason = new Map(
+    enteredRows.map((row) => [row.seasonId, Number(row.amount || 0)])
+  );
+
+  const parityPass =
+    enteredBySeason.size === expectedBySeason.size
+    && [...expectedBySeason.entries()].every(([seasonId, expected]) =>
+      enteredBySeason.has(seasonId)
+      && Math.abs(Number(enteredBySeason.get(seasonId)) - expected) <= 0.01
+    );
+
+  if (!parityPass) {
+    alert(
+      'The retained salary season amounts no longer match the entered percentage. '
+      + 'Re-enter the percentage to recalculate, or clear the percentage field to use manual season amounts.'
+    );
+    return false;
+  }
+
+  return true;
+}
+
+
 function renderTransactionPlayerSnapshot() {
   const player = state.players.find((item) => item.id === el('transactionPlayer').value);
   const box = el('transactionPlayerSnapshot');
@@ -336,14 +667,19 @@ function renderTransactionFinancialMode() {
   const type = el('transactionType').value;
   const config = transactionTypeConfig(type);
   const section = el('transactionFinancialSection');
+  ensureTradeRetentionControlsV3115();
+
   if (!config.financial) {
     section.classList.add('hidden');
+    syncTradeRetentionControlsV3115({ recalculate:false });
     return;
   }
+
   section.classList.remove('hidden');
   const automatic = config.financial === 'waiver' || config.financial === 'buyout';
   el('transactionRulePreview').classList.toggle('hidden', !automatic);
   el('transactionManualFinancialFields').classList.toggle('hidden', automatic);
+
   if (automatic) {
     const rule = transactionRuleForType(type);
     el('transactionFinancialTitle').textContent = `${type} Dead Cap`;
@@ -352,11 +688,19 @@ function renderTransactionFinancialMode() {
     el('transactionRulePreviewCopy').textContent = `${transactionRuleModeLabel(rule.mode, rule.value)} · ${transactionRuleScopeLabel(rule.scope)}.`;
     const player = state.players.find((item) => item.id === el('transactionPlayer').value);
     el('transactionAdjustmentDescription').value = player ? `${player.name} ${type.toLowerCase()} penalty` : `${type} penalty`;
+  } else if (type === 'Trade') {
+    el('transactionFinancialTitle').textContent = 'Salary Retention';
+    el('transactionFinancialCopy').textContent =
+      'Optional. Select an outgoing player and enter the percentage your team keeps. Retention is calculated from each entered remaining salary season. The outgoing player is removed by the structured trade, so only the retained amount remains on Cap.';
+    if (!el('transactionAdjustmentDescription').value) {
+      el('transactionAdjustmentDescription').value = 'Retained salary';
+    }
   } else {
     el('transactionFinancialTitle').textContent = 'Optional Dead Cap';
     el('transactionFinancialCopy').textContent = 'Enter retained salary or another transaction-generated amount that should remain on your cap.';
-    if (type === 'Trade' && !el('transactionAdjustmentDescription').value) el('transactionAdjustmentDescription').value = 'Retained salary';
   }
+
+  syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
 function automaticPenaltyRows(type, player) {
@@ -425,6 +769,7 @@ function handleTransactionTypeChange() {
   renderTransactionFinancialMode();
   autoTransactionSummary();
   applyAutomaticTransactionPenalty();
+  syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
 function resetTransactionEditState() {
@@ -438,6 +783,7 @@ function resetTransactionEditState() {
   el('transactionDialogTitle').textContent = 'Record transaction';
   el('saveTransactionBtn').textContent = 'Save Transaction';
   el('tradeEditLock').classList.add('hidden');
+  resetTradeRetentionDraftV3115();
 }
 
 function openTransactionDialog(options = {}) {
@@ -512,6 +858,8 @@ function openEditTransactionDialog(transactionId) {
       if (input) input.value = String(row.amount);
     });
   }
+
+  syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
 async function deleteTransaction(transactionId) {
@@ -541,6 +889,7 @@ async function saveTransactionFromDialog(event) {
   if (!editingTransactionId && type === 'Trade') {
     if (!el('transactionCounterparty').value.trim()) { alert('Enter the other team for this trade.'); return; }
     try { structuredTrade = collectStructuredTradePayload(); } catch (error) { alert(error.message); return; }
+    if (!validateTradeRetentionV3115(structuredTrade)) return;
   }
   autoTransactionSummary();
   const summary = el('transactionSummary').value.trim();
@@ -549,7 +898,7 @@ async function saveTransactionFromDialog(event) {
   const rows = financialVisible ? [...document.querySelectorAll('[data-transaction-adjustment-season]')].map((input) => ({ season_id: input.dataset.transactionAdjustmentSeason, amount: nullableNumber(input.value) })).filter((row) => row.amount !== null && row.amount !== 0) : [];
   if (rows.some((row) => row.amount < 0)) { alert('Dead Cap amounts cannot be negative.'); return; }
   button.disabled = true;
-  button.textContent = editingTransactionId ? 'Saving…' : 'Saving…';
+  button.textContent = 'Saving…';
   try {
     const incoming = config.flow ? el('transactionIncoming').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
     const outgoing = config.flow ? el('transactionOutgoing').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
