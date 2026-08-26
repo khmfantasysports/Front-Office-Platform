@@ -5975,3 +5975,1063 @@ Load after workspace-shared.css.
     padding-right:5px;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.11.1 — Bundled Transactions Decision Support
+   ============================================================================ */
+
+/* ==========================================================================\n   RosterCap V3.10.1 — Visible Player Decisions\n   ========================================================================== */
+
+.player-decision-launcher-v310 {
+  margin-top:16px;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border:1px solid rgba(77,181,255,.26);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(54,173,255,.10),transparent 46%),
+    rgba(8,23,34,.72);
+}
+
+.player-decision-launcher-v310.hidden {
+  display:none !important;
+}
+
+.player-decision-launcher-copy-v310 {
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.player-decision-launcher-copy-v310 .eyebrow {
+  margin:0;
+  font-size:.62rem;
+}
+
+.player-decision-launcher-copy-v310 strong {
+  color:var(--text);
+  font-size:.94rem;
+}
+
+.player-decision-launcher-copy-v310 span {
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+.player-decision-launcher-btn-v310 {
+  flex:0 0 auto;
+  min-width:136px;
+}
+
+.decision-centre-dialog-v310 {
+  --decision-teal:#63dbc8;
+  --decision-blue:#79caff;
+}
+
+.decision-centre-card-v310 {
+  width:min(920px,calc(100vw - 22px));
+  max-width:920px;
+  max-height:min(90dvh,900px);
+  overflow:hidden;
+}
+
+.decision-centre-header-v310 {
+  flex:0 0 auto;
+}
+
+.decision-centre-body-v310 {
+  display:grid;
+  gap:14px;
+  min-width:0;
+  overflow-x:hidden;
+}
+
+.decision-player-hero-v310,
+.decision-options-v310 {
+  border:1px solid rgba(112,164,199,.24);
+  border-radius:18px;
+  background:rgba(8,21,31,.54);
+}
+
+.decision-player-hero-v310 {
+  padding:18px;
+}
+
+.decision-player-heading-v310 {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.decision-player-heading-v310 .eyebrow,
+.decision-options-heading-v310 .eyebrow,
+.decision-action-copy-v310 .eyebrow {
+  margin:0 0 3px;
+}
+
+.decision-player-heading-v310 h3,
+.decision-options-heading-v310 h3 {
+  margin:0;
+  color:var(--text);
+}
+
+.decision-player-heading-v310 h3 {
+  font-size:1.35rem;
+}
+
+.decision-player-heading-v310 p:not(.eyebrow) {
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.76rem;
+}
+
+.decision-location-badge-v310 {
+  flex:0 0 auto;
+  padding:7px 10px;
+  border:1px solid rgba(100,217,197,.26);
+  border-radius:999px;
+  background:rgba(31,122,107,.12);
+  color:#a7ead8;
+  font-size:.67rem;
+  font-weight:800;
+  letter-spacing:.035em;
+}
+
+.decision-summary-grid-v310 {
+  margin-top:15px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  border:1px solid rgba(112,164,199,.22);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(9,20,29,.58);
+}
+
+.decision-summary-grid-v310 > div {
+  min-width:0;
+  padding:12px 13px;
+  display:grid;
+  gap:3px;
+  text-align:center;
+  border-right:1px solid rgba(112,164,199,.18);
+}
+
+.decision-summary-grid-v310 > div:last-child {
+  border-right:0;
+}
+
+.decision-summary-grid-v310 span,
+.decision-static-status-v310 span,
+.decision-impact-total-v310 span {
+  color:var(--muted);
+  font-size:.61rem;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.decision-summary-grid-v310 strong {
+  min-width:0;
+  color:var(--text);
+  font-size:.92rem;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.decision-summary-grid-v310 small {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+.decision-strip-head-v310 {
+  margin:14px 2px 7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-strip-head-v310 span {
+  color:#9fc5dc;
+  font-size:.67rem;
+  font-weight:900;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.decision-strip-head-v310 small {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+.decision-contract-strip-v310 {
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(104px,1fr);
+  gap:8px;
+  overflow-x:auto;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  padding:1px 1px 5px;
+}
+
+.decision-contract-season-v310 {
+  min-width:0;
+  padding:10px 9px;
+  display:grid;
+  gap:3px;
+  text-align:center;
+  border:1px solid rgba(112,164,199,.18);
+  border-radius:12px;
+  background:rgba(9,20,29,.56);
+}
+
+.decision-contract-season-v310.entered {
+  border-color:rgba(92,199,227,.30);
+  background:rgba(21,57,75,.30);
+}
+
+.decision-contract-season-v310 span {
+  color:#9fc5dc;
+  font-size:.63rem;
+  font-weight:800;
+}
+
+.decision-contract-season-v310 strong {
+  color:var(--text);
+  font-size:.78rem;
+}
+
+.decision-contract-season-v310 small {
+  color:var(--muted);
+  font-size:.57rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.decision-options-v310 {
+  padding:18px;
+}
+
+.decision-options-heading-v310 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:12px;
+}
+
+.decision-options-heading-v310 h3 {
+  font-size:1.02rem;
+}
+
+.decision-options-heading-v310 > span {
+  max-width:300px;
+  color:var(--muted);
+  font-size:.65rem;
+  line-height:1.4;
+  text-align:right;
+}
+
+.decision-actions-grid-v310 {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.decision-action-card-v310 {
+  min-width:0;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  border:1px solid rgba(112,164,199,.22);
+  border-radius:14px;
+  background:rgba(7,18,27,.66);
+}
+
+.decision-action-card-v310.primary {
+  border-color:rgba(84,185,255,.34);
+  background:linear-gradient(145deg,rgba(22,74,102,.28),rgba(7,18,27,.72));
+}
+
+.decision-action-card-v310.danger {
+  border-color:rgba(223,109,115,.28);
+}
+
+.decision-action-copy-v310 {
+  display:grid;
+  gap:3px;
+}
+
+.decision-action-copy-v310 h4 {
+  margin:0;
+  color:var(--text);
+  font-size:.94rem;
+}
+
+.decision-action-copy-v310 p:not(.eyebrow) {
+  margin:0;
+  color:var(--muted);
+  font-size:.70rem;
+  line-height:1.45;
+}
+
+.decision-static-status-v310,
+.decision-impact-v310 {
+  padding:10px 11px;
+  border:1px solid rgba(112,164,199,.18);
+  border-radius:11px;
+  background:rgba(14,29,40,.58);
+}
+
+.decision-static-status-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-static-status-v310 strong {
+  color:#cfe2ee;
+  font-size:.72rem;
+  text-align:right;
+}
+
+.decision-impact-v310 {
+  display:grid;
+  gap:7px;
+}
+
+.decision-impact-v310.neutral {
+  gap:3px;
+}
+
+.decision-impact-v310.neutral strong {
+  color:#cfe2ee;
+  font-size:.75rem;
+}
+
+.decision-impact-v310.neutral span {
+  color:var(--muted);
+  font-size:.64rem;
+  line-height:1.35;
+}
+
+.decision-impact-total-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-impact-total-v310 strong {
+  color:var(--decision-teal);
+  font-size:.92rem;
+}
+
+.decision-impact-v310 > p {
+  margin:0;
+  color:var(--muted);
+  font-size:.62rem;
+  line-height:1.35;
+}
+
+.decision-relief-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-top:6px;
+  border-top:1px solid rgba(112,164,199,.14);
+}
+
+.decision-relief-v310 span {
+  color:#9fc5dc;
+  font-size:.59rem;
+  font-weight:800;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+}
+
+.decision-relief-v310 strong {
+  color:var(--decision-teal);
+  font-size:.72rem;
+}
+
+.decision-relief-v310.cost strong {
+  color:#ef9ba0;
+}
+
+.decision-impact-seasons-v310 {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.decision-impact-season-v310 {
+  padding:5px 7px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border:1px solid rgba(112,164,199,.17);
+  border-radius:8px;
+  background:rgba(5,15,23,.45);
+}
+
+.decision-impact-season-v310 small {
+  color:var(--muted);
+  font-size:.56rem;
+}
+
+.decision-impact-season-v310 strong {
+  color:#d7e8f2;
+  font-size:.62rem;
+}
+
+.decision-impact-empty-v310 {
+  color:var(--muted);
+  font-size:.63rem;
+}
+
+.decision-action-btn-v310 {
+  margin-top:auto;
+  width:100%;
+  min-height:40px;
+}
+
+.decision-centre-footer-v310 {
+  gap:12px;
+}
+
+.decision-centre-footer-note-v310 {
+  flex:1 1 auto;
+  color:var(--muted);
+  font-size:.65rem;
+  line-height:1.35;
+}
+
+@media (max-width:720px) {
+  .player-decision-launcher-v310 {
+    align-items:stretch;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .player-decision-launcher-btn-v310 {
+    width:100%;
+  }
+
+  .decision-centre-card-v310 {
+    width:min(100vw - 12px,920px);
+    max-height:calc(100dvh - 12px);
+    border-radius:18px;
+  }
+
+  .decision-centre-body-v310 {
+    gap:10px;
+  }
+
+  .decision-player-hero-v310,
+  .decision-options-v310 {
+    padding:13px;
+    border-radius:15px;
+  }
+
+  .decision-player-heading-v310 h3 {
+    font-size:1.18rem;
+  }
+
+  .decision-summary-grid-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .decision-summary-grid-v310 > div:nth-child(2) {
+    border-right:0;
+  }
+
+  .decision-summary-grid-v310 > div:nth-child(-n+2) {
+    border-bottom:1px solid rgba(112,164,199,.18);
+  }
+
+  .decision-actions-grid-v310 {
+    grid-template-columns:1fr;
+  }
+
+  .decision-options-heading-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .decision-options-heading-v310 > span {
+    max-width:none;
+    text-align:left;
+  }
+
+  .decision-centre-footer-v310 {
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .decision-centre-footer-v310 .btn {
+    width:100%;
+  }
+}
+
+@media (max-width:390px) {
+  .decision-player-heading-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .decision-summary-grid-v310 > div {
+    padding:10px 8px;
+  }
+
+  .decision-summary-grid-v310 strong {
+    font-size:.82rem;
+  }
+
+  .decision-contract-strip-v310 {
+    grid-auto-columns:96px;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.10.1 — Visible Player Decisions
+   ============================================================================ */
+
+/* Existing-player launcher: move it near the top and keep it compact. */
+.player-decision-launcher-v310 {
+  margin:8px 0 12px;
+  padding:9px 10px;
+  border-radius:11px;
+}
+
+.player-decision-launcher-copy-v310 {
+  gap:2px;
+}
+
+.player-decision-launcher-copy-v310 strong {
+  font-size:.75rem;
+}
+
+.player-decision-launcher-copy-v310 span {
+  font-size:.57rem;
+  line-height:1.32;
+}
+
+.player-decision-launcher-btn-v310 {
+  min-width:112px;
+  min-height:32px;
+  padding:5px 8px;
+  font-size:.56rem;
+}
+
+/* Obvious Roster-page entry point below Import / Tools + Add Player. */
+#rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 {
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:100%;
+  min-height:32px;
+  padding:5px 8px;
+  border-color:rgba(99,219,200,.18);
+  background:rgba(99,219,200,.035);
+  color:#CDEFE8;
+  font-size:.58rem;
+}
+
+#rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 span {
+  font-weight:900;
+}
+
+#rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 small {
+  color:#789B98;
+  font-size:.47rem;
+  font-weight:700;
+}
+
+/* Roster-wide player chooser. */
+.decision-player-picker-card-v3101 {
+  width:min(620px,calc(100vw - 22px));
+  max-width:620px;
+  max-height:min(86dvh,760px);
+  overflow:hidden;
+}
+
+.decision-player-picker-body-v3101 {
+  display:grid;
+  gap:9px;
+  overflow:hidden;
+}
+
+.decision-player-picker-intro-v3101 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-player-picker-intro-v3101 > div {
+  display:grid;
+  gap:2px;
+}
+
+.decision-player-picker-intro-v3101 strong {
+  color:var(--text);
+  font-size:.75rem;
+}
+
+.decision-player-picker-intro-v3101 span,
+.decision-player-picker-intro-v3101 > small {
+  color:var(--muted);
+  font-size:.55rem;
+  line-height:1.3;
+}
+
+.decision-player-picker-search-v3101 {
+  display:grid;
+  gap:4px;
+}
+
+.decision-player-picker-search-v3101 > span {
+  color:#8EA8B8;
+  font-size:.50rem;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.decision-player-picker-search-v3101 input {
+  min-height:34px;
+  padding:6px 9px;
+  border-radius:9px;
+  font-size:.60rem;
+}
+
+.decision-player-picker-list-v3101 {
+  display:grid;
+  gap:5px;
+  max-height:58dvh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:2px;
+  scrollbar-width:thin;
+}
+
+.decision-player-choice-v3101 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  width:100%;
+  min-height:48px;
+  padding:7px 8px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  color:inherit;
+  background:rgba(255,255,255,.012);
+  text-align:left;
+  cursor:pointer;
+}
+
+.decision-player-choice-v3101:hover,
+.decision-player-choice-v3101:focus-visible {
+  border-color:rgba(99,219,200,.28);
+  background:rgba(99,219,200,.035);
+}
+
+.decision-player-choice-main-v3101,
+.decision-player-choice-contract-v3101 {
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+
+.decision-player-choice-main-v3101 strong {
+  overflow:hidden;
+  color:#DCECF6;
+  font-size:.64rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.decision-player-choice-main-v3101 small,
+.decision-player-choice-contract-v3101 small {
+  color:#758B9B;
+  font-size:.50rem;
+}
+
+.decision-player-choice-contract-v3101 {
+  justify-items:end;
+}
+
+.decision-player-choice-contract-v3101 strong {
+  color:#BFD8E6;
+  font-size:.59rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.decision-player-picker-empty-v3101 {
+  padding:12px;
+  border:1px dashed rgba(119,201,255,.13);
+  border-radius:9px;
+  color:#7D93A3;
+}
+
+.decision-player-picker-empty-v3101 strong,
+.decision-player-picker-empty-v3101 span {
+  display:block;
+}
+
+.decision-player-picker-empty-v3101 strong {
+  color:#BDD3E0;
+  font-size:.63rem;
+}
+
+.decision-player-picker-empty-v3101 span {
+  margin-top:3px;
+  font-size:.53rem;
+}
+
+@media (max-width:720px) {
+  #rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 {
+    min-height:31px;
+    font-size:.56rem;
+  }
+
+  .decision-player-picker-card-v3101 {
+    width:min(620px,calc(100vw - 14px));
+  }
+
+  .decision-player-picker-list-v3101 {
+    max-height:56dvh;
+  }
+
+  .decision-player-choice-v3101 {
+    min-height:46px;
+    padding:7px;
+  }
+
+  .player-decision-launcher-v310 {
+    gap:8px;
+    padding:8px 9px;
+  }
+
+  .player-decision-launcher-copy-v310 span {
+    display:none;
+  }
+
+  .player-decision-launcher-btn-v310 {
+    min-width:104px;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 {
+    gap:5px;
+    font-size:.54rem;
+  }
+
+  #rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 small {
+    font-size:.45rem;
+  }
+
+  .decision-player-choice-v3101 {
+    grid-template-columns:minmax(0,1fr) 84px;
+  }
+}
+
+/* ==========================================================================
+   RosterCap V3.11.0 — Transactions Action Centre
+   ========================================================================== */
+
+#transactionsView .transactions-action-centre-page-v311 {
+  gap:8px;
+}
+
+/* Overall Transactions heading ------------------------------------------ */
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-page-heading-v294 {
+  grid-template-columns:minmax(0,1fr);
+}
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-page-heading-v294 .page-copy {
+  max-width:640px;
+}
+
+/* Plan a Move ------------------------------------------------------------ */
+
+#transactionsView .transaction-action-centre-v311 {
+  display:grid;
+  gap:8px;
+  padding:10px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:11px;
+  background:
+    radial-gradient(circle at 4% 0%,rgba(99,219,200,.045),transparent 36%),
+    rgba(255,255,255,.012);
+}
+
+#transactionsView .transaction-action-centre-head-v311 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+}
+
+#transactionsView .transaction-action-centre-head-v311 > div {
+  display:grid;
+  gap:2px;
+}
+
+#transactionsView .transaction-action-centre-head-v311 .eyebrow,
+#transactionsView .transaction-history-section-head-v311 .eyebrow {
+  margin:0;
+  color:#88B9D8;
+  font-size:.48rem;
+  letter-spacing:.11em;
+}
+
+#transactionsView .transaction-action-centre-head-v311 h4,
+#transactionsView .transaction-history-section-head-v311 h4 {
+  margin:0;
+  color:#D8EAF4;
+  font-size:.72rem;
+  line-height:1.12;
+}
+
+#transactionsView .transaction-action-centre-head-v311 p:not(.eyebrow) {
+  margin:1px 0 0;
+  color:#7F94A4;
+  font-size:.52rem;
+  line-height:1.32;
+}
+
+#transactionsView .transaction-action-centre-note-v311 {
+  flex:0 0 auto;
+  max-width:240px;
+  color:#708798;
+  font-size:.48rem;
+  line-height:1.28;
+  text-align:right;
+}
+
+#transactionsView .transaction-action-grid-v311 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+
+#transactionsView .transaction-action-card-v311 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-content:center;
+  justify-items:start;
+  gap:2px;
+  min-width:0;
+  min-height:62px;
+  padding:8px 9px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:#0D1822;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+#transactionsView .transaction-action-card-v311:hover,
+#transactionsView .transaction-action-card-v311:focus-visible {
+  border-color:rgba(119,201,255,.25);
+  background:#101E2A;
+  transform:translateY(-1px);
+}
+
+#transactionsView .transaction-action-card-v311.player {
+  box-shadow:inset 2px 0 0 rgba(99,219,200,.32);
+}
+
+#transactionsView .transaction-action-card-v311.trade {
+  box-shadow:inset 2px 0 0 rgba(75,169,255,.34);
+}
+
+#transactionsView .transaction-action-card-v311.record {
+  box-shadow:inset 2px 0 0 rgba(171,184,197,.20);
+}
+
+#transactionsView .transaction-action-kicker-v311 {
+  color:#738A9A;
+  font-size:.42rem;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+#transactionsView .transaction-action-card-v311 strong {
+  overflow:hidden;
+  max-width:100%;
+  color:#DDECF5;
+  font-size:.63rem;
+  line-height:1.16;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#transactionsView .transaction-action-card-v311 small {
+  color:#718899;
+  font-size:.47rem;
+  line-height:1.22;
+}
+
+/* History --------------------------------------------------------------- */
+
+#transactionsView .transaction-history-section-head-v311 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:2px;
+  padding:1px 1px 0;
+}
+
+#transactionsView .transaction-history-section-head-v311 > div {
+  display:grid;
+  gap:2px;
+}
+
+#transactionsView .transaction-history-section-head-v311 > span {
+  color:#708798;
+  font-size:.49rem;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Existing history now belongs visually to the History section. */
+#transactionsView .transactions-action-centre-page-v311
+.tx-history-toolbar-v294 {
+  margin-top:-1px;
+}
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-empty-state-v294 {
+  margin-top:0;
+}
+
+/* The original heading-level Record button is intentionally superseded. */
+#transactionsView .transactions-action-centre-page-v311
+#recordTransactionBtn[hidden] {
+  display:none !important;
+}
+
+/* Player picker remains modal, not Roster-page chrome. */
+#rosterView #rosterPlayerDecisionsBtnV3101 {
+  display:none !important;
+}
+
+/* Mobile ---------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-action-centre-page-v311 {
+    gap:7px;
+  }
+
+  #transactionsView .transaction-action-centre-v311 {
+    gap:7px;
+    padding:9px;
+  }
+
+  #transactionsView .transaction-action-centre-head-v311 {
+    display:grid;
+    gap:3px;
+  }
+
+  #transactionsView .transaction-action-centre-note-v311 {
+    max-width:none;
+    font-size:.46rem;
+    text-align:left;
+  }
+
+  #transactionsView .transaction-action-grid-v311 {
+    gap:5px;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:58px;
+    padding:7px 8px;
+  }
+
+  #transactionsView .transaction-action-card-v311 strong {
+    font-size:.60rem;
+  }
+
+  #transactionsView .transaction-action-card-v311 small {
+    font-size:.45rem;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionsView .transaction-action-centre-v311 {
+    padding:8px;
+  }
+
+  #transactionsView .transaction-action-centre-head-v311 p:not(.eyebrow) {
+    font-size:.50rem;
+  }
+
+  #transactionsView .transaction-action-centre-note-v311 {
+    display:none;
+  }
+
+  #transactionsView .transaction-action-grid-v311 {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:57px;
+    padding:7px 6px;
+  }
+
+  #transactionsView .transaction-action-card-v311 strong {
+    font-size:.56rem;
+  }
+
+  #transactionsView .transaction-action-card-v311 small {
+    font-size:.42rem;
+  }
+
+  #transactionsView .transaction-action-kicker-v311 {
+    font-size:.39rem;
+  }
+}
+
+@media (max-width:360px) {
+  #transactionsView .transaction-action-card-v311 small {
+    display:none;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:50px;
+  }
+}
+
+
+/* Transactions owns the persistent action entry point. */
+#rosterView #rosterPlayerDecisionsBtnV3101 {
+  display:none !important;
+}
