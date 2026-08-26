@@ -5782,3 +5782,196 @@ Load after workspace-shared.css.
     padding:8px;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.08.1 — Populated transaction-card polish
+   Presentation only. Uses the existing data-history-type contract.
+   ============================================================================ */
+
+/* Card spacing / hierarchy ------------------------------------------------ */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 {
+  padding:8px 9px;
+  border-color:rgba(119,201,255,.11);
+  border-radius:10px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-head-v228 {
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:8px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 .transaction-type {
+  min-height:16px;
+  padding:2px 6px;
+  border-color:rgba(119,201,255,.14);
+  background:rgba(119,201,255,.035);
+  font-size:.41rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+  margin-top:4px;
+  color:#DCECF6;
+  font-size:.69rem;
+  line-height:1.16;
+}
+
+/* On Trade cards the generated "With Vancouver" subtitle repeats
+   "Trade with Vancouver". Keep the title as the single counterparty label. */
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-title-v228 p {
+  display:none;
+}
+
+/* Date + edit/delete area ------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 {
+  display:grid;
+  justify-items:end;
+  gap:4px;
+  min-width:max-content;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 time {
+  color:#778E9E;
+  font-size:.46rem;
+  line-height:1;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 {
+  display:flex;
+  justify-content:flex-end;
+  gap:4px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+  min-height:23px;
+  padding:3px 6px;
+  border-radius:7px;
+  font-size:.46rem;
+}
+
+/* IN / OUT ledger --------------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-body-v228 {
+  display:grid;
+  gap:0;
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid rgba(119,201,255,.08);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 {
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr);
+  align-items:start;
+  gap:7px;
+  min-height:25px;
+  padding:4px 0;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 + .tx-ledger-flow-v228 {
+  border-top:1px solid rgba(255,255,255,.035);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-direction-v228 {
+  padding-top:2px;
+  font-size:.41rem;
+  font-weight:950;
+  letter-spacing:.095em;
+  line-height:1.2;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228.in .tx-ledger-direction-v228 {
+  color:#68DBB6;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228.out .tx-ledger-direction-v228 {
+  color:#F07C83;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 > span:last-child {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:3px 8px;
+  min-width:0;
+}
+
+/* Trade contents read as ledger text, not chip/pill controls. */
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228 em {
+  display:inline;
+  max-width:100%;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#BFCFDC;
+  font-size:.52rem;
+  font-style:normal;
+  font-weight:650;
+  line-height:1.3;
+  white-space:normal;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228.in em {
+  color:#C8E6DD;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228.out em {
+  color:#D8DDE3;
+}
+
+/* Notes remain secondary -------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-notes-v228 {
+  margin-top:5px;
+  padding-top:5px;
+  border-top:1px solid rgba(255,255,255,.035);
+  color:#718899;
+  font-size:.49rem;
+  line-height:1.3;
+}
+
+/* Mobile ----------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v294 .transaction-card-v294 {
+    padding:7px 8px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-head-v228 {
+    gap:6px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+    font-size:.67rem;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 {
+    grid-template-columns:34px minmax(0,1fr);
+    gap:6px;
+    min-height:24px;
+    padding:4px 0;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228 em {
+    font-size:.50rem;
+  }
+}
+
+@media (max-width:390px) {
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 {
+    gap:3px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 {
+    gap:3px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+    padding-left:5px;
+    padding-right:5px;
+  }
+}
