@@ -2,6 +2,9 @@
 
 // Transaction ledger, smart penalties and structured trades.
 
+// V3.11.6 — compact, data-driven transaction ledger filters.
+let transactionLedgerFilterV3116 = 'ALL';
+
 function transactionItemsFor(transactionId, direction = null) {
   return state.transactionItems.filter((item) => item.transactionId === transactionId && (!direction || item.direction === direction));
 }
@@ -157,11 +160,45 @@ function renderTransactions() {
     `${b.date} ${b.createdAt}`.localeCompare(`${a.date} ${a.createdAt}`)
   );
 
-  const tradeCount = sortedTransactions.filter((tx) => tx.type === 'Trade').length;
-  const deadCapTransactions = sortedTransactions.filter((tx) => Boolean(transactionDeadCapFor(tx.id)));
-  const totalDeadCap = deadCapTransactions.reduce((sum, tx) => sum + Number(transactionDeadCapFor(tx.id)?.total || 0), 0);
+  const availableTypes = [...new Set(
+    sortedTransactions
+      .map((tx) => String(tx.type || '').trim())
+      .filter(Boolean)
+  )];
 
-  const txRows = sortedTransactions.map((tx) => {
+  if (
+    transactionLedgerFilterV3116 !== 'ALL'
+    && !availableTypes.includes(transactionLedgerFilterV3116)
+  ) {
+    transactionLedgerFilterV3116 = 'ALL';
+  }
+
+  const visibleTransactions = transactionLedgerFilterV3116 === 'ALL'
+    ? sortedTransactions
+    : sortedTransactions.filter((tx) => String(tx.type || '').trim() === transactionLedgerFilterV3116);
+
+  const filterButtons = [
+    {
+      value:'ALL',
+      label:'All',
+      count:sortedTransactions.length
+    },
+    ...availableTypes.map((type) => ({
+      value:type,
+      label:type,
+      count:sortedTransactions.filter((tx) => tx.type === type).length
+    }))
+  ].map((filter) => {
+    const active = filter.value === transactionLedgerFilterV3116;
+    return `<button
+      class="depth-position-tab ${active ? 'active' : ''}"
+      data-transaction-ledger-filter="${escapeAttr(filter.value)}"
+      type="button"
+      aria-pressed="${active ? 'true' : 'false'}"
+    >${escapeHtml(filter.label)} <span aria-hidden="true">· ${filter.count}</span></button>`;
+  }).join('');
+
+  const txRows = visibleTransactions.map((tx) => {
     const allItems = transactionItemsFor(tx.id);
     const incoming = allItems.filter((item) => item.direction === 'IN' && item.kind !== 'FINANCIAL');
     const outgoing = allItems.filter((item) => item.direction === 'OUT' && item.kind !== 'FINANCIAL');
@@ -199,23 +236,39 @@ function renderTransactions() {
     </article>`;
   }).join('');
 
+  const activeLabel = transactionLedgerFilterV3116 === 'ALL'
+    ? 'all transaction types'
+    : transactionLedgerFilterV3116;
+
   el('transactionsView').innerHTML = `<div class="transactions-page transactions-page-v228">
     <div class="page-heading-row tx-page-heading-v228">
-      <div><p class="eyebrow">Ledger</p><h3>Transactions</h3><p class="page-copy">Every roster move, structured trade and Dead Cap event in one chronological ledger.</p></div>
+      <div>
+        <p class="eyebrow">Ledger</p>
+        <h3>Transactions</h3>
+        <p class="page-copy">Showing ${visibleTransactions.length} of ${sortedTransactions.length} recorded moves · ${escapeHtml(activeLabel)}.</p>
+      </div>
       <button id="recordTransactionBtn" class="btn btn-primary" type="button">+ Record Transaction</button>
     </div>
 
-    <div class="tx-summary-grid-v228">
-      <div><span>Transactions</span><strong>${sortedTransactions.length}</strong><small>all recorded moves</small></div>
-      <div><span>Trades</span><strong>${tradeCount}</strong><small>structured exchanges</small></div>
-      <div><span>Dead Cap Events</span><strong>${deadCapTransactions.length}</strong><small>with cap cost</small></div>
-      <div><span>Dead Cap Total</span><strong>${formatMoney(totalDeadCap)}</strong><small>all recorded seasons</small></div>
+    <div class="depth-position-tabs" role="group" aria-label="Filter transactions by type">
+      ${filterButtons}
     </div>
 
-    ${txRows ? `<div class="transaction-list transaction-list-v228">${txRows}</div>` : `<div class="empty-state"><h4>No transactions recorded</h4><p>Record a trade, signing, waiver, buyout, call-up or other move to begin the ledger.</p></div>`}
+    ${txRows
+      ? `<div class="transaction-list transaction-list-v228">${txRows}</div>`
+      : `<div class="empty-state"><h4>No transactions recorded</h4><p>Record a trade, signing, waiver, buyout, call-up or other move to begin the ledger.</p></div>`
+    }
   </div>`;
 
   el('recordTransactionBtn').addEventListener('click', () => openTransactionDialog());
+
+  document.querySelectorAll('[data-transaction-ledger-filter]').forEach((button) => {
+    button.addEventListener('click', () => {
+      transactionLedgerFilterV3116 = button.dataset.transactionLedgerFilter || 'ALL';
+      renderTransactions();
+    });
+  });
+
   document.querySelectorAll('[data-edit-transaction]').forEach((button) =>
     button.addEventListener('click', () => openEditTransactionDialog(button.dataset.editTransaction))
   );
