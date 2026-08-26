@@ -21,6 +21,12 @@ async function init() {
   installCapControlsPolish();
   installTransactionModalFitPolish();
   installTransactionModalWidthFix();
+
+  // V3.11.1 — Transactions owns the persistent front-office action workflow.
+  // Install after the established player/transaction wrappers.
+  installDecisionCentreV310();
+  installTransactionActionCentreV311();
+
   bindEvents();
   setCloudStatus('Connecting…', 'busy');
 
@@ -2964,6 +2970,946 @@ function installTransactionModalWidthFix() {
   });
 }
 
+
+
+
+// ============================================================================
+// V3.11.1 — Transactions Decision Support Bundle
+// Bundled into app.js to avoid standalone deployment/path dependencies.
+// ============================================================================
+
+'use strict';
+
+// ============================================================================
+// RosterCap V3.11.1 — Bundled Player Decision Centre
+//
+// Read-only decision support until the user explicitly launches one of the
+// established transaction flows. This module is intentionally loaded AFTER
+// app.js so it can wrap the final player editor and reuse the canonical
+// transaction, contract, roster-move and penalty helpers already installed.
+//
+// No database writes occur inside the Decision Centre itself.
+// ============================================================================
+
+const ROSTERCAP_DECISION_CENTRE_VERSION_V310 = '3.11.1';
+let decisionCentreInstalledV310 = false;
+let decisionCentrePlayerIdV310 = null;
+
+function decisionCentreDevelopmentLabelV310() {
+  try {
+    return window.RosterCapTerminology?.developmentLabel?.() || 'Minors';
+  } catch (_error) {
+    return 'Minors';
+  }
+}
+
+function decisionCentrePlayerV310(playerId = decisionCentrePlayerIdV310) {
+  return (state.players || []).find((player) => player.id === playerId) || null;
+}
+
+function decisionCentreCurrentSeasonV310() {
+  return typeof currentSeason === 'function' ? currentSeason() : null;
+}
+
+function decisionCentreSeasonsV310() {
+  return typeof contractHorizonSeasons === 'function'
+    ? contractHorizonSeasons().slice().sort((a, b) => Number(a.startYear) - Number(b.startYear))
+    : [];
+}
+
+function decisionCentreSeasonLabelV310(season) {
+  if (!season) return '—';
+  return typeof seasonLabel === 'function'
+    ? seasonLabel(season.startYear)
+    : String(season.startYear || '—');
+}
+
+function decisionCentreMoneyV310(value) {
+  if (value === null || value === undefined || !Number.isFinite(Number(value))) return '—';
+  return typeof formatMoney === 'function'
+    ? formatMoney(Number(value))
+    : `$${Number(value).toLocaleString()}`;
+}
+
+function decisionCentreContractEndV310(player) {
+  if (!player?.contractEndSeasonId) return null;
+  if (typeof seasonById === 'function') return seasonById(player.contractEndSeasonId) || null;
+  return decisionCentreSeasonsV310().find((season) => season.id === player.contractEndSeasonId) || null;
+}
+
+function decisionCentreContractRowsV310(player) {
+  const end = decisionCentreContractEndV310(player);
+  return decisionCentreSeasonsV310().map((season) => {
+    const charge = typeof effectivePlayerCharge === 'function'
+      ? effectivePlayerCharge(player, season.id)
+      : (player?.salaries?.[season.id]?.capOverride ?? player?.salaries?.[season.id]?.salary ?? null);
+    const salary = player?.salaries?.[season.id]?.salary ?? null;
+    const insideContract = !end || Number(season.startYear) <= Number(end.startYear);
+    return { season, charge, salary, insideContract };
+  });
+}
+
+function decisionCentreKnownCommitmentV310(player) {
+  const enteredRows = decisionCentreContractRowsV310(player)
+    .filter((row) => row.insideContract && row.charge !== null && row.charge !== undefined);
+
+  if (!enteredRows.length) return null;
+  return enteredRows.reduce((sum, row) => sum + Number(row.charge || 0), 0);
+}
+
+function decisionCentreCountsTowardCapV310(player) {
+  return typeof playerCountsTowardCap === 'function'
+    ? Boolean(playerCountsTowardCap(player))
+    : player?.rosterGroup !== 'FARM';
+}
+
+function decisionCentreLocationV310(player) {
+  return player?.rosterGroup === 'FARM'
+    ? decisionCentreDevelopmentLabelV310()
+    : 'Active roster';
+}
+
+function decisionCentrePenaltyRuleV310(type) {
+  return typeof transactionRuleForType === 'function'
+    ? transactionRuleForType(type)
+    : null;
+}
+
+function decisionCentrePenaltyRowsV310(type, player) {
+  if (typeof automaticPenaltyRows === 'function') {
+    try {
+      return automaticPenaltyRows(type, player) || [];
+    } catch (_error) {
+      return [];
+    }
+  }
+  return [];
+}
+
+function decisionCentrePenaltyPreviewV310(type, player) {
+  const rule = decisionCentrePenaltyRuleV310(type);
+  const rows = decisionCentrePenaltyRowsV310(type, player);
+  const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+
+  const modeLabel = rule && typeof transactionRuleModeLabel === 'function'
+    ? transactionRuleModeLabel(rule.mode, rule.value)
+    : (rule?.mode === 'NONE' || !rule ? 'No automatic penalty' : String(rule.mode || 'Configured rule'));
+
+  const scopeLabel = rule && typeof transactionRuleScopeLabel === 'function'
+    ? transactionRuleScopeLabel(rule.scope)
+    : '';
+
+  const seasons = rows.map((row) => {
+    const season = typeof seasonById === 'function'
+      ? seasonById(row.seasonId)
+      : decisionCentreSeasonsV310().find((item) => item.id === row.seasonId);
+    return {
+      label: decisionCentreSeasonLabelV310(season),
+      amount: Number(row.amount || 0)
+    };
+  });
+
+  const current = decisionCentreCurrentSeasonV310();
+  const currentCharge = current && typeof effectivePlayerCharge === 'function'
+    ? effectivePlayerCharge(player, current.id)
+    : null;
+  const countsTowardCap = decisionCentreCountsTowardCapV310(player);
+  const currentPenalty = current
+    ? rows
+        .filter((row) => row.seasonId === current.id)
+        .reduce((sum, row) => sum + Number(row.amount || 0), 0)
+    : 0;
+  const currentRosterCost = countsTowardCap && currentCharge !== null && currentCharge !== undefined
+    ? Number(currentCharge)
+    : 0;
+  const netCurrentRelief = currentRosterCost - currentPenalty;
+
+  return {
+    rule,
+    rows,
+    total,
+    modeLabel,
+    scopeLabel,
+    seasons,
+    currentPenalty,
+    currentRosterCost,
+    netCurrentRelief
+  };
+}
+
+function decisionCentreRuleMarkupV310(type, player) {
+  const preview = decisionCentrePenaltyPreviewV310(type, player);
+  const configured = preview.rule && preview.rule.mode !== 'NONE';
+
+  if (!configured) {
+    return `
+      <div class="decision-impact-v310 neutral">
+        <strong>No automatic penalty</strong>
+        <span>Settings currently have no automatic ${escapeHtml(type.toLowerCase())} penalty.</span>
+      </div>
+    `;
+  }
+
+  const rows = preview.seasons.length
+    ? preview.seasons.map((row) => `
+        <span class="decision-impact-season-v310">
+          <small>${escapeHtml(row.label)}</small>
+          <strong>${escapeHtml(decisionCentreMoneyV310(row.amount))}</strong>
+        </span>
+      `).join('')
+    : `<span class="decision-impact-empty-v310">No entered salary rows produce an automatic amount.</span>`;
+
+  return `
+    <div class="decision-impact-v310">
+      <div class="decision-impact-total-v310">
+        <span>Estimated penalty</span>
+        <strong>${escapeHtml(decisionCentreMoneyV310(preview.total))}</strong>
+      </div>
+      <p>${escapeHtml(preview.modeLabel)}${preview.scopeLabel ? ` · ${escapeHtml(preview.scopeLabel)}` : ''}</p>
+      <div class="decision-relief-v310 ${preview.netCurrentRelief < 0 ? 'cost' : ''}">
+        <span>${preview.netCurrentRelief < 0 ? 'Current cap increase' : 'Current cap relief'}</span>
+        <strong>${escapeHtml(decisionCentreMoneyV310(Math.abs(preview.netCurrentRelief)))}</strong>
+      </div>
+      <div class="decision-impact-seasons-v310">${rows}</div>
+    </div>
+  `;
+}
+
+function ensureDecisionCentreDialogV310() {
+  if (el('playerDecisionCentreV310')) return;
+
+  const dialog = document.createElement('dialog');
+  dialog.id = 'playerDecisionCentreV310';
+  dialog.className = 'modal-dialog decision-centre-dialog-v310';
+  dialog.innerHTML = `
+    <div class="modal-card decision-centre-card-v310">
+      <header class="drawer-header decision-centre-header-v310">
+        <div>
+          <p class="eyebrow">Decision support</p>
+          <h3>Player Decision Centre</h3>
+        </div>
+        <button aria-label="Close" class="icon-btn" id="closePlayerDecisionCentreV310" type="button">×</button>
+      </header>
+      <div class="modal-body decision-centre-body-v310" id="playerDecisionCentreBodyV310"></div>
+      <footer class="drawer-footer decision-centre-footer-v310">
+        <span class="decision-centre-footer-note-v310">Preview first. Nothing changes until you record a transaction.</span>
+        <button class="btn btn-ghost" id="donePlayerDecisionCentreV310" type="button">Done</button>
+      </footer>
+    </div>
+  `;
+
+  document.body.appendChild(dialog);
+
+  el('closePlayerDecisionCentreV310')?.addEventListener('click', () => dialog.close());
+  el('donePlayerDecisionCentreV310')?.addEventListener('click', () => dialog.close());
+
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+
+  dialog.addEventListener('close', () => {
+    decisionCentrePlayerIdV310 = null;
+  });
+}
+
+function ensureDecisionCentreLauncherV310() {
+  const playerForm = el('playerForm');
+  const footer = playerForm?.querySelector('.drawer-footer');
+  const body = playerForm?.querySelector('.drawer-body');
+  if (!playerForm || !footer || !body || el('playerDecisionLauncherV310')) return;
+
+  const launcher = document.createElement('section');
+  launcher.id = 'playerDecisionLauncherV310';
+  launcher.className = 'player-decision-launcher-v310 hidden';
+  launcher.innerHTML = `
+    <div class="player-decision-launcher-copy-v310">
+      <p class="eyebrow">Front office decision</p>
+      <strong>Preview your options</strong>
+      <span>Compare the saved contract, cap and roster consequences before making a move.</span>
+    </div>
+    <button class="btn btn-secondary player-decision-launcher-btn-v310" id="openPlayerDecisionCentreV310" type="button">
+      Decision Centre
+    </button>
+  `;
+
+  const intro = el('playerDialogIntro');
+  if (intro?.parentElement === body) intro.insertAdjacentElement('afterend', launcher);
+  else body.prepend(launcher);
+
+  el('openPlayerDecisionCentreV310')?.addEventListener('click', () => {
+    const playerId = launcher.dataset.playerId || '';
+    if (!playerId) return;
+    openPlayerDecisionCentreV310(playerId);
+  });
+}
+
+function syncDecisionCentreLauncherV310(playerId = null) {
+  ensureDecisionCentreLauncherV310();
+  const launcher = el('playerDecisionLauncherV310');
+  if (!launcher) return;
+
+  const player = playerId ? decisionCentrePlayerV310(playerId) : null;
+  launcher.classList.toggle('hidden', !player);
+  launcher.dataset.playerId = player?.id || '';
+}
+
+function decisionCentreSeasonStripV310(player) {
+  const rows = decisionCentreContractRowsV310(player);
+  if (!rows.length) return '';
+
+  return `
+    <div class="decision-contract-strip-v310" role="region" aria-label="Entered contract charges by season" tabindex="0">
+      ${rows.map((row) => {
+        const active = row.insideContract && row.charge !== null && row.charge !== undefined;
+        return `
+          <div class="decision-contract-season-v310 ${active ? 'entered' : ''}">
+            <span>${escapeHtml(decisionCentreSeasonLabelV310(row.season))}</span>
+            <strong>${escapeHtml(decisionCentreMoneyV310(row.charge))}</strong>
+            <small>${active ? 'entered' : '—'}</small>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function decisionCentreActionCardV310({
+  tone = '',
+  eyebrow,
+  title,
+  copy,
+  impact = '',
+  action = '',
+  actionLabel = '',
+  disabled = false
+}) {
+  return `
+    <article class="decision-action-card-v310 ${escapeAttr(tone)}">
+      <div class="decision-action-copy-v310">
+        <p class="eyebrow">${escapeHtml(eyebrow)}</p>
+        <h4>${escapeHtml(title)}</h4>
+        <p>${escapeHtml(copy)}</p>
+      </div>
+      ${impact}
+      ${action ? `
+        <button
+          class="btn ${tone === 'danger' ? 'btn-danger' : tone === 'primary' ? 'btn-primary' : 'btn-secondary'} decision-action-btn-v310"
+          data-decision-action-v310="${escapeAttr(action)}"
+          type="button"
+          ${disabled ? 'disabled' : ''}
+        >${escapeHtml(actionLabel)}</button>
+      ` : ''}
+    </article>
+  `;
+}
+
+function renderDecisionCentreV310(player) {
+  const body = el('playerDecisionCentreBodyV310');
+  if (!body || !player) return;
+
+  const current = decisionCentreCurrentSeasonV310();
+  const currentCharge = current && typeof effectivePlayerCharge === 'function'
+    ? effectivePlayerCharge(player, current.id)
+    : null;
+  const end = decisionCentreContractEndV310(player);
+  const commitment = decisionCentreKnownCommitmentV310(player);
+  const capEligible = decisionCentreCountsTowardCapV310(player);
+  const location = decisionCentreLocationV310(player);
+  const devLabel = decisionCentreDevelopmentLabelV310();
+
+  const meta = [
+    player.position || null,
+    player.realTeam || null,
+    player.ageSnapshot !== null && player.ageSnapshot !== undefined ? `Age ${player.ageSnapshot}` : null
+  ].filter(Boolean).join(' · ');
+
+  const extensionCopy = end
+    ? `Build the next contract after ${decisionCentreSeasonLabelV310(end)} using the existing contract transaction flow.`
+    : 'Build an extension using the saved contract transaction flow. Add a contract end first if the current term needs a defined endpoint.';
+
+  const actionCards = [
+    decisionCentreActionCardV310({
+      eyebrow:'Keep',
+      title:'Keep current contract',
+      copy:'No roster or contract change. The current saved terms remain in place.',
+      impact:`<div class="decision-static-status-v310"><span>Current decision</span><strong>No transaction required</strong></div>`
+    }),
+    decisionCentreActionCardV310({
+      tone:'primary',
+      eyebrow:'Contract',
+      title:'Extend / re-sign',
+      copy:extensionCopy,
+      impact:`<div class="decision-static-status-v310"><span>Current term</span><strong>${escapeHtml(end ? `Through ${decisionCentreSeasonLabelV310(end)}` : 'No end set')}</strong></div>`,
+      action:'EXTENSION',
+      actionLabel:'Build Extension'
+    }),
+    decisionCentreActionCardV310({
+      eyebrow:'Roster move',
+      title:'Waive player',
+      copy:'Preview the saved waiver rule, then record the move through Transactions.',
+      impact:decisionCentreRuleMarkupV310('Waiver', player),
+      action:'WAIVER',
+      actionLabel:'Record Waiver'
+    }),
+    decisionCentreActionCardV310({
+      tone:'danger',
+      eyebrow:'Contract exit',
+      title:'Buy out contract',
+      copy:'Preview the saved buyout rule and dead-cap effect before recording the transaction.',
+      impact:decisionCentreRuleMarkupV310('Buyout', player),
+      action:'BUYOUT',
+      actionLabel:'Record Buyout'
+    }),
+    decisionCentreActionCardV310({
+      eyebrow:'Roster exit',
+      title:'Release player',
+      copy:'Remove the player through the existing Release transaction. The current Release flow does not add an automatic penalty.',
+      impact:`<div class="decision-static-status-v310"><span>Current roster charge</span><strong>${escapeHtml(decisionCentreMoneyV310(capEligible ? currentCharge : 0))}</strong></div>`,
+      action:'RELEASE',
+      actionLabel:'Record Release'
+    })
+  ];
+
+  if (player.isProspect) {
+    const inDevelopment = player.rosterGroup === 'FARM';
+    actionCards.push(decisionCentreActionCardV310({
+      eyebrow:'Roster location',
+      title:inDevelopment ? 'Call up' : `Send to ${devLabel}`,
+      copy:inDevelopment
+        ? `Move the player from ${devLabel} to the active roster through the existing transaction flow.`
+        : `Move the player from the active roster to ${devLabel} through the existing transaction flow.`,
+      impact:`<div class="decision-static-status-v310"><span>Current location</span><strong>${escapeHtml(location)}</strong></div>`,
+      action:inDevelopment ? 'CALL_UP' : 'SEND_DOWN',
+      actionLabel:inDevelopment ? 'Record Call Up' : `Send to ${devLabel}`
+    }));
+  }
+
+  actionCards.push(decisionCentreActionCardV310({
+    eyebrow:'Trade',
+    title:'Shop / trade player',
+    copy:'Start the structured Trade transaction with this player already selected as outgoing.',
+    impact:`<div class="decision-static-status-v310"><span>Current charge</span><strong>${escapeHtml(decisionCentreMoneyV310(currentCharge))}</strong></div>`,
+    action:'TRADE',
+    actionLabel:'Start Trade'
+  }));
+
+  body.innerHTML = `
+    <section class="decision-player-hero-v310">
+      <div class="decision-player-heading-v310">
+        <div>
+          <p class="eyebrow">Player</p>
+          <h3>${escapeHtml(player.name)}</h3>
+          <p>${escapeHtml(meta || 'Roster player')}</p>
+        </div>
+        <span class="decision-location-badge-v310">${escapeHtml(location)}</span>
+      </div>
+
+      <div class="decision-summary-grid-v310">
+        <div><span>Current charge</span><strong>${escapeHtml(decisionCentreMoneyV310(currentCharge))}</strong><small>${capEligible ? 'counts toward cap' : 'excluded from cap'}</small></div>
+        <div><span>Contract through</span><strong>${escapeHtml(end ? decisionCentreSeasonLabelV310(end) : 'Not set')}</strong><small>${end ? 'saved term' : 'no end entered'}</small></div>
+        <div><span>Entered commitment</span><strong>${escapeHtml(decisionCentreMoneyV310(commitment))}</strong><small>known charges in entered term</small></div>
+        <div><span>Roster location</span><strong>${escapeHtml(location)}</strong><small>${player.isProspect ? 'development eligible' : 'current location'}</small></div>
+      </div>
+
+      <div class="decision-strip-head-v310">
+        <span>Contract horizon</span>
+        <small>Swipe for future seasons</small>
+      </div>
+      ${decisionCentreSeasonStripV310(player)}
+    </section>
+
+    <section class="decision-options-v310">
+      <div class="decision-options-heading-v310">
+        <div>
+          <p class="eyebrow">Options</p>
+          <h3>What do you want to evaluate?</h3>
+        </div>
+        <span>Saved league rules are used for penalty previews.</span>
+      </div>
+      <div class="decision-actions-grid-v310">${actionCards.join('')}</div>
+    </section>
+  `;
+
+  body.querySelectorAll('[data-decision-action-v310]').forEach((button) => {
+    button.addEventListener('click', () => {
+      handleDecisionCentreActionV310(button.dataset.decisionActionV310, player.id);
+    });
+  });
+}
+
+function closePlayerEditorForDecisionV310() {
+  const dialog = el('playerDialog');
+  if (dialog?.open) dialog.close();
+}
+
+function launchDecisionTransactionV310(type, playerId) {
+  const decisionDialog = el('playerDecisionCentreV310');
+  if (decisionDialog?.open) decisionDialog.close();
+  closePlayerEditorForDecisionV310();
+
+  if (typeof openTransactionDialog !== 'function') {
+    alert('The transaction editor is not available yet. Refresh RosterCap and try again.');
+    return;
+  }
+
+  openTransactionDialog({ type, playerId });
+}
+
+function launchDecisionTradeV310(playerId) {
+  const decisionDialog = el('playerDecisionCentreV310');
+  if (decisionDialog?.open) decisionDialog.close();
+  closePlayerEditorForDecisionV310();
+
+  if (typeof openTransactionDialog !== 'function') {
+    alert('The transaction editor is not available yet. Refresh RosterCap and try again.');
+    return;
+  }
+
+  openTransactionDialog({ type:'Trade' });
+
+  window.requestAnimationFrame(() => {
+    const input = document.querySelector(`[data-trade-out-player="${CSS.escape(playerId)}"]`);
+    if (!input) return;
+    input.checked = true;
+    input.dispatchEvent(new Event('change', { bubbles:true }));
+    input.closest('.trade-choice')?.scrollIntoView({ block:'nearest', behavior:'smooth' });
+  });
+}
+
+function handleDecisionCentreActionV310(action, playerId) {
+  const player = decisionCentrePlayerV310(playerId);
+  if (!player) return;
+
+  if (action === 'EXTENSION') return launchDecisionTransactionV310('Extension', playerId);
+  if (action === 'WAIVER') return launchDecisionTransactionV310('Waiver', playerId);
+  if (action === 'BUYOUT') return launchDecisionTransactionV310('Buyout', playerId);
+  if (action === 'RELEASE') return launchDecisionTransactionV310('Release', playerId);
+  if (action === 'CALL_UP') return launchDecisionTransactionV310('Call Up', playerId);
+  if (action === 'SEND_DOWN') return launchDecisionTransactionV310('Send Down', playerId);
+  if (action === 'TRADE') return launchDecisionTradeV310(playerId);
+}
+
+function openPlayerDecisionCentreV310(playerId) {
+  const player = decisionCentrePlayerV310(playerId);
+  if (!player) {
+    alert('That player is no longer available in this Front Office.');
+    return;
+  }
+
+  const dirty = typeof playerFormDirty !== 'undefined' && playerFormDirty;
+  if (dirty) {
+    alert('Save or discard your player changes before opening the Decision Centre so the preview uses saved roster and contract data.');
+    return;
+  }
+
+  ensureDecisionCentreDialogV310();
+  decisionCentrePlayerIdV310 = playerId;
+  renderDecisionCentreV310(player);
+
+  const dialog = el('playerDecisionCentreV310');
+  if (!dialog) return;
+
+  if (dialog.open) dialog.close();
+  dialog.showModal();
+  dialog.querySelector('.decision-centre-body-v310')?.scrollTo({ top:0 });
+}
+
+
+function decisionCentrePickerPlayersV3101() {
+  return [...(state.players || [])]
+    .sort((a, b) => {
+      const groupA = a.rosterGroup === 'FARM' ? 1 : 0;
+      const groupB = b.rosterGroup === 'FARM' ? 1 : 0;
+      return groupA - groupB || String(a.name || '').localeCompare(String(b.name || ''));
+    });
+}
+
+function decisionCentrePickerRowMarkupV3101(player) {
+  const current = decisionCentreCurrentSeasonV310();
+  const charge = current && typeof effectivePlayerCharge === 'function'
+    ? effectivePlayerCharge(player, current.id)
+    : null;
+  const end = decisionCentreContractEndV310(player);
+  const group = player.rosterGroup === 'FARM'
+    ? decisionCentreDevelopmentLabelV310()
+    : 'Active';
+
+  return `
+    <button
+      class="decision-player-choice-v3101"
+      data-decision-player-choice-v3101="${escapeAttr(player.id)}"
+      data-decision-player-search-v3101="${escapeAttr([
+        player.name,
+        player.position,
+        player.realTeam,
+        group
+      ].filter(Boolean).join(' ').toLowerCase())}"
+      type="button"
+    >
+      <span class="decision-player-choice-main-v3101">
+        <strong>${escapeHtml(player.name)}</strong>
+        <small>${escapeHtml([
+          player.position || '—',
+          player.realTeam || '—',
+          group
+        ].join(' · '))}</small>
+      </span>
+      <span class="decision-player-choice-contract-v3101">
+        <strong>${escapeHtml(decisionCentreMoneyV310(charge))}</strong>
+        <small>${escapeHtml(end ? `Through ${decisionCentreSeasonLabelV310(end)}` : 'No end set')}</small>
+      </span>
+    </button>
+  `;
+}
+
+function renderDecisionPlayerPickerV3101() {
+  const list = el('decisionPlayerPickerListV3101');
+  const count = el('decisionPlayerPickerCountV3101');
+  if (!list) return;
+
+  const players = decisionCentrePickerPlayersV3101();
+  if (count) count.textContent = `${players.length} ${players.length === 1 ? 'player' : 'players'}`;
+
+  list.innerHTML = players.length
+    ? players.map(decisionCentrePickerRowMarkupV3101).join('')
+    : `<div class="decision-player-picker-empty-v3101">
+        <strong>No players available</strong>
+        <span>Add a player to the roster before opening Player Decisions.</span>
+      </div>`;
+
+  list.querySelectorAll('[data-decision-player-choice-v3101]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const playerId = button.dataset.decisionPlayerChoiceV3101;
+      el('decisionPlayerPickerV3101')?.close();
+      if (playerId) openPlayerDecisionCentreV310(playerId);
+    });
+  });
+
+  const search = el('decisionPlayerPickerSearchV3101');
+  if (search) {
+    search.value = '';
+    search.oninput = () => {
+      const query = search.value.trim().toLowerCase();
+      list.querySelectorAll('[data-decision-player-choice-v3101]').forEach((button) => {
+        button.hidden = Boolean(query)
+          && !String(button.dataset.decisionPlayerSearchV3101 || '').includes(query);
+      });
+    };
+  }
+}
+
+function ensureDecisionPlayerPickerV3101() {
+  if (el('decisionPlayerPickerV3101')) return;
+
+  const dialog = document.createElement('dialog');
+  dialog.id = 'decisionPlayerPickerV3101';
+  dialog.className = 'modal-dialog decision-player-picker-dialog-v3101';
+  dialog.innerHTML = `
+    <div class="modal-card decision-player-picker-card-v3101">
+      <header class="drawer-header decision-player-picker-header-v3101">
+        <div>
+          <p class="eyebrow">Decision Centre</p>
+          <h3>Player Decisions</h3>
+        </div>
+        <button aria-label="Close" class="icon-btn" id="closeDecisionPlayerPickerV3101" type="button">×</button>
+      </header>
+      <div class="modal-body decision-player-picker-body-v3101">
+        <div class="decision-player-picker-intro-v3101">
+          <div>
+            <strong>Choose a player</strong>
+            <span>Preview contract, cap and roster options before recording a move.</span>
+          </div>
+          <small id="decisionPlayerPickerCountV3101"></small>
+        </div>
+        <label class="decision-player-picker-search-v3101">
+          <span>Search</span>
+          <input id="decisionPlayerPickerSearchV3101" type="search" placeholder="Player, position or team"/>
+        </label>
+        <div class="decision-player-picker-list-v3101" id="decisionPlayerPickerListV3101"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+
+  el('closeDecisionPlayerPickerV3101')?.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+
+function openDecisionPlayerPickerV3101() {
+  ensureDecisionPlayerPickerV3101();
+  renderDecisionPlayerPickerV3101();
+
+  const dialog = el('decisionPlayerPickerV3101');
+  if (!dialog) return;
+  if (dialog.open) dialog.close();
+  dialog.showModal();
+
+  window.requestAnimationFrame(() => {
+    el('decisionPlayerPickerSearchV3101')?.focus({ preventScroll:true });
+  });
+}
+
+function ensureRosterDecisionLauncherV3101() {
+  const actions = document.querySelector('#rosterView .roster-header-actions-v252');
+  if (!actions || actions.querySelector('#rosterPlayerDecisionsBtnV3101')) return;
+
+  const button = document.createElement('button');
+  button.id = 'rosterPlayerDecisionsBtnV3101';
+  button.className = 'btn btn-secondary roster-player-decisions-btn-v3101';
+  button.type = 'button';
+  button.innerHTML = '<span>Player Decisions</span><small>Contract & roster options</small>';
+  button.addEventListener('click', openDecisionPlayerPickerV3101);
+  actions.appendChild(button);
+}
+
+function deprecatedInstallRosterDecisionLauncherV3101() {
+  ensureRosterDecisionLauncherV3101();
+
+  if (typeof renderRoster === 'function') {
+    const originalRenderRosterV3101 = renderRoster;
+    renderRoster = function(...args) {
+      const result = originalRenderRosterV3101(...args);
+      window.requestAnimationFrame(ensureRosterDecisionLauncherV3101);
+      return result;
+    };
+  }
+}
+
+function installDecisionCentreV310() {
+  if (decisionCentreInstalledV310) return;
+  decisionCentreInstalledV310 = true;
+
+  ensureDecisionCentreDialogV310();
+  ensureDecisionCentreLauncherV310();
+  ensureDecisionPlayerPickerV3101();
+
+  // V3.11.0: Transactions owns the persistent decision entry point.
+  // Remove the V3.10.1 Roster-page launcher if an older cached render left one behind.
+  document.querySelector('#rosterPlayerDecisionsBtnV3101')?.remove();
+
+  if (typeof openPlayerDialog === 'function') {
+    const originalOpenPlayerDialogV310 = openPlayerDialog;
+    openPlayerDialog = function(playerId = null) {
+      const result = originalOpenPlayerDialogV310(playerId);
+      syncDecisionCentreLauncherV310(playerId);
+      return result;
+    };
+  }
+
+  syncDecisionCentreLauncherV310(null);
+
+  document.documentElement.dataset.rostercapDecisionCentre = ROSTERCAP_DECISION_CENTRE_VERSION_V310;
+
+  window.RosterCapDecisionCentre = Object.freeze({
+    version:ROSTERCAP_DECISION_CENTRE_VERSION_V310,
+    open:openPlayerDecisionCentreV310,
+    openPicker:openDecisionPlayerPickerV3101
+  });
+}
+
+'use strict';
+
+// ============================================================================
+// RosterCap V3.11.1 — Bundled Transactions Action Centre
+//
+// Transactions now owns front-office actions:
+//   Plan a Move
+//     - Player Decision -> read-only Decision Centre / canonical transaction flow
+//     - Trade Builder   -> established structured Trade transaction form
+//     - Record          -> established generic transaction form
+//
+// History remains the canonical chronological transaction ledger.
+//
+// This module does not write to Supabase and does not replace any transaction
+// RPC. It only provides entry points into established workflows.
+// ============================================================================
+
+const ROSTERCAP_TRANSACTION_ACTION_CENTRE_VERSION_V311 = '3.11.1';
+let transactionActionCentreInstalledV311 = false;
+
+function transactionActionCentrePageV311() {
+  return document.querySelector(
+    '#transactionsView .transactions-page-v294, #transactionsView .transactions-page-v228'
+  );
+}
+
+function transactionActionCentreOpenPlayerDecisionV311() {
+  const api = window.RosterCapDecisionCentre;
+  if (!api?.openPicker) {
+    alert('Player Decisions are still loading. Refresh once and try again.');
+    return;
+  }
+  api.openPicker();
+}
+
+function transactionActionCentreOpenTradeV311() {
+  if (typeof openTransactionDialog !== 'function') {
+    alert('The Trade workflow is unavailable. Refresh once and try again.');
+    return;
+  }
+  openTransactionDialog({ type:'Trade' });
+}
+
+function transactionActionCentreOpenRecordV311() {
+  if (typeof openTransactionDialog !== 'function') {
+    alert('The transaction recorder is unavailable. Refresh once and try again.');
+    return;
+  }
+  openTransactionDialog();
+}
+
+function transactionActionCentreMarkupV311() {
+  return `
+    <section class="transaction-action-centre-v311" id="transactionActionCentreV311">
+      <div class="transaction-action-centre-head-v311">
+        <div>
+          <p class="eyebrow">Plan a move</p>
+          <h4>Front Office Actions</h4>
+          <p>Preview a player decision, build a structured trade, or record a completed move.</p>
+        </div>
+        <span class="transaction-action-centre-note-v311">Nothing is recorded until you save a transaction.</span>
+      </div>
+
+      <div class="transaction-action-grid-v311">
+        <button
+          class="transaction-action-card-v311 player"
+          id="transactionPlayerDecisionBtnV311"
+          type="button"
+        >
+          <span class="transaction-action-kicker-v311">Player</span>
+          <strong>Player Decision</strong>
+          <small>Contract & roster options</small>
+        </button>
+
+        <button
+          class="transaction-action-card-v311 trade"
+          id="transactionTradeBuilderBtnV311"
+          type="button"
+        >
+          <span class="transaction-action-kicker-v311">Trade</span>
+          <strong>Trade Builder</strong>
+          <small>Players, picks & assets</small>
+        </button>
+
+        <button
+          class="transaction-action-card-v311 record"
+          id="transactionRecordMoveBtnV311"
+          type="button"
+        >
+          <span class="transaction-action-kicker-v311">Record</span>
+          <strong>Transaction</strong>
+          <small>Enter a completed move</small>
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function transactionHistoryHeaderMarkupV311() {
+  const count = (state.transactions || []).length;
+  return `
+    <div class="transaction-history-section-head-v311" id="transactionHistorySectionHeadV311">
+      <div>
+        <p class="eyebrow">History</p>
+        <h4>Transaction History</h4>
+      </div>
+      <span>${count} ${count === 1 ? 'move' : 'moves'}</span>
+    </div>
+  `;
+}
+
+function syncTransactionActionCentreV311() {
+  const page = transactionActionCentrePageV311();
+  if (!page) return;
+
+  page.classList.add('transactions-action-centre-page-v311');
+
+  const heading = page.querySelector('.tx-page-heading-v294, .tx-page-heading-v228');
+  if (!heading) return;
+
+  const pageCopy = heading.querySelector('.page-copy');
+  if (pageCopy) {
+    pageCopy.textContent =
+      'Plan roster, contract and trade moves here, then keep the final record below.';
+  }
+
+  // The old header Record button is replaced by the explicit action card.
+  const legacyRecordButton = page.querySelector('#recordTransactionBtn');
+  if (legacyRecordButton) {
+    legacyRecordButton.hidden = true;
+    legacyRecordButton.setAttribute('aria-hidden', 'true');
+    legacyRecordButton.tabIndex = -1;
+  }
+
+  let actionCentre = page.querySelector('#transactionActionCentreV311');
+  if (!actionCentre) {
+    heading.insertAdjacentHTML('afterend', transactionActionCentreMarkupV311());
+    actionCentre = page.querySelector('#transactionActionCentreV311');
+
+    el('transactionPlayerDecisionBtnV311')?.addEventListener(
+      'click',
+      transactionActionCentreOpenPlayerDecisionV311
+    );
+    el('transactionTradeBuilderBtnV311')?.addEventListener(
+      'click',
+      transactionActionCentreOpenTradeV311
+    );
+    el('transactionRecordMoveBtnV311')?.addEventListener(
+      'click',
+      transactionActionCentreOpenRecordV311
+    );
+  }
+
+  page.querySelector('#transactionHistorySectionHeadV311')?.remove();
+
+  const historyHeaderHtml = transactionHistoryHeaderMarkupV311();
+  const toolbar = page.querySelector('.tx-history-toolbar-v294');
+  const list = page.querySelector('.transaction-list-v228');
+  const empty = page.querySelector('.tx-empty-state-v294, .empty-state');
+
+  const historyAnchor = toolbar || list || empty;
+  if (historyAnchor) {
+    historyAnchor.insertAdjacentHTML('beforebegin', historyHeaderHtml);
+  } else {
+    actionCentre?.insertAdjacentHTML('afterend', historyHeaderHtml);
+  }
+
+  const emptyTitle = page.querySelector('.tx-empty-state-v294 h4');
+  if (emptyTitle) emptyTitle.textContent = 'No transaction history yet';
+
+  const emptyCopy = page.querySelector('.tx-empty-state-v294 p');
+  if (emptyCopy) {
+    emptyCopy.textContent =
+      'Completed trades, contracts and roster moves will appear here after you record them.';
+  }
+}
+
+function installTransactionActionCentreV311() {
+  if (transactionActionCentreInstalledV311) return;
+  transactionActionCentreInstalledV311 = true;
+
+  if (typeof renderTransactions === 'function') {
+    const originalRenderTransactionsV311 = renderTransactions;
+    renderTransactions = function(...args) {
+      const result = originalRenderTransactionsV311(...args);
+      syncTransactionActionCentreV311();
+      return result;
+    };
+  }
+
+  // Handles a page that rendered before this late-loaded feature installed.
+  syncTransactionActionCentreV311();
+
+  document.documentElement.dataset.rostercapTransactionActionCentre =
+    ROSTERCAP_TRANSACTION_ACTION_CENTRE_VERSION_V311;
+
+  window.RosterCapTransactionActionCentre = Object.freeze({
+    version:ROSTERCAP_TRANSACTION_ACTION_CENTRE_VERSION_V311,
+    refresh:syncTransactionActionCentreV311
+  });
+}
 
 // Bootstrap only after every shared/page/feature file above has loaded.
 init();
