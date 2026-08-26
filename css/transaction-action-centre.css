@@ -1,0 +1,274 @@
+/* ==========================================================================
+   RosterCap V3.11.0 — Transactions Action Centre
+   ========================================================================== */
+
+#transactionsView .transactions-action-centre-page-v311 {
+  gap:8px;
+}
+
+/* Overall Transactions heading ------------------------------------------ */
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-page-heading-v294 {
+  grid-template-columns:minmax(0,1fr);
+}
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-page-heading-v294 .page-copy {
+  max-width:640px;
+}
+
+/* Plan a Move ------------------------------------------------------------ */
+
+#transactionsView .transaction-action-centre-v311 {
+  display:grid;
+  gap:8px;
+  padding:10px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:11px;
+  background:
+    radial-gradient(circle at 4% 0%,rgba(99,219,200,.045),transparent 36%),
+    rgba(255,255,255,.012);
+}
+
+#transactionsView .transaction-action-centre-head-v311 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+}
+
+#transactionsView .transaction-action-centre-head-v311 > div {
+  display:grid;
+  gap:2px;
+}
+
+#transactionsView .transaction-action-centre-head-v311 .eyebrow,
+#transactionsView .transaction-history-section-head-v311 .eyebrow {
+  margin:0;
+  color:#88B9D8;
+  font-size:.48rem;
+  letter-spacing:.11em;
+}
+
+#transactionsView .transaction-action-centre-head-v311 h4,
+#transactionsView .transaction-history-section-head-v311 h4 {
+  margin:0;
+  color:#D8EAF4;
+  font-size:.72rem;
+  line-height:1.12;
+}
+
+#transactionsView .transaction-action-centre-head-v311 p:not(.eyebrow) {
+  margin:1px 0 0;
+  color:#7F94A4;
+  font-size:.52rem;
+  line-height:1.32;
+}
+
+#transactionsView .transaction-action-centre-note-v311 {
+  flex:0 0 auto;
+  max-width:240px;
+  color:#708798;
+  font-size:.48rem;
+  line-height:1.28;
+  text-align:right;
+}
+
+#transactionsView .transaction-action-grid-v311 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+
+#transactionsView .transaction-action-card-v311 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-content:center;
+  justify-items:start;
+  gap:2px;
+  min-width:0;
+  min-height:62px;
+  padding:8px 9px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:#0D1822;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+#transactionsView .transaction-action-card-v311:hover,
+#transactionsView .transaction-action-card-v311:focus-visible {
+  border-color:rgba(119,201,255,.25);
+  background:#101E2A;
+  transform:translateY(-1px);
+}
+
+#transactionsView .transaction-action-card-v311.player {
+  box-shadow:inset 2px 0 0 rgba(99,219,200,.32);
+}
+
+#transactionsView .transaction-action-card-v311.trade {
+  box-shadow:inset 2px 0 0 rgba(75,169,255,.34);
+}
+
+#transactionsView .transaction-action-card-v311.record {
+  box-shadow:inset 2px 0 0 rgba(171,184,197,.20);
+}
+
+#transactionsView .transaction-action-kicker-v311 {
+  color:#738A9A;
+  font-size:.42rem;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+#transactionsView .transaction-action-card-v311 strong {
+  overflow:hidden;
+  max-width:100%;
+  color:#DDECF5;
+  font-size:.63rem;
+  line-height:1.16;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#transactionsView .transaction-action-card-v311 small {
+  color:#718899;
+  font-size:.47rem;
+  line-height:1.22;
+}
+
+/* History --------------------------------------------------------------- */
+
+#transactionsView .transaction-history-section-head-v311 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:2px;
+  padding:1px 1px 0;
+}
+
+#transactionsView .transaction-history-section-head-v311 > div {
+  display:grid;
+  gap:2px;
+}
+
+#transactionsView .transaction-history-section-head-v311 > span {
+  color:#708798;
+  font-size:.49rem;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Existing history now belongs visually to the History section. */
+#transactionsView .transactions-action-centre-page-v311
+.tx-history-toolbar-v294 {
+  margin-top:-1px;
+}
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-empty-state-v294 {
+  margin-top:0;
+}
+
+/* The original heading-level Record button is intentionally superseded. */
+#transactionsView .transactions-action-centre-page-v311
+#recordTransactionBtn[hidden] {
+  display:none !important;
+}
+
+/* Player picker remains modal, not Roster-page chrome. */
+#rosterView #rosterPlayerDecisionsBtnV3101 {
+  display:none !important;
+}
+
+/* Mobile ---------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-action-centre-page-v311 {
+    gap:7px;
+  }
+
+  #transactionsView .transaction-action-centre-v311 {
+    gap:7px;
+    padding:9px;
+  }
+
+  #transactionsView .transaction-action-centre-head-v311 {
+    display:grid;
+    gap:3px;
+  }
+
+  #transactionsView .transaction-action-centre-note-v311 {
+    max-width:none;
+    font-size:.46rem;
+    text-align:left;
+  }
+
+  #transactionsView .transaction-action-grid-v311 {
+    gap:5px;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:58px;
+    padding:7px 8px;
+  }
+
+  #transactionsView .transaction-action-card-v311 strong {
+    font-size:.60rem;
+  }
+
+  #transactionsView .transaction-action-card-v311 small {
+    font-size:.45rem;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionsView .transaction-action-centre-v311 {
+    padding:8px;
+  }
+
+  #transactionsView .transaction-action-centre-head-v311 p:not(.eyebrow) {
+    font-size:.50rem;
+  }
+
+  #transactionsView .transaction-action-centre-note-v311 {
+    display:none;
+  }
+
+  #transactionsView .transaction-action-grid-v311 {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:57px;
+    padding:7px 6px;
+  }
+
+  #transactionsView .transaction-action-card-v311 strong {
+    font-size:.56rem;
+  }
+
+  #transactionsView .transaction-action-card-v311 small {
+    font-size:.42rem;
+  }
+
+  #transactionsView .transaction-action-kicker-v311 {
+    font-size:.39rem;
+  }
+}
+
+@media (max-width:360px) {
+  #transactionsView .transaction-action-card-v311 small {
+    display:none;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:50px;
+  }
+}
