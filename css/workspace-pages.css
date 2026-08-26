@@ -7035,3 +7035,177 @@ Load after workspace-shared.css.
 #rosterView #rosterPlayerDecisionsBtnV3101 {
   display:none !important;
 }
+
+
+/* ============================================================================
+   RosterCap V3.11.2 — Decision modal viewport / iOS Safari hardening
+
+   The decision cards were viewport-sized, but the dialog element could still
+   contribute padding around them. On narrow Safari viewports that made the
+   effective width larger than the visible screen.
+
+   Own the outer dialog geometry here, then let the card fill the safe area.
+   ============================================================================ */
+
+.decision-player-picker-dialog-v3101,
+.decision-centre-dialog-v310 {
+  box-sizing:border-box !important;
+  width:100vw !important;
+  max-width:100vw !important;
+  height:100dvh !important;
+  max-height:100dvh !important;
+  margin:0 !important;
+  padding:
+    max(8px,env(safe-area-inset-top))
+    max(7px,env(safe-area-inset-right))
+    max(8px,env(safe-area-inset-bottom))
+    max(7px,env(safe-area-inset-left)) !important;
+  border:0 !important;
+  background:transparent !important;
+  overflow:hidden !important;
+}
+
+/* Fallback for engines where dvh is unavailable. */
+@supports not (height:100dvh) {
+  .decision-player-picker-dialog-v3101,
+  .decision-centre-dialog-v310 {
+    height:100vh !important;
+    max-height:100vh !important;
+  }
+}
+
+/* The card must fit inside the dialog's safe-area box, not size against 100vw
+   independently of that outer padding. */
+.decision-player-picker-dialog-v3101 .decision-player-picker-card-v3101,
+.decision-centre-dialog-v310 .decision-centre-card-v310 {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  margin:0 auto !important;
+  overflow:hidden !important;
+}
+
+/* Preserve sensible desktop widths while still respecting the viewport. */
+@media (min-width:721px) {
+  .decision-player-picker-dialog-v3101 .decision-player-picker-card-v3101 {
+    width:min(620px,100%) !important;
+    max-width:620px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-centre-card-v310 {
+    width:min(920px,100%) !important;
+    max-width:920px !important;
+  }
+}
+
+/* Modal cards are vertical shells. Header remains visible; body owns scrolling. */
+.decision-player-picker-dialog-v3101 .decision-player-picker-card-v3101,
+.decision-centre-dialog-v310 .decision-centre-card-v310 {
+  display:flex !important;
+  flex-direction:column !important;
+}
+
+.decision-player-picker-dialog-v3101 .decision-player-picker-header-v3101,
+.decision-centre-dialog-v310 .decision-centre-header-v310 {
+  flex:0 0 auto !important;
+  min-width:0;
+}
+
+.decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101,
+.decision-centre-dialog-v310 .decision-centre-body-v310 {
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+}
+
+/* Player picker: the list, not the entire card, scrolls. */
+.decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+  overflow:hidden !important;
+}
+
+.decision-player-picker-dialog-v3101 .decision-player-picker-list-v3101 {
+  flex:1 1 auto;
+  min-height:0;
+  max-height:none !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Actual decision screen: allow its body to scroll within the fitted shell. */
+.decision-centre-dialog-v310 .decision-centre-body-v310 {
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Narrow-screen containment. Prevent text/meta from forcing horizontal width. */
+@media (max-width:720px) {
+  .decision-player-picker-dialog-v3101,
+  .decision-centre-dialog-v310 {
+    padding:
+      max(6px,env(safe-area-inset-top))
+      max(6px,env(safe-area-inset-right))
+      max(6px,env(safe-area-inset-bottom))
+      max(6px,env(safe-area-inset-left)) !important;
+  }
+
+  .decision-player-picker-intro-v3101 {
+    align-items:flex-start;
+    min-width:0;
+  }
+
+  .decision-player-picker-intro-v3101 > div {
+    min-width:0;
+  }
+
+  .decision-player-picker-intro-v3101 > small {
+    flex:0 0 auto;
+    max-width:74px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .decision-player-picker-search-v3101,
+  .decision-player-picker-search-v3101 input {
+    box-sizing:border-box;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+  }
+
+  .decision-player-choice-v3101 {
+    box-sizing:border-box;
+    min-width:0;
+    max-width:100%;
+  }
+
+  .decision-player-choice-main-v3101,
+  .decision-player-choice-contract-v3101 {
+    min-width:0;
+  }
+}
+
+/* iPhone-width layout: keep price/end column controlled so the player side
+   gets the remaining width instead of pushing the card wider. */
+@media (max-width:430px) {
+  .decision-player-choice-v3101 {
+    grid-template-columns:minmax(0,1fr) minmax(76px,92px) !important;
+    gap:7px;
+  }
+
+  .decision-player-choice-contract-v3101 {
+    max-width:92px;
+  }
+
+  .decision-player-choice-contract-v3101 strong,
+  .decision-player-choice-contract-v3101 small {
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+}
