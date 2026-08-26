@@ -1,7 +1,7 @@
 'use strict';
 
 // ============================================================================
-// RosterCap V3.10.0 — Player / Contract Decision Centre V1
+// RosterCap V3.11.0 — Player Decision Centre owned by Transactions
 //
 // Read-only decision support until the user explicitly launches one of the
 // established transaction flows. This module is intentionally loaded AFTER
@@ -11,7 +11,7 @@
 // No database writes occur inside the Decision Centre itself.
 // ============================================================================
 
-const ROSTERCAP_DECISION_CENTRE_VERSION_V310 = '3.10.0';
+const ROSTERCAP_DECISION_CENTRE_VERSION_V310 = '3.11.0';
 let decisionCentreInstalledV310 = false;
 let decisionCentrePlayerIdV310 = null;
 
@@ -252,7 +252,9 @@ function ensureDecisionCentreLauncherV310() {
     </button>
   `;
 
-  body.appendChild(launcher);
+  const intro = el('playerDialogIntro');
+  if (intro?.parentElement === body) intro.insertAdjacentElement('afterend', launcher);
+  else body.prepend(launcher);
 
   el('openPlayerDecisionCentreV310')?.addEventListener('click', () => {
     const playerId = launcher.dataset.playerId || '';
@@ -532,12 +534,180 @@ function openPlayerDecisionCentreV310(playerId) {
   dialog.querySelector('.decision-centre-body-v310')?.scrollTo({ top:0 });
 }
 
+
+function decisionCentrePickerPlayersV3101() {
+  return [...(state.players || [])]
+    .sort((a, b) => {
+      const groupA = a.rosterGroup === 'FARM' ? 1 : 0;
+      const groupB = b.rosterGroup === 'FARM' ? 1 : 0;
+      return groupA - groupB || String(a.name || '').localeCompare(String(b.name || ''));
+    });
+}
+
+function decisionCentrePickerRowMarkupV3101(player) {
+  const current = decisionCentreCurrentSeasonV310();
+  const charge = current && typeof effectivePlayerCharge === 'function'
+    ? effectivePlayerCharge(player, current.id)
+    : null;
+  const end = decisionCentreContractEndV310(player);
+  const group = player.rosterGroup === 'FARM'
+    ? decisionCentreDevelopmentLabelV310()
+    : 'Active';
+
+  return `
+    <button
+      class="decision-player-choice-v3101"
+      data-decision-player-choice-v3101="${escapeAttr(player.id)}"
+      data-decision-player-search-v3101="${escapeAttr([
+        player.name,
+        player.position,
+        player.realTeam,
+        group
+      ].filter(Boolean).join(' ').toLowerCase())}"
+      type="button"
+    >
+      <span class="decision-player-choice-main-v3101">
+        <strong>${escapeHtml(player.name)}</strong>
+        <small>${escapeHtml([
+          player.position || '—',
+          player.realTeam || '—',
+          group
+        ].join(' · '))}</small>
+      </span>
+      <span class="decision-player-choice-contract-v3101">
+        <strong>${escapeHtml(decisionCentreMoneyV310(charge))}</strong>
+        <small>${escapeHtml(end ? `Through ${decisionCentreSeasonLabelV310(end)}` : 'No end set')}</small>
+      </span>
+    </button>
+  `;
+}
+
+function renderDecisionPlayerPickerV3101() {
+  const list = el('decisionPlayerPickerListV3101');
+  const count = el('decisionPlayerPickerCountV3101');
+  if (!list) return;
+
+  const players = decisionCentrePickerPlayersV3101();
+  if (count) count.textContent = `${players.length} ${players.length === 1 ? 'player' : 'players'}`;
+
+  list.innerHTML = players.length
+    ? players.map(decisionCentrePickerRowMarkupV3101).join('')
+    : `<div class="decision-player-picker-empty-v3101">
+        <strong>No players available</strong>
+        <span>Add a player to the roster before opening Player Decisions.</span>
+      </div>`;
+
+  list.querySelectorAll('[data-decision-player-choice-v3101]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const playerId = button.dataset.decisionPlayerChoiceV3101;
+      el('decisionPlayerPickerV3101')?.close();
+      if (playerId) openPlayerDecisionCentreV310(playerId);
+    });
+  });
+
+  const search = el('decisionPlayerPickerSearchV3101');
+  if (search) {
+    search.value = '';
+    search.oninput = () => {
+      const query = search.value.trim().toLowerCase();
+      list.querySelectorAll('[data-decision-player-choice-v3101]').forEach((button) => {
+        button.hidden = Boolean(query)
+          && !String(button.dataset.decisionPlayerSearchV3101 || '').includes(query);
+      });
+    };
+  }
+}
+
+function ensureDecisionPlayerPickerV3101() {
+  if (el('decisionPlayerPickerV3101')) return;
+
+  const dialog = document.createElement('dialog');
+  dialog.id = 'decisionPlayerPickerV3101';
+  dialog.className = 'modal-dialog decision-player-picker-dialog-v3101';
+  dialog.innerHTML = `
+    <div class="modal-card decision-player-picker-card-v3101">
+      <header class="drawer-header decision-player-picker-header-v3101">
+        <div>
+          <p class="eyebrow">Decision Centre</p>
+          <h3>Player Decisions</h3>
+        </div>
+        <button aria-label="Close" class="icon-btn" id="closeDecisionPlayerPickerV3101" type="button">×</button>
+      </header>
+      <div class="modal-body decision-player-picker-body-v3101">
+        <div class="decision-player-picker-intro-v3101">
+          <div>
+            <strong>Choose a player</strong>
+            <span>Preview contract, cap and roster options before recording a move.</span>
+          </div>
+          <small id="decisionPlayerPickerCountV3101"></small>
+        </div>
+        <label class="decision-player-picker-search-v3101">
+          <span>Search</span>
+          <input id="decisionPlayerPickerSearchV3101" type="search" placeholder="Player, position or team"/>
+        </label>
+        <div class="decision-player-picker-list-v3101" id="decisionPlayerPickerListV3101"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(dialog);
+
+  el('closeDecisionPlayerPickerV3101')?.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+
+function openDecisionPlayerPickerV3101() {
+  ensureDecisionPlayerPickerV3101();
+  renderDecisionPlayerPickerV3101();
+
+  const dialog = el('decisionPlayerPickerV3101');
+  if (!dialog) return;
+  if (dialog.open) dialog.close();
+  dialog.showModal();
+
+  window.requestAnimationFrame(() => {
+    el('decisionPlayerPickerSearchV3101')?.focus({ preventScroll:true });
+  });
+}
+
+function ensureRosterDecisionLauncherV3101() {
+  const actions = document.querySelector('#rosterView .roster-header-actions-v252');
+  if (!actions || actions.querySelector('#rosterPlayerDecisionsBtnV3101')) return;
+
+  const button = document.createElement('button');
+  button.id = 'rosterPlayerDecisionsBtnV3101';
+  button.className = 'btn btn-secondary roster-player-decisions-btn-v3101';
+  button.type = 'button';
+  button.innerHTML = '<span>Player Decisions</span><small>Contract & roster options</small>';
+  button.addEventListener('click', openDecisionPlayerPickerV3101);
+  actions.appendChild(button);
+}
+
+function installRosterDecisionLauncherV3101() {
+  ensureRosterDecisionLauncherV3101();
+
+  if (typeof renderRoster === 'function') {
+    const originalRenderRosterV3101 = renderRoster;
+    renderRoster = function(...args) {
+      const result = originalRenderRosterV3101(...args);
+      window.requestAnimationFrame(ensureRosterDecisionLauncherV3101);
+      return result;
+    };
+  }
+}
+
 function installDecisionCentreV310() {
   if (decisionCentreInstalledV310) return;
   decisionCentreInstalledV310 = true;
 
   ensureDecisionCentreDialogV310();
   ensureDecisionCentreLauncherV310();
+  ensureDecisionPlayerPickerV3101();
+
+  // V3.11.0: Transactions owns the persistent decision entry point.
+  // Remove the V3.10.1 Roster-page launcher if an older cached render left one behind.
+  document.querySelector('#rosterPlayerDecisionsBtnV3101')?.remove();
 
   if (typeof openPlayerDialog === 'function') {
     const originalOpenPlayerDialogV310 = openPlayerDialog;
@@ -554,7 +724,8 @@ function installDecisionCentreV310() {
 
   window.RosterCapDecisionCentre = Object.freeze({
     version:ROSTERCAP_DECISION_CENTRE_VERSION_V310,
-    open:openPlayerDecisionCentreV310
+    open:openPlayerDecisionCentreV310,
+    openPicker:openDecisionPlayerPickerV3101
   });
 }
 
