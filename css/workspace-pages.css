@@ -5490,3 +5490,295 @@ Load after workspace-shared.css.
     font-size:.47rem;
   }
 }
+
+
+/* ============================================================================
+   RosterCap V3.08.0 — Transactions page polish
+   Presentation only. Transaction persistence/workflows are unchanged.
+   ============================================================================ */
+
+#transactionsView .transactions-page-v294 {
+  gap:7px;
+}
+
+/* Ledger heading ---------------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:9px 12px;
+  padding-bottom:1px;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .eyebrow {
+  margin-bottom:2px;
+  color:#88B9D8;
+  font-size:.51rem;
+  letter-spacing:.105em;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+  font-size:1rem;
+  line-height:1.06;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+  margin-top:3px;
+  max-width:540px;
+  color:#8196A6;
+  font-size:.56rem;
+  line-height:1.32;
+}
+
+#transactionsView .transactions-page-v294 #recordTransactionBtn {
+  min-width:108px;
+  min-height:32px;
+  padding:5px 9px;
+  border-radius:9px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  font-size:.56rem;
+  font-weight:900;
+}
+
+/* Empty ledger ------------------------------------------------------------ */
+
+#transactionsView .transactions-page-v294.empty-transaction-history-v294 {
+  gap:6px;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+  position:relative;
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr);
+  grid-template-areas:
+    "mark title"
+    "mark copy";
+  align-items:center;
+  gap:2px 9px;
+  min-height:0;
+  margin-top:1px;
+  padding:9px 10px;
+  border:1px dashed rgba(119,201,255,.16);
+  border-radius:9px;
+  background:rgba(119,201,255,.018);
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294::before {
+  content:"";
+  grid-area:mark;
+  width:22px;
+  height:22px;
+  border:1px solid rgba(119,201,255,.15);
+  border-radius:7px;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(119,201,255,.75) 0 2px,transparent 3px),
+    rgba(119,201,255,.035);
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 h4 {
+  grid-area:title;
+  margin:0;
+  color:#D5E6F1;
+  font-size:.68rem;
+  line-height:1.15;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 p {
+  grid-area:copy;
+  margin:0;
+  max-width:none;
+  color:#7890A0;
+  font-size:.52rem;
+  line-height:1.30;
+}
+
+/* Type filters once the ledger has data ---------------------------------- */
+
+#transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+  gap:5px;
+  margin-top:0;
+  padding:0;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filters-v259 {
+  display:flex;
+  gap:4px;
+  overflow-x:auto;
+  width:100%;
+  padding:0 0 2px;
+  scrollbar-width:thin;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 {
+  flex:0 0 auto;
+  min-height:28px;
+  padding:3px 7px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:999px;
+  background:rgba(255,255,255,.014);
+  color:#8DA1B0;
+  font-size:.51rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259.active {
+  border-color:rgba(50,173,255,.34);
+  background:rgba(50,173,255,.075);
+  color:#DDF2FF;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 strong {
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  background:rgba(255,255,255,.05);
+  font-size:.45rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259.active strong {
+  background:rgba(50,173,255,.14);
+}
+
+#transactionsView .transactions-page-v294 .tx-history-status-v259 {
+  color:#718899;
+  font-size:.48rem;
+}
+
+/* Populated ledger cards -------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-list-v228 {
+  gap:5px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 {
+  padding:7px 8px;
+  border:1px solid rgba(119,201,255,.09);
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(13,24,34,.94),rgba(10,19,28,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.012);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294:hover,
+#transactionsView .transactions-page-v294 .transaction-card-v294:focus-within {
+  border-color:rgba(119,201,255,.18);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 .transaction-type {
+  display:inline-flex;
+  align-items:center;
+  min-height:17px;
+  padding:2px 5px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:999px;
+  background:rgba(119,201,255,.025);
+  color:#8FCFFF;
+  font-size:.42rem;
+  letter-spacing:.06em;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+  margin-top:3px;
+  color:#D8E9F4;
+  font-size:.67rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 p,
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 time {
+  color:#748B9B;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+  min-height:22px;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:.46rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-body-v228 {
+  margin-top:5px;
+  padding-top:5px;
+  border-top-color:rgba(119,201,255,.07);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 em {
+  background:rgba(255,255,255,.025);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-notes-v228 {
+  color:#7B91A1;
+}
+
+/* Mobile ----------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+    gap:7px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+    font-size:.96rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    max-width:470px;
+    font-size:.54rem;
+    line-height:1.28;
+  }
+
+  #transactionsView .transactions-page-v294 #recordTransactionBtn {
+    min-width:101px;
+    min-height:31px;
+    padding:4px 8px;
+    font-size:.54rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+    grid-template-columns:22px minmax(0,1fr);
+    gap:2px 8px;
+    padding:8px 9px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294::before {
+    width:20px;
+    height:20px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 h4 {
+    font-size:.66rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 p {
+    font-size:.50rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+    display:block;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 {
+    padding:6px 7px;
+  }
+}
+
+@media (max-width:390px) {
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    gap:6px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    max-width:235px;
+  }
+
+  #transactionsView .transactions-page-v294 #recordTransactionBtn {
+    min-width:96px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.52rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+    padding:8px;
+  }
+}
