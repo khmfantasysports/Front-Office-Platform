@@ -22,7 +22,10 @@ async function init() {
   installTransactionModalFitPolish();
   installTransactionModalWidthFix();
 
-  // V3.11.1 — Transactions owns the persistent front-office action workflow.
+  // V3.11.4 — Waiver and Buyout use different penalty schedules.
+  installTransactionPenaltySemanticsV3114();
+
+  // Transactions owns the persistent front-office action workflow.
   // Install after the established player/transaction wrappers.
   installDecisionCentreV310();
   installTransactionActionCentreV311();
@@ -2973,6 +2976,265 @@ function installTransactionModalWidthFix() {
 
 
 
+
+// ============================================================================
+// RosterCap V3.11.4 — Waiver / Buyout penalty semantics
+//
+// Canonical league behavior requested for RosterCap:
+//
+// WAIVER
+//   Apply the configured percentage/amount to EACH remaining contract season.
+//   Example: 2 years at $5M, 50% => $2.5M + $2.5M.
+//
+// BUYOUT
+//   Sum ALL remaining contract salary first, apply the configured
+//   percentage/amount once, and place the resulting Dead Cap in ONE season
+//   (the current season).
+//   Example: 2 years at $5M, 50% => $5M once.
+//
+// Existing DB fields/RPC payloads remain unchanged. We only change the rows
+// supplied to the established transaction recorder.
+// ============================================================================
+
+const ROSTERCAP_PENALTY_SEMANTICS_VERSION_V3114 = '3.11.4';
+let transactionPenaltySemanticsInstalledV3114 = false;
+
+function transactionPenaltyRoundV3114(value) {
+  return Math.round(Number(value || 0) * 100) / 100;
+}
+
+function transactionPenaltyAmountV3114(rule, salaryBase, flatAmountIsOneTime = false) {
+  const base = Number(salaryBase || 0);
+  if (!rule || rule.mode === 'NONE') return 0;
+
+  if (rule.mode === 'FULL_SALARY') return transactionPenaltyRoundV3114(base);
+  if (rule.mode === 'HALF_SALARY') return transactionPenaltyRoundV3114(base * 0.5);
+  if (rule.mode === 'CUSTOM_PERCENT') {
+    return transactionPenaltyRoundV3114(base * (Number(rule.value || 0) / 100));
+  }
+
+  // A flat Waiver amount applies to every remaining season.
+  // A flat Buyout amount is a single one-time amount.
+  if (rule.mode === 'FLAT_AMOUNT') {
+    return transactionPenaltyRoundV3114(Number(rule.value || 0));
+  }
+
+  return 0;
+}
+
+function transactionPenaltyRemainingSalaryRowsV3114(player) {
+  if (!player || typeof transactionPlayerSalaryRows !== 'function') return [];
+
+  return transactionPlayerSalaryRows(player)
+    .filter((row) =>
+      row?.insideContract
+      && row?.salary !== null
+      && row?.salary !== undefined
+    );
+}
+
+function calculateTransactionPenaltyRowsV3114(type, player, rule) {
+  if (!player || !rule || rule.mode === 'NONE') return [];
+
+  const remaining = transactionPenaltyRemainingSalaryRowsV3114(player);
+  if (!remaining.length) return [];
+
+  if (type === 'Waiver') {
+    // Preserve the remaining contract term: each salary season receives its
+    // own configured penalty percentage/amount.
+    return remaining
+      .map((row) => ({
+        seasonId:row.season.id,
+        amount:transactionPenaltyAmountV3114(rule, Number(row.salary || 0), false)
+      }))
+      .filter((row) => row.amount !== 0);
+  }
+
+  if (type === 'Buyout') {
+    // Buyout is one Dead Cap season based on the TOTAL remaining salary.
+    const totalRemainingSalary = remaining.reduce(
+      (sum, row) => sum + Number(row.salary || 0),
+      0
+    );
+
+    const amount = transactionPenaltyAmountV3114(
+      rule,
+      totalRemainingSalary,
+      true
+    );
+
+    const season = typeof currentSeason === 'function' ? currentSeason() : null;
+    if (!season || amount === 0) return [];
+
+    return [{
+      seasonId:season.id,
+      amount
+    }];
+  }
+
+  return [];
+}
+
+function transactionPenaltyMethodLabelV3114(type, rule) {
+  if (!rule || rule.mode === 'NONE') return 'No automatic penalty';
+
+  const value = Number(rule.value || 0);
+
+  if (rule.mode === 'FULL_SALARY') {
+    return type === 'Buyout'
+      ? '100% of total remaining salary'
+      : '100% of each remaining season salary';
+  }
+
+  if (rule.mode === 'HALF_SALARY') {
+    return type === 'Buyout'
+      ? '50% of total remaining salary'
+      : '50% of each remaining season salary';
+  }
+
+  if (rule.mode === 'CUSTOM_PERCENT') {
+    const percent = value.toLocaleString(undefined, { maximumFractionDigits:2 });
+    return type === 'Buyout'
+      ? `${percent}% of total remaining salary`
+      : `${percent}% of each remaining season salary`;
+  }
+
+  if (rule.mode === 'FLAT_AMOUNT') {
+    const money = typeof formatMoney === 'function'
+      ? formatMoney(value)
+      : `$${value.toLocaleString()}`;
+    return type === 'Buyout'
+      ? `${money} one-time`
+      : `${money} per remaining season`;
+  }
+
+  return 'Configured penalty';
+}
+
+function transactionPenaltyScheduleLabelV3114(type) {
+  return type === 'Buyout'
+    ? 'one Dead Cap season'
+    : 'each remaining contract season';
+}
+
+function syncTransactionPenaltyPreviewCopyV3114() {
+  const type = el('transactionType')?.value;
+  if (!['Waiver','Buyout'].includes(type)) return;
+
+  const rule = typeof transactionRuleForType === 'function'
+    ? transactionRuleForType(type)
+    : null;
+
+  const preview = el('transactionRulePreviewCopy');
+  if (preview && rule) {
+    preview.textContent =
+      `${transactionPenaltyMethodLabelV3114(type, rule)} · ${transactionPenaltyScheduleLabelV3114(type)}.`;
+  }
+
+  const financialCopy = el('transactionFinancialCopy');
+  if (financialCopy) {
+    financialCopy.textContent = type === 'Buyout'
+      ? 'Calculated from total remaining contract salary. The configured buyout penalty is recorded as one Dead Cap season and can be overridden before saving.'
+      : 'Calculated season by season from the remaining contract salary. The configured waiver penalty is recorded in each remaining contract season and can be overridden before saving.';
+  }
+}
+
+function syncTransactionPenaltySettingsV3114() {
+  const configurations = [
+    {
+      prefix:'waiver',
+      value:'REMAINING_CONTRACT',
+      text:'Each remaining contract season',
+      description:'Percentage applies separately to each remaining season salary.'
+    },
+    {
+      prefix:'buyout',
+      value:'REMAINING_CONTRACT',
+      text:'One season from total remaining salary',
+      description:'Remaining contract salary is totaled first; the result becomes one Dead Cap season.'
+    }
+  ];
+
+  configurations.forEach((config) => {
+    const select = el(`${config.prefix}PenaltyScope`);
+    if (!select) return;
+
+    // Retain the existing DB field/RPC contract, but remove the misleading
+    // user choice because the schedule is now defined by transaction type.
+    select.innerHTML = `<option value="${config.value}">${config.text}</option>`;
+    select.value = config.value;
+
+    const label = select.closest('label');
+    if (label) {
+      const textNode = [...label.childNodes].find(
+        (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+      );
+      if (textNode) textNode.textContent = 'Penalty schedule';
+
+      let note = label.querySelector('.penalty-semantics-note-v3114');
+      if (!note) {
+        note = document.createElement('small');
+        note.className = 'penalty-semantics-note-v3114 muted';
+        label.appendChild(note);
+      }
+      note.textContent = config.description;
+    }
+  });
+
+  const footer = document.querySelector(
+    '#settingsView .transaction-rules-footer > span'
+  );
+  if (footer) {
+    footer.textContent =
+      'For Custom Percentage, enter 0–100. Waiver applies the rule to each remaining season; Buyout applies it once to total remaining salary.';
+  }
+}
+
+function installTransactionPenaltySemanticsV3114() {
+  if (transactionPenaltySemanticsInstalledV3114) return;
+  transactionPenaltySemanticsInstalledV3114 = true;
+
+  // Replace the old shared per-season calculator. Both the transaction form
+  // and Player Decision Centre consume this same function.
+  if (typeof automaticPenaltyRows === 'function') {
+    automaticPenaltyRows = function(type, player) {
+      const rule = typeof transactionRuleForType === 'function'
+        ? transactionRuleForType(type)
+        : null;
+      return calculateTransactionPenaltyRowsV3114(type, player, rule);
+    };
+  }
+
+  // Keep the established transaction financial UI, then correct its copy to
+  // describe the transaction-specific schedule.
+  if (typeof renderTransactionFinancialMode === 'function') {
+    const originalRenderTransactionFinancialModeV3114 =
+      renderTransactionFinancialMode;
+
+    renderTransactionFinancialMode = function(...args) {
+      const result = originalRenderTransactionFinancialModeV3114(...args);
+      syncTransactionPenaltyPreviewCopyV3114();
+      return result;
+    };
+  }
+
+  // Settings keeps the same persisted columns but no longer presents a scope
+  // choice that contradicts the defined Waiver/Buyout behavior.
+  if (typeof renderSettings === 'function') {
+    const originalRenderSettingsV3114 = renderSettings;
+
+    renderSettings = function(...args) {
+      const result = originalRenderSettingsV3114(...args);
+      syncTransactionPenaltySettingsV3114();
+      return result;
+    };
+  }
+
+  document.documentElement.dataset.rostercapPenaltySemantics =
+    ROSTERCAP_PENALTY_SEMANTICS_VERSION_V3114;
+}
+
+
 // ============================================================================
 // V3.11.1 — Transactions Decision Support Bundle
 // Bundled into app.js to avoid standalone deployment/path dependencies.
@@ -3091,12 +3353,12 @@ function decisionCentrePenaltyPreviewV310(type, player) {
   const rows = decisionCentrePenaltyRowsV310(type, player);
   const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0);
 
-  const modeLabel = rule && typeof transactionRuleModeLabel === 'function'
-    ? transactionRuleModeLabel(rule.mode, rule.value)
-    : (rule?.mode === 'NONE' || !rule ? 'No automatic penalty' : String(rule.mode || 'Configured rule'));
+  const modeLabel = rule
+    ? transactionPenaltyMethodLabelV3114(type, rule)
+    : 'No automatic penalty';
 
-  const scopeLabel = rule && typeof transactionRuleScopeLabel === 'function'
-    ? transactionRuleScopeLabel(rule.scope)
+  const scopeLabel = rule
+    ? transactionPenaltyScheduleLabelV3114(type)
     : '';
 
   const seasons = rows.map((row) => {
