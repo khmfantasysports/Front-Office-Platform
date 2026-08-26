@@ -1,0 +1,525 @@
+
+/* ==========================================================================\n   RosterCap V3.10.0 — Player / Contract Decision Centre V1\n   ========================================================================== */
+
+.player-decision-launcher-v310 {
+  margin-top:16px;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border:1px solid rgba(77,181,255,.26);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(54,173,255,.10),transparent 46%),
+    rgba(8,23,34,.72);
+}
+
+.player-decision-launcher-v310.hidden {
+  display:none !important;
+}
+
+.player-decision-launcher-copy-v310 {
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.player-decision-launcher-copy-v310 .eyebrow {
+  margin:0;
+  font-size:.62rem;
+}
+
+.player-decision-launcher-copy-v310 strong {
+  color:var(--text);
+  font-size:.94rem;
+}
+
+.player-decision-launcher-copy-v310 span {
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+.player-decision-launcher-btn-v310 {
+  flex:0 0 auto;
+  min-width:136px;
+}
+
+.decision-centre-dialog-v310 {
+  --decision-teal:#63dbc8;
+  --decision-blue:#79caff;
+}
+
+.decision-centre-card-v310 {
+  width:min(920px,calc(100vw - 22px));
+  max-width:920px;
+  max-height:min(90dvh,900px);
+  overflow:hidden;
+}
+
+.decision-centre-header-v310 {
+  flex:0 0 auto;
+}
+
+.decision-centre-body-v310 {
+  display:grid;
+  gap:14px;
+  min-width:0;
+  overflow-x:hidden;
+}
+
+.decision-player-hero-v310,
+.decision-options-v310 {
+  border:1px solid rgba(112,164,199,.24);
+  border-radius:18px;
+  background:rgba(8,21,31,.54);
+}
+
+.decision-player-hero-v310 {
+  padding:18px;
+}
+
+.decision-player-heading-v310 {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.decision-player-heading-v310 .eyebrow,
+.decision-options-heading-v310 .eyebrow,
+.decision-action-copy-v310 .eyebrow {
+  margin:0 0 3px;
+}
+
+.decision-player-heading-v310 h3,
+.decision-options-heading-v310 h3 {
+  margin:0;
+  color:var(--text);
+}
+
+.decision-player-heading-v310 h3 {
+  font-size:1.35rem;
+}
+
+.decision-player-heading-v310 p:not(.eyebrow) {
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.76rem;
+}
+
+.decision-location-badge-v310 {
+  flex:0 0 auto;
+  padding:7px 10px;
+  border:1px solid rgba(100,217,197,.26);
+  border-radius:999px;
+  background:rgba(31,122,107,.12);
+  color:#a7ead8;
+  font-size:.67rem;
+  font-weight:800;
+  letter-spacing:.035em;
+}
+
+.decision-summary-grid-v310 {
+  margin-top:15px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  border:1px solid rgba(112,164,199,.22);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(9,20,29,.58);
+}
+
+.decision-summary-grid-v310 > div {
+  min-width:0;
+  padding:12px 13px;
+  display:grid;
+  gap:3px;
+  text-align:center;
+  border-right:1px solid rgba(112,164,199,.18);
+}
+
+.decision-summary-grid-v310 > div:last-child {
+  border-right:0;
+}
+
+.decision-summary-grid-v310 span,
+.decision-static-status-v310 span,
+.decision-impact-total-v310 span {
+  color:var(--muted);
+  font-size:.61rem;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.decision-summary-grid-v310 strong {
+  min-width:0;
+  color:var(--text);
+  font-size:.92rem;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.decision-summary-grid-v310 small {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+.decision-strip-head-v310 {
+  margin:14px 2px 7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-strip-head-v310 span {
+  color:#9fc5dc;
+  font-size:.67rem;
+  font-weight:900;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.decision-strip-head-v310 small {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+.decision-contract-strip-v310 {
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(104px,1fr);
+  gap:8px;
+  overflow-x:auto;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  padding:1px 1px 5px;
+}
+
+.decision-contract-season-v310 {
+  min-width:0;
+  padding:10px 9px;
+  display:grid;
+  gap:3px;
+  text-align:center;
+  border:1px solid rgba(112,164,199,.18);
+  border-radius:12px;
+  background:rgba(9,20,29,.56);
+}
+
+.decision-contract-season-v310.entered {
+  border-color:rgba(92,199,227,.30);
+  background:rgba(21,57,75,.30);
+}
+
+.decision-contract-season-v310 span {
+  color:#9fc5dc;
+  font-size:.63rem;
+  font-weight:800;
+}
+
+.decision-contract-season-v310 strong {
+  color:var(--text);
+  font-size:.78rem;
+}
+
+.decision-contract-season-v310 small {
+  color:var(--muted);
+  font-size:.57rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.decision-options-v310 {
+  padding:18px;
+}
+
+.decision-options-heading-v310 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:12px;
+}
+
+.decision-options-heading-v310 h3 {
+  font-size:1.02rem;
+}
+
+.decision-options-heading-v310 > span {
+  max-width:300px;
+  color:var(--muted);
+  font-size:.65rem;
+  line-height:1.4;
+  text-align:right;
+}
+
+.decision-actions-grid-v310 {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.decision-action-card-v310 {
+  min-width:0;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  border:1px solid rgba(112,164,199,.22);
+  border-radius:14px;
+  background:rgba(7,18,27,.66);
+}
+
+.decision-action-card-v310.primary {
+  border-color:rgba(84,185,255,.34);
+  background:linear-gradient(145deg,rgba(22,74,102,.28),rgba(7,18,27,.72));
+}
+
+.decision-action-card-v310.danger {
+  border-color:rgba(223,109,115,.28);
+}
+
+.decision-action-copy-v310 {
+  display:grid;
+  gap:3px;
+}
+
+.decision-action-copy-v310 h4 {
+  margin:0;
+  color:var(--text);
+  font-size:.94rem;
+}
+
+.decision-action-copy-v310 p:not(.eyebrow) {
+  margin:0;
+  color:var(--muted);
+  font-size:.70rem;
+  line-height:1.45;
+}
+
+.decision-static-status-v310,
+.decision-impact-v310 {
+  padding:10px 11px;
+  border:1px solid rgba(112,164,199,.18);
+  border-radius:11px;
+  background:rgba(14,29,40,.58);
+}
+
+.decision-static-status-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-static-status-v310 strong {
+  color:#cfe2ee;
+  font-size:.72rem;
+  text-align:right;
+}
+
+.decision-impact-v310 {
+  display:grid;
+  gap:7px;
+}
+
+.decision-impact-v310.neutral {
+  gap:3px;
+}
+
+.decision-impact-v310.neutral strong {
+  color:#cfe2ee;
+  font-size:.75rem;
+}
+
+.decision-impact-v310.neutral span {
+  color:var(--muted);
+  font-size:.64rem;
+  line-height:1.35;
+}
+
+.decision-impact-total-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-impact-total-v310 strong {
+  color:var(--decision-teal);
+  font-size:.92rem;
+}
+
+.decision-impact-v310 > p {
+  margin:0;
+  color:var(--muted);
+  font-size:.62rem;
+  line-height:1.35;
+}
+
+.decision-relief-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-top:6px;
+  border-top:1px solid rgba(112,164,199,.14);
+}
+
+.decision-relief-v310 span {
+  color:#9fc5dc;
+  font-size:.59rem;
+  font-weight:800;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+}
+
+.decision-relief-v310 strong {
+  color:var(--decision-teal);
+  font-size:.72rem;
+}
+
+.decision-relief-v310.cost strong {
+  color:#ef9ba0;
+}
+
+.decision-impact-seasons-v310 {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.decision-impact-season-v310 {
+  padding:5px 7px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border:1px solid rgba(112,164,199,.17);
+  border-radius:8px;
+  background:rgba(5,15,23,.45);
+}
+
+.decision-impact-season-v310 small {
+  color:var(--muted);
+  font-size:.56rem;
+}
+
+.decision-impact-season-v310 strong {
+  color:#d7e8f2;
+  font-size:.62rem;
+}
+
+.decision-impact-empty-v310 {
+  color:var(--muted);
+  font-size:.63rem;
+}
+
+.decision-action-btn-v310 {
+  margin-top:auto;
+  width:100%;
+  min-height:40px;
+}
+
+.decision-centre-footer-v310 {
+  gap:12px;
+}
+
+.decision-centre-footer-note-v310 {
+  flex:1 1 auto;
+  color:var(--muted);
+  font-size:.65rem;
+  line-height:1.35;
+}
+
+@media (max-width:720px) {
+  .player-decision-launcher-v310 {
+    align-items:stretch;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .player-decision-launcher-btn-v310 {
+    width:100%;
+  }
+
+  .decision-centre-card-v310 {
+    width:min(100vw - 12px,920px);
+    max-height:calc(100dvh - 12px);
+    border-radius:18px;
+  }
+
+  .decision-centre-body-v310 {
+    gap:10px;
+  }
+
+  .decision-player-hero-v310,
+  .decision-options-v310 {
+    padding:13px;
+    border-radius:15px;
+  }
+
+  .decision-player-heading-v310 h3 {
+    font-size:1.18rem;
+  }
+
+  .decision-summary-grid-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .decision-summary-grid-v310 > div:nth-child(2) {
+    border-right:0;
+  }
+
+  .decision-summary-grid-v310 > div:nth-child(-n+2) {
+    border-bottom:1px solid rgba(112,164,199,.18);
+  }
+
+  .decision-actions-grid-v310 {
+    grid-template-columns:1fr;
+  }
+
+  .decision-options-heading-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .decision-options-heading-v310 > span {
+    max-width:none;
+    text-align:left;
+  }
+
+  .decision-centre-footer-v310 {
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .decision-centre-footer-v310 .btn {
+    width:100%;
+  }
+}
+
+@media (max-width:390px) {
+  .decision-player-heading-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .decision-summary-grid-v310 > div {
+    padding:10px 8px;
+  }
+
+  .decision-summary-grid-v310 strong {
+    font-size:.82rem;
+  }
+
+  .decision-contract-strip-v310 {
+    grid-auto-columns:96px;
+  }
+}
