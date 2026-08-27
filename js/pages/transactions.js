@@ -5,6 +5,9 @@
 // V3.11.6 — compact, data-driven transaction ledger filters.
 let transactionLedgerFilterV3116 = 'ALL';
 
+// V3.11.7 — ledger financial season visibility.
+const ROSTERCAP_TRANSACTION_LEDGER_FINANCIAL_VERSION_V3117 = '3.11.7';
+
 function transactionItemsFor(transactionId, direction = null) {
   return state.transactionItems.filter((item) => item.transactionId === transactionId && (!direction || item.direction === direction));
 }
@@ -205,6 +208,17 @@ function renderTransactions() {
     const playerItems = allItems.filter((item) => item.kind === 'PLAYER' && item.direction === 'NONE');
     const deadCap = transactionDeadCapFor(tx.id);
 
+    const financialSeasonChips = deadCap
+      ? [...deadCap.rows]
+          .map((row) => ({ row, season:seasonById(row.seasonId) }))
+          .filter((item) => item.season)
+          .sort((a,b) => a.season.startYear - b.season.startYear)
+          .map((item) => `<em>${escapeHtml(seasonLabel(item.season.startYear))} · ${formatMoney(item.row.amount)}</em>`)
+          .join('')
+      : '';
+
+    const financialLabel = tx.type === 'Trade' ? 'RETAINED' : 'DEAD CAP';
+
     const inRow = incoming.length
       ? `<div class="tx-ledger-flow-v228 in"><span class="tx-ledger-direction-v228">IN</span><span>${incoming.map((item) => `<em>${escapeHtml(item.label)}</em>`).join('')}</span></div>`
       : '';
@@ -215,7 +229,7 @@ function renderTransactions() {
       ? `<div class="tx-ledger-flow-v228"><span class="tx-ledger-direction-v228">PLAYER</span><span>${playerItems.map((item) => `<em>${escapeHtml(item.label)}</em>`).join('')}</span></div>`
       : '';
     const deadCapRow = deadCap
-      ? `<div class="tx-ledger-flow-v228 financial"><span class="tx-ledger-direction-v228">DEAD CAP</span><span><em>${escapeHtml(deadCap.description)}</em><strong>${formatMoney(deadCap.total)}</strong></span></div>`
+      ? `<div class="tx-ledger-flow-v228 financial"><span class="tx-ledger-direction-v228">${financialLabel}</span><span><em>${escapeHtml(deadCap.description)}</em>${financialSeasonChips}<strong>Total ${formatMoney(deadCap.total)}</strong></span></div>`
       : '';
 
     return `<article class="transaction-card transaction-card-v228">
