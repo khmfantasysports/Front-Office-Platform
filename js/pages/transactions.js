@@ -11,6 +11,217 @@ const ROSTERCAP_TRANSACTION_LEDGER_FINANCIAL_VERSION_V3117 = '3.11.7';
 // V3.11.8 — transaction correction integrity.
 const ROSTERCAP_TRANSACTION_CORRECTION_VERSION_V3118 = '3.11.8';
 
+// V3.12.1 — incoming Trade player setup + roster editing.
+const ROSTERCAP_TRADE_INCOMING_PLAYER_VERSION_V3121 = '3.12.1';
+
+function tradeIncomingPlayerSportConfigV3121() {
+  const sport = state.frontOffice?.sport || 'NHL';
+  return window.RosterCapSports?.get?.(sport)
+    || window.ROSTERCAP_SPORTS?.[sport]
+    || null;
+}
+
+function tradeIncomingPlayerPositionsV3121() {
+  const configured = window.RosterCapPositionConfig?.active?.() || [];
+  if (configured.length) return [...configured];
+
+  const sportConfig = tradeIncomingPlayerSportConfigV3121();
+  if (sportConfig?.player?.positions?.length) {
+    return [...sportConfig.player.positions];
+  }
+
+  return ['C','LW','RW','F','D','G'];
+}
+
+function tradeIncomingPlayerTeamCopyV3121() {
+  const sport = state.frontOffice?.sport || 'NHL';
+  const config = tradeIncomingPlayerSportConfigV3121();
+  return {
+    label:config?.player?.teamLabel || `${sport} team`,
+    placeholder:config?.player?.teamPlaceholder || 'Team',
+    eligiblePlaceholder:config?.player?.eligiblePlaceholder || 'C,LW'
+  };
+}
+
+function tradeIncomingPlayerDevelopmentLabelV3121() {
+  return window.RosterCapTerminology?.developmentLabel?.()
+    || 'Minors';
+}
+
+function tradeIncomingPlayerPositionOptionsV3121(selected = '') {
+  const positions = tradeIncomingPlayerPositionsV3121();
+  const selectedCode = String(selected || '').trim().toUpperCase();
+  return positions.map((position) =>
+    `<option value="${escapeAttr(position)}" ${position === selectedCode ? 'selected' : ''}>${escapeHtml(position)}</option>`
+  ).join('');
+}
+
+function tradeIncomingPlayerQuickContractRowsV3121(card, index) {
+  if (!card) return false;
+
+  const startingSalary = nullableNumber(
+    card.querySelector(`[data-trade-player-quick-salary="${index}"]`)?.value
+  );
+  const years = nullableInteger(
+    card.querySelector(`[data-trade-player-quick-years="${index}"]`)?.value
+  );
+  const mode =
+    card.querySelector(`[data-trade-player-quick-mode="${index}"]`)?.value
+    || 'same';
+  const pct = mode === 'same'
+    ? 0
+    : nullableNumber(
+        card.querySelector(`[data-trade-player-quick-pct="${index}"]`)?.value
+      );
+
+  if (startingSalary === null || startingSalary < 0) {
+    alert('Enter a valid starting salary for the incoming player.');
+    return false;
+  }
+
+  const seasons = contractHorizonSeasons();
+  if (!seasons.length) {
+    alert('No contract seasons are available.');
+    return false;
+  }
+
+  if (!years || years < 1) {
+    alert('Enter at least 1 year remaining.');
+    return false;
+  }
+
+  if (mode !== 'same' && (pct === null || pct < 0 || pct > 100)) {
+    alert('Annual salary change must be between 0% and 100%.');
+    return false;
+  }
+
+  const boundedYears = Math.min(years, seasons.length);
+  const direction = mode === 'increase' ? 1 : mode === 'decrease' ? -1 : 0;
+  const factor = 1 + (direction * Number(pct || 0) / 100);
+
+  card.querySelectorAll(`[data-trade-player-salary="${index}"]`).forEach((input) => {
+    const seasonIndex = seasons.findIndex(
+      (season) => season.id === input.dataset.seasonId
+    );
+
+    if (seasonIndex >= 0 && seasonIndex < boundedYears) {
+      const amount = Math.max(
+        0,
+        Math.round(startingSalary * Math.pow(factor, seasonIndex))
+      );
+      input.value = String(amount);
+    } else {
+      input.value = '';
+    }
+  });
+
+  const endSelect = card.querySelector(`[data-trade-player-end="${index}"]`);
+  if (endSelect) endSelect.value = seasons[boundedYears - 1].id;
+
+  const summary = card.querySelector(
+    `[data-trade-player-contract-summary-v3121="${index}"]`
+  );
+  if (summary) {
+    const changeText = mode === 'same'
+      ? 'same salary'
+      : `${Number(pct || 0).toLocaleString(undefined,{maximumFractionDigits:2})}% ${mode} / year`;
+    summary.textContent =
+      `${boundedYears} ${boundedYears === 1 ? 'season' : 'seasons'} · ${formatMoney(startingSalary)} starting · ${changeText}`;
+  }
+
+  return true;
+}
+
+function syncTradeIncomingPlayerQuickModeV3121(card, index) {
+  if (!card) return;
+  const mode = card.querySelector(
+    `[data-trade-player-quick-mode="${index}"]`
+  )?.value || 'same';
+  const pct = card.querySelector(
+    `[data-trade-player-quick-pct="${index}"]`
+  );
+  if (!pct) return;
+
+  pct.disabled = mode === 'same';
+  if (mode === 'same') pct.value = '0';
+}
+
+function tradeIncomingPlayerCurrentMetaV3121(player) {
+  if (!player) return '';
+
+  const status = statusById(player.statusId);
+  const endSeason = player.contractEndSeasonId
+    ? seasonById(player.contractEndSeasonId)
+    : null;
+  const development = tradeIncomingPlayerDevelopmentLabelV3121();
+
+  return [
+    player.position || '—',
+    player.realTeam || 'No team',
+    player.ageSnapshot === null || player.ageSnapshot === undefined
+      ? null
+      : `Age ${player.ageSnapshot}`,
+    player.rosterGroup === 'FARM' ? development : 'Active',
+    status?.name || null,
+    endSeason ? `Through ${seasonLabel(endSeason.startYear)}` : 'No contract end'
+  ].filter(Boolean).join(' · ');
+}
+
+function structuredTradeIncomingPlayerLabelV3121(item) {
+  const player = item?.playerId
+    ? (state.players || []).find((candidate) => candidate.id === item.playerId)
+    : null;
+
+  if (!player) {
+    return `<div class="trade-choice">
+      <span class="trade-choice-value">IN</span>
+      <span class="trade-choice-main">
+        <strong>${escapeHtml(item.label)}</strong>
+        <small>Player · no longer on current roster</small>
+      </span>
+      <span class="trade-choice-value">Historical</span>
+    </div>`;
+  }
+
+  return `<div class="trade-choice">
+    <span class="trade-choice-value">IN</span>
+    <span class="trade-choice-main">
+      <strong>${escapeHtml(player.name)}</strong>
+      <small>${escapeHtml(tradeIncomingPlayerCurrentMetaV3121(player))}</small>
+    </span>
+    <button
+      class="btn btn-secondary btn-small"
+      data-edit-trade-incoming-player-v3121="${escapeAttr(player.id)}"
+      type="button"
+    >Edit Player</button>
+  </div>`;
+}
+
+function bindStructuredTradeIncomingPlayerEditsV3121() {
+  document
+    .querySelectorAll('[data-edit-trade-incoming-player-v3121]')
+    .forEach((button) => {
+      button.addEventListener('click', () => {
+        const playerId = button.dataset.editTradeIncomingPlayerV3121;
+        const player = (state.players || []).find(
+          (candidate) => candidate.id === playerId
+        );
+        if (!player) {
+          alert('This incoming player is no longer on the current roster.');
+          return;
+        }
+
+        transactionDialog.close();
+        resetTransactionEditState();
+
+        if (typeof openPlayerDialog === 'function') {
+          openPlayerDialog(playerId);
+        }
+      });
+    });
+}
+
+
 function transactionMetadataFlagV3118(item, key) {
   const value = item?.metadata?.[key];
   return value === true || String(value || '').trim().toLowerCase() === 'true';
@@ -131,27 +342,218 @@ function tradeSalaryInputs(index) {
 function addTradeIncomingPlayer() {
   const index = ++tradeBuilderSequence;
   const wrap = document.createElement('div');
+  const teamCopy = tradeIncomingPlayerTeamCopyV3121();
+  const development = tradeIncomingPlayerDevelopmentLabelV3121();
+  const positions = tradeIncomingPlayerPositionsV3121();
+  const defaultPosition = positions[0] || 'C';
+
   wrap.className = 'trade-builder-card';
   wrap.dataset.tradeIncomingPlayerCard = String(index);
-  wrap.innerHTML = `<div class="trade-builder-head"><strong>Incoming Player</strong><button class="btn btn-ghost" data-remove-trade-builder type="button">Remove</button></div><div class="trade-builder-grid">
-    <label class="full">Player name<input data-trade-player-name="${index}" autocomplete="off" placeholder="Player name" /></label>
-    <label>Position<select data-trade-player-position="${index}"><option>C</option><option>LW</option><option>RW</option><option>F</option><option>D</option><option>G</option></select></label>
-    <label>Eligible<input data-trade-player-eligible="${index}" placeholder="C,LW" /></label>
-    <label>NHL team<input data-trade-player-team="${index}" maxlength="8" placeholder="EDM" /></label>
-    <label>Age<input data-trade-player-age="${index}" type="number" min="0" max="100" step="1" /></label>
-    <label>Roster status<select data-trade-player-status="${index}">${state.statuses.map((status) => `<option value="${status.id}">${escapeHtml(status.name)}</option>`).join('')}</select></label>
-    <label>Location<select data-trade-player-group="${index}"><option value="ACTIVE">Active roster</option><option value="FARM">Minors</option></select></label>
-    <label class="trade-builder-check"><input data-trade-player-prospect="${index}" type="checkbox" /> Prospect</label>
-    <label>Contract through<select data-trade-player-end="${index}"><option value="">Not set</option>${contractHorizonSeasons().map((season) => `<option value="${season.id}">${seasonLabel(season.startYear)}</option>`).join('')}</select></label>
-    <div class="full"><span class="muted" style="font-size:.61rem">Salary by season</span><div class="trade-contract-grid" style="margin-top:5px">${tradeSalaryInputs(index)}</div></div>
-  </div>`;
-  wrap.querySelector('[data-remove-trade-builder]').addEventListener('click', () => wrap.remove());
+  wrap.innerHTML = `
+    <div class="trade-builder-head">
+      <div>
+        <strong>Incoming Player</strong>
+        <small class="muted" style="display:block;margin-top:2px;font-size:.56rem">
+          Creates a real roster player when this Trade is saved.
+        </small>
+      </div>
+      <button class="btn btn-ghost" data-remove-trade-builder type="button">Remove</button>
+    </div>
+
+    <div class="trade-builder-grid">
+      <label class="full">
+        Player name
+        <input
+          data-trade-player-name="${index}"
+          autocomplete="off"
+          placeholder="Player name"
+        />
+      </label>
+
+      <label>
+        Position
+        <select data-trade-player-position="${index}">
+          ${tradeIncomingPlayerPositionOptionsV3121(defaultPosition)}
+        </select>
+      </label>
+
+      <label>
+        Eligible positions
+        <input
+          data-trade-player-eligible="${index}"
+          placeholder="${escapeAttr(teamCopy.eligiblePlaceholder)}"
+        />
+      </label>
+
+      <label>
+        ${escapeHtml(teamCopy.label)}
+        <input
+          data-trade-player-team="${index}"
+          maxlength="12"
+          placeholder="${escapeAttr(teamCopy.placeholder)}"
+        />
+      </label>
+
+      <label>
+        Age
+        <input
+          data-trade-player-age="${index}"
+          type="number"
+          min="0"
+          max="100"
+          step="1"
+        />
+      </label>
+
+      <label>
+        Roster status
+        <select data-trade-player-status="${index}">
+          ${state.statuses.map((status) =>
+            `<option value="${status.id}">${escapeHtml(status.name)}</option>`
+          ).join('')}
+        </select>
+      </label>
+
+      <label>
+        Location
+        <select data-trade-player-group="${index}">
+          <option value="ACTIVE">Active roster</option>
+          <option value="FARM">${escapeHtml(development)}</option>
+        </select>
+      </label>
+
+      <label class="trade-builder-check">
+        <input data-trade-player-prospect="${index}" type="checkbox" />
+        Prospect / development player
+      </label>
+    </div>
+
+    <div class="trade-builder-card" style="padding:8px;margin-top:1px">
+      <div class="trade-builder-head">
+        <div>
+          <strong>Quick contract</strong>
+          <small
+            class="muted"
+            data-trade-player-contract-summary-v3121="${index}"
+            style="display:block;margin-top:2px;font-size:.54rem"
+          >Optional — generate the salary years below.</small>
+        </div>
+      </div>
+
+      <div class="trade-builder-grid">
+        <label>
+          Starting salary
+          <input
+            data-trade-player-quick-salary="${index}"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            step="1"
+            placeholder="e.g. 5000000"
+          />
+        </label>
+
+        <label>
+          Years remaining
+          <input
+            data-trade-player-quick-years="${index}"
+            type="number"
+            inputmode="numeric"
+            min="1"
+            max="${contractHorizonSeasons().length}"
+            step="1"
+            placeholder="1"
+          />
+        </label>
+
+        <label>
+          Annual change
+          <select data-trade-player-quick-mode="${index}">
+            <option value="same">Same salary</option>
+            <option value="increase">Increase each year</option>
+            <option value="decrease">Decrease each year</option>
+          </select>
+        </label>
+
+        <label>
+          Change %
+          <input
+            data-trade-player-quick-pct="${index}"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            max="100"
+            step="0.01"
+            value="0"
+            disabled
+          />
+        </label>
+
+        <div class="full trade-add-actions">
+          <button
+            class="btn btn-secondary btn-small"
+            data-apply-trade-player-contract-v3121="${index}"
+            type="button"
+          >Apply Contract</button>
+        </div>
+      </div>
+    </div>
+
+    <details class="full">
+      <summary style="cursor:pointer;color:var(--muted);font-size:.61rem;font-weight:800">
+        Advanced contract years
+      </summary>
+      <div class="trade-builder-grid" style="margin-top:7px">
+        <label>
+          Contract through
+          <select data-trade-player-end="${index}">
+            <option value="">Not set</option>
+            ${contractHorizonSeasons().map((season) =>
+              `<option value="${season.id}">${seasonLabel(season.startYear)}</option>`
+            ).join('')}
+          </select>
+        </label>
+        <div class="full">
+          <span class="muted" style="font-size:.61rem">Salary by season</span>
+          <div class="trade-contract-grid" style="margin-top:5px">
+            ${tradeSalaryInputs(index)}
+          </div>
+        </div>
+      </div>
+    </details>
+  `;
+
+  wrap
+    .querySelector('[data-remove-trade-builder]')
+    .addEventListener('click', () => wrap.remove());
+
   const group = wrap.querySelector(`[data-trade-player-group="${index}"]`);
   const prospect = wrap.querySelector(`[data-trade-player-prospect="${index}"]`);
-  group.addEventListener('change', () => { if (group.value === 'FARM') prospect.checked = true; });
+  const position = wrap.querySelector(`[data-trade-player-position="${index}"]`);
+  const eligible = wrap.querySelector(`[data-trade-player-eligible="${index}"]`);
+  const quickMode = wrap.querySelector(`[data-trade-player-quick-mode="${index}"]`);
+
+  group.addEventListener('change', () => {
+    if (group.value === 'FARM') prospect.checked = true;
+  });
+
+  position.addEventListener('change', () => {
+    if (!eligible.value.trim()) eligible.value = position.value;
+  });
+
+  quickMode.addEventListener('change', () => {
+    syncTradeIncomingPlayerQuickModeV3121(wrap, index);
+  });
+
+  wrap
+    .querySelector(`[data-apply-trade-player-contract-v3121="${index}"]`)
+    .addEventListener('click', () => {
+      tradeIncomingPlayerQuickContractRowsV3121(wrap, index);
+    });
+
+  syncTradeIncomingPlayerQuickModeV3121(wrap, index);
   el('tradeIncomingPlayers').appendChild(wrap);
 }
-
 function addTradeIncomingAsset() {
   const index = ++tradeBuilderSequence;
   const wrap = document.createElement('div');
@@ -187,14 +589,33 @@ function renderStructuredTradeEditSummary(transactionId) {
   const items = transactionItemsFor(transactionId).filter((item) => item.kind !== 'FINANCIAL');
   const outgoing = items.filter((item) => item.direction === 'OUT');
   const incoming = items.filter((item) => item.direction === 'IN');
-  el('tradeOutgoingPlayers').innerHTML = outgoing.filter((item) => item.kind === 'PLAYER').map(structuredTradeItemLabel).join('') || '<div class="trade-empty">No outgoing players.</div>';
-  el('tradeOutgoingAssets').innerHTML = outgoing.filter((item) => item.kind === 'ASSET').map(structuredTradeItemLabel).join('') || '<div class="trade-empty">No outgoing assets.</div>';
-  el('tradeIncomingExistingAssets').innerHTML = incoming.filter((item) => item.kind === 'ASSET').map(structuredTradeItemLabel).join('') || '<div class="trade-empty">No incoming assets.</div>';
-  el('tradeIncomingPlayers').innerHTML = incoming.filter((item) => item.kind === 'PLAYER').map(structuredTradeItemLabel).join('');
+  const incomingPlayers = incoming.filter((item) => item.kind === 'PLAYER');
+
+  el('tradeOutgoingPlayers').innerHTML = outgoing
+    .filter((item) => item.kind === 'PLAYER')
+    .map(structuredTradeItemLabel)
+    .join('') || '<div class="trade-empty">No outgoing players.</div>';
+
+  el('tradeOutgoingAssets').innerHTML = outgoing
+    .filter((item) => item.kind === 'ASSET')
+    .map(structuredTradeItemLabel)
+    .join('') || '<div class="trade-empty">No outgoing assets.</div>';
+
+  el('tradeIncomingExistingAssets').innerHTML = incoming
+    .filter((item) => item.kind === 'ASSET')
+    .map(structuredTradeItemLabel)
+    .join('') || '<div class="trade-empty">No incoming assets.</div>';
+
+  el('tradeIncomingPlayers').innerHTML = incomingPlayers.length
+    ? incomingPlayers.map(structuredTradeIncomingPlayerLabelV3121).join('')
+    : '<div class="trade-empty">No incoming players.</div>';
+
   el('tradeIncomingAssets').innerHTML = '';
   el('tradeEditLock').classList.remove('hidden');
   el('addTradeIncomingPlayerBtn').classList.add('hidden');
   el('addTradeIncomingAssetBtn').classList.add('hidden');
+
+  bindStructuredTradeIncomingPlayerEditsV3121();
   syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
@@ -987,7 +1408,7 @@ function openEditTransactionDialog(transactionId) {
   if (tx.type === 'Trade') {
     el('transactionTradeStructuredSection').classList.remove('hidden');
     renderStructuredTradeEditSummary(transactionId);
-    el('transactionEditNotice').textContent = 'Players and assets in this structured trade are locked while editing because ownership/roster state has already changed. Delete and recreate the trade if a structured item is wrong.';
+    el('transactionEditNotice').textContent = 'Trade movement is locked because roster and asset ownership already changed. Incoming players that still belong to your team can be opened with Edit Player to update their roster, identity and contract details without rewriting the Trade.';
   }
 
   if (deadCap) {
