@@ -14,6 +14,32 @@ const ROSTERCAP_TRANSACTION_CORRECTION_VERSION_V3118 = '3.11.8';
 // V3.12.1 — incoming Trade player setup + roster editing.
 const ROSTERCAP_TRADE_INCOMING_PLAYER_VERSION_V3121 = '3.12.1';
 
+// V3.13.0 — Trade Block feature bootstrap.
+// Load after DOMContentLoaded so Draft & Assets Hub has already installed its
+// final renderAssets wrapper. This keeps Trade Block additive and avoids an
+// index.html/script-order migration.
+const ROSTERCAP_TRADE_BLOCK_VERSION_V3130 = '3.13.0';
+
+function installTradeBlockFeatureV3130() {
+  if (document.querySelector('script[data-rostercap-trade-block-v3130]')) return;
+
+  const script = document.createElement('script');
+  script.src = './js/features/trade-block.js?v=20260827-v3130';
+  script.dataset.rostercapTradeBlockV3130 = ROSTERCAP_TRADE_BLOCK_VERSION_V3130;
+  document.head.appendChild(script);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener(
+    'DOMContentLoaded',
+    installTradeBlockFeatureV3130,
+    { once:true }
+  );
+} else {
+  queueMicrotask(installTradeBlockFeatureV3130);
+}
+
+
 function tradeIncomingPlayerSportConfigV3121() {
   const sport = state.frontOffice?.sport || 'NHL';
   return window.RosterCapSports?.get?.(sport)
