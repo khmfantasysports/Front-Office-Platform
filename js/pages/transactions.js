@@ -8,6 +8,78 @@ let transactionLedgerFilterV3116 = 'ALL';
 // V3.11.7 — ledger financial season visibility.
 const ROSTERCAP_TRANSACTION_LEDGER_FINANCIAL_VERSION_V3117 = '3.11.7';
 
+// V3.11.8 — transaction correction integrity.
+const ROSTERCAP_TRANSACTION_CORRECTION_VERSION_V3118 = '3.11.8';
+
+function transactionMetadataFlagV3118(item, key) {
+  const value = item?.metadata?.[key];
+  return value === true || String(value || '').trim().toLowerCase() === 'true';
+}
+
+function transactionExecutionDateLockedV3118(transactionId) {
+  return transactionItemsFor(transactionId).some((item) => {
+    if (transactionMetadataFlagV3118(item, 'structured_trade')) return true;
+    if (transactionMetadataFlagV3118(item, 'structured_draft')) return true;
+    if (transactionMetadataFlagV3118(item, 'contract_transaction_v296')) return true;
+
+    if (item.kind === 'PLAYER') {
+      const action = String(item.metadata?.roster_action || 'NONE')
+        .trim()
+        .toUpperCase();
+      if (action !== 'NONE') return true;
+    }
+
+    return false;
+  });
+}
+
+function syncTransactionExecutionDateLockV3118(transactionId) {
+  const tx = state.transactions.find((item) => item.id === transactionId);
+  const dateInput = el('transactionDate');
+  if (!tx || !dateInput) return;
+
+  const locked = transactionExecutionDateLockedV3118(transactionId);
+  dateInput.disabled = locked;
+
+  if (!locked) return;
+
+  const notice = el('transactionEditNotice');
+  const lockCopy =
+    'Transaction date is locked because this entry already changed roster, contract or asset state. '
+    + 'Keeping the execution date fixed preserves safe reversal ordering.';
+
+  if (notice && !notice.textContent.includes('Transaction date is locked')) {
+    notice.textContent = `${notice.textContent.trim()} ${lockCopy}`.trim();
+    notice.classList.remove('hidden');
+  }
+
+  // Draft History is installed later by app.js and rewrites its own helper copy.
+  // Re-apply the integrity language after all synchronous wrappers finish.
+  queueMicrotask(() => {
+    if (editingTransactionId !== transactionId) return;
+
+    const currentDateInput = el('transactionDate');
+    if (currentDateInput) currentDateInput.disabled = true;
+
+    if (tx.type === 'Draft') {
+      const help = el('transactionTypeHelp');
+      if (help) {
+        help.textContent =
+          'The execution date, drafted player and Draft Pick are locked after recording. '
+          + 'You can still correct the summary and notes.';
+      }
+
+      const draftLock = el('draftTransactionEditLock');
+      if (draftLock) {
+        draftLock.textContent =
+          'The transaction date, player and Draft Pick are locked after the Draft is recorded. '
+          + 'Edit the summary or notes here; delete and recreate the Draft entry to change the selection.';
+      }
+    }
+  });
+}
+
+
 function transactionItemsFor(transactionId, direction = null) {
   return state.transactionItems.filter((item) => item.transactionId === transactionId && (!direction || item.direction === direction));
 }
@@ -842,6 +914,7 @@ function handleTransactionTypeChange() {
 function resetTransactionEditState() {
   editingTransactionId = null;
   el('transactionType').disabled = false;
+  el('transactionDate').disabled = false;
   el('transactionPlayer').disabled = false;
   el('transactionRosterAction').disabled = false;
   el('transactionRosterStatus').disabled = false;
@@ -926,6 +999,7 @@ function openEditTransactionDialog(transactionId) {
     });
   }
 
+  syncTransactionExecutionDateLockV3118(transactionId);
   syncTradeRetentionControlsV3115({ recalculate:false });
 }
 
@@ -935,7 +1009,7 @@ async function deleteTransaction(transactionId) {
   const confirmed = confirm(`Delete “${tx.summary}”?\n\nIts Dead Cap will be removed. Structured player and asset movements will also be reversed when no later transaction makes that reversal unsafe.`);
   if (!confirmed) return;
   await runCloudAction(async () => {
-    const { error } = await db.rpc('delete_front_office_transaction_v2', {
+    const { error } = await db.rpc('delete_front_office_transaction_v3', {
       p_front_office_id: state.frontOffice.id,
       p_transaction_id: transactionId
     });
@@ -971,7 +1045,7 @@ async function saveTransactionFromDialog(event) {
     const outgoing = config.flow ? el('transactionOutgoing').value.split(/\n+/).map((value) => value.trim()).filter(Boolean) : [];
     const success = await runCloudAction(async () => {
       if (editingTransactionId) {
-        const { error } = await db.rpc('update_front_office_transaction_v1', {
+        const { error } = await db.rpc('update_front_office_transaction_v2', {
           p_front_office_id: state.frontOffice.id,
           p_transaction_id: editingTransactionId,
           p_transaction_date: el('transactionDate').value || todayIsoDate(),
@@ -985,7 +1059,7 @@ async function saveTransactionFromDialog(event) {
         });
         if (error) throw error;
       } else if (type === 'Trade') {
-        const { error } = await db.rpc('record_structured_trade_v1', {
+        const { error } = await db.rpc('record_structured_trade_v2', {
           p_front_office_id: state.frontOffice.id,
           p_transaction_date: el('transactionDate').value || todayIsoDate(),
           p_counterparty: el('transactionCounterparty').value.trim(),
