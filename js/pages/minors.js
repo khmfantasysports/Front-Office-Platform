@@ -15,6 +15,44 @@ let developmentDepthDraftOrderV3122 = [];
 let developmentDepthSavingV3122 = false;
 let developmentDepthFrameV3122 = 0;
 
+// V3.12.3 — development depth presentation polish.
+const ROSTERCAP_DEVELOPMENT_DEPTH_POLISH_VERSION_V3123 = '3.12.3';
+const DEVELOPMENT_DEPTH_MOBILE_QUERY_V3123 = '(max-width:720px)';
+
+let developmentDepthMobilePositionV3123 = null;
+let developmentDepthResizeBoundV3123 = false;
+
+function ensureDevelopmentDepthPolishStylesV3123() {
+  if (document.getElementById('developmentDepthStylesV3123')) return;
+
+  const link = document.createElement('link');
+  link.id = 'developmentDepthStylesV3123';
+  link.rel = 'stylesheet';
+  link.href = './css/development-depth.css?v=20260827-v3123';
+  document.head.appendChild(link);
+}
+
+function developmentDepthIsMobileV3123() {
+  return window.matchMedia(DEVELOPMENT_DEPTH_MOBILE_QUERY_V3123).matches;
+}
+
+function installDevelopmentDepthResizeWatcherV3123() {
+  if (developmentDepthResizeBoundV3123) return;
+  developmentDepthResizeBoundV3123 = true;
+
+  const media = window.matchMedia(DEVELOPMENT_DEPTH_MOBILE_QUERY_V3123);
+  const handle = () => scheduleDevelopmentDepthDecorationV3122();
+
+  if (typeof media.addEventListener === 'function') {
+    media.addEventListener('change', handle);
+  } else if (typeof media.addListener === 'function') {
+    media.addListener(handle);
+  }
+}
+
+ensureDevelopmentDepthPolishStylesV3123();
+installDevelopmentDepthResizeWatcherV3123();
+
 function openFarmProspectDialog() {
   openPlayerDialog();
   el('playerIsProspect').checked = true;
@@ -293,7 +331,7 @@ function ensureDevelopmentDepthColumnActionsV3122(column, position) {
   head.querySelector('.development-depth-actions-v3122')?.remove();
 
   const playerCount = resolvedDevelopmentDepthPlayerIdsV3122(position).length;
-  const actions = document.createElement('span');
+  const actions = document.createElement('div');
   actions.className = 'depth-chart-actions development-depth-actions-v3122';
 
   if (developmentDepthEditPositionV3122 === position) {
@@ -347,6 +385,7 @@ function beginDevelopmentDepthEditV3122(position) {
   developmentDepthEditPositionV3122 = normalized;
   developmentDepthDraftOrderV3122 =
     resolvedDevelopmentDepthPlayerIdsV3122(normalized);
+  developmentDepthMobilePositionV3123 = normalized;
 
   renderFarm();
 }
@@ -416,6 +455,145 @@ async function saveDevelopmentDepthOrderV3122() {
   renderFarm();
 }
 
+
+function developmentDepthColumnPositionV3123(column) {
+  return normalizeDevelopmentDepthPositionV3122(
+    column?.dataset?.farmDepthPosition
+  );
+}
+
+function developmentDepthVisiblePositionsV3123(board) {
+  return [...board.querySelectorAll('.farm-depth-column-v292')]
+    .map((column) => ({
+      column,
+      position:developmentDepthColumnPositionV3123(column)
+    }))
+    .filter((item) => item.position);
+}
+
+function resolveDevelopmentDepthMobilePositionV3123(items) {
+  const positions = items.map((item) => item.position);
+
+  if (
+    developmentDepthEditPositionV3122
+    && positions.includes(developmentDepthEditPositionV3122)
+  ) {
+    developmentDepthMobilePositionV3123 =
+      developmentDepthEditPositionV3122;
+    return developmentDepthMobilePositionV3123;
+  }
+
+  if (
+    developmentDepthMobilePositionV3123
+    && positions.includes(developmentDepthMobilePositionV3123)
+  ) {
+    return developmentDepthMobilePositionV3123;
+  }
+
+  const firstPopulated = items.find((item) =>
+    resolvedDevelopmentDepthPlayerIdsV3122(item.position).length > 0
+  );
+
+  developmentDepthMobilePositionV3123 =
+    firstPopulated?.position || positions[0] || null;
+
+  return developmentDepthMobilePositionV3123;
+}
+
+function applyDevelopmentDepthMobilePositionV3123(board, rail) {
+  if (!board) return;
+
+  const items = developmentDepthVisiblePositionsV3123(board);
+  const mobile = developmentDepthIsMobileV3123();
+  const selected = resolveDevelopmentDepthMobilePositionV3123(items);
+  const scroll = board.closest('.farm-depth-scroll-v292');
+
+  board.classList.toggle('development-depth-mobile-board-v3123', mobile);
+  scroll?.classList.toggle(
+    'development-depth-mobile-scroll-v3123',
+    mobile
+  );
+
+  items.forEach(({ column, position }) => {
+    column.classList.toggle(
+      'development-depth-mobile-hidden-v3123',
+      mobile && position !== selected
+    );
+    column.classList.toggle(
+      'development-depth-mobile-active-v3123',
+      mobile && position === selected
+    );
+  });
+
+  rail
+    ?.querySelectorAll('[data-development-depth-tab-v3123]')
+    .forEach((button) => {
+      const active =
+        button.dataset.developmentDepthTabV3123 === selected;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+}
+
+function ensureDevelopmentDepthMobileTabsV3123(board) {
+  const scroll = board?.closest('.farm-depth-scroll-v292');
+  if (!scroll) return;
+
+  const items = developmentDepthVisiblePositionsV3123(board);
+  if (!items.length) return;
+
+  let rail = scroll.previousElementSibling;
+
+  if (!rail?.classList?.contains('development-depth-tabs-v3123')) {
+    rail = document.createElement('div');
+    rail.className = 'development-depth-tabs-v3123';
+    rail.setAttribute(
+      'aria-label',
+      'Development depth positions'
+    );
+    scroll.insertAdjacentElement('beforebegin', rail);
+  }
+
+  const selected = resolveDevelopmentDepthMobilePositionV3123(items);
+
+  rail.innerHTML = items.map(({ position }) => {
+    const count =
+      resolvedDevelopmentDepthPlayerIdsV3122(position).length;
+    const active = position === selected;
+    const disabled =
+      Boolean(developmentDepthEditPositionV3122)
+      && developmentDepthEditPositionV3122 !== position;
+
+    return `
+      <button
+        class="development-depth-tab-v3123 ${active ? 'active' : ''}"
+        data-development-depth-tab-v3123="${escapeAttr(position)}"
+        type="button"
+        aria-pressed="${active ? 'true' : 'false'}"
+        ${disabled ? 'disabled' : ''}
+      >
+        <span>${escapeHtml(position === 'OTHER' ? 'Other' : position)}</span>
+        <strong>${count}</strong>
+      </button>
+    `;
+  }).join('');
+
+  rail
+    .querySelectorAll('[data-development-depth-tab-v3123]')
+    .forEach((button) => {
+      button.addEventListener('click', () => {
+        if (button.disabled) return;
+
+        developmentDepthMobilePositionV3123 =
+          button.dataset.developmentDepthTabV3123 || null;
+
+        applyDevelopmentDepthMobilePositionV3123(board, rail);
+      });
+    });
+
+  applyDevelopmentDepthMobilePositionV3123(board, rail);
+}
+
 function decorateDevelopmentDepthOrderV3122() {
   developmentDepthFrameV3122 = 0;
 
@@ -443,8 +621,12 @@ function decorateDevelopmentDepthOrderV3122() {
       ensureDevelopmentDepthColumnActionsV3122(column, position);
     });
 
+  ensureDevelopmentDepthMobileTabsV3123(board);
+
   document.documentElement.dataset.rostercapDevelopmentDepth =
     ROSTERCAP_DEVELOPMENT_DEPTH_VERSION_V3122;
+  document.documentElement.dataset.rostercapDevelopmentDepthPolish =
+    ROSTERCAP_DEVELOPMENT_DEPTH_POLISH_VERSION_V3123;
 }
 
 function scheduleDevelopmentDepthDecorationV3122() {
