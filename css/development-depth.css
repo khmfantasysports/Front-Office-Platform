@@ -1,0 +1,381 @@
+/*
+RosterCap V3.12.3 — Development Depth Mobile Polish
+Scope: #farmView only.
+
+Purpose:
+- Fix V3.12.2 Order-action wrapper collision with the existing count-badge CSS.
+- Keep the desktop multi-column development board.
+- On phones, switch to compact position tabs + one full-width position.
+- Make player rows denser/readable and remove clipped partial columns/large
+  empty board areas.
+*/
+
+/* Header/action collision fix -------------------------------------------- */
+
+#farmView .development-depth-actions-v3122 {
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:4px;
+  flex:0 0 auto;
+  min-width:0;
+  margin-left:auto;
+}
+
+#farmView .development-depth-actions-v3122 .btn {
+  min-width:0;
+  min-height:24px;
+  padding:3px 7px;
+  border-radius:7px;
+  font-size:.48rem;
+  line-height:1;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-column-head-v292 {
+  gap:5px;
+}
+
+#farmView .farm-depth-column-head-v292 > strong {
+  flex:0 0 auto;
+}
+
+#farmView .farm-depth-column-head-v292 > span {
+  flex:0 0 auto;
+}
+
+/* Give the desktop columns enough room for Position + Count + Order. */
+@media (min-width:721px) {
+  #farmView .farm-depth-board-v292 {
+    grid-template-columns:
+      repeat(var(--farm-depth-columns),minmax(136px,1fr));
+    min-width:max(
+      100%,
+      calc(
+        var(--farm-depth-columns) * 136px
+        + (var(--farm-depth-columns) - 1) * 5px
+      )
+    );
+  }
+}
+
+/* Mobile position rail --------------------------------------------------- */
+
+#farmView .development-depth-tabs-v3123 {
+  display:none;
+}
+
+@media (max-width:720px) {
+  #farmView .farm-depth-panel-v292 {
+    padding:8px;
+  }
+
+  #farmView .farm-depth-panel-v292 .farm-section-head-v228 {
+    padding-bottom:6px;
+  }
+
+  #farmView .development-depth-tabs-v3123 {
+    display:flex;
+    align-items:center;
+    gap:4px;
+    width:100%;
+    min-width:0;
+    margin-bottom:6px;
+    padding:3px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:rgba(9,20,29,.78);
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  #farmView .development-depth-tabs-v3123::-webkit-scrollbar {
+    display:none;
+  }
+
+  #farmView .development-depth-tab-v3123 {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    flex:1 0 auto;
+    min-width:56px;
+    min-height:31px;
+    padding:5px 8px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--muted);
+    font:inherit;
+    font-size:.64rem;
+    font-weight:900;
+    cursor:pointer;
+  }
+
+  #farmView .development-depth-tab-v3123 strong {
+    display:grid;
+    place-items:center;
+    min-width:18px;
+    height:18px;
+    padding:0 4px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    color:#BBD7EA;
+    font-size:.47rem;
+    line-height:1;
+  }
+
+  #farmView .development-depth-tab-v3123.active {
+    background:rgba(50,173,255,.12);
+    color:var(--text);
+  }
+
+  #farmView .development-depth-tab-v3123.active strong {
+    background:rgba(50,173,255,.20);
+    color:#A9D9FF;
+  }
+
+  #farmView .development-depth-tab-v3123:disabled {
+    opacity:.42;
+    cursor:default;
+  }
+
+  /* One clean position at a time instead of several clipped narrow columns. */
+  #farmView .development-depth-mobile-scroll-v3123 {
+    width:100%;
+    overflow:visible;
+    padding:0;
+  }
+
+  #farmView .development-depth-mobile-board-v3123 {
+    display:block;
+    width:100%;
+    min-width:0;
+  }
+
+  #farmView .development-depth-mobile-hidden-v3123 {
+    display:none !important;
+  }
+
+  #farmView .development-depth-mobile-active-v3123 {
+    display:grid;
+    width:100% !important;
+    min-width:0;
+    padding:7px;
+    gap:6px;
+    border-radius:11px;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-column-head-v292 {
+    min-height:29px;
+    padding:0 1px;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-column-head-v292 > strong {
+    font-size:.78rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-column-head-v292 > span {
+    min-width:21px;
+    height:21px;
+    font-size:.49rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .development-depth-actions-v3122 {
+    margin-left:auto;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .development-depth-actions-v3122 .btn {
+    min-height:27px;
+    padding:4px 8px;
+    font-size:.53rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-stack-v292 {
+    gap:5px;
+  }
+
+  /* Compact horizontal player rows. */
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-player-card-v292 {
+    display:grid;
+    grid-template-columns:48px minmax(0,1fr) 88px !important;
+    align-items:center;
+    gap:7px !important;
+    width:100%;
+    min-width:0;
+    padding:7px !important;
+    border-radius:9px !important;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-rank-v292 {
+    justify-self:start;
+    margin:0;
+    padding:0;
+    border-bottom:0;
+    font-size:.48rem;
+    line-height:1.15;
+    text-align:left;
+    white-space:nowrap;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-main {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    justify-items:stretch;
+    gap:8px;
+    min-width:0;
+    padding:0;
+    text-align:left;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-copy-v228 {
+    min-width:0;
+    text-align:left;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-copy-v228 strong {
+    font-size:.72rem;
+    line-height:1.15;
+    text-align:left;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-copy-v228 small {
+    margin-top:2px;
+    font-size:.52rem;
+    line-height:1.2;
+    text-align:left;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-copy-v228 em {
+    margin-top:1px;
+    font-size:.49rem;
+    line-height:1.18;
+    text-align:left;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-cap {
+    display:block;
+    min-width:58px;
+    text-align:right;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-cap strong {
+    font-size:.62rem;
+    text-align:right;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    [data-call-up] {
+    width:88px;
+    min-width:0;
+    min-height:34px;
+    padding:5px 6px;
+    border-radius:8px;
+    font-size:.56rem;
+  }
+
+  /* Ordering editor now uses the full phone width. */
+  #farmView
+    .development-depth-mobile-active-v3123
+    .depth-order-list {
+    gap:5px;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .depth-order-row {
+    grid-template-columns:34px minmax(0,1fr) auto;
+    min-height:52px;
+    padding:7px;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .depth-order-rank {
+    font-size:.66rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .depth-order-player strong {
+    font-size:.72rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .depth-order-player span {
+    font-size:.54rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .depth-move-btn {
+    width:31px;
+    height:31px;
+  }
+}
+
+@media (max-width:390px) {
+  #farmView .development-depth-tab-v3123 {
+    min-width:52px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.60rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-depth-player-card-v292 {
+    grid-template-columns:43px minmax(0,1fr) 80px !important;
+    gap:6px !important;
+    padding:6px !important;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    [data-call-up] {
+    width:80px;
+    min-height:32px;
+    font-size:.53rem;
+  }
+
+  #farmView
+    .development-depth-mobile-active-v3123
+    .farm-player-copy-v228 strong {
+    font-size:.68rem;
+  }
+}
