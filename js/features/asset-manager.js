@@ -1,21 +1,27 @@
 'use strict';
 
 // -----------------------------------------------------------------------------
-// RosterCap V2.70 — Asset Manager
+// RosterCap V3.12.0 — Asset Ownership + Transaction Integration
 //
-// Frontend-only enhancement around the established asset + transaction model:
-// - asset status filters
-// - Draft Pick lifecycle context
-// - progressive-disclosure Asset editor
-// - existing transaction activity inside Edit Asset
-// - unsaved-change protection
+// Extends the established V2.70 Asset Manager without replacing persistence.
+// The asset table remains the current ownership source of truth; transaction
+// items remain the ownership-history evidence.
 //
-// No asset persistence or transaction persistence logic is replaced.
+// Adds:
+// - current ownership + latest movement summary in the Asset editor
+// - full linked Trade / Draft activity on the asset itself
+// - direct opening of the exact linked transaction
+// - correct reset when navigating from Asset history to Transactions
+// - transaction-managed lock for current TRADED_AWAY / USED states
+//
+// No asset RPC, transaction RPC, schema, RLS or Trade reversal contract changes.
 // -----------------------------------------------------------------------------
 
 let assetManagerInstalledV270 = false;
 let assetStatusFilterV270 = 'ALL';
 let assetFormDirtyV270 = false;
+
+const ROSTERCAP_ASSET_TRANSACTION_INTEGRATION_VERSION_V3120 = '3.12.0';
 
 function currentEditingAssetV270() {
   if (typeof editingAssetId === 'undefined' || !editingAssetId) return null;
@@ -61,11 +67,10 @@ function assetActivityV270(assetId) {
       transaction: txById.get(item.transactionId) || null
     }))
     .filter((row) => row.transaction)
-    .sort((a, b) => {
-      const aTime = Date.parse(a.transaction.date || a.transaction.createdAt || '') || 0;
-      const bTime = Date.parse(b.transaction.date || b.transaction.createdAt || '') || 0;
-      return bTime - aTime;
-    });
+    .sort((a, b) =>
+      `${b.transaction.date || ''} ${b.transaction.createdAt || ''}`
+        .localeCompare(`${a.transaction.date || ''} ${a.transaction.createdAt || ''}`)
+    );
 }
 
 function assetActivityDateV270(value) {
@@ -87,6 +92,66 @@ function assetActivityDirectionV270(row) {
   if (direction === 'IN') return 'Acquired';
   if (direction === 'OUT') return 'Moved out';
   return 'Referenced';
+}
+
+function assetMetadataFlagV3120(item, key) {
+  const value = item?.metadata?.[key];
+  return value === true || String(value || '').trim().toLowerCase() === 'true';
+}
+
+function assetStructuredActivityV3120(assetId) {
+  return assetActivityV270(assetId).filter((row) =>
+    assetMetadataFlagV3120(row.item, 'structured_trade')
+    || assetMetadataFlagV3120(row.item, 'structured_draft')
+  );
+}
+
+function assetCurrentStatusLabelV3120(status) {
+  return ({
+    OWNED:'Owned',
+    TRADED_AWAY:'Traded Away',
+    CONDITIONAL:'Conditional',
+    USED:'Used',
+    EXPIRED:'Expired'
+  })[status] || assetStatusLabel(status);
+}
+
+function assetActivityHeadlineV3120(row) {
+  const tx = row?.transaction;
+  const item = row?.item;
+  if (!tx || !item) return 'Asset activity';
+
+  const counterparty = String(tx.counterparty || '').trim();
+
+  if (tx.type === 'Draft') {
+    const playerItem = (state.transactionItems || []).find((candidate) =>
+      candidate.transactionId === tx.id
+      && candidate.kind === 'PLAYER'
+    );
+    const player = playerItem?.playerId
+      ? (state.players || []).find((candidate) => candidate.id === playerItem.playerId)
+      : null;
+    const playerName = player?.name || playerItem?.label || '';
+    return playerName ? `Used to draft ${playerName}` : 'Used in Draft';
+  }
+
+  if (tx.type === 'Trade' && item.direction === 'IN') {
+    return counterparty ? `Acquired from ${counterparty}` : 'Acquired via Trade';
+  }
+
+  if (tx.type === 'Trade' && item.direction === 'OUT') {
+    return counterparty ? `Traded to ${counterparty}` : 'Traded via Trade';
+  }
+
+  return `${assetActivityDirectionV270(row)} · ${tx.type || 'Transaction'}`;
+}
+
+function assetActivitySecondaryV3120(row) {
+  const tx = row?.transaction;
+  if (!tx) return '';
+  const date = assetActivityDateV270(tx.date || tx.createdAt);
+  const summary = String(tx.summary || '').trim();
+  return [summary, date].filter(Boolean).join(' · ');
 }
 
 function latestAssetLifecycleCopyV270(asset) {
@@ -126,6 +191,56 @@ function latestAssetLifecycleCopyV270(asset) {
   return `${direction} · ${tx.type}${date ? ` · ${date}` : ''}`;
 }
 
+function assetOwnershipConflictCopyV3120(asset) {
+  if (!asset) return '';
+
+  const structured = assetStructuredActivityV3120(asset.id);
+  const latest = structured[0] || null;
+  if (!latest) return '';
+
+  if (
+    assetMetadataFlagV3120(latest.item, 'structured_draft')
+    && asset.status !== 'USED'
+  ) {
+    return 'History warning: the latest recorded Draft says this pick was Used.';
+  }
+
+  if (
+    assetMetadataFlagV3120(latest.item, 'structured_trade')
+    && latest.item.direction === 'OUT'
+    && asset.status !== 'TRADED_AWAY'
+  ) {
+    return 'History warning: the latest recorded Trade moved this asset out.';
+  }
+
+  return '';
+}
+
+function assetOwnershipManagedV3120(asset) {
+  if (!asset) return false;
+
+  const structured = assetStructuredActivityV3120(asset.id);
+  const latest = structured[0] || null;
+  if (!latest) return false;
+
+  if (
+    asset.status === 'USED'
+    && assetMetadataFlagV3120(latest.item, 'structured_draft')
+  ) {
+    return true;
+  }
+
+  if (
+    asset.status === 'TRADED_AWAY'
+    && assetMetadataFlagV3120(latest.item, 'structured_trade')
+    && latest.item.direction === 'OUT'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 function decorateAssetCardsV270() {
   document.querySelectorAll('#assetsView [data-edit-asset]').forEach((card) => {
     const asset = (state.assets || []).find((item) => item.id === card.dataset.editAsset);
@@ -135,19 +250,30 @@ function decorateAssetCardsV270() {
     card.classList.toggle('asset-card-traded-v270', asset.status === 'TRADED_AWAY');
     card.classList.toggle('asset-card-conditional-v270', asset.status === 'CONDITIONAL');
 
+    const status = card.querySelector('.asset-status');
+    if (status) status.textContent = assetCurrentStatusLabelV3120(asset.status);
+
     const existing = card.querySelector('.asset-lifecycle-v270');
     existing?.remove();
 
     const lifecycle = latestAssetLifecycleCopyV270(asset);
-    if (!lifecycle) return;
+    if (lifecycle) {
+      const line = document.createElement('span');
+      line.className = 'asset-lifecycle-v270';
+      line.textContent = lifecycle;
 
-    const line = document.createElement('span');
-    line.className = 'asset-lifecycle-v270';
-    line.textContent = lifecycle;
+      const meta = card.querySelector('.asset-card-meta');
+      if (meta) meta.insertAdjacentElement('afterend', line);
+      else card.appendChild(line);
+    }
 
-    const meta = card.querySelector('.asset-card-meta');
-    if (meta) meta.insertAdjacentElement('afterend', line);
-    else card.appendChild(line);
+    const conflict = assetOwnershipConflictCopyV3120(asset);
+    const titleParts = [
+      assetCurrentStatusLabelV3120(asset.status),
+      lifecycle,
+      conflict
+    ].filter(Boolean);
+    if (titleParts.length) card.title = titleParts.join(' · ');
   });
 }
 
@@ -322,6 +448,20 @@ function ensureAssetEditorStructureV270() {
     draftFields.insertAdjacentElement('afterend', preview);
   }
 
+  if (!el('assetOwnershipSnapshotV3120')) {
+    const ownership = document.createElement('div');
+    ownership.id = 'assetOwnershipSnapshotV3120';
+    ownership.className = 'asset-pick-preview-v270 hidden';
+    ownership.innerHTML = `
+      <span>Ownership</span>
+      <strong id="assetOwnershipSnapshotCopyV3120">No ownership history yet</strong>
+    `;
+
+    const preview = el('assetPickPreviewV270');
+    if (preview) preview.insertAdjacentElement('afterend', ownership);
+    else draftFields.insertAdjacentElement('afterend', ownership);
+  }
+
   if (!el('assetOptionalDetailsV270')) {
     const details = document.createElement('details');
     details.id = 'assetOptionalDetailsV270';
@@ -349,7 +489,7 @@ function ensureAssetEditorStructureV270() {
 
     const summary = document.createElement('summary');
     summary.innerHTML = `
-      <span>Asset activity</span>
+      <span>Ownership history</span>
       <small id="assetActivityCountV270">0 entries</small>
     `;
 
@@ -359,6 +499,9 @@ function ensureAssetEditorStructureV270() {
 
     activity.append(summary, content);
     body.appendChild(activity);
+  } else {
+    const summaryLabel = el('assetActivityDetailsV270')?.querySelector('summary > span');
+    if (summaryLabel) summaryLabel.textContent = 'Ownership history';
   }
 }
 
@@ -457,6 +600,121 @@ function syncAssetOptionalDetailsV270() {
   if (parts.length) details.open = true;
 }
 
+function renderAssetOwnershipSnapshotV3120(assetId) {
+  ensureAssetEditorStructureV270();
+
+  const wrap = el('assetOwnershipSnapshotV3120');
+  const copy = el('assetOwnershipSnapshotCopyV3120');
+  if (!wrap || !copy) return;
+
+  const asset = assetId
+    ? (state.assets || []).find((item) => item.id === assetId)
+    : null;
+
+  if (!asset) {
+    wrap.classList.add('hidden');
+    copy.textContent = 'No ownership history yet';
+    return;
+  }
+
+  const activity = assetActivityV270(asset.id);
+  const lifecycle = latestAssetLifecycleCopyV270(asset);
+  const conflict = assetOwnershipConflictCopyV3120(asset);
+  const activityCount = activity.length;
+
+  const parts = [
+    assetCurrentStatusLabelV3120(asset.status),
+    lifecycle || 'No linked transaction history',
+    activityCount
+      ? `${activityCount} ${activityCount === 1 ? 'linked transaction' : 'linked transactions'}`
+      : null,
+    conflict || null
+  ].filter(Boolean);
+
+  copy.textContent = parts.join(' · ');
+  wrap.classList.remove('hidden');
+  wrap.classList.toggle('complete', !conflict);
+}
+
+function syncAssetTransactionOwnershipLockV3120(assetId) {
+  const status = el('assetStatus');
+  if (!status) return;
+
+  const asset = assetId
+    ? (state.assets || []).find((item) => item.id === assetId)
+    : null;
+
+  if (!asset) {
+    status.disabled = false;
+    status.removeAttribute('title');
+    return;
+  }
+
+  const managed = assetOwnershipManagedV3120(asset);
+
+  // USED Draft Picks are also locked by app.js Draft History. Reasserting the
+  // same status lock here keeps ownership logic consistent after all wrappers.
+  status.disabled = managed;
+
+  if (managed) {
+    status.title = asset.status === 'USED'
+      ? 'Used status is controlled by Draft history. Delete the linked Draft transaction to restore this pick.'
+      : 'Traded Away status is controlled by Trade history. Reacquire the asset or reverse the linked Trade to restore ownership.';
+  } else {
+    status.removeAttribute('title');
+  }
+}
+
+function confirmAssetHistoryNavigationV3120(message) {
+  if (!assetFormDirtyV270) return true;
+
+  const proceed = confirm(
+    message || 'Discard unsaved asset changes and open transaction history?'
+  );
+
+  if (proceed) assetFormDirtyV270 = false;
+  return proceed;
+}
+
+function openAssetLinkedTransactionV3120(transactionId) {
+  if (!transactionId) return;
+
+  if (!confirmAssetHistoryNavigationV3120(
+    'Discard unsaved asset changes and open this transaction?'
+  )) {
+    return;
+  }
+
+  assetDialog.close();
+
+  if (typeof openEditTransactionDialog === 'function') {
+    openEditTransactionDialog(transactionId);
+    return;
+  }
+
+  if (typeof switchView === 'function') switchView('transactions');
+}
+
+function openAssetTransactionCentreV3120() {
+  if (!confirmAssetHistoryNavigationV3120()) return;
+
+  assetDialog.close();
+
+  // V3.11.6 base filter.
+  if (typeof transactionLedgerFilterV3116 !== 'undefined') {
+    transactionLedgerFilterV3116 = 'ALL';
+  }
+
+  // app.js V2.59 presentation filter. The old V2.70 code referenced a
+  // non-existent transactionHistoryFilterV259 symbol, so an old filter could
+  // remain active when arriving from Assets.
+  if (typeof transactionHistoryFilter !== 'undefined') {
+    transactionHistoryFilter = 'ALL';
+  }
+
+  if (typeof switchView === 'function') switchView('transactions');
+}
+
 function renderAssetActivityV270(assetId) {
   const details = el('assetActivityDetailsV270');
   const body = el('assetActivityBodyV270');
@@ -465,6 +723,8 @@ function renderAssetActivityV270(assetId) {
 
   if (!assetId) {
     details.classList.add('hidden');
+    details.removeAttribute('open');
+    details.dataset.assetHistoryIdV3120 = '';
     body.innerHTML = '';
     count.textContent = '0 entries';
     return;
@@ -474,42 +734,63 @@ function renderAssetActivityV270(assetId) {
   details.classList.toggle('hidden', rows.length === 0);
   count.textContent = `${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`;
 
+  if (details.dataset.assetHistoryIdV3120 !== assetId) {
+    details.dataset.assetHistoryIdV3120 = assetId;
+    details.open = rows.length > 0;
+  }
+
   if (!rows.length) {
     body.innerHTML = '';
     return;
   }
 
-  body.innerHTML = rows.slice(0, 10).map((row) => {
+  body.innerHTML = rows.map((row) => {
     const tx = row.transaction;
     const direction = assetActivityDirectionV270(row);
-    const date = assetActivityDateV270(tx.date);
+    const headline = assetActivityHeadlineV3120(row);
+    const secondary = assetActivitySecondaryV3120(row);
 
     return `
-      <div class="asset-activity-row-v270">
+      <div
+        class="asset-activity-row-v270"
+        data-open-asset-transaction-v3120="${escapeAttr(tx.id)}"
+        role="button"
+        tabindex="0"
+        aria-label="Open ${escapeAttr(tx.type || 'transaction')}: ${escapeAttr(tx.summary || headline)}"
+        title="Open linked transaction"
+        style="cursor:pointer"
+      >
         <span class="asset-activity-direction-v270">${escapeHtml(direction)}</span>
         <span class="asset-activity-copy-v270">
-          <strong>${escapeHtml(tx.type || 'Transaction')}</strong>
-          <small>${escapeHtml(tx.summary || 'Asset activity')}</small>
+          <strong>${escapeHtml(headline)}</strong>
+          <small>${escapeHtml(secondary || tx.summary || 'Asset activity')}</small>
         </span>
-        <time>${escapeHtml(date)}</time>
+        <time>${escapeHtml(assetActivityDateV270(tx.date || tx.createdAt))}</time>
       </div>
     `;
   }).join('') + `
     <button class="btn btn-secondary btn-small asset-open-ledger-v270" type="button" id="assetOpenLedgerV270">
-      View Transactions
+      Open Transaction Centre
     </button>
   `;
 
-  el('assetOpenLedgerV270')?.addEventListener('click', () => {
-    assetFormDirtyV270 = false;
-    assetDialog.close();
+  body.querySelectorAll('[data-open-asset-transaction-v3120]').forEach((row) => {
+    const open = () => openAssetLinkedTransactionV3120(
+      row.dataset.openAssetTransactionV3120
+    );
 
-    if (typeof transactionHistoryFilterV259 !== 'undefined') {
-      transactionHistoryFilterV259 = 'All';
-    }
-
-    if (typeof switchView === 'function') switchView('transactions');
+    row.addEventListener('click', open);
+    row.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      open();
+    });
   });
+
+  el('assetOpenLedgerV270')?.addEventListener(
+    'click',
+    openAssetTransactionCentreV3120
+  );
 }
 
 function syncAssetEditorV270(assetId = null) {
@@ -531,7 +812,19 @@ function syncAssetEditorV270(assetId = null) {
   syncAssetUsedOptionV270();
   syncAssetOptionalDetailsV270();
   syncAssetPickPreviewV270();
-  renderAssetActivityV270(assetId || (typeof editingAssetId !== 'undefined' ? editingAssetId : null));
+
+  const resolvedAssetId =
+    assetId || (typeof editingAssetId !== 'undefined' ? editingAssetId : null);
+
+  renderAssetOwnershipSnapshotV3120(resolvedAssetId);
+  renderAssetActivityV270(resolvedAssetId);
+
+  // app.js installs its Draft History wrapper later. Apply this lock after the
+  // current synchronous call stack so it runs after that wrapper as well.
+  queueMicrotask(() => {
+    if (!assetDialog?.open) return;
+    syncAssetTransactionOwnershipLockV3120(resolvedAssetId);
+  });
 }
 
 function guardAssetCloseV270(event) {
@@ -587,12 +880,20 @@ function installAssetManagerV270() {
     if (assetDialog?.open) assetFormDirtyV270 = true;
     syncAssetPickPreviewV270();
     syncAssetOptionalDetailsV270();
+
+    const assetId =
+      typeof editingAssetId !== 'undefined' ? editingAssetId : null;
+    renderAssetOwnershipSnapshotV3120(assetId);
   });
 
   el('assetForm')?.addEventListener('change', () => {
     if (assetDialog?.open) assetFormDirtyV270 = true;
     syncAssetPickPreviewV270();
     syncAssetOptionalDetailsV270();
+
+    const assetId =
+      typeof editingAssetId !== 'undefined' ? editingAssetId : null;
+    renderAssetOwnershipSnapshotV3120(assetId);
   });
 
   el('closeAssetDialog')?.addEventListener('click', guardAssetCloseV270, true);
@@ -609,6 +910,9 @@ function installAssetManagerV270() {
 
     event.preventDefault();
   });
+
+  document.documentElement.dataset.rostercapAssetTransactions =
+    ROSTERCAP_ASSET_TRANSACTION_INTEGRATION_VERSION_V3120;
 }
 
 installAssetManagerV270();
