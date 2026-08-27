@@ -1,7 +1,7 @@
 'use strict';
 
 // ============================================================================
-// RosterCap V3.13.0 — Trade Block
+// RosterCap V3.13.1 — Trade Block on Transactions
 //
 // Planning layer only.
 // - Does NOT change roster ownership.
@@ -17,76 +17,76 @@
 // Absence of a row = not on Trade Block.
 // ============================================================================
 
-const ROSTERCAP_TRADE_BLOCK_FEATURE_VERSION_V3130 = '3.13.0';
-const TRADE_BLOCK_STATUSES_V3130 = ['AVAILABLE','LISTENING','UNTOUCHABLE'];
+const ROSTERCAP_TRADE_BLOCK_FEATURE_VERSION_V3131 = '3.13.1';
+const TRADE_BLOCK_STATUSES_V3131 = ['AVAILABLE','LISTENING','UNTOUCHABLE'];
 
-let tradeBlockOfficeIdV3130 = null;
-let tradeBlockEntriesV3130 = [];
-let tradeBlockLoadedV3130 = false;
-let tradeBlockLoadingV3130 = null;
-let editingTradeBlockEntryIdV3130 = null;
-let tradeBlockInstalledV3130 = false;
+let tradeBlockOfficeIdV3131 = null;
+let tradeBlockEntriesV3131 = [];
+let tradeBlockLoadedV3131 = false;
+let tradeBlockLoadingV3131 = null;
+let editingTradeBlockEntryIdV3131 = null;
+let tradeBlockInstalledV3131 = false;
 
 
-function ensureTradeBlockStylesV3130() {
-  let link = document.getElementById('tradeBlockStylesV3130');
+function ensureTradeBlockStylesV3131() {
+  let link = document.getElementById('tradeBlockStylesV3131');
 
   if (!link) {
     link = document.createElement('link');
-    link.id = 'tradeBlockStylesV3130';
+    link.id = 'tradeBlockStylesV3131';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
   }
 
-  link.href = './css/trade-block.css?v=20260827-v3130';
+  link.href = './css/trade-block.css?v=20260827-v3131';
 }
 
 
-function resetTradeBlockCacheV3130() {
-  tradeBlockOfficeIdV3130 = null;
-  tradeBlockEntriesV3130 = [];
-  tradeBlockLoadedV3130 = false;
-  tradeBlockLoadingV3130 = null;
-  editingTradeBlockEntryIdV3130 = null;
+function resetTradeBlockCacheV3131() {
+  tradeBlockOfficeIdV3131 = null;
+  tradeBlockEntriesV3131 = [];
+  tradeBlockLoadedV3131 = false;
+  tradeBlockLoadingV3131 = null;
+  editingTradeBlockEntryIdV3131 = null;
 }
 
 
-function tradeBlockNormalizeStatusV3130(value) {
+function tradeBlockNormalizeStatusV3131(value) {
   const status = String(value || '').trim().toUpperCase();
-  return TRADE_BLOCK_STATUSES_V3130.includes(status) ? status : 'AVAILABLE';
+  return TRADE_BLOCK_STATUSES_V3131.includes(status) ? status : 'AVAILABLE';
 }
 
 
-function tradeBlockNormalizeKindV3130(value) {
+function tradeBlockNormalizeKindV3131(value) {
   const kind = String(value || '').trim().toUpperCase();
   return kind === 'ASSET' ? 'ASSET' : 'PLAYER';
 }
 
 
-function tradeBlockStatusLabelV3130(status) {
+function tradeBlockStatusLabelV3131(status) {
   return ({
     AVAILABLE:'Available',
     LISTENING:'Listening',
     UNTOUCHABLE:'Untouchable'
-  })[tradeBlockNormalizeStatusV3130(status)] || 'Available';
+  })[tradeBlockNormalizeStatusV3131(status)] || 'Available';
 }
 
 
-function tradeBlockStatusHelpV3130(status) {
+function tradeBlockStatusHelpV3131(status) {
   return ({
     AVAILABLE:'Actively willing to move.',
     LISTENING:'Open to the right offer.',
     UNTOUCHABLE:'Internal reference — not currently shopping.'
-  })[tradeBlockNormalizeStatusV3130(status)] || '';
+  })[tradeBlockNormalizeStatusV3131(status)] || '';
 }
 
 
-function tradeBlockDevelopmentLabelV3130() {
+function tradeBlockDevelopmentLabelV3131() {
   return window.RosterCapTerminology?.developmentLabel?.() || 'Minors';
 }
 
 
-function tradeBlockAssetLabelV3130(asset) {
+function tradeBlockAssetLabelV3131(asset) {
   if (!asset) return 'Asset';
 
   if (typeof draftHubPickLabelV3060 === 'function' && asset.type === 'DRAFT_PICK') {
@@ -97,7 +97,7 @@ function tradeBlockAssetLabelV3130(asset) {
 }
 
 
-function tradeBlockPlayerMetaV3130(player) {
+function tradeBlockPlayerMetaV3131(player) {
   if (!player) return '';
 
   const season = typeof currentSeason === 'function' ? currentSeason() : null;
@@ -112,7 +112,7 @@ function tradeBlockPlayerMetaV3130(player) {
     player.position || '—',
     player.realTeam || 'No team',
     player.rosterGroup === 'FARM'
-      ? tradeBlockDevelopmentLabelV3130()
+      ? tradeBlockDevelopmentLabelV3131()
       : 'Active',
     charge === null || charge === undefined
       ? null
@@ -124,7 +124,7 @@ function tradeBlockPlayerMetaV3130(player) {
 }
 
 
-function tradeBlockAssetMetaV3130(asset) {
+function tradeBlockAssetMetaV3131(asset) {
   if (!asset) return '';
 
   const type = typeof assetTypeLabel === 'function'
@@ -147,12 +147,12 @@ function tradeBlockAssetMetaV3130(asset) {
 }
 
 
-function tradeBlockPlayerEligibleV3130(player) {
+function tradeBlockPlayerEligibleV3131(player) {
   return Boolean(player?.id);
 }
 
 
-function tradeBlockAssetEligibleV3130(asset) {
+function tradeBlockAssetEligibleV3131(asset) {
   return Boolean(
     asset
     && !asset.archivedAt
@@ -161,14 +161,14 @@ function tradeBlockAssetEligibleV3130(asset) {
 }
 
 
-function tradeBlockTargetV3130(entry) {
+function tradeBlockTargetV3131(entry) {
   if (!entry) return null;
 
   if (entry.kind === 'PLAYER') {
     const player = (state.players || [])
       .find((candidate) => candidate.id === entry.playerId) || null;
 
-    return tradeBlockPlayerEligibleV3130(player)
+    return tradeBlockPlayerEligibleV3131(player)
       ? { kind:'PLAYER', item:player }
       : null;
   }
@@ -176,23 +176,23 @@ function tradeBlockTargetV3130(entry) {
   const asset = (state.assets || [])
     .find((candidate) => candidate.id === entry.assetId) || null;
 
-  return tradeBlockAssetEligibleV3130(asset)
+  return tradeBlockAssetEligibleV3131(asset)
     ? { kind:'ASSET', item:asset }
     : null;
 }
 
 
-function visibleTradeBlockEntriesV3130() {
+function visibleTradeBlockEntriesV3131() {
   const statusOrder = new Map([
     ['AVAILABLE', 0],
     ['LISTENING', 1],
     ['UNTOUCHABLE', 2]
   ]);
 
-  return (tradeBlockEntriesV3130 || [])
+  return (tradeBlockEntriesV3131 || [])
     .map((entry) => ({
       entry,
-      target:tradeBlockTargetV3130(entry)
+      target:tradeBlockTargetV3131(entry)
     }))
     .filter((row) => row.target)
     .sort((a, b) => {
@@ -208,23 +208,23 @@ function visibleTradeBlockEntriesV3130() {
 
       const aLabel = a.entry.kind === 'PLAYER'
         ? a.target.item.name
-        : tradeBlockAssetLabelV3130(a.target.item);
+        : tradeBlockAssetLabelV3131(a.target.item);
       const bLabel = b.entry.kind === 'PLAYER'
         ? b.target.item.name
-        : tradeBlockAssetLabelV3130(b.target.item);
+        : tradeBlockAssetLabelV3131(b.target.item);
 
       return String(aLabel || '').localeCompare(String(bLabel || ''));
     });
 }
 
 
-function tradeBlockEntryFromRowV3130(row) {
+function tradeBlockEntryFromRowV3131(row) {
   return {
     id:row.trade_block_entry_id,
-    kind:tradeBlockNormalizeKindV3130(row.item_kind),
+    kind:tradeBlockNormalizeKindV3131(row.item_kind),
     playerId:row.front_office_player_id || null,
     assetId:row.front_office_asset_id || null,
-    status:tradeBlockNormalizeStatusV3130(row.trade_status),
+    status:tradeBlockNormalizeStatusV3131(row.trade_status),
     note:row.note || '',
     createdAt:row.created_at || null,
     updatedAt:row.updated_at || null
@@ -232,29 +232,29 @@ function tradeBlockEntryFromRowV3130(row) {
 }
 
 
-async function loadTradeBlockV3130(force = false) {
+async function loadTradeBlockV3131(force = false) {
   const officeId = state.frontOffice?.id || null;
   if (!officeId) {
-    resetTradeBlockCacheV3130();
+    resetTradeBlockCacheV3131();
     return [];
   }
 
-  if (tradeBlockOfficeIdV3130 !== officeId) {
-    tradeBlockOfficeIdV3130 = officeId;
-    tradeBlockEntriesV3130 = [];
-    tradeBlockLoadedV3130 = false;
-    tradeBlockLoadingV3130 = null;
+  if (tradeBlockOfficeIdV3131 !== officeId) {
+    tradeBlockOfficeIdV3131 = officeId;
+    tradeBlockEntriesV3131 = [];
+    tradeBlockLoadedV3131 = false;
+    tradeBlockLoadingV3131 = null;
   }
 
-  if (tradeBlockLoadedV3130 && !force) {
-    return tradeBlockEntriesV3130;
+  if (tradeBlockLoadedV3131 && !force) {
+    return tradeBlockEntriesV3131;
   }
 
-  if (tradeBlockLoadingV3130 && !force) {
-    return tradeBlockLoadingV3130;
+  if (tradeBlockLoadingV3131 && !force) {
+    return tradeBlockLoadingV3131;
   }
 
-  tradeBlockLoadingV3130 = (async () => {
+  tradeBlockLoadingV3131 = (async () => {
     const { data, error } = await db
       .from('front_office_trade_block_entries')
       .select(
@@ -265,20 +265,20 @@ async function loadTradeBlockV3130(force = false) {
 
     if (error) throw error;
 
-    tradeBlockEntriesV3130 = (data || []).map(tradeBlockEntryFromRowV3130);
-    tradeBlockLoadedV3130 = true;
-    return tradeBlockEntriesV3130;
+    tradeBlockEntriesV3131 = (data || []).map(tradeBlockEntryFromRowV3131);
+    tradeBlockLoadedV3131 = true;
+    return tradeBlockEntriesV3131;
   })();
 
   try {
-    return await tradeBlockLoadingV3130;
+    return await tradeBlockLoadingV3131;
   } finally {
-    tradeBlockLoadingV3130 = null;
+    tradeBlockLoadingV3131 = null;
   }
 }
 
 
-function tradeBlockSummaryV3130(entries) {
+function tradeBlockSummaryV3131(entries) {
   return {
     total:entries.length,
     available:entries.filter((row) => row.entry.status === 'AVAILABLE').length,
@@ -288,50 +288,50 @@ function tradeBlockSummaryV3130(entries) {
 }
 
 
-function tradeBlockCardMarkupV3130(row) {
+function tradeBlockCardMarkupV3131(row) {
   const { entry, target } = row;
   const player = target.kind === 'PLAYER' ? target.item : null;
   const asset = target.kind === 'ASSET' ? target.item : null;
 
   const label = player
     ? player.name
-    : tradeBlockAssetLabelV3130(asset);
+    : tradeBlockAssetLabelV3131(asset);
 
   const meta = player
-    ? tradeBlockPlayerMetaV3130(player)
-    : tradeBlockAssetMetaV3130(asset);
+    ? tradeBlockPlayerMetaV3131(player)
+    : tradeBlockAssetMetaV3131(asset);
 
   const kindLabel = player ? 'Player' : 'Asset';
   const canStartTrade = entry.status !== 'UNTOUCHABLE';
 
   return `
-    <article class="trade-block-card-v3130 status-${escapeAttr(entry.status.toLowerCase())}">
-      <div class="trade-block-card-head-v3130">
-        <span class="trade-block-kind-v3130">${escapeHtml(kindLabel)}</span>
-        <span class="trade-block-status-v3130">${escapeHtml(tradeBlockStatusLabelV3130(entry.status))}</span>
+    <article class="trade-block-card-v3131 status-${escapeAttr(entry.status.toLowerCase())}">
+      <div class="trade-block-card-head-v3131">
+        <span class="trade-block-kind-v3131">${escapeHtml(kindLabel)}</span>
+        <span class="trade-block-status-v3131">${escapeHtml(tradeBlockStatusLabelV3131(entry.status))}</span>
       </div>
 
-      <div class="trade-block-card-copy-v3130">
+      <div class="trade-block-card-copy-v3131">
         <strong title="${escapeAttr(label)}">${escapeHtml(label)}</strong>
         <small>${escapeHtml(meta || kindLabel)}</small>
         ${entry.note
           ? `<p>${escapeHtml(entry.note)}</p>`
-          : `<p class="trade-block-note-empty-v3130">${escapeHtml(tradeBlockStatusHelpV3130(entry.status))}</p>`
+          : `<p class="trade-block-note-empty-v3131">${escapeHtml(tradeBlockStatusHelpV3131(entry.status))}</p>`
         }
       </div>
 
-      <div class="trade-block-card-actions-v3130">
+      <div class="trade-block-card-actions-v3131">
         ${canStartTrade
           ? `<button
               class="btn btn-primary btn-small"
-              data-trade-block-start-v3130="${escapeAttr(entry.id)}"
+              data-trade-block-start-v3131="${escapeAttr(entry.id)}"
               type="button"
             >Start Trade</button>`
           : ''
         }
         <button
           class="btn btn-ghost btn-small"
-          data-trade-block-edit-v3130="${escapeAttr(entry.id)}"
+          data-trade-block-edit-v3131="${escapeAttr(entry.id)}"
           type="button"
         >Edit</button>
       </div>
@@ -340,44 +340,44 @@ function tradeBlockCardMarkupV3130(row) {
 }
 
 
-function tradeBlockPanelMarkupV3130() {
-  const rows = visibleTradeBlockEntriesV3130();
-  const summary = tradeBlockSummaryV3130(rows);
+function tradeBlockPanelMarkupV3131() {
+  const rows = visibleTradeBlockEntriesV3131();
+  const summary = tradeBlockSummaryV3131(rows);
 
   return `
-    <section class="trade-block-panel-v3130" id="tradeBlockPanelV3130">
-      <div class="trade-block-head-v3130">
+    <section class="trade-block-panel-v3131" id="tradeBlockPanelV3131">
+      <div class="trade-block-head-v3131">
         <div>
           <p class="eyebrow">Trade planning</p>
           <h4>Trade Block</h4>
-          <p>Track which players and assets you are willing to discuss.</p>
+          <p>Plan trade availability, then launch the existing structured Trade flow.</p>
         </div>
 
         <button
           class="btn btn-secondary btn-small"
-          id="manageTradeBlockBtnV3130"
+          id="manageTradeBlockBtnV3131"
           type="button"
         >+ Add</button>
       </div>
 
       ${summary.total
-        ? `<div class="trade-block-summary-v3130" aria-label="Trade Block summary">
+        ? `<div class="trade-block-summary-v3131" aria-label="Trade Block summary">
             <span><strong>${summary.available}</strong> Available</span>
             <span><strong>${summary.listening}</strong> Listening</span>
             <span><strong>${summary.untouchable}</strong> Untouchable</span>
           </div>
 
-          <div class="trade-block-grid-v3130">
-            ${rows.map(tradeBlockCardMarkupV3130).join('')}
+          <div class="trade-block-grid-v3131">
+            ${rows.map(tradeBlockCardMarkupV3131).join('')}
           </div>`
-        : `<div class="trade-block-empty-v3130">
+        : `<div class="trade-block-empty-v3131">
             <span>
               <strong>No players or assets listed yet.</strong>
               <small>Add something you would move, listen on, or mark untouchable.</small>
             </span>
             <button
               class="btn btn-primary btn-small"
-              id="emptyTradeBlockAddBtnV3130"
+              id="emptyTradeBlockAddBtnV3131"
               type="button"
             >Add to Trade Block</button>
           </div>`
@@ -387,155 +387,126 @@ function tradeBlockPanelMarkupV3130() {
 }
 
 
-function bindTradeBlockPanelV3130(panel) {
+function bindTradeBlockPanelV3131(panel) {
   if (!panel) return;
 
   panel
-    .querySelector('#manageTradeBlockBtnV3130')
-    ?.addEventListener('click', () => openTradeBlockDialogV3130());
+    .querySelector('#manageTradeBlockBtnV3131')
+    ?.addEventListener('click', () => openTradeBlockDialogV3131());
 
   panel
-    .querySelector('#emptyTradeBlockAddBtnV3130')
-    ?.addEventListener('click', () => openTradeBlockDialogV3130());
+    .querySelector('#emptyTradeBlockAddBtnV3131')
+    ?.addEventListener('click', () => openTradeBlockDialogV3131());
 
   panel
-    .querySelectorAll('[data-trade-block-edit-v3130]')
+    .querySelectorAll('[data-trade-block-edit-v3131]')
     .forEach((button) => {
       button.addEventListener('click', () => {
-        const entry = tradeBlockEntriesV3130.find(
-          (candidate) => candidate.id === button.dataset.tradeBlockEditV3130
+        const entry = tradeBlockEntriesV3131.find(
+          (candidate) => candidate.id === button.dataset.tradeBlockEditV3131
         );
-        if (entry) openTradeBlockDialogV3130(entry);
+        if (entry) openTradeBlockDialogV3131(entry);
       });
     });
 
   panel
-    .querySelectorAll('[data-trade-block-start-v3130]')
+    .querySelectorAll('[data-trade-block-start-v3131]')
     .forEach((button) => {
       button.addEventListener('click', () => {
-        const entry = tradeBlockEntriesV3130.find(
-          (candidate) => candidate.id === button.dataset.tradeBlockStartV3130
+        const entry = tradeBlockEntriesV3131.find(
+          (candidate) => candidate.id === button.dataset.tradeBlockStartV3131
         );
-        if (entry) startTradeFromTradeBlockV3130(entry);
+        if (entry) startTradeFromTradeBlockV3131(entry);
       });
     });
 }
 
 
-function placeTradeBlockPanelV3130() {
-  const page = document.querySelector('#assetsView .assets-page-v230');
+function placeTradeBlockPanelV3131() {
+  const page = document.querySelector(
+    '#transactionsView .transactions-page-v228'
+  );
   if (!page) return;
 
-  page.querySelector('#tradeBlockPanelV3130')?.remove();
+  page.querySelector('#tradeBlockPanelV3131')?.remove();
 
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = tradeBlockPanelMarkupV3130();
+  wrapper.innerHTML = tradeBlockPanelMarkupV3131();
   const panel = wrapper.firstElementChild;
   if (!panel) return;
 
-  const draftSummary = page.querySelector('#draftCapitalSummaryV3060');
-  const tabs = page.querySelector('.asset-tabs-v230');
+  const filters = page.querySelector(
+    '.depth-position-tabs[aria-label="Filter transactions by type"]'
+  );
 
-  if (draftSummary) {
-    draftSummary.insertAdjacentElement('beforebegin', panel);
-  } else if (tabs) {
-    tabs.insertAdjacentElement('beforebegin', panel);
+  if (filters) {
+    filters.insertAdjacentElement('beforebegin', panel);
   } else {
-    page.appendChild(panel);
+    const heading = page.querySelector('.tx-page-heading-v228');
+    if (heading) heading.insertAdjacentElement('afterend', panel);
+    else page.prepend(panel);
   }
 
-  bindTradeBlockPanelV3130(panel);
+  bindTradeBlockPanelV3131(panel);
 }
+async function decorateTradeBlockV3131() {
+  if (!state.frontOffice || activeView !== 'transactions') return;
 
-
-function renderTradeBlockLoadingV3130() {
-  const page = document.querySelector('#assetsView .assets-page-v230');
-  if (!page) return;
-
-  page.querySelector('#tradeBlockPanelV3130')?.remove();
-
-  const panel = document.createElement('section');
-  panel.id = 'tradeBlockPanelV3130';
-  panel.className = 'trade-block-panel-v3130 trade-block-loading-v3130';
-  panel.innerHTML = `
-    <div class="trade-block-head-v3130">
-      <div>
-        <p class="eyebrow">Trade planning</p>
-        <h4>Trade Block</h4>
-        <p>Loading player and asset availability…</p>
-      </div>
-    </div>
-  `;
-
-  const draftSummary = page.querySelector('#draftCapitalSummaryV3060');
-  const tabs = page.querySelector('.asset-tabs-v230');
-
-  if (draftSummary) draftSummary.insertAdjacentElement('beforebegin', panel);
-  else if (tabs) tabs.insertAdjacentElement('beforebegin', panel);
-  else page.appendChild(panel);
-}
-
-
-async function decorateTradeBlockV3130() {
-  if (!state.frontOffice || activeView !== 'assets') return;
-
-  if (!tradeBlockLoadedV3130 || tradeBlockOfficeIdV3130 !== state.frontOffice.id) {
-    renderTradeBlockLoadingV3130();
-
-    try {
-      await loadTradeBlockV3130();
-    } catch (error) {
-      console.error('Trade Block load failed', error);
-
-      const panel = document.querySelector('#tradeBlockPanelV3130');
-      if (panel) {
-        panel.classList.add('trade-block-load-error-v3130');
-        panel.innerHTML = `
-          <div class="trade-block-head-v3130">
-            <div>
-              <p class="eyebrow">Trade planning</p>
-              <h4>Trade Block unavailable</h4>
-              <p>${escapeHtml(error?.message || 'Trade Block could not be loaded.')}</p>
-            </div>
-          </div>
-        `;
-      }
-      return;
-    }
+  if (
+    tradeBlockLoadedV3131
+    && tradeBlockOfficeIdV3131 === state.frontOffice.id
+  ) {
+    placeTradeBlockPanelV3131();
+    return;
   }
 
-  placeTradeBlockPanelV3130();
+  // Quiet preload:
+  // keep the normal Transactions page fully stable while the planning metadata
+  // loads. Insert the finished Trade Block once; never replace the page with a
+  // temporary loading state.
+  try {
+    await loadTradeBlockV3131();
+  } catch (error) {
+    console.error('Trade Block load failed', error);
+    return;
+  }
+
+  if (
+    state.frontOffice
+    && activeView === 'transactions'
+    && tradeBlockOfficeIdV3131 === state.frontOffice.id
+  ) {
+    placeTradeBlockPanelV3131();
+  }
 }
-
-
-function ensureTradeBlockDialogV3130() {
-  let dialog = document.getElementById('tradeBlockDialogV3130');
+function ensureTradeBlockDialogV3131() {
+  let dialog = document.getElementById('tradeBlockDialogV3131');
   if (dialog) return dialog;
 
   dialog = document.createElement('dialog');
-  dialog.id = 'tradeBlockDialogV3130';
-  dialog.className = 'drawer-dialog trade-block-dialog-v3130';
+  dialog.id = 'tradeBlockDialogV3131';
+  dialog.className = 'drawer-dialog trade-block-dialog-v3131';
 
   dialog.innerHTML = `
-    <form class="drawer-card trade-block-dialog-card-v3130" id="tradeBlockFormV3130">
+    <form class="drawer-card trade-block-dialog-card-v3131" id="tradeBlockFormV3131">
       <header class="drawer-header">
         <div class="drawer-header-copy">
           <p class="eyebrow">Trade planning</p>
-          <h3 id="tradeBlockDialogTitleV3130">Add to Trade Block</h3>
+          <h3 id="tradeBlockDialogTitleV3131">Add to Trade Block</h3>
         </div>
         <button
           aria-label="Close"
           class="icon-btn"
-          id="closeTradeBlockDialogV3130"
+          id="closeTradeBlockDialogV3131"
           type="button"
         >×</button>
       </header>
 
-      <div class="modal-body trade-block-dialog-body-v3130">
-        <div class="trade-block-form-grid-v3130">
+      <div class="modal-body trade-block-dialog-body-v3131">
+        <div class="trade-block-form-grid-v3131">
           <label>
             Item type
-            <select id="tradeBlockKindV3130">
+            <select id="tradeBlockKindV3131">
               <option value="PLAYER">Player</option>
               <option value="ASSET">Asset</option>
             </select>
@@ -543,12 +514,12 @@ function ensureTradeBlockDialogV3130() {
 
           <label class="full">
             Player / asset
-            <select id="tradeBlockTargetV3130"></select>
+            <select id="tradeBlockTargetV3131"></select>
           </label>
 
           <label class="full">
             Trade status
-            <select id="tradeBlockStatusV3130">
+            <select id="tradeBlockStatusV3131">
               <option value="AVAILABLE">Available</option>
               <option value="LISTENING">Listening</option>
               <option value="UNTOUCHABLE">Untouchable</option>
@@ -558,7 +529,7 @@ function ensureTradeBlockDialogV3130() {
           <label class="full">
             Note
             <textarea
-              id="tradeBlockNoteV3130"
+              id="tradeBlockNoteV3131"
               maxlength="240"
               rows="3"
               placeholder="Optional — asking price, preferred return, context, etc."
@@ -566,12 +537,12 @@ function ensureTradeBlockDialogV3130() {
           </label>
         </div>
 
-        <div class="trade-block-dialog-hint-v3130" id="tradeBlockDialogHintV3130"></div>
+        <div class="trade-block-dialog-hint-v3131" id="tradeBlockDialogHintV3131"></div>
 
-        <div class="form-actions trade-block-form-actions-v3130">
+        <div class="form-actions trade-block-form-actions-v3131">
           <button
             class="btn btn-danger hidden"
-            id="removeTradeBlockBtnV3130"
+            id="removeTradeBlockBtnV3131"
             type="button"
           >Remove</button>
 
@@ -579,13 +550,13 @@ function ensureTradeBlockDialogV3130() {
 
           <button
             class="btn btn-ghost"
-            id="cancelTradeBlockBtnV3130"
+            id="cancelTradeBlockBtnV3131"
             type="button"
           >Cancel</button>
 
           <button
             class="btn btn-primary"
-            id="saveTradeBlockBtnV3130"
+            id="saveTradeBlockBtnV3131"
             type="submit"
           >Save</button>
         </div>
@@ -596,47 +567,47 @@ function ensureTradeBlockDialogV3130() {
   document.body.appendChild(dialog);
 
   dialog
-    .querySelector('#closeTradeBlockDialogV3130')
+    .querySelector('#closeTradeBlockDialogV3131')
     ?.addEventListener('click', () => dialog.close());
 
   dialog
-    .querySelector('#cancelTradeBlockBtnV3130')
+    .querySelector('#cancelTradeBlockBtnV3131')
     ?.addEventListener('click', () => dialog.close());
 
   dialog
-    .querySelector('#tradeBlockKindV3130')
-    ?.addEventListener('change', syncTradeBlockTargetOptionsV3130);
+    .querySelector('#tradeBlockKindV3131')
+    ?.addEventListener('change', syncTradeBlockTargetOptionsV3131);
 
   dialog
-    .querySelector('#tradeBlockStatusV3130')
-    ?.addEventListener('change', syncTradeBlockDialogHintV3130);
+    .querySelector('#tradeBlockStatusV3131')
+    ?.addEventListener('change', syncTradeBlockDialogHintV3131);
 
   dialog
-    .querySelector('#tradeBlockFormV3130')
-    ?.addEventListener('submit', saveTradeBlockFromDialogV3130);
+    .querySelector('#tradeBlockFormV3131')
+    ?.addEventListener('submit', saveTradeBlockFromDialogV3131);
 
   dialog
-    .querySelector('#removeTradeBlockBtnV3130')
-    ?.addEventListener('click', removeTradeBlockFromDialogV3130);
+    .querySelector('#removeTradeBlockBtnV3131')
+    ?.addEventListener('click', removeTradeBlockFromDialogV3131);
 
   dialog.addEventListener('close', () => {
-    editingTradeBlockEntryIdV3130 = null;
+    editingTradeBlockEntryIdV3131 = null;
   });
 
   return dialog;
 }
 
 
-function tradeBlockAvailablePlayersV3130() {
+function tradeBlockAvailablePlayersV3131() {
   return [...(state.players || [])]
-    .filter(tradeBlockPlayerEligibleV3130)
+    .filter(tradeBlockPlayerEligibleV3131)
     .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 }
 
 
-function tradeBlockAvailableAssetsV3130() {
+function tradeBlockAvailableAssetsV3131() {
   return [...(state.assets || [])]
-    .filter(tradeBlockAssetEligibleV3130)
+    .filter(tradeBlockAssetEligibleV3131)
     .sort((a, b) => {
       const aYear = Number(a.draftYear || 9999);
       const bYear = Number(b.draftYear || 9999);
@@ -646,22 +617,22 @@ function tradeBlockAvailableAssetsV3130() {
       const bRound = Number(b.draftRound || 999);
       if (aRound !== bRound) return aRound - bRound;
 
-      return tradeBlockAssetLabelV3130(a)
-        .localeCompare(tradeBlockAssetLabelV3130(b));
+      return tradeBlockAssetLabelV3131(a)
+        .localeCompare(tradeBlockAssetLabelV3131(b));
     });
 }
 
 
-function syncTradeBlockTargetOptionsV3130(selectedId = null) {
-  const dialog = ensureTradeBlockDialogV3130();
-  const kind = tradeBlockNormalizeKindV3130(
-    dialog.querySelector('#tradeBlockKindV3130')?.value
+function syncTradeBlockTargetOptionsV3131(selectedId = null) {
+  const dialog = ensureTradeBlockDialogV3131();
+  const kind = tradeBlockNormalizeKindV3131(
+    dialog.querySelector('#tradeBlockKindV3131')?.value
   );
-  const select = dialog.querySelector('#tradeBlockTargetV3130');
+  const select = dialog.querySelector('#tradeBlockTargetV3131');
   if (!select) return;
 
   if (kind === 'PLAYER') {
-    const players = tradeBlockAvailablePlayersV3130();
+    const players = tradeBlockAvailablePlayersV3131();
 
     select.innerHTML = players.length
       ? players.map((player) => `
@@ -671,12 +642,12 @@ function syncTradeBlockTargetOptionsV3130(selectedId = null) {
         `).join('')
       : '<option value="">No current roster players</option>';
   } else {
-    const assets = tradeBlockAvailableAssetsV3130();
+    const assets = tradeBlockAvailableAssetsV3131();
 
     select.innerHTML = assets.length
       ? assets.map((asset) => `
           <option value="${escapeAttr(asset.id)}">
-            ${escapeHtml(tradeBlockAssetLabelV3130(asset))}
+            ${escapeHtml(tradeBlockAssetLabelV3131(asset))}
           </option>
         `).join('')
       : '<option value="">No owned assets</option>';
@@ -686,43 +657,43 @@ function syncTradeBlockTargetOptionsV3130(selectedId = null) {
     select.value = selectedId;
   }
 
-  syncTradeBlockDialogHintV3130();
+  syncTradeBlockDialogHintV3131();
 }
 
 
-function syncTradeBlockDialogHintV3130() {
-  const dialog = ensureTradeBlockDialogV3130();
-  const hint = dialog.querySelector('#tradeBlockDialogHintV3130');
-  const status = tradeBlockNormalizeStatusV3130(
-    dialog.querySelector('#tradeBlockStatusV3130')?.value
+function syncTradeBlockDialogHintV3131() {
+  const dialog = ensureTradeBlockDialogV3131();
+  const hint = dialog.querySelector('#tradeBlockDialogHintV3131');
+  const status = tradeBlockNormalizeStatusV3131(
+    dialog.querySelector('#tradeBlockStatusV3131')?.value
   );
 
-  if (hint) hint.textContent = tradeBlockStatusHelpV3130(status);
+  if (hint) hint.textContent = tradeBlockStatusHelpV3131(status);
 }
 
 
-function openTradeBlockDialogV3130(entry = null) {
-  const dialog = ensureTradeBlockDialogV3130();
-  const title = dialog.querySelector('#tradeBlockDialogTitleV3130');
-  const kind = dialog.querySelector('#tradeBlockKindV3130');
-  const target = dialog.querySelector('#tradeBlockTargetV3130');
-  const status = dialog.querySelector('#tradeBlockStatusV3130');
-  const note = dialog.querySelector('#tradeBlockNoteV3130');
-  const remove = dialog.querySelector('#removeTradeBlockBtnV3130');
+function openTradeBlockDialogV3131(entry = null) {
+  const dialog = ensureTradeBlockDialogV3131();
+  const title = dialog.querySelector('#tradeBlockDialogTitleV3131');
+  const kind = dialog.querySelector('#tradeBlockKindV3131');
+  const target = dialog.querySelector('#tradeBlockTargetV3131');
+  const status = dialog.querySelector('#tradeBlockStatusV3131');
+  const note = dialog.querySelector('#tradeBlockNoteV3131');
+  const remove = dialog.querySelector('#removeTradeBlockBtnV3131');
 
-  editingTradeBlockEntryIdV3130 = entry?.id || null;
+  editingTradeBlockEntryIdV3131 = entry?.id || null;
 
   if (entry) {
     title.textContent = 'Edit Trade Block';
     kind.value = entry.kind;
     kind.disabled = true;
 
-    syncTradeBlockTargetOptionsV3130(
+    syncTradeBlockTargetOptionsV3131(
       entry.kind === 'PLAYER' ? entry.playerId : entry.assetId
     );
 
     target.disabled = true;
-    status.value = tradeBlockNormalizeStatusV3130(entry.status);
+    status.value = tradeBlockNormalizeStatusV3131(entry.status);
     note.value = entry.note || '';
     remove.classList.remove('hidden');
   } else {
@@ -733,38 +704,38 @@ function openTradeBlockDialogV3130(entry = null) {
     status.value = 'AVAILABLE';
     note.value = '';
     remove.classList.add('hidden');
-    syncTradeBlockTargetOptionsV3130();
+    syncTradeBlockTargetOptionsV3131();
   }
 
-  syncTradeBlockDialogHintV3130();
+  syncTradeBlockDialogHintV3131();
 
   if (!dialog.open) dialog.showModal();
 }
 
 
-function currentTradeBlockDialogEntryV3130() {
-  return tradeBlockEntriesV3130.find(
-    (entry) => entry.id === editingTradeBlockEntryIdV3130
+function currentTradeBlockDialogEntryV3131() {
+  return tradeBlockEntriesV3131.find(
+    (entry) => entry.id === editingTradeBlockEntryIdV3131
   ) || null;
 }
 
 
-async function saveTradeBlockFromDialogV3130(event) {
+async function saveTradeBlockFromDialogV3131(event) {
   event.preventDefault();
 
-  const dialog = ensureTradeBlockDialogV3130();
-  const existing = currentTradeBlockDialogEntryV3130();
-  const kind = existing?.kind || tradeBlockNormalizeKindV3130(
-    dialog.querySelector('#tradeBlockKindV3130')?.value
+  const dialog = ensureTradeBlockDialogV3131();
+  const existing = currentTradeBlockDialogEntryV3131();
+  const kind = existing?.kind || tradeBlockNormalizeKindV3131(
+    dialog.querySelector('#tradeBlockKindV3131')?.value
   );
   const targetId = existing
     ? (existing.kind === 'PLAYER' ? existing.playerId : existing.assetId)
-    : dialog.querySelector('#tradeBlockTargetV3130')?.value || null;
-  const status = tradeBlockNormalizeStatusV3130(
-    dialog.querySelector('#tradeBlockStatusV3130')?.value
+    : dialog.querySelector('#tradeBlockTargetV3131')?.value || null;
+  const status = tradeBlockNormalizeStatusV3131(
+    dialog.querySelector('#tradeBlockStatusV3131')?.value
   );
-  const note = dialog.querySelector('#tradeBlockNoteV3130')?.value.trim() || null;
-  const save = dialog.querySelector('#saveTradeBlockBtnV3130');
+  const note = dialog.querySelector('#tradeBlockNoteV3131')?.value.trim() || null;
+  const save = dialog.querySelector('#saveTradeBlockBtnV3131');
 
   if (!targetId) {
     alert(kind === 'PLAYER'
@@ -788,14 +759,14 @@ async function saveTradeBlockFromDialogV3130(event) {
 
       if (error) throw error;
 
-      await loadTradeBlockV3130(true);
+      await loadTradeBlockV3131(true);
     });
 
     if (!success) return;
 
-    editingTradeBlockEntryIdV3130 = null;
+    editingTradeBlockEntryIdV3131 = null;
     dialog.close();
-    placeTradeBlockPanelV3130();
+    placeTradeBlockPanelV3131();
   } finally {
     save.disabled = false;
     save.textContent = 'Save';
@@ -803,21 +774,21 @@ async function saveTradeBlockFromDialogV3130(event) {
 }
 
 
-async function removeTradeBlockFromDialogV3130() {
-  const dialog = ensureTradeBlockDialogV3130();
-  const entry = currentTradeBlockDialogEntryV3130();
+async function removeTradeBlockFromDialogV3131() {
+  const dialog = ensureTradeBlockDialogV3131();
+  const entry = currentTradeBlockDialogEntryV3131();
   if (!entry) return;
 
-  const target = tradeBlockTargetV3130(entry);
+  const target = tradeBlockTargetV3131(entry);
   const label = target?.kind === 'PLAYER'
     ? target.item.name
     : target?.kind === 'ASSET'
-      ? tradeBlockAssetLabelV3130(target.item)
+      ? tradeBlockAssetLabelV3131(target.item)
       : 'this item';
 
   if (!confirm(`Remove ${label} from the Trade Block?`)) return;
 
-  const remove = dialog.querySelector('#removeTradeBlockBtnV3130');
+  const remove = dialog.querySelector('#removeTradeBlockBtnV3131');
   remove.disabled = true;
   remove.textContent = 'Removing…';
 
@@ -831,14 +802,14 @@ async function removeTradeBlockFromDialogV3130() {
 
       if (error) throw error;
 
-      await loadTradeBlockV3130(true);
+      await loadTradeBlockV3131(true);
     });
 
     if (!success) return;
 
-    editingTradeBlockEntryIdV3130 = null;
+    editingTradeBlockEntryIdV3131 = null;
     dialog.close();
-    placeTradeBlockPanelV3130();
+    placeTradeBlockPanelV3131();
   } finally {
     remove.disabled = false;
     remove.textContent = 'Remove';
@@ -846,8 +817,8 @@ async function removeTradeBlockFromDialogV3130() {
 }
 
 
-function startTradeFromTradeBlockV3130(entry) {
-  const target = tradeBlockTargetV3130(entry);
+function startTradeFromTradeBlockV3131(entry) {
+  const target = tradeBlockTargetV3131(entry);
 
   if (!target) {
     alert('This Trade Block item is no longer available to trade.');
@@ -885,41 +856,69 @@ function startTradeFromTradeBlockV3130(entry) {
 }
 
 
-function installTradeBlockV3130() {
-  if (tradeBlockInstalledV3130) return;
-  tradeBlockInstalledV3130 = true;
+function installTradeBlockV3131() {
+  if (tradeBlockInstalledV3131) return;
+  tradeBlockInstalledV3131 = true;
 
-  ensureTradeBlockStylesV3130();
+  ensureTradeBlockStylesV3131();
 
-  if (typeof renderAssets === 'function') {
-    const originalRenderAssetsV3130 = renderAssets;
+  // The dynamic feature script loads after DOMContentLoaded, so app.js has
+  // already installed its transaction presentation wrappers. Wrap the final
+  // renderer and keep the Trade Block attached to Transactions only.
+  if (typeof renderTransactions === 'function') {
+    const originalRenderTransactionsV3131 = renderTransactions;
 
-    renderAssets = function() {
-      const result = originalRenderAssetsV3130();
-      queueMicrotask(decorateTradeBlockV3130);
+    renderTransactions = function() {
+      const result = originalRenderTransactionsV3131();
+      queueMicrotask(decorateTradeBlockV3131);
       return result;
     };
   }
 
+  // Office data and Trade Block planning data are separate contracts.
+  // Preload planning metadata after each office load without forcing another
+  // full workspace render.
   if (typeof loadOffice === 'function') {
-    const originalLoadOfficeV3130 = loadOffice;
+    const originalLoadOfficeV3131 = loadOffice;
 
     loadOffice = async function(...args) {
-      resetTradeBlockCacheV3130();
-      return originalLoadOfficeV3130(...args);
+      resetTradeBlockCacheV3131();
+
+      const result = await originalLoadOfficeV3131(...args);
+
+      if (state.frontOffice?.id) {
+        loadTradeBlockV3131()
+          .then(() => {
+            if (activeView === 'transactions') {
+              placeTradeBlockPanelV3131();
+            }
+          })
+          .catch((error) => {
+            console.error('Trade Block preload failed', error);
+          });
+      }
+
+      return result;
     };
   }
 
-  ensureTradeBlockDialogV3130();
+  ensureTradeBlockDialogV3131();
 
   document.documentElement.dataset.rostercapTradeBlock =
-    ROSTERCAP_TRADE_BLOCK_FEATURE_VERSION_V3130;
+    ROSTERCAP_TRADE_BLOCK_FEATURE_VERSION_V3131;
 
-  // If the user resumed directly into Draft & Assets before this dynamic
-  // feature finished loading, decorate the already-rendered page now.
-  if (state.frontOffice && activeView === 'assets') {
-    queueMicrotask(decorateTradeBlockV3130);
+  // Handle a resumed office if the feature finished loading after the current
+  // office had already been hydrated.
+  if (state.frontOffice?.id) {
+    loadTradeBlockV3131()
+      .then(() => {
+        if (activeView === 'transactions') {
+          placeTradeBlockPanelV3131();
+        }
+      })
+      .catch((error) => {
+        console.error('Trade Block initial preload failed', error);
+      });
   }
 }
-
-installTradeBlockV3130();
+installTradeBlockV3131();
