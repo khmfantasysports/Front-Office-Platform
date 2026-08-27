@@ -15,43 +15,23 @@ let developmentDepthDraftOrderV3122 = [];
 let developmentDepthSavingV3122 = false;
 let developmentDepthFrameV3122 = 0;
 
-// V3.12.3 — development depth presentation polish.
-const ROSTERCAP_DEVELOPMENT_DEPTH_POLISH_VERSION_V3123 = '3.12.3';
-const DEVELOPMENT_DEPTH_MOBILE_QUERY_V3123 = '(max-width:720px)';
+// V3.12.4 — compact across-screen development depth + header editor.
+const ROSTERCAP_DEVELOPMENT_DEPTH_UI_VERSION_V3124 = '3.12.4';
 
-let developmentDepthMobilePositionV3123 = null;
-let developmentDepthResizeBoundV3123 = false;
+function ensureDevelopmentDepthStylesV3124() {
+  let link = document.getElementById('developmentDepthStylesV3124');
 
-function ensureDevelopmentDepthPolishStylesV3123() {
-  if (document.getElementById('developmentDepthStylesV3123')) return;
-
-  const link = document.createElement('link');
-  link.id = 'developmentDepthStylesV3123';
-  link.rel = 'stylesheet';
-  link.href = './css/development-depth.css?v=20260827-v3123';
-  document.head.appendChild(link);
-}
-
-function developmentDepthIsMobileV3123() {
-  return window.matchMedia(DEVELOPMENT_DEPTH_MOBILE_QUERY_V3123).matches;
-}
-
-function installDevelopmentDepthResizeWatcherV3123() {
-  if (developmentDepthResizeBoundV3123) return;
-  developmentDepthResizeBoundV3123 = true;
-
-  const media = window.matchMedia(DEVELOPMENT_DEPTH_MOBILE_QUERY_V3123);
-  const handle = () => scheduleDevelopmentDepthDecorationV3122();
-
-  if (typeof media.addEventListener === 'function') {
-    media.addEventListener('change', handle);
-  } else if (typeof media.addListener === 'function') {
-    media.addListener(handle);
+  if (!link) {
+    link = document.createElement('link');
+    link.id = 'developmentDepthStylesV3124';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
   }
+
+  link.href = './css/development-depth.css?v=20260827-v3124';
 }
 
-ensureDevelopmentDepthPolishStylesV3123();
-installDevelopmentDepthResizeWatcherV3123();
+ensureDevelopmentDepthStylesV3124();
 
 function openFarmProspectDialog() {
   openPlayerDialog();
@@ -277,21 +257,26 @@ function renderDevelopmentDepthEditorV3122(column, position) {
       && developmentDepthPlayerColumnV3122(player) === position
     );
 
+  column.classList.add('development-depth-edit-column-v3124');
+
   if (!players.length) {
     stack.innerHTML = '<div class="farm-depth-empty-v292">No players</div>';
     return;
   }
 
   stack.innerHTML = `
-    <div class="depth-order-list">
+    <div class="development-depth-edit-list-v3124">
       ${players.map((player, index) => `
-        <div class="depth-order-row">
-          <span class="depth-order-rank">${index + 1}</span>
-          <span class="depth-order-player">
-            <strong>${escapeHtml(player.name)}</strong>
-            <span>${escapeHtml(developmentDepthPlayerMetaV3122(player))}</span>
-          </span>
-          <span class="depth-order-controls">
+        <div class="development-depth-edit-card-v3124">
+          <span class="development-depth-edit-rank-v3124">Depth ${index + 1}</span>
+          <strong title="${escapeAttr(player.name)}">${escapeHtml(player.name)}</strong>
+          <small>${escapeHtml([
+            player.realTeam || '—',
+            player.ageSnapshot === null || player.ageSnapshot === undefined
+              ? null
+              : player.ageSnapshot
+          ].filter((value) => value !== null).join(' · '))}</small>
+          <div class="development-depth-edit-controls-v3124">
             <button
               class="depth-move-btn"
               data-development-depth-move-v3122="${index}"
@@ -308,7 +293,7 @@ function renderDevelopmentDepthEditorV3122(column, position) {
               aria-label="Move ${escapeAttr(player.name)} down"
               ${index === players.length - 1 || developmentDepthSavingV3122 ? 'disabled' : ''}
             >↓</button>
-          </span>
+          </div>
         </div>
       `).join('')}
     </div>
@@ -323,59 +308,118 @@ function renderDevelopmentDepthEditorV3122(column, position) {
     });
   });
 }
+function ensureDevelopmentDepthColumnActionsV3122(column) {
+  // V3.12.4:
+  // Ordering controls now live beside "Depth by position" instead of inside
+  // every position column. Remove any stale V3.12.2 action wrapper.
+  column
+    ?.querySelector('.development-depth-actions-v3122')
+    ?.remove();
+}
 
-function ensureDevelopmentDepthColumnActionsV3122(column, position) {
-  const head = column?.querySelector('.farm-depth-column-head-v292');
-  if (!head) return;
+function developmentDepthEditablePositionsV3124() {
+  return developmentDepthPositionsV3122()
+    .map((position) => ({
+      position,
+      count:resolvedDevelopmentDepthPlayerIdsV3122(position).length
+    }))
+    .filter((item) => item.count > 1);
+}
 
-  head.querySelector('.development-depth-actions-v3122')?.remove();
+function ensureDevelopmentDepthHeaderControlsV3124(board) {
+  const panel = board?.closest('.farm-depth-panel-v292');
+  const head = panel?.querySelector('.farm-section-head-v228');
+  const copy = head?.querySelector(':scope > div');
+  const title = copy?.querySelector('h3');
 
-  const playerCount = resolvedDevelopmentDepthPlayerIdsV3122(position).length;
-  const actions = document.createElement('div');
-  actions.className = 'depth-chart-actions development-depth-actions-v3122';
+  if (!panel || !head || !copy || !title) return;
 
-  if (developmentDepthEditPositionV3122 === position) {
-    actions.innerHTML = `
+  copy
+    .querySelector('.development-depth-heading-row-v3124')
+    ?.remove();
+
+  const row = document.createElement('div');
+  row.className = 'development-depth-heading-row-v3124';
+
+  title.insertAdjacentElement('beforebegin', row);
+  row.appendChild(title);
+
+  if (developmentDepthEditPositionV3122) {
+    const position = developmentDepthEditPositionV3122;
+
+    const stateLabel = document.createElement('span');
+    stateLabel.className = 'development-depth-editing-label-v3124';
+    stateLabel.textContent = `${position} order`;
+    row.appendChild(stateLabel);
+
+    const controls = document.createElement('div');
+    controls.className = 'development-depth-header-actions-v3124';
+    controls.innerHTML = `
       <button
         class="btn btn-ghost btn-small"
-        data-cancel-development-depth-v3122="${escapeAttr(position)}"
+        id="cancelDevelopmentDepthV3124"
         type="button"
         ${developmentDepthSavingV3122 ? 'disabled' : ''}
       >Cancel</button>
       <button
         class="btn btn-primary btn-small"
-        data-save-development-depth-v3122="${escapeAttr(position)}"
+        id="saveDevelopmentDepthV3124"
         type="button"
         ${developmentDepthSavingV3122 ? 'disabled' : ''}
       >${developmentDepthSavingV3122 ? 'Saving…' : 'Save'}</button>
     `;
-  } else if (playerCount > 1) {
-    actions.innerHTML = `
-      <button
-        class="btn btn-ghost btn-small"
-        data-edit-development-depth-v3122="${escapeAttr(position)}"
-        type="button"
-        title="Edit ${escapeAttr(position)} development depth order"
-      >Order</button>
-    `;
+
+    row.appendChild(controls);
+
+    controls
+      .querySelector('#cancelDevelopmentDepthV3124')
+      ?.addEventListener('click', cancelDevelopmentDepthEditV3122);
+
+    controls
+      .querySelector('#saveDevelopmentDepthV3124')
+      ?.addEventListener('click', saveDevelopmentDepthOrderV3122);
+
+    return;
   }
 
-  if (!actions.children.length) return;
-  head.appendChild(actions);
+  const editable = developmentDepthEditablePositionsV3124();
 
-  actions
-    .querySelector('[data-edit-development-depth-v3122]')
-    ?.addEventListener('click', () => beginDevelopmentDepthEditV3122(position));
+  if (!editable.length) return;
 
-  actions
-    .querySelector('[data-cancel-development-depth-v3122]')
-    ?.addEventListener('click', cancelDevelopmentDepthEditV3122);
+  const menu = document.createElement('details');
+  menu.className = 'development-depth-edit-menu-v3124';
 
-  actions
-    .querySelector('[data-save-development-depth-v3122]')
-    ?.addEventListener('click', saveDevelopmentDepthOrderV3122);
+  menu.innerHTML = `
+    <summary class="btn btn-secondary btn-small">Edit order</summary>
+    <div class="development-depth-edit-popover-v3124">
+      <span>Choose position</span>
+      <div>
+        ${editable.map(({ position, count }) => `
+          <button
+            type="button"
+            data-edit-development-depth-v3124="${escapeAttr(position)}"
+          >
+            <strong>${escapeHtml(position)}</strong>
+            <small>${count}</small>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  row.appendChild(menu);
+
+  menu
+    .querySelectorAll('[data-edit-development-depth-v3124]')
+    .forEach((button) => {
+      button.addEventListener('click', () => {
+        menu.open = false;
+        beginDevelopmentDepthEditV3122(
+          button.dataset.editDevelopmentDepthV3124
+        );
+      });
+    });
 }
-
 function beginDevelopmentDepthEditV3122(position) {
   if (developmentDepthSavingV3122) return;
 
@@ -385,7 +429,6 @@ function beginDevelopmentDepthEditV3122(position) {
   developmentDepthEditPositionV3122 = normalized;
   developmentDepthDraftOrderV3122 =
     resolvedDevelopmentDepthPlayerIdsV3122(normalized);
-  developmentDepthMobilePositionV3123 = normalized;
 
   renderFarm();
 }
@@ -455,145 +498,6 @@ async function saveDevelopmentDepthOrderV3122() {
   renderFarm();
 }
 
-
-function developmentDepthColumnPositionV3123(column) {
-  return normalizeDevelopmentDepthPositionV3122(
-    column?.dataset?.farmDepthPosition
-  );
-}
-
-function developmentDepthVisiblePositionsV3123(board) {
-  return [...board.querySelectorAll('.farm-depth-column-v292')]
-    .map((column) => ({
-      column,
-      position:developmentDepthColumnPositionV3123(column)
-    }))
-    .filter((item) => item.position);
-}
-
-function resolveDevelopmentDepthMobilePositionV3123(items) {
-  const positions = items.map((item) => item.position);
-
-  if (
-    developmentDepthEditPositionV3122
-    && positions.includes(developmentDepthEditPositionV3122)
-  ) {
-    developmentDepthMobilePositionV3123 =
-      developmentDepthEditPositionV3122;
-    return developmentDepthMobilePositionV3123;
-  }
-
-  if (
-    developmentDepthMobilePositionV3123
-    && positions.includes(developmentDepthMobilePositionV3123)
-  ) {
-    return developmentDepthMobilePositionV3123;
-  }
-
-  const firstPopulated = items.find((item) =>
-    resolvedDevelopmentDepthPlayerIdsV3122(item.position).length > 0
-  );
-
-  developmentDepthMobilePositionV3123 =
-    firstPopulated?.position || positions[0] || null;
-
-  return developmentDepthMobilePositionV3123;
-}
-
-function applyDevelopmentDepthMobilePositionV3123(board, rail) {
-  if (!board) return;
-
-  const items = developmentDepthVisiblePositionsV3123(board);
-  const mobile = developmentDepthIsMobileV3123();
-  const selected = resolveDevelopmentDepthMobilePositionV3123(items);
-  const scroll = board.closest('.farm-depth-scroll-v292');
-
-  board.classList.toggle('development-depth-mobile-board-v3123', mobile);
-  scroll?.classList.toggle(
-    'development-depth-mobile-scroll-v3123',
-    mobile
-  );
-
-  items.forEach(({ column, position }) => {
-    column.classList.toggle(
-      'development-depth-mobile-hidden-v3123',
-      mobile && position !== selected
-    );
-    column.classList.toggle(
-      'development-depth-mobile-active-v3123',
-      mobile && position === selected
-    );
-  });
-
-  rail
-    ?.querySelectorAll('[data-development-depth-tab-v3123]')
-    .forEach((button) => {
-      const active =
-        button.dataset.developmentDepthTabV3123 === selected;
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-pressed', active ? 'true' : 'false');
-    });
-}
-
-function ensureDevelopmentDepthMobileTabsV3123(board) {
-  const scroll = board?.closest('.farm-depth-scroll-v292');
-  if (!scroll) return;
-
-  const items = developmentDepthVisiblePositionsV3123(board);
-  if (!items.length) return;
-
-  let rail = scroll.previousElementSibling;
-
-  if (!rail?.classList?.contains('development-depth-tabs-v3123')) {
-    rail = document.createElement('div');
-    rail.className = 'development-depth-tabs-v3123';
-    rail.setAttribute(
-      'aria-label',
-      'Development depth positions'
-    );
-    scroll.insertAdjacentElement('beforebegin', rail);
-  }
-
-  const selected = resolveDevelopmentDepthMobilePositionV3123(items);
-
-  rail.innerHTML = items.map(({ position }) => {
-    const count =
-      resolvedDevelopmentDepthPlayerIdsV3122(position).length;
-    const active = position === selected;
-    const disabled =
-      Boolean(developmentDepthEditPositionV3122)
-      && developmentDepthEditPositionV3122 !== position;
-
-    return `
-      <button
-        class="development-depth-tab-v3123 ${active ? 'active' : ''}"
-        data-development-depth-tab-v3123="${escapeAttr(position)}"
-        type="button"
-        aria-pressed="${active ? 'true' : 'false'}"
-        ${disabled ? 'disabled' : ''}
-      >
-        <span>${escapeHtml(position === 'OTHER' ? 'Other' : position)}</span>
-        <strong>${count}</strong>
-      </button>
-    `;
-  }).join('');
-
-  rail
-    .querySelectorAll('[data-development-depth-tab-v3123]')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        if (button.disabled) return;
-
-        developmentDepthMobilePositionV3123 =
-          button.dataset.developmentDepthTabV3123 || null;
-
-        applyDevelopmentDepthMobilePositionV3123(board, rail);
-      });
-    });
-
-  applyDevelopmentDepthMobilePositionV3123(board, rail);
-}
-
 function decorateDevelopmentDepthOrderV3122() {
   developmentDepthFrameV3122 = 0;
 
@@ -612,21 +516,23 @@ function decorateDevelopmentDepthOrderV3122() {
 
       if (!position) return;
 
+      column.classList.remove('development-depth-edit-column-v3124');
+
       if (developmentDepthEditPositionV3122 === position) {
         renderDevelopmentDepthEditorV3122(column, position);
       } else {
         reorderDevelopmentDepthColumnV3122(column, position);
       }
 
-      ensureDevelopmentDepthColumnActionsV3122(column, position);
+      ensureDevelopmentDepthColumnActionsV3122(column);
     });
 
-  ensureDevelopmentDepthMobileTabsV3123(board);
+  ensureDevelopmentDepthHeaderControlsV3124(board);
 
   document.documentElement.dataset.rostercapDevelopmentDepth =
     ROSTERCAP_DEVELOPMENT_DEPTH_VERSION_V3122;
-  document.documentElement.dataset.rostercapDevelopmentDepthPolish =
-    ROSTERCAP_DEVELOPMENT_DEPTH_POLISH_VERSION_V3123;
+  document.documentElement.dataset.rostercapDevelopmentDepthUi =
+    ROSTERCAP_DEVELOPMENT_DEPTH_UI_VERSION_V3124;
 }
 
 function scheduleDevelopmentDepthDecorationV3122() {
