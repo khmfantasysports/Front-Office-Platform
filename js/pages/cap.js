@@ -72,14 +72,30 @@ function renderContractIntelligencePanel(intel) {
 
   return `<section class="cap-panel-v228 contract-intelligence-panel">
     <div class="cap-section-head-v228 contract-intelligence-head">
-      <div><p class="eyebrow">Contract intelligence</p><h3>Entered commitments and contract watch</h3><p>Evidence from saved contract terms and salary rows only. No salary values are inferred.</p></div>
+      <div><p class="eyebrow">Contract intelligence</p><h3>Commitments & contract watch</h3><p>Saved terms and salary rows only. No salary values are inferred.</p></div>
     </div>
 
-    <div class="contract-intel-summary">
-      <div><span>Expiring now</span><strong>${intel.activeExpiringCurrent.length}</strong><small>${formatMoney(currentExpiryCharges)} current cap charge</small></div>
-      <div><span>Expiring next</span><strong>${intel.activeExpiringNext.length}</strong><small>${formatMoney(nextExpiryCharges)} entered next-year charge</small></div>
-      <div class="${intel.activeMissingFutureSalary.length ? 'warning' : ''}"><span>Future salary gaps</span><strong>${intel.activeMissingFutureSalary.length}</strong><small>active roster contracts</small></div>
-      <div><span>Minors contracts</span><strong>${intel.minorsContracts.length}</strong><small>excluded from cap</small></div>
+    <div class="contract-intel-strip-v3142">
+      <div>
+        <span>Expiring now</span>
+        <strong>${intel.activeExpiringCurrent.length}</strong>
+        <small>${formatMoney(currentExpiryCharges)}</small>
+      </div>
+      <div>
+        <span>Expiring next</span>
+        <strong>${intel.activeExpiringNext.length}</strong>
+        <small>${formatMoney(nextExpiryCharges)}</small>
+      </div>
+      <div class="${intel.activeMissingFutureSalary.length ? 'warning' : ''}">
+        <span>Salary gaps</span>
+        <strong>${intel.activeMissingFutureSalary.length}</strong>
+        <small>active contracts</small>
+      </div>
+      <div>
+        <span>Minors deals</span>
+        <strong>${intel.minorsContracts.length}</strong>
+        <small>cap excluded</small>
+      </div>
     </div>
 
     <div class="contract-intel-columns">
@@ -145,7 +161,7 @@ function renderCap() {
   ).join('');
 
   el('capView').innerHTML = `
-    <div class="cap-page-v228 cap-dashboard-page-v3140">
+    <div class="cap-page-v228 cap-dashboard-page-v3142">
       <div class="page-heading-row cap-page-heading-v228">
         <div>
           <p class="eyebrow">Cap management</p>
@@ -156,21 +172,21 @@ function renderCap() {
         </div>
       </div>
 
-      ${renderCapDashboardV3140({
+      ${renderCapDashboardV3142({
         season:activeSeason,
         yearCount:3,
         context:'cap'
       })}
 
-      <section class="cap-panel-v228 cap-horizon-panel-v3140">
-        <div class="cap-section-head-v228 cap-section-head-compact-v3140">
+      <section class="cap-panel-v228 cap-horizon-panel-v3142">
+        <div class="cap-section-head-v228 cap-section-head-compact-v3142">
           <div>
             <p class="eyebrow">Commitment horizon</p>
-            <h3>Seven-season outlook</h3>
+            <h3>Season-by-season outlook</h3>
             <p>Known cap commitments from saved player and adjustment data.</p>
           </div>
         </div>
-        ${renderCapHorizonV3140()}
+        ${renderCapHorizonV3142()}
       </section>
 
       ${renderContractIntelligencePanel(intel)}
@@ -196,7 +212,7 @@ function renderCap() {
             <div
               class="table-wrap cap-horizontal-scroll"
               role="region"
-              aria-label="Seven-season cap detail table."
+              aria-label="Cap detail across configured seasons."
               tabindex="0"
             >
               <table class="cap-detail-table cap-detail-table-v25 cap-detail-table-v221">
