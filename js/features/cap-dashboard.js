@@ -1,21 +1,21 @@
 'use strict';
 
-// RosterCap V3.14.0 — shared cap dashboard presentation.
+// RosterCap V3.14.2 — shared cap dashboard presentation.
 //
 // Presentation only.
 // Every value comes from the existing calculateSeason(), deadCapForSeason(),
 // contractHorizonSeasons(), activeRosterPlayers() and Front Office settings.
 
-const ROSTERCAP_CAP_DASHBOARD_VERSION_V3140 = '3.14.0';
+const ROSTERCAP_CAP_DASHBOARD_VERSION_V3142 = '3.14.2';
 
-function capDashboardToneV3140(calc) {
+function capDashboardToneV3142(calc) {
   if (!calc || !calc.complete || calc.salaryCap === null) return 'warning';
   if (calc.capSpace < 0) return 'danger';
   if (calc.salaryCap > 0 && calc.capUsed / calc.salaryCap >= 0.95) return 'warning';
   return 'good';
 }
 
-function capDashboardSnapshotV3140(season) {
+function capDashboardSnapshotV3142(season) {
   const calc = calculateSeason(season.id);
   const salaryCap = calc.salaryCap;
   const deadCap = deadCapForSeason(season.id);
@@ -37,11 +37,11 @@ function capDashboardSnapshotV3140(season) {
     remaining,
     rawPct,
     pct:Math.max(0, Math.min(100, rawPct)),
-    tone:capDashboardToneV3140(calc)
+    tone:capDashboardToneV3142(calc)
   };
 }
 
-function capDashboardPrimaryV3140(snapshot) {
+function capDashboardPrimaryV3142(snapshot) {
   if (snapshot.salaryCap === null) {
     return {
       value:'Not set',
@@ -69,7 +69,7 @@ function capDashboardPrimaryV3140(snapshot) {
   };
 }
 
-function capDashboardRosterTextV3140() {
+function capDashboardRosterTextV3142() {
   const active = activeRosterPlayers().length;
   const limit = state.frontOffice?.rosterLimit;
 
@@ -80,8 +80,8 @@ function capDashboardRosterTextV3140() {
   return `${active} / ${limit} roster`;
 }
 
-function capDashboardYearCellV3140(season, fallbackMax = 1) {
-  const snapshot = capDashboardSnapshotV3140(season);
+function capDashboardYearCellV3142(season, fallbackMax = 1) {
+  const snapshot = capDashboardSnapshotV3142(season);
   const shortSeason =
     `${String(season.startYear).slice(2)}-${String((season.startYear + 1) % 100).padStart(2, '0')}`;
 
@@ -93,31 +93,32 @@ function capDashboardYearCellV3140(season, fallbackMax = 1) {
     ? 3
     : Math.max(6, Math.min(100, Math.round(basisPct)));
 
-  let footer = 'Cap incomplete';
+  let footer = 'Known commitments only';
+
   if (snapshot.salaryCap === null) {
-    footer = 'Cap not set';
+    footer = 'Cap TBD';
   } else if (snapshot.calc.complete && snapshot.remaining !== null) {
     footer = snapshot.remaining < 0
       ? `${formatMoney(Math.abs(snapshot.remaining))} over`
       : `${formatMoney(snapshot.remaining)} left`;
   }
 
-  return `<div class="rc-year-cell-v3140 ${snapshot.tone}">
-    <span class="rc-year-label-v3140">${escapeHtml(shortSeason)}</span>
+  return `<div class="rc-year-cell-v3142 ${snapshot.tone}">
+    <span class="rc-year-label-v3142">${escapeHtml(shortSeason)}</span>
     <strong>${escapeHtml(formatMoney(snapshot.used))}</strong>
-    <div class="rc-year-track-v3140" aria-hidden="true">
+    <div class="rc-year-track-v3142" aria-hidden="true">
       <span style="width:${width}%"></span>
     </div>
     <small>${escapeHtml(footer)}</small>
   </div>`;
 }
 
-function renderCapDashboardV3140(options = {}) {
+function renderCapDashboardV3142(options = {}) {
   const season = options.season || currentSeason();
   if (!season) return '';
 
-  const snapshot = capDashboardSnapshotV3140(season);
-  const primary = capDashboardPrimaryV3140(snapshot);
+  const snapshot = capDashboardSnapshotV3142(season);
+  const primary = capDashboardPrimaryV3142(snapshot);
   const horizon = contractHorizonSeasons();
   const yearCount = Math.max(1, Math.min(
     Number(options.yearCount || 3),
@@ -145,24 +146,24 @@ function renderCapDashboardV3140(options = {}) {
     ? 'danger'
     : snapshot.tone;
 
-  return `<section class="rc-cap-dashboard-v3140 ${options.context === 'cap' ? 'cap-page' : 'overview'}">
-    <article class="rc-cap-space-card-v3140 tone-${snapshot.tone}">
-      <div class="rc-cap-card-head-v3140">
+  return `<section class="rc-cap-dashboard-v3142 ${options.context === 'cap' ? 'cap-page' : 'overview'}">
+    <article class="rc-cap-space-card-v3142 tone-${snapshot.tone}">
+      <div class="rc-cap-card-head-v3142">
         <div>
           <p class="eyebrow">Cap Space</p>
           <span>${escapeHtml(seasonLabel(season.startYear))}</span>
         </div>
-        <small>${escapeHtml(capDashboardRosterTextV3140())}</small>
+        <small>${escapeHtml(capDashboardRosterTextV3142())}</small>
       </div>
 
-      <div class="rc-cap-space-body-v3140">
-        <div class="rc-cap-primary-v3140">
+      <div class="rc-cap-space-body-v3142">
+        <div class="rc-cap-primary-v3142">
           <strong class="${primaryTone}">${escapeHtml(primary.value)}</strong>
           <span>${escapeHtml(primary.label)}</span>
         </div>
 
         <div
-          class="rc-cap-ring-v3140 tone-${snapshot.tone}"
+          class="rc-cap-ring-v3142 tone-${snapshot.tone}"
           style="--rc-cap-pct:${snapshot.pct}"
           aria-label="${escapeAttr(percentLabel)} of salary cap used"
         >
@@ -173,31 +174,31 @@ function renderCapDashboardV3140(options = {}) {
         </div>
       </div>
 
-      <div class="rc-cap-mini-strip-v3140">
+      <div class="rc-cap-mini-strip-v3142">
         <span><small>Used</small><strong>${escapeHtml(usedLabel)}</strong></span>
         <span><small>Dead</small><strong>${escapeHtml(formatMoney(snapshot.deadCap))}</strong></span>
         <span><small>Limit</small><strong>${escapeHtml(capLimit)}</strong></span>
       </div>
     </article>
 
-    <article class="rc-year-breakdown-card-v3140">
-      <div class="rc-cap-card-head-v3140">
+    <article class="rc-year-breakdown-card-v3142">
+      <div class="rc-cap-card-head-v3142">
         <div>
           <p class="eyebrow">Year Breakdown</p>
           <span>Known cap commitments</span>
         </div>
       </div>
       <div
-        class="rc-year-breakdown-v3140"
+        class="rc-year-breakdown-v3142"
         style="--rc-year-count:${shown.length}"
       >
-        ${shown.map((item) => capDashboardYearCellV3140(item, fallbackMax)).join('')}
+        ${shown.map((item) => capDashboardYearCellV3142(item, fallbackMax)).join('')}
       </div>
     </article>
   </section>`;
 }
 
-function renderCapHorizonV3140() {
+function renderCapHorizonV3142() {
   const horizon = contractHorizonSeasons();
   if (!horizon.length) return '';
 
@@ -207,16 +208,19 @@ function renderCapHorizonV3140() {
   );
 
   return `<div
-    class="rc-cap-horizon-scroll-v3140"
+    class="rc-cap-horizon-scroll-v3142"
     role="region"
-    aria-label="Seven-season cap commitment horizon. Swipe horizontally to view future seasons."
+    aria-label="Cap commitment horizon across configured seasons. Swipe horizontally to view future seasons."
     tabindex="0"
   >
-    <div class="rc-cap-horizon-v3140">
-      ${horizon.map((item) => capDashboardYearCellV3140(item, fallbackMax)).join('')}
+    <div
+      class="rc-cap-horizon-v3142"
+      style="--rc-horizon-count:${horizon.length}"
+    >
+      ${horizon.map((item) => capDashboardYearCellV3142(item, fallbackMax)).join('')}
     </div>
   </div>`;
 }
 
 document.documentElement.dataset.rostercapCapDashboard =
-  ROSTERCAP_CAP_DASHBOARD_VERSION_V3140;
+  ROSTERCAP_CAP_DASHBOARD_VERSION_V3142;
