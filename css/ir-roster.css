@@ -1,0 +1,236 @@
+/*
+RosterCap V3.14.2 — Injured Reserve
+
+Scope:
+- Roster > Depth: IR panel below active positional depth.
+- Place-on-IR dialog.
+- Overview IR card uses cap-dashboard.css.
+*/
+
+#rosterView .ir-roster-section-v3142 {
+  display:grid;
+  gap:7px;
+  min-width:0;
+  margin-top:8px;
+  padding:9px;
+  border:1px solid rgba(119,201,255,.15);
+  border-radius:11px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15,30,42,.96),
+      rgba(9,20,29,.96)
+    );
+}
+
+#rosterView .ir-roster-head-v3142 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+}
+
+#rosterView .ir-roster-head-v3142 > div {
+  min-width:0;
+}
+
+#rosterView .ir-roster-head-v3142 .eyebrow {
+  margin:0 0 2px;
+}
+
+#rosterView .ir-roster-head-v3142 h4 {
+  margin:0;
+  color:var(--text);
+  font-size:.78rem;
+  line-height:1.05;
+}
+
+#rosterView .ir-roster-head-v3142 small {
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:.50rem;
+  line-height:1.25;
+}
+
+#rosterView .ir-roster-head-v3142 > .btn {
+  flex:0 0 auto;
+  min-height:27px;
+  padding:3px 8px;
+  font-size:.50rem;
+}
+
+#rosterView .ir-roster-grid-v3142 {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:6px;
+}
+
+#rosterView .ir-player-card-v3142 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:stretch;
+  gap:5px;
+  min-width:0;
+  padding:6px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:9px;
+  background:#0D1822;
+}
+
+#rosterView .ir-player-main-v3142 {
+  display:grid;
+  align-content:center;
+  gap:2px;
+  min-width:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+
+#rosterView .ir-player-main-v3142 strong,
+#rosterView .ir-player-main-v3142 span,
+#rosterView .ir-player-main-v3142 small {
+  display:block;
+  overflow:hidden;
+  max-width:100%;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#rosterView .ir-player-main-v3142 strong {
+  color:var(--text);
+  font-size:.66rem;
+  line-height:1.12;
+}
+
+#rosterView .ir-player-main-v3142 span {
+  color:var(--muted);
+  font-size:.47rem;
+  line-height:1.15;
+}
+
+#rosterView .ir-player-main-v3142 small {
+  color:#B9CBD8;
+  font-size:.46rem;
+  font-weight:700;
+  line-height:1.15;
+}
+
+#rosterView .ir-player-main-v3142 small.warning {
+  color:var(--warning);
+}
+
+#rosterView .ir-activate-btn-v3142 {
+  align-self:stretch;
+  min-width:62px;
+  min-height:34px;
+  padding:4px 7px;
+  border-radius:8px;
+  font-size:.48rem;
+}
+
+#rosterView .ir-roster-empty-v3142 {
+  display:grid;
+  gap:2px;
+  padding:7px 8px;
+  border:1px dashed rgba(119,201,255,.13);
+  border-radius:8px;
+  background:rgba(255,255,255,.01);
+}
+
+#rosterView .ir-roster-empty-v3142 span {
+  color:#C8D5DF;
+  font-size:.56rem;
+  font-weight:850;
+}
+
+#rosterView .ir-roster-empty-v3142 small {
+  color:var(--muted);
+  font-size:.48rem;
+  line-height:1.25;
+}
+
+
+/* Move dialog ----------------------------------------------------------- */
+
+.ir-move-dialog-v3142 .ir-move-card-v3142 {
+  width:min(430px,calc(100vw - 18px));
+}
+
+.ir-move-body-v3142 {
+  display:grid;
+  gap:10px;
+}
+
+.ir-move-body-v3142 label {
+  display:grid;
+  gap:5px;
+}
+
+.ir-move-note-v3142 {
+  padding:7px 8px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:8px;
+  background:rgba(50,173,255,.025);
+  color:var(--muted);
+  font-size:.55rem;
+  line-height:1.35;
+}
+
+
+@media (max-width:720px) {
+  #rosterView .ir-roster-section-v3142 {
+    gap:6px;
+    margin-top:7px;
+    padding:8px;
+  }
+
+  #rosterView .ir-roster-grid-v3142 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+  }
+
+  #rosterView .ir-player-card-v3142 {
+    grid-template-columns:minmax(0,1fr);
+    gap:5px;
+    padding:6px;
+  }
+
+  #rosterView .ir-activate-btn-v3142 {
+    width:100%;
+    min-width:0;
+    min-height:29px;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .ir-roster-head-v3142 {
+    gap:6px;
+  }
+
+  #rosterView .ir-roster-head-v3142 small {
+    font-size:.46rem;
+  }
+
+  #rosterView .ir-roster-head-v3142 > .btn {
+    min-height:26px;
+    padding-left:6px;
+    padding-right:6px;
+    font-size:.47rem;
+  }
+
+  #rosterView .ir-player-main-v3142 strong {
+    font-size:.62rem;
+  }
+
+  #rosterView .ir-player-main-v3142 span,
+  #rosterView .ir-player-main-v3142 small {
+    font-size:.43rem;
+  }
+}
