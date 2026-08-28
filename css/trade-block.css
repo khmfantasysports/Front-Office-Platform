@@ -1,9 +1,9 @@
 /*
-RosterCap V3.13.7 — Trade Block
+RosterCap V3.13.8 — Trade Block
 Scope: Transactions page + dynamically-created Trade Block dialog.
 */
 
-#transactionsView .trade-block-panel-v3137 {
+#transactionsView .trade-block-panel-v3138 {
   display:grid;
   gap:7px;
   min-width:0;
@@ -18,7 +18,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   );
 }
 
-#transactionsView .trade-block-head-v3137 {
+#transactionsView .trade-block-head-v3138 {
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
@@ -26,28 +26,28 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-head-v3137 > div {
+#transactionsView .trade-block-head-v3138 > div {
   min-width:0;
 }
 
-#transactionsView .trade-block-head-v3137 .eyebrow {
+#transactionsView .trade-block-head-v3138 .eyebrow {
   margin:0 0 2px;
 }
 
-#transactionsView .trade-block-head-v3137 h4 {
+#transactionsView .trade-block-head-v3138 h4 {
   margin:0;
   font-size:.83rem;
 }
 
 
-#transactionsView .trade-block-head-v3137 > .btn {
+#transactionsView .trade-block-head-v3138 > .btn {
   flex:0 0 auto;
   min-height:29px;
   padding:4px 8px;
   font-size:.55rem;
 }
 
-#transactionsView .trade-block-summary-v3137 {
+#transactionsView .trade-block-summary-v3138 {
   display:flex;
   align-items:center;
   gap:5px;
@@ -56,11 +56,11 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   scrollbar-width:none;
 }
 
-#transactionsView .trade-block-summary-v3137::-webkit-scrollbar {
+#transactionsView .trade-block-summary-v3138::-webkit-scrollbar {
   display:none;
 }
 
-#transactionsView .trade-block-summary-v3137 > span {
+#transactionsView .trade-block-summary-v3138 > span {
   display:inline-flex;
   align-items:center;
   gap:4px;
@@ -75,18 +75,18 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   font-weight:800;
 }
 
-#transactionsView .trade-block-summary-v3137 strong {
+#transactionsView .trade-block-summary-v3138 strong {
   color:var(--text);
   font-size:.56rem;
 }
 
-#transactionsView .trade-block-grid-v3137 {
+#transactionsView .trade-block-grid-v3138 {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
   gap:6px;
 }
 
-#transactionsView .trade-block-card-v3137 {
+#transactionsView .trade-block-card-v3138 {
   display:grid;
   align-content:start;
   gap:6px;
@@ -97,27 +97,27 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:#0D1822;
 }
 
-#transactionsView .trade-block-card-v3137.status-available {
+#transactionsView .trade-block-card-v3138.status-available {
   border-color:rgba(82,215,194,.20);
 }
 
-#transactionsView .trade-block-card-v3137.status-listening {
+#transactionsView .trade-block-card-v3138.status-listening {
   border-color:rgba(50,173,255,.22);
 }
 
-#transactionsView .trade-block-card-v3137.status-untouchable {
+#transactionsView .trade-block-card-v3138.status-untouchable {
   border-color:rgba(242,198,109,.20);
 }
 
-#transactionsView .trade-block-card-head-v3137 {
+#transactionsView .trade-block-card-head-v3138 {
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:6px;
 }
 
-#transactionsView .trade-block-kind-v3137,
-#transactionsView .trade-block-status-v3137 {
+#transactionsView .trade-block-kind-v3138,
+#transactionsView .trade-block-status-v3138 {
   display:inline-flex;
   align-items:center;
   min-height:18px;
@@ -133,29 +133,29 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .status-available .trade-block-status-v3137 {
+#transactionsView .status-available .trade-block-status-v3138 {
   color:#8FE6D5;
   border-color:rgba(82,215,194,.20);
   background:rgba(82,215,194,.05);
 }
 
-#transactionsView .status-listening .trade-block-status-v3137 {
+#transactionsView .status-listening .trade-block-status-v3138 {
   color:#9DD5FF;
   border-color:rgba(50,173,255,.22);
   background:rgba(50,173,255,.05);
 }
 
-#transactionsView .status-untouchable .trade-block-status-v3137 {
+#transactionsView .status-untouchable .trade-block-status-v3138 {
   color:#E8CB85;
   border-color:rgba(242,198,109,.22);
   background:rgba(242,198,109,.045);
 }
 
-#transactionsView .trade-block-card-copy-v3137 {
+#transactionsView .trade-block-card-copy-v3138 {
   min-width:0;
 }
 
-#transactionsView .trade-block-card-copy-v3137 > strong {
+#transactionsView .trade-block-card-copy-v3138 > strong {
   display:block;
   overflow:hidden;
   color:var(--text);
@@ -165,7 +165,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-card-copy-v3137 > small {
+#transactionsView .trade-block-card-copy-v3138 > small {
   display:block;
   overflow:hidden;
   margin-top:2px;
@@ -176,7 +176,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-card-copy-v3137 > p {
+#transactionsView .trade-block-card-copy-v3138 > p {
   margin:5px 0 0;
   min-height:1.3em;
   color:#B8C7D3;
@@ -184,24 +184,24 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   line-height:1.3;
 }
 
-#transactionsView .trade-block-card-copy-v3137 > p.trade-block-note-empty-v3137 {
+#transactionsView .trade-block-card-copy-v3138 > p.trade-block-note-empty-v3138 {
   color:var(--muted);
 }
 
-#transactionsView .trade-block-card-actions-v3137 {
+#transactionsView .trade-block-card-actions-v3138 {
   display:flex;
   align-items:center;
   gap:5px;
   margin-top:auto;
 }
 
-#transactionsView .trade-block-card-actions-v3137 .btn {
+#transactionsView .trade-block-card-actions-v3138 .btn {
   min-height:27px;
   padding:3px 7px;
   font-size:.50rem;
 }
 
-#transactionsView .trade-block-empty-v3137 {
+#transactionsView .trade-block-empty-v3138 {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -213,73 +213,73 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:rgba(255,255,255,.01);
 }
 
-#transactionsView .trade-block-empty-v3137 > span {
+#transactionsView .trade-block-empty-v3138 > span {
   min-width:0;
 }
 
-#transactionsView .trade-block-empty-v3137 strong,
-#transactionsView .trade-block-empty-v3137 small {
+#transactionsView .trade-block-empty-v3138 strong,
+#transactionsView .trade-block-empty-v3138 small {
   display:block;
 }
 
-#transactionsView .trade-block-empty-v3137 strong {
+#transactionsView .trade-block-empty-v3138 strong {
   font-size:.62rem;
 }
 
-#transactionsView .trade-block-empty-v3137 small {
+#transactionsView .trade-block-empty-v3138 small {
   margin-top:2px;
   color:var(--muted);
   font-size:.51rem;
   line-height:1.3;
 }
 
-#transactionsView .trade-block-empty-v3137 .btn {
+#transactionsView .trade-block-empty-v3138 .btn {
   flex:0 0 auto;
 }
 
-#transactionsView .trade-block-loading-v3137 {
+#transactionsView .trade-block-loading-v3138 {
   opacity:.75;
 }
 
-#transactionsView .trade-block-load-error-v3137 {
+#transactionsView .trade-block-load-error-v3138 {
   border-color:rgba(255,96,96,.30);
 }
 
 
 /* Dialog ---------------------------------------------------------------- */
 
-.trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+.trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
   width:min(520px,calc(100vw - 20px));
 }
 
-.trade-block-dialog-body-v3137 {
+.trade-block-dialog-body-v3138 {
   display:grid;
   gap:10px;
 }
 
-.trade-block-form-grid-v3137 {
+.trade-block-form-grid-v3138 {
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
 }
 
-.trade-block-form-grid-v3137 label {
+.trade-block-form-grid-v3138 label {
   display:grid;
   gap:5px;
   min-width:0;
 }
 
-.trade-block-form-grid-v3137 label.full {
+.trade-block-form-grid-v3138 label.full {
   grid-column:1 / -1;
 }
 
-.trade-block-form-grid-v3137 textarea {
+.trade-block-form-grid-v3138 textarea {
   resize:vertical;
   min-height:74px;
   max-height:160px;
 }
 
-.trade-block-dialog-hint-v3137 {
+.trade-block-dialog-hint-v3138 {
   min-height:30px;
   padding:7px 8px;
   border:1px solid var(--border-soft);
@@ -290,7 +290,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   line-height:1.35;
 }
 
-.trade-block-form-actions-v3137 {
+.trade-block-form-actions-v3138 {
   display:grid;
   grid-template-columns:auto 1fr auto auto;
   gap:6px;
@@ -298,111 +298,111 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
 }
 
 @media (max-width:720px) {
-  #transactionsView .trade-block-panel-v3137 {
+  #transactionsView .trade-block-panel-v3138 {
     padding:8px;
   }
 
-  #transactionsView .trade-block-grid-v3137 {
+  #transactionsView .trade-block-grid-v3138 {
     display:grid;
     grid-template-columns:1fr;
     gap:6px;
   }
 
-  #transactionsView .trade-block-card-v3137 {
+  #transactionsView .trade-block-card-v3138 {
     width:100%;
   }
 
-  #transactionsView .trade-block-empty-v3137 {
+  #transactionsView .trade-block-empty-v3138 {
     align-items:flex-start;
   }
 
-  .trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+  .trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
     width:calc(100vw - 14px);
   }
 }
 
 @media (max-width:430px) {
-  #transactionsView .trade-block-head-v3137 {
+  #transactionsView .trade-block-head-v3138 {
     align-items:flex-start;
   }
 
-  #transactionsView .trade-block-head-v3137 h4 {
+  #transactionsView .trade-block-head-v3138 h4 {
     font-size:.78rem;
   }
 
-  #transactionsView .trade-block-card-v3137 {
+  #transactionsView .trade-block-card-v3138 {
     padding:8px;
   }
 
-  #transactionsView .trade-block-empty-v3137 {
+  #transactionsView .trade-block-empty-v3138 {
     display:grid;
     grid-template-columns:1fr;
   }
 
-  #transactionsView .trade-block-empty-v3137 .btn {
+  #transactionsView .trade-block-empty-v3138 .btn {
     justify-self:start;
   }
 
-  .trade-block-form-grid-v3137 {
+  .trade-block-form-grid-v3138 {
     grid-template-columns:1fr;
   }
 
-  .trade-block-form-grid-v3137 label.full {
+  .trade-block-form-grid-v3138 label.full {
     grid-column:auto;
   }
 
-  .trade-block-form-actions-v3137 {
+  .trade-block-form-actions-v3138 {
     grid-template-columns:1fr 1fr;
   }
 
-  .trade-block-form-actions-v3137 > span {
+  .trade-block-form-actions-v3138 > span {
     display:none;
   }
 
-  .trade-block-form-actions-v3137 .btn {
+  .trade-block-form-actions-v3138 .btn {
     width:100%;
   }
 }
 
 
-/* V3.13.7 Transactions placement ---------------------------------------- */
+/* V3.13.8 Transactions placement ---------------------------------------- */
 
-#transactionsView .trade-block-panel-v3137 {
+#transactionsView .trade-block-panel-v3138 {
   margin:0 0 8px;
 }
 
-#transactionsView .tx-page-heading-v228 + .trade-block-panel-v3137 {
+#transactionsView .tx-page-heading-v228 + .trade-block-panel-v3138 {
   margin-top:0;
 }
 
 #transactionsView
-  .trade-block-panel-v3137
+  .trade-block-panel-v3138
   + .depth-position-tabs {
   margin-top:0;
 }
 
 @media (max-width:720px) {
-  #transactionsView .trade-block-panel-v3137 {
+  #transactionsView .trade-block-panel-v3138 {
     margin-bottom:7px;
   }
 }
 
 
-/* V3.13.7 — integrated first-render stability --------------------------- */
+/* V3.13.8 — integrated first-render stability --------------------------- */
 
-#transactionsView .trade-block-head-v3137 > div {
+#transactionsView .trade-block-head-v3138 > div {
   display:grid;
   gap:2px;
 }
 
-#transactionsView .trade-block-head-v3137 h4 {
+#transactionsView .trade-block-head-v3138 h4 {
   line-height:1.1;
 }
 
 
-/* V3.13.7 — market board filters + compensation ------------------------- */
+/* V3.13.8 — market board filters + compensation ------------------------- */
 
-#transactionsView .trade-block-filter-rail-v3137 {
+#transactionsView .trade-block-filter-rail-v3138 {
   display:flex;
   align-items:center;
   gap:5px;
@@ -414,11 +414,11 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   -webkit-overflow-scrolling:touch;
 }
 
-#transactionsView .trade-block-filter-rail-v3137::-webkit-scrollbar {
+#transactionsView .trade-block-filter-rail-v3138::-webkit-scrollbar {
   display:none;
 }
 
-#transactionsView .trade-block-filter-v3137 {
+#transactionsView .trade-block-filter-v3138 {
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -437,7 +437,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-filter-v3137 strong {
+#transactionsView .trade-block-filter-v3138 strong {
   display:grid;
   place-items:center;
   min-width:18px;
@@ -449,18 +449,18 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   font-size:.44rem;
 }
 
-#transactionsView .trade-block-filter-v3137.active {
+#transactionsView .trade-block-filter-v3138.active {
   border-color:rgba(50,173,255,.32);
   background:rgba(50,173,255,.10);
   color:#D9EDFB;
 }
 
-#transactionsView .trade-block-filter-v3137.active strong {
+#transactionsView .trade-block-filter-v3138.active strong {
   background:rgba(50,173,255,.18);
   color:#9ED8FF;
 }
 
-#transactionsView .trade-block-filter-empty-v3137 {
+#transactionsView .trade-block-filter-empty-v3138 {
   padding:10px;
   border:1px dashed var(--border-soft);
   border-radius:9px;
@@ -470,22 +470,22 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-align:center;
 }
 
-#transactionsView .trade-block-card-v3137 {
+#transactionsView .trade-block-card-v3138 {
   grid-template-rows:auto auto auto 1fr auto;
 }
 
-#transactionsView .trade-block-card-copy-v3137 > strong {
+#transactionsView .trade-block-card-copy-v3138 > strong {
   font-size:.73rem;
 }
 
-#transactionsView .trade-block-card-copy-v3137 > small {
+#transactionsView .trade-block-card-copy-v3138 > small {
   white-space:normal;
   overflow:visible;
   text-overflow:clip;
   line-height:1.3;
 }
 
-#transactionsView .trade-block-compensation-v3137 {
+#transactionsView .trade-block-compensation-v3138 {
   display:grid;
   gap:2px;
   min-width:0;
@@ -495,7 +495,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:rgba(50,173,255,.035);
 }
 
-#transactionsView .trade-block-compensation-v3137 > span {
+#transactionsView .trade-block-compensation-v3138 > span {
   color:#8FCFFF;
   font-size:.42rem;
   font-weight:950;
@@ -503,96 +503,96 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-transform:uppercase;
 }
 
-#transactionsView .trade-block-compensation-v3137 > strong {
+#transactionsView .trade-block-compensation-v3138 > strong {
   overflow-wrap:anywhere;
   color:#DCEAF5;
   font-size:.56rem;
   line-height:1.3;
 }
 
-#transactionsView .trade-block-internal-note-v3137 {
+#transactionsView .trade-block-internal-note-v3138 {
   margin:0;
   color:var(--muted);
   font-size:.50rem;
   line-height:1.35;
 }
 
-.trade-block-dialog-v3137 .trade-block-compensation-field-v3137 textarea {
+.trade-block-dialog-v3138 .trade-block-compensation-field-v3138 textarea {
   min-height:64px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 textarea {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 textarea {
   resize:none;
 }
 
-.trade-block-dialog-v3137 .trade-block-dialog-body-v3137 {
+.trade-block-dialog-v3138 .trade-block-dialog-body-v3138 {
   align-content:start;
 }
 
 @media (max-width:720px) {
-  #transactionsView .trade-block-filter-v3137 {
+  #transactionsView .trade-block-filter-v3138 {
     min-height:27px;
     padding:4px 7px;
     font-size:.49rem;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 .btn {
+  #transactionsView .trade-block-card-actions-v3138 .btn {
     min-height:30px;
   }
 
-  .trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+  .trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
     height:auto;
     max-height:calc(100dvh - 18px);
   }
 
-  .trade-block-dialog-v3137 .trade-block-dialog-body-v3137 {
+  .trade-block-dialog-v3138 .trade-block-dialog-body-v3138 {
     overflow-y:auto;
   }
 }
 
 
-/* V3.13.7 — compact transactions trade block ------------------------------ */
+/* V3.13.8 — compact transactions trade block ------------------------------ */
 
-#transactionsView .trade-block-panel-v3137 {
+#transactionsView .trade-block-panel-v3138 {
   gap:6px;
   padding:8px;
   border-radius:10px;
 }
 
-#transactionsView .trade-block-head-v3137 {
+#transactionsView .trade-block-head-v3138 {
   align-items:flex-start;
   gap:8px;
 }
 
-#transactionsView .trade-block-head-copy-v3137 {
+#transactionsView .trade-block-head-copy-v3138 {
   display:grid;
   gap:5px;
   min-width:0;
   flex:1 1 auto;
 }
 
-#transactionsView .trade-block-head-row-v3137 {
+#transactionsView .trade-block-head-row-v3138 {
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
   gap:8px;
 }
 
-#transactionsView .trade-block-head-v3137 .eyebrow {
+#transactionsView .trade-block-head-v3138 .eyebrow {
   margin:0 0 1px;
 }
 
-#transactionsView .trade-block-head-v3137 h4 {
+#transactionsView .trade-block-head-v3138 h4 {
   font-size:.8rem;
 }
 
-#transactionsView .trade-block-head-v3137 > .btn {
+#transactionsView .trade-block-head-v3138 > .btn {
   min-height:28px;
   padding:3px 8px;
   font-size:.54rem;
 }
 
-#transactionsView .trade-block-summary-inline-v3137 {
+#transactionsView .trade-block-summary-inline-v3138 {
   display:flex;
   align-items:center;
   justify-content:flex-end;
@@ -601,7 +601,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   flex-wrap:wrap;
 }
 
-#transactionsView .trade-block-summary-pill-v3137 {
+#transactionsView .trade-block-summary-pill-v3138 {
   display:inline-flex;
   align-items:center;
   gap:4px;
@@ -616,65 +616,65 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-summary-pill-v3137 strong {
+#transactionsView .trade-block-summary-pill-v3138 strong {
   color:var(--text);
   font-size:.53rem;
 }
 
-#transactionsView .trade-block-summary-pill-v3137.available {
+#transactionsView .trade-block-summary-pill-v3138.available {
   border-color:rgba(82,215,194,.18);
 }
 
-#transactionsView .trade-block-summary-pill-v3137.listening {
+#transactionsView .trade-block-summary-pill-v3138.listening {
   border-color:rgba(50,173,255,.18);
 }
 
-#transactionsView .trade-block-summary-pill-v3137.untouchable {
+#transactionsView .trade-block-summary-pill-v3138.untouchable {
   border-color:rgba(242,198,109,.18);
 }
 
-#transactionsView .trade-block-filter-rail-v3137 {
+#transactionsView .trade-block-filter-rail-v3138 {
   gap:4px;
   padding:0;
 }
 
-#transactionsView .trade-block-filter-v3137 {
+#transactionsView .trade-block-filter-v3138 {
   min-height:24px;
   padding:3px 7px;
   font-size:.49rem;
 }
 
-#transactionsView .trade-block-filter-v3137 strong {
+#transactionsView .trade-block-filter-v3138 strong {
   min-width:16px;
   height:16px;
   font-size:.41rem;
 }
 
-#transactionsView .trade-block-grid-v3137 {
+#transactionsView .trade-block-grid-v3138 {
   gap:5px;
 }
 
-#transactionsView .trade-block-card-v3137 {
+#transactionsView .trade-block-card-v3138 {
   gap:5px;
   padding:7px;
   border-radius:8px;
 }
 
-#transactionsView .trade-block-card-top-v3137 {
+#transactionsView .trade-block-card-top-v3138 {
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
   gap:7px;
 }
 
-#transactionsView .trade-block-card-title-v3137 {
+#transactionsView .trade-block-card-title-v3138 {
   display:flex;
   align-items:center;
   gap:6px;
   min-width:0;
 }
 
-#transactionsView .trade-block-card-title-v3137 > strong {
+#transactionsView .trade-block-card-title-v3138 > strong {
   overflow:hidden;
   color:var(--text);
   font-size:.72rem;
@@ -683,14 +683,14 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-kind-v3137,
-#transactionsView .trade-block-status-v3137 {
+#transactionsView .trade-block-kind-v3138,
+#transactionsView .trade-block-status-v3138 {
   min-height:17px;
   padding:1px 5px;
   font-size:.42rem;
 }
 
-#transactionsView .trade-block-card-meta-v3137 {
+#transactionsView .trade-block-card-meta-v3138 {
   display:block;
   margin-top:-1px;
   color:var(--muted);
@@ -698,17 +698,17 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   line-height:1.28;
 }
 
-#transactionsView .trade-block-compensation-v3137 {
+#transactionsView .trade-block-compensation-v3138 {
   gap:1px;
   padding:5px 7px;
 }
 
-#transactionsView .trade-block-compensation-v3137 > strong {
+#transactionsView .trade-block-compensation-v3138 > strong {
   font-size:.54rem;
   line-height:1.25;
 }
 
-#transactionsView .trade-block-internal-note-v3137 {
+#transactionsView .trade-block-internal-note-v3138 {
   display:grid;
   gap:1px;
   margin:0;
@@ -717,7 +717,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   line-height:1.28;
 }
 
-#transactionsView .trade-block-internal-note-v3137 > span {
+#transactionsView .trade-block-internal-note-v3138 > span {
   color:#8FCFFF;
   font-size:.40rem;
   font-weight:900;
@@ -725,183 +725,183 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-transform:uppercase;
 }
 
-#transactionsView .trade-block-card-actions-v3137 {
+#transactionsView .trade-block-card-actions-v3138 {
   gap:4px;
 }
 
-#transactionsView .trade-block-card-actions-v3137 .btn {
+#transactionsView .trade-block-card-actions-v3138 .btn {
   min-height:25px;
   padding:3px 7px;
   font-size:.49rem;
 }
 
-#transactionsView .trade-block-empty-v3137.compact {
+#transactionsView .trade-block-empty-v3138.compact {
   gap:8px;
   padding:7px 8px;
 }
 
-.trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+.trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
   width:min(500px,calc(100vw - 16px));
 }
 
-.trade-block-dialog-v3137 .drawer-header {
+.trade-block-dialog-v3138 .drawer-header {
   padding:11px 13px;
 }
 
-.trade-block-dialog-v3137 .trade-block-dialog-body-v3137 {
+.trade-block-dialog-v3138 .trade-block-dialog-body-v3138 {
   gap:8px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 {
   gap:7px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 label {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 label {
   gap:4px;
   font-size:.66rem;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 textarea {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 textarea {
   min-height:58px;
   max-height:120px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-actions-v3137 {
+.trade-block-dialog-v3138 .trade-block-form-actions-v3138 {
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:6px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-actions-v3137 > span {
+.trade-block-dialog-v3138 .trade-block-form-actions-v3138 > span {
   display:none;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-actions-v3137 .btn {
+.trade-block-dialog-v3138 .trade-block-form-actions-v3138 .btn {
   width:100%;
   min-height:38px;
 }
 
 @media (max-width:720px) {
-  #transactionsView .trade-block-head-row-v3137 {
+  #transactionsView .trade-block-head-row-v3138 {
     align-items:flex-start;
     flex-direction:column;
   }
 
-  #transactionsView .trade-block-summary-inline-v3137 {
+  #transactionsView .trade-block-summary-inline-v3138 {
     justify-content:flex-start;
   }
 
-  #transactionsView .trade-block-filter-v3137 {
+  #transactionsView .trade-block-filter-v3138 {
     min-height:23px;
     padding:3px 6px;
     font-size:.48rem;
   }
 
-  #transactionsView .trade-block-card-v3137 {
+  #transactionsView .trade-block-card-v3138 {
     padding:7px;
   }
 
-  #transactionsView .trade-block-card-title-v3137 > strong {
+  #transactionsView .trade-block-card-title-v3138 > strong {
     font-size:.71rem;
   }
 
-  .trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+  .trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
     width:calc(100vw - 12px);
   }
 }
 
 @media (max-width:430px) {
-  #transactionsView .trade-block-panel-v3137 {
+  #transactionsView .trade-block-panel-v3138 {
     padding:7px;
   }
 
-  #transactionsView .trade-block-card-top-v3137 {
+  #transactionsView .trade-block-card-top-v3138 {
     gap:5px;
   }
 
-  #transactionsView .trade-block-status-v3137 {
+  #transactionsView .trade-block-status-v3138 {
     max-width:46%;
   }
 
-  .trade-block-dialog-v3137 .trade-block-form-grid-v3137 {
+  .trade-block-dialog-v3138 .trade-block-form-grid-v3138 {
     grid-template-columns:1fr;
   }
 
-  .trade-block-dialog-v3137 .trade-block-form-grid-v3137 label.full {
+  .trade-block-dialog-v3138 .trade-block-form-grid-v3138 label.full {
     grid-column:auto;
   }
 }
 
 
-/* V3.13.7 — compact list-board revamp ----------------------------------- */
+/* V3.13.8 — compact list-board revamp ----------------------------------- */
 
-#transactionsView .trade-block-panel-v3137 {
+#transactionsView .trade-block-panel-v3138 {
   gap:5px;
   padding:8px;
   border-radius:10px;
 }
 
-#transactionsView .trade-block-head-v3137,
-#transactionsView .trade-block-head-copy-v3137 {
+#transactionsView .trade-block-head-v3138,
+#transactionsView .trade-block-head-copy-v3138 {
   display:grid;
   gap:4px;
   min-width:0;
 }
 
-#transactionsView .trade-block-head-row-v3137 {
+#transactionsView .trade-block-head-row-v3138 {
   display:flex;
   align-items:flex-end;
   justify-content:space-between;
   gap:8px;
 }
 
-#transactionsView .trade-block-head-v3137 .eyebrow {
+#transactionsView .trade-block-head-v3138 .eyebrow {
   margin:0 0 1px;
 }
 
-#transactionsView .trade-block-head-v3137 h4 {
+#transactionsView .trade-block-head-v3138 h4 {
   margin:0;
   font-size:.79rem;
   line-height:1.08;
 }
 
-#transactionsView .trade-block-head-v3137 > .btn,
-#transactionsView .trade-block-head-row-v3137 > .btn {
+#transactionsView .trade-block-head-v3138 > .btn,
+#transactionsView .trade-block-head-row-v3138 > .btn {
   min-height:27px;
   padding:3px 8px;
   font-size:.53rem;
 }
 
-#transactionsView .trade-block-market-meta-v3137 {
+#transactionsView .trade-block-market-meta-v3138 {
   margin:0;
   color:var(--muted);
   font-size:.52rem;
   line-height:1.22;
 }
 
-#transactionsView .trade-block-filter-rail-v3137 {
+#transactionsView .trade-block-filter-rail-v3138 {
   gap:4px;
   padding:0;
 }
 
-#transactionsView .trade-block-filter-v3137 {
+#transactionsView .trade-block-filter-v3138 {
   min-height:23px;
   padding:3px 7px;
   font-size:.48rem;
 }
 
-#transactionsView .trade-block-filter-v3137 strong {
+#transactionsView .trade-block-filter-v3138 strong {
   min-width:16px;
   height:16px;
   font-size:.41rem;
 }
 
-#transactionsView .trade-block-grid-v3137.compact-list {
+#transactionsView .trade-block-grid-v3138.compact-list {
   display:grid;
   grid-template-columns:1fr;
   gap:5px;
 }
 
-#transactionsView .trade-block-row-v3137 {
+#transactionsView .trade-block-row-v3138 {
   display:grid;
   grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;
   align-items:center;
@@ -913,33 +913,33 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:#0D1822;
 }
 
-#transactionsView .trade-block-row-v3137.status-available {
+#transactionsView .trade-block-row-v3138.status-available {
   border-color:rgba(82,215,194,.18);
 }
 
-#transactionsView .trade-block-row-v3137.status-listening {
+#transactionsView .trade-block-row-v3138.status-listening {
   border-color:rgba(50,173,255,.20);
 }
 
-#transactionsView .trade-block-row-v3137.status-untouchable {
+#transactionsView .trade-block-row-v3138.status-untouchable {
   border-color:rgba(242,198,109,.18);
 }
 
-#transactionsView .trade-block-row-identity-v3137,
-#transactionsView .trade-block-row-market-v3137 {
+#transactionsView .trade-block-row-identity-v3138,
+#transactionsView .trade-block-row-market-v3138 {
   display:grid;
   gap:2px;
   min-width:0;
 }
 
-#transactionsView .trade-block-row-title-v3137 {
+#transactionsView .trade-block-row-title-v3138 {
   display:flex;
   align-items:center;
   gap:6px;
   min-width:0;
 }
 
-#transactionsView .trade-block-row-title-v3137 > strong {
+#transactionsView .trade-block-row-title-v3138 > strong {
   overflow:hidden;
   color:var(--text);
   font-size:.71rem;
@@ -948,8 +948,8 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-kind-v3137,
-#transactionsView .trade-block-status-v3137 {
+#transactionsView .trade-block-kind-v3138,
+#transactionsView .trade-block-status-v3138 {
   display:inline-flex;
   align-items:center;
   min-height:17px;
@@ -965,36 +965,36 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .status-available .trade-block-status-v3137 {
+#transactionsView .status-available .trade-block-status-v3138 {
   color:#8FE6D5;
   border-color:rgba(82,215,194,.20);
   background:rgba(82,215,194,.05);
 }
 
-#transactionsView .status-listening .trade-block-status-v3137 {
+#transactionsView .status-listening .trade-block-status-v3138 {
   color:#9DD5FF;
   border-color:rgba(50,173,255,.22);
   background:rgba(50,173,255,.05);
 }
 
-#transactionsView .status-untouchable .trade-block-status-v3137 {
+#transactionsView .status-untouchable .trade-block-status-v3138 {
   color:#E8CB85;
   border-color:rgba(242,198,109,.22);
   background:rgba(242,198,109,.045);
 }
 
-#transactionsView .trade-block-card-meta-v3137 {
+#transactionsView .trade-block-card-meta-v3138 {
   display:block;
   color:var(--muted);
   font-size:.49rem;
   line-height:1.22;
 }
 
-#transactionsView .trade-block-row-market-v3137 {
+#transactionsView .trade-block-row-market-v3138 {
   padding:0;
 }
 
-#transactionsView .trade-block-looking-label-v3137 {
+#transactionsView .trade-block-looking-label-v3138 {
   color:#8FCFFF;
   font-size:.40rem;
   font-weight:950;
@@ -1002,7 +1002,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-transform:uppercase;
 }
 
-#transactionsView .trade-block-row-market-v3137 > strong {
+#transactionsView .trade-block-row-market-v3138 > strong {
   display:block;
   overflow:hidden;
   color:#DCEAF5;
@@ -1012,28 +1012,28 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-note-inline-v3137 {
+#transactionsView .trade-block-note-inline-v3138 {
   display:block;
   color:var(--muted);
   font-size:.47rem;
   line-height:1.2;
 }
 
-#transactionsView .trade-block-card-actions-v3137 {
+#transactionsView .trade-block-card-actions-v3138 {
   display:flex;
   align-items:center;
   justify-content:flex-end;
   gap:4px;
 }
 
-#transactionsView .trade-block-card-actions-v3137 .btn {
+#transactionsView .trade-block-card-actions-v3138 .btn {
   min-height:25px;
   padding:3px 7px;
   font-size:.49rem;
 }
 
-#transactionsView .trade-block-filter-empty-v3137.compact,
-#transactionsView .trade-block-empty-v3137.compact-inline {
+#transactionsView .trade-block-filter-empty-v3138.compact,
+#transactionsView .trade-block-empty-v3138.compact-inline {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -1045,137 +1045,137 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:rgba(255,255,255,.01);
 }
 
-#transactionsView .trade-block-filter-empty-v3137.compact {
+#transactionsView .trade-block-filter-empty-v3138.compact {
   justify-content:center;
   color:var(--muted);
   font-size:.55rem;
 }
 
-#transactionsView .trade-block-empty-v3137.compact-inline > span {
+#transactionsView .trade-block-empty-v3138.compact-inline > span {
   min-width:0;
 }
 
-#transactionsView .trade-block-empty-v3137.compact-inline strong,
-#transactionsView .trade-block-empty-v3137.compact-inline small {
+#transactionsView .trade-block-empty-v3138.compact-inline strong,
+#transactionsView .trade-block-empty-v3138.compact-inline small {
   display:block;
 }
 
-#transactionsView .trade-block-empty-v3137.compact-inline strong {
+#transactionsView .trade-block-empty-v3138.compact-inline strong {
   font-size:.60rem;
 }
 
-#transactionsView .trade-block-empty-v3137.compact-inline small {
+#transactionsView .trade-block-empty-v3138.compact-inline small {
   margin-top:2px;
   color:var(--muted);
   font-size:.50rem;
   line-height:1.25;
 }
 
-.trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+.trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
   width:min(490px,calc(100vw - 16px));
 }
 
-.trade-block-dialog-v3137 .drawer-header {
+.trade-block-dialog-v3138 .drawer-header {
   padding:11px 13px;
 }
 
-.trade-block-dialog-v3137 .trade-block-dialog-body-v3137 {
+.trade-block-dialog-v3138 .trade-block-dialog-body-v3138 {
   gap:8px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 {
   gap:7px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 label {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 label {
   gap:4px;
   font-size:.66rem;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-grid-v3137 textarea {
+.trade-block-dialog-v3138 .trade-block-form-grid-v3138 textarea {
   min-height:56px;
   max-height:112px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-actions-v3137 {
+.trade-block-dialog-v3138 .trade-block-form-actions-v3138 {
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:6px;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-actions-v3137 > span {
+.trade-block-dialog-v3138 .trade-block-form-actions-v3138 > span {
   display:none;
 }
 
-.trade-block-dialog-v3137 .trade-block-form-actions-v3137 .btn {
+.trade-block-dialog-v3138 .trade-block-form-actions-v3138 .btn {
   width:100%;
   min-height:38px;
 }
 
 @media (max-width:860px) {
-  #transactionsView .trade-block-row-v3137 {
+  #transactionsView .trade-block-row-v3138 {
     grid-template-columns:minmax(0,1fr);
     align-items:flex-start;
   }
 
-  #transactionsView .trade-block-row-market-v3137 > strong {
+  #transactionsView .trade-block-row-market-v3138 > strong {
     white-space:normal;
     text-overflow:clip;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 {
+  #transactionsView .trade-block-card-actions-v3138 {
     justify-content:flex-start;
   }
 }
 
 @media (max-width:430px) {
-  #transactionsView .trade-block-panel-v3137 {
+  #transactionsView .trade-block-panel-v3138 {
     padding:7px;
   }
 
-  #transactionsView .trade-block-head-row-v3137,
-  #transactionsView .trade-block-empty-v3137.compact-inline {
+  #transactionsView .trade-block-head-row-v3138,
+  #transactionsView .trade-block-empty-v3138.compact-inline {
     align-items:flex-start;
     flex-direction:column;
   }
 
-  #transactionsView .trade-block-row-title-v3137 {
+  #transactionsView .trade-block-row-title-v3138 {
     flex-wrap:wrap;
     gap:5px;
   }
 
-  #transactionsView .trade-block-row-title-v3137 > strong {
+  #transactionsView .trade-block-row-title-v3138 > strong {
     white-space:normal;
     text-overflow:clip;
   }
 
-  #transactionsView .trade-block-filter-v3137 {
+  #transactionsView .trade-block-filter-v3138 {
     min-height:22px;
     padding:3px 6px;
   }
 
-  .trade-block-dialog-v3137 .trade-block-dialog-card-v3137 {
+  .trade-block-dialog-v3138 .trade-block-dialog-card-v3138 {
     width:calc(100vw - 12px);
   }
 
-  .trade-block-dialog-v3137 .trade-block-form-grid-v3137 {
+  .trade-block-dialog-v3138 .trade-block-form-grid-v3138 {
     grid-template-columns:1fr;
   }
 
-  .trade-block-dialog-v3137 .trade-block-form-grid-v3137 label.full {
+  .trade-block-dialog-v3138 .trade-block-form-grid-v3138 label.full {
     grid-column:auto;
   }
 }
 
 
-/* V3.13.7 — two-row compact market board -------------------------------- */
+/* V3.13.8 — two-row compact market board -------------------------------- */
 
-#transactionsView .trade-block-panel-v3137 {
+#transactionsView .trade-block-panel-v3138 {
   gap:5px;
   padding:7px 8px;
   border-radius:10px;
 }
 
-#transactionsView .trade-block-head-v3137 {
+#transactionsView .trade-block-head-v3138 {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -1183,7 +1183,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-head-main-v3137 {
+#transactionsView .trade-block-head-main-v3138 {
   display:flex;
   align-items:center;
   gap:8px;
@@ -1191,7 +1191,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   flex:1 1 auto;
 }
 
-#transactionsView .trade-block-title-line-v3137 {
+#transactionsView .trade-block-title-line-v3138 {
   display:flex;
   align-items:baseline;
   gap:6px;
@@ -1199,20 +1199,20 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-title-line-v3137 .eyebrow {
+#transactionsView .trade-block-title-line-v3138 .eyebrow {
   margin:0;
   font-size:.48rem;
   line-height:1;
 }
 
-#transactionsView .trade-block-title-line-v3137 h4 {
+#transactionsView .trade-block-title-line-v3138 h4 {
   margin:0;
   font-size:.78rem;
   line-height:1.05;
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-market-meta-v3137 {
+#transactionsView .trade-block-market-meta-v3138 {
   overflow:hidden;
   color:var(--muted);
   font-size:.49rem;
@@ -1221,38 +1221,38 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-head-v3137 > .btn {
+#transactionsView .trade-block-head-v3138 > .btn {
   flex:0 0 auto;
   min-height:25px;
   padding:3px 7px;
   font-size:.50rem;
 }
 
-#transactionsView .trade-block-filter-rail-v3137 {
+#transactionsView .trade-block-filter-rail-v3138 {
   gap:4px;
   padding:0;
 }
 
-#transactionsView .trade-block-filter-v3137 {
+#transactionsView .trade-block-filter-v3138 {
   min-height:22px;
   padding:2px 6px;
   font-size:.46rem;
 }
 
-#transactionsView .trade-block-filter-v3137 strong {
+#transactionsView .trade-block-filter-v3138 strong {
   min-width:15px;
   height:15px;
   padding:0 3px;
   font-size:.39rem;
 }
 
-#transactionsView .trade-block-grid-v3137.compact-list {
+#transactionsView .trade-block-grid-v3138.compact-list {
   display:grid;
   grid-template-columns:1fr;
   gap:4px;
 }
 
-#transactionsView .trade-block-row-v3137 {
+#transactionsView .trade-block-row-v3138 {
   display:grid;
   gap:4px;
   min-width:0;
@@ -1262,19 +1262,19 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:#0D1822;
 }
 
-#transactionsView .trade-block-row-v3137.status-available {
+#transactionsView .trade-block-row-v3138.status-available {
   border-color:rgba(82,215,194,.18);
 }
 
-#transactionsView .trade-block-row-v3137.status-listening {
+#transactionsView .trade-block-row-v3138.status-listening {
   border-color:rgba(50,173,255,.20);
 }
 
-#transactionsView .trade-block-row-v3137.status-untouchable {
+#transactionsView .trade-block-row-v3138.status-untouchable {
   border-color:rgba(242,198,109,.18);
 }
 
-#transactionsView .trade-block-row-primary-v3137 {
+#transactionsView .trade-block-row-primary-v3138 {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -1282,7 +1282,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-row-title-v3137 {
+#transactionsView .trade-block-row-title-v3138 {
   display:flex;
   align-items:center;
   gap:5px;
@@ -1290,7 +1290,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   flex:0 1 auto;
 }
 
-#transactionsView .trade-block-row-title-v3137 > strong {
+#transactionsView .trade-block-row-title-v3138 > strong {
   overflow:hidden;
   color:var(--text);
   font-size:.70rem;
@@ -1299,8 +1299,8 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-kind-v3137,
-#transactionsView .trade-block-status-v3137 {
+#transactionsView .trade-block-kind-v3138,
+#transactionsView .trade-block-status-v3138 {
   display:inline-flex;
   align-items:center;
   min-height:16px;
@@ -1316,25 +1316,25 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .status-available .trade-block-status-v3137 {
+#transactionsView .status-available .trade-block-status-v3138 {
   color:#8FE6D5;
   border-color:rgba(82,215,194,.20);
   background:rgba(82,215,194,.05);
 }
 
-#transactionsView .status-listening .trade-block-status-v3137 {
+#transactionsView .status-listening .trade-block-status-v3138 {
   color:#9DD5FF;
   border-color:rgba(50,173,255,.22);
   background:rgba(50,173,255,.05);
 }
 
-#transactionsView .status-untouchable .trade-block-status-v3137 {
+#transactionsView .status-untouchable .trade-block-status-v3138 {
   color:#E8CB85;
   border-color:rgba(242,198,109,.22);
   background:rgba(242,198,109,.045);
 }
 
-#transactionsView .trade-block-card-meta-v3137 {
+#transactionsView .trade-block-card-meta-v3138 {
   display:block;
   overflow:hidden;
   min-width:0;
@@ -1346,7 +1346,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-row-secondary-v3137 {
+#transactionsView .trade-block-row-secondary-v3138 {
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   align-items:center;
@@ -1354,14 +1354,14 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-row-market-v3137 {
+#transactionsView .trade-block-row-market-v3138 {
   display:flex;
   align-items:baseline;
   gap:4px;
   min-width:0;
 }
 
-#transactionsView .trade-block-looking-label-v3137 {
+#transactionsView .trade-block-looking-label-v3138 {
   flex:0 0 auto;
   color:#8FCFFF;
   font-size:.39rem;
@@ -1370,7 +1370,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-transform:uppercase;
 }
 
-#transactionsView .trade-block-row-market-v3137 > strong {
+#transactionsView .trade-block-row-market-v3138 > strong {
   overflow:hidden;
   min-width:0;
   color:#DCEAF5;
@@ -1380,7 +1380,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-note-inline-v3137 {
+#transactionsView .trade-block-note-inline-v3138 {
   overflow:hidden;
   min-width:0;
   color:var(--muted);
@@ -1390,7 +1390,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-card-actions-v3137 {
+#transactionsView .trade-block-card-actions-v3138 {
   display:flex;
   align-items:center;
   justify-content:flex-end;
@@ -1398,115 +1398,115 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   flex:0 0 auto;
 }
 
-#transactionsView .trade-block-card-actions-v3137 .btn {
+#transactionsView .trade-block-card-actions-v3138 .btn {
   min-height:24px;
   padding:2px 7px;
   border-radius:7px;
   font-size:.47rem;
 }
 
-#transactionsView .trade-block-filter-empty-v3137.compact,
-#transactionsView .trade-block-empty-v3137.compact-inline {
+#transactionsView .trade-block-filter-empty-v3138.compact,
+#transactionsView .trade-block-empty-v3138.compact-inline {
   min-height:34px;
   padding:6px 7px;
 }
 
-#transactionsView .trade-block-empty-v3137.compact-inline strong {
+#transactionsView .trade-block-empty-v3138.compact-inline strong {
   font-size:.58rem;
 }
 
-#transactionsView .trade-block-empty-v3137.compact-inline small {
+#transactionsView .trade-block-empty-v3138.compact-inline small {
   font-size:.47rem;
 }
 
 @media (max-width:720px) {
-  #transactionsView .trade-block-panel-v3137 {
+  #transactionsView .trade-block-panel-v3138 {
     padding:7px;
   }
 
-  #transactionsView .trade-block-head-main-v3137 {
+  #transactionsView .trade-block-head-main-v3138 {
     display:grid;
     gap:2px;
   }
 
-  #transactionsView .trade-block-title-line-v3137 {
+  #transactionsView .trade-block-title-line-v3138 {
     gap:5px;
   }
 
-  #transactionsView .trade-block-title-line-v3137 .eyebrow {
+  #transactionsView .trade-block-title-line-v3138 .eyebrow {
     font-size:.45rem;
   }
 
-  #transactionsView .trade-block-title-line-v3137 h4 {
+  #transactionsView .trade-block-title-line-v3138 h4 {
     font-size:.76rem;
   }
 
-  #transactionsView .trade-block-market-meta-v3137 {
+  #transactionsView .trade-block-market-meta-v3138 {
     font-size:.47rem;
   }
 
-  #transactionsView .trade-block-row-v3137 {
+  #transactionsView .trade-block-row-v3138 {
     gap:4px;
     padding:6px 7px;
   }
 
-  #transactionsView .trade-block-row-primary-v3137 {
+  #transactionsView .trade-block-row-primary-v3138 {
     display:grid;
     grid-template-columns:minmax(0,1fr);
     gap:2px;
   }
 
-  #transactionsView .trade-block-row-title-v3137 {
+  #transactionsView .trade-block-row-title-v3138 {
     width:100%;
   }
 
-  #transactionsView .trade-block-card-meta-v3137 {
+  #transactionsView .trade-block-card-meta-v3138 {
     text-align:left;
   }
 
-  #transactionsView .trade-block-row-secondary-v3137 {
+  #transactionsView .trade-block-row-secondary-v3138 {
     grid-template-columns:minmax(0,1fr) auto;
     gap:6px;
   }
 
-  #transactionsView .trade-block-row-market-v3137 {
+  #transactionsView .trade-block-row-market-v3138 {
     flex-wrap:wrap;
     gap:2px 4px;
   }
 
-  #transactionsView .trade-block-row-market-v3137 > strong {
+  #transactionsView .trade-block-row-market-v3138 > strong {
     white-space:normal;
     text-overflow:clip;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 .btn {
+  #transactionsView .trade-block-card-actions-v3138 .btn {
     min-height:25px;
     padding:3px 6px;
   }
 }
 
 @media (max-width:430px) {
-  #transactionsView .trade-block-title-line-v3137 .eyebrow {
+  #transactionsView .trade-block-title-line-v3138 .eyebrow {
     display:none;
   }
 
-  #transactionsView .trade-block-row-title-v3137 > strong {
+  #transactionsView .trade-block-row-title-v3138 > strong {
     font-size:.68rem;
   }
 
-  #transactionsView .trade-block-status-v3137 {
+  #transactionsView .trade-block-status-v3138 {
     margin-left:auto;
   }
 
-  #transactionsView .trade-block-row-secondary-v3137 {
+  #transactionsView .trade-block-row-secondary-v3138 {
     grid-template-columns:minmax(0,1fr) auto;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 {
+  #transactionsView .trade-block-card-actions-v3138 {
     gap:3px;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 .btn {
+  #transactionsView .trade-block-card-actions-v3138 .btn {
     padding-left:6px;
     padding-right:6px;
     font-size:.45rem;
@@ -1514,15 +1514,15 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
 }
 
 
-/* V3.13.7 — flat two-line market list ----------------------------------- */
+/* V3.13.8 — flat two-line market list ----------------------------------- */
 
-#transactionsView .trade-block-panel-v3137 {
+#transactionsView .trade-block-panel-v3138 {
   gap:5px;
   padding:7px 8px;
   border-radius:10px;
 }
 
-#transactionsView .trade-block-head-v3137 {
+#transactionsView .trade-block-head-v3138 {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -1530,7 +1530,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-head-main-v3137 {
+#transactionsView .trade-block-head-main-v3138 {
   display:flex;
   align-items:center;
   gap:8px;
@@ -1538,27 +1538,27 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   flex:1 1 auto;
 }
 
-#transactionsView .trade-block-title-line-v3137 {
+#transactionsView .trade-block-title-line-v3138 {
   display:flex;
   align-items:baseline;
   gap:6px;
   flex:0 0 auto;
 }
 
-#transactionsView .trade-block-title-line-v3137 .eyebrow {
+#transactionsView .trade-block-title-line-v3138 .eyebrow {
   margin:0;
   font-size:.46rem;
   line-height:1;
 }
 
-#transactionsView .trade-block-title-line-v3137 h4 {
+#transactionsView .trade-block-title-line-v3138 h4 {
   margin:0;
   font-size:.77rem;
   line-height:1.05;
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-market-meta-v3137 {
+#transactionsView .trade-block-market-meta-v3138 {
   overflow:hidden;
   color:var(--muted);
   font-size:.48rem;
@@ -1567,25 +1567,25 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-head-v3137 > .btn {
+#transactionsView .trade-block-head-v3138 > .btn {
   flex:0 0 auto;
   min-height:24px;
   padding:2px 7px;
   font-size:.48rem;
 }
 
-#transactionsView .trade-block-filter-rail-v3137 {
+#transactionsView .trade-block-filter-rail-v3138 {
   gap:4px;
   padding:0;
 }
 
-#transactionsView .trade-block-filter-v3137 {
+#transactionsView .trade-block-filter-v3138 {
   min-height:21px;
   padding:2px 6px;
   font-size:.45rem;
 }
 
-#transactionsView .trade-block-filter-v3137 strong {
+#transactionsView .trade-block-filter-v3138 strong {
   min-width:14px;
   height:14px;
   padding:0 3px;
@@ -1595,14 +1595,14 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
 
 /* One shared list surface. Individual entries use dividers, not cards. */
 
-#transactionsView .trade-block-list-v3137 {
+#transactionsView .trade-block-list-v3138 {
   overflow:hidden;
   border:1px solid var(--border-soft);
   border-radius:8px;
   background:#0D1822;
 }
 
-#transactionsView .trade-block-listing-v3137 {
+#transactionsView .trade-block-listing-v3138 {
   display:grid;
   gap:3px;
   min-width:0;
@@ -1612,23 +1612,23 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   background:transparent;
 }
 
-#transactionsView .trade-block-listing-v3137:last-child {
+#transactionsView .trade-block-listing-v3138:last-child {
   border-bottom:0;
 }
 
-#transactionsView .trade-block-listing-v3137.status-available {
+#transactionsView .trade-block-listing-v3138.status-available {
   box-shadow:inset 2px 0 0 rgba(82,215,194,.34);
 }
 
-#transactionsView .trade-block-listing-v3137.status-listening {
+#transactionsView .trade-block-listing-v3138.status-listening {
   box-shadow:inset 2px 0 0 rgba(50,173,255,.34);
 }
 
-#transactionsView .trade-block-listing-v3137.status-untouchable {
+#transactionsView .trade-block-listing-v3138.status-untouchable {
   box-shadow:inset 2px 0 0 rgba(242,198,109,.32);
 }
 
-#transactionsView .trade-block-listing-top-v3137 {
+#transactionsView .trade-block-listing-top-v3138 {
   display:grid;
   grid-template-columns:minmax(0,1fr) auto auto;
   align-items:center;
@@ -1636,14 +1636,14 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-listing-identity-v3137 {
+#transactionsView .trade-block-listing-identity-v3138 {
   display:flex;
   align-items:center;
   gap:5px;
   min-width:0;
 }
 
-#transactionsView .trade-block-listing-identity-v3137 > strong {
+#transactionsView .trade-block-listing-identity-v3138 > strong {
   overflow:hidden;
   min-width:0;
   color:var(--text);
@@ -1653,8 +1653,8 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-kind-v3137,
-#transactionsView .trade-block-status-v3137 {
+#transactionsView .trade-block-kind-v3138,
+#transactionsView .trade-block-status-v3138 {
   display:inline-flex;
   align-items:center;
   min-height:15px;
@@ -1671,32 +1671,32 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .status-available .trade-block-status-v3137 {
+#transactionsView .status-available .trade-block-status-v3138 {
   color:#8FE6D5;
   border-color:rgba(82,215,194,.20);
   background:rgba(82,215,194,.05);
 }
 
-#transactionsView .status-listening .trade-block-status-v3137 {
+#transactionsView .status-listening .trade-block-status-v3138 {
   color:#9DD5FF;
   border-color:rgba(50,173,255,.22);
   background:rgba(50,173,255,.05);
 }
 
-#transactionsView .status-untouchable .trade-block-status-v3137 {
+#transactionsView .status-untouchable .trade-block-status-v3138 {
   color:#E8CB85;
   border-color:rgba(242,198,109,.22);
   background:rgba(242,198,109,.045);
 }
 
-#transactionsView .trade-block-card-actions-v3137 {
+#transactionsView .trade-block-card-actions-v3138 {
   display:flex;
   align-items:center;
   gap:3px;
   flex:0 0 auto;
 }
 
-#transactionsView .trade-block-card-actions-v3137 .btn {
+#transactionsView .trade-block-card-actions-v3138 .btn {
   min-height:22px;
   padding:2px 6px;
   border-radius:6px;
@@ -1704,7 +1704,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   line-height:1;
 }
 
-#transactionsView .trade-block-listing-bottom-v3137 {
+#transactionsView .trade-block-listing-bottom-v3138 {
   display:grid;
   grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
   align-items:baseline;
@@ -1712,7 +1712,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   min-width:0;
 }
 
-#transactionsView .trade-block-card-meta-v3137 {
+#transactionsView .trade-block-card-meta-v3138 {
   display:block;
   overflow:hidden;
   min-width:0;
@@ -1723,7 +1723,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-row-market-v3137 {
+#transactionsView .trade-block-row-market-v3138 {
   display:flex;
   align-items:baseline;
   justify-content:flex-end;
@@ -1732,7 +1732,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-align:right;
 }
 
-#transactionsView .trade-block-looking-label-v3137 {
+#transactionsView .trade-block-looking-label-v3138 {
   flex:0 0 auto;
   color:#8FCFFF;
   font-size:.37rem;
@@ -1741,7 +1741,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   text-transform:uppercase;
 }
 
-#transactionsView .trade-block-row-market-v3137 > strong {
+#transactionsView .trade-block-row-market-v3138 > strong {
   overflow:hidden;
   min-width:0;
   color:#DCEAF5;
@@ -1751,7 +1751,7 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-note-inline-v3137 {
+#transactionsView .trade-block-note-inline-v3138 {
   overflow:hidden;
   min-width:0;
   color:var(--muted);
@@ -1761,8 +1761,8 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
   white-space:nowrap;
 }
 
-#transactionsView .trade-block-filter-empty-v3137.compact,
-#transactionsView .trade-block-empty-v3137.compact-inline {
+#transactionsView .trade-block-filter-empty-v3138.compact,
+#transactionsView .trade-block-empty-v3138.compact-inline {
   min-height:32px;
   padding:5px 7px;
 }
@@ -1771,92 +1771,158 @@ Scope: Transactions page + dynamically-created Trade Block dialog.
 /* Mobile keeps the same two-line information hierarchy. */
 
 @media (max-width:720px) {
-  #transactionsView .trade-block-panel-v3137 {
+  #transactionsView .trade-block-panel-v3138 {
     padding:7px;
   }
 
-  #transactionsView .trade-block-head-main-v3137 {
+  #transactionsView .trade-block-head-main-v3138 {
     display:grid;
     gap:1px;
   }
 
-  #transactionsView .trade-block-title-line-v3137 {
+  #transactionsView .trade-block-title-line-v3138 {
     gap:5px;
   }
 
-  #transactionsView .trade-block-title-line-v3137 .eyebrow {
+  #transactionsView .trade-block-title-line-v3138 .eyebrow {
     font-size:.43rem;
   }
 
-  #transactionsView .trade-block-market-meta-v3137 {
+  #transactionsView .trade-block-market-meta-v3138 {
     font-size:.45rem;
   }
 
-  #transactionsView .trade-block-listing-v3137 {
+  #transactionsView .trade-block-listing-v3138 {
     padding:6px 7px;
   }
 
-  #transactionsView .trade-block-listing-top-v3137 {
+  #transactionsView .trade-block-listing-top-v3138 {
     grid-template-columns:minmax(0,1fr) auto auto;
     gap:5px;
   }
 
-  #transactionsView .trade-block-listing-bottom-v3137 {
+  #transactionsView .trade-block-listing-bottom-v3138 {
     grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);
     gap:6px;
   }
 
-  #transactionsView .trade-block-row-market-v3137 {
+  #transactionsView .trade-block-row-market-v3138 {
     justify-content:flex-start;
     text-align:left;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 .btn {
+  #transactionsView .trade-block-card-actions-v3138 .btn {
     min-height:23px;
     padding:2px 6px;
   }
 }
 
 @media (max-width:430px) {
-  #transactionsView .trade-block-title-line-v3137 .eyebrow {
+  #transactionsView .trade-block-title-line-v3138 .eyebrow {
     display:none;
   }
 
-  #transactionsView .trade-block-listing-top-v3137 {
+  #transactionsView .trade-block-listing-top-v3138 {
     grid-template-columns:minmax(0,1fr) auto auto;
   }
 
-  #transactionsView .trade-block-listing-identity-v3137 > strong {
+  #transactionsView .trade-block-listing-identity-v3138 > strong {
     font-size:.67rem;
   }
 
-  #transactionsView .trade-block-status-v3137 {
+  #transactionsView .trade-block-status-v3138 {
     max-width:74px;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
-  #transactionsView .trade-block-card-actions-v3137 .btn {
+  #transactionsView .trade-block-card-actions-v3138 .btn {
     min-width:0;
     padding-left:5px;
     padding-right:5px;
     font-size:.42rem;
   }
 
-  #transactionsView .trade-block-listing-bottom-v3137 {
+  #transactionsView .trade-block-listing-bottom-v3138 {
     grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
   }
 
-  #transactionsView .trade-block-card-meta-v3137,
-  #transactionsView .trade-block-row-market-v3137 > strong {
+  #transactionsView .trade-block-card-meta-v3138,
+  #transactionsView .trade-block-row-market-v3138 > strong {
     font-size:.45rem;
   }
 
-  #transactionsView .trade-block-looking-label-v3137 {
+  #transactionsView .trade-block-looking-label-v3138 {
     font-size:.35rem;
   }
 
-  #transactionsView .trade-block-note-inline-v3137 {
+  #transactionsView .trade-block-note-inline-v3138 {
     display:none;
+  }
+}
+
+
+/* V3.13.8 — player metadata hierarchy ----------------------------------- */
+
+#transactionsView .trade-block-listing-identity-v3138 {
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  min-width:0;
+}
+
+#transactionsView .trade-block-listing-identity-v3138 > strong {
+  flex:0 1 auto;
+}
+
+#transactionsView .trade-block-player-context-v3138 {
+  overflow:hidden;
+  min-width:0;
+  color:var(--muted);
+  font-size:.45rem;
+  line-height:1.1;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#transactionsView .trade-block-card-meta-v3138 {
+  color:#BACAD6;
+  font-size:.47rem;
+  font-weight:650;
+}
+
+@media (max-width:720px) {
+  #transactionsView .trade-block-listing-identity-v3138 {
+    flex-wrap:wrap;
+    row-gap:2px;
+  }
+
+  #transactionsView .trade-block-player-context-v3138 {
+    flex:1 1 auto;
+    overflow:visible;
+    text-overflow:clip;
+  }
+
+  #transactionsView .trade-block-card-meta-v3138 {
+    overflow:visible;
+    text-overflow:clip;
+    white-space:nowrap;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionsView .trade-block-listing-identity-v3138 {
+    display:grid;
+    grid-template-columns:auto minmax(0,auto) minmax(0,1fr);
+    align-items:baseline;
+    gap:4px;
+  }
+
+  #transactionsView .trade-block-player-context-v3138 {
+    font-size:.43rem;
+  }
+
+  #transactionsView .trade-block-card-meta-v3138 {
+    font-size:.45rem;
   }
 }
