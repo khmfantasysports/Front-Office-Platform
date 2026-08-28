@@ -42,7 +42,6 @@ function renderCapVisuals() {
   const calc = calculateSeason(season.id);
   const tone = capTone(calc);
   const salaryCap = calc.salaryCap;
-  const deadCap = deadCapForSeason(season.id);
   const capUsed = calc.complete ? calc.capUsed : calc.knownCapUsed;
   const capRemaining = calc.complete && salaryCap !== null ? calc.capSpace : null;
   const rawPct = salaryCap && salaryCap > 0 ? (calc.knownCapUsed / salaryCap) * 100 : 0;
@@ -100,18 +99,36 @@ function renderOverviewContractWatch(intel) {
     ? `<span class="contract-watch-priority warning"><strong>${gapCount} future salar${gapCount === 1 ? 'y gap' : 'y gaps'}</strong><small>Inside entered contract terms</small></span>`
     : '';
 
-  return `<section class="overview-panel-v227 contract-watch-v246">
-    <div class="overview-section-head-v227">
+  return `<section class="overview-panel-v227 contract-watch-v246 contract-watch-compact-v3142">
+    <div class="overview-section-head-v227 overview-section-head-compact-v3142">
       <div><p class="eyebrow">Contract watch</p><h3>Key contract timing</h3></div>
       <button id="overviewContractRosterBtn" class="overview-text-action" type="button">Open Roster →</button>
     </div>
-    <div class="contract-watch-metrics-v246">
-      <div><span>Expiring</span><strong>${currentCount}</strong><small>this season</small></div>
-      <div><span>Next year</span><strong>${nextCount}</strong><small>contract ends</small></div>
-      <div class="${gapCount ? 'warning' : ''}"><span>Salary gaps</span><strong>${gapCount}</strong><small>future entered terms</small></div>
-      <div><span>Minors deals</span><strong>${minorsCount}</strong><small>with contract data</small></div>
+
+    <div class="contract-watch-strip-v3142">
+      <div>
+        <span>Expiring</span>
+        <strong>${currentCount}</strong>
+        <small>this season</small>
+      </div>
+      <div>
+        <span>Next</span>
+        <strong>${nextCount}</strong>
+        <small>contract ends</small>
+      </div>
+      <div class="${gapCount ? 'warning' : ''}">
+        <span>Salary gaps</span>
+        <strong>${gapCount}</strong>
+        <small>future terms</small>
+      </div>
+      <div>
+        <span>Minors deals</span>
+        <strong>${minorsCount}</strong>
+        <small>contract data</small>
+      </div>
     </div>
-    ${priority ? `<div class="contract-watch-footer-v246">${priority}</div>` : ''}
+
+    ${priority ? `<div class="contract-watch-footer-v246 contract-watch-footer-compact-v3142">${priority}</div>` : ''}
   </section>`;
 }
 
@@ -119,13 +136,23 @@ function renderOverview() {
   const season = currentSeason();
   const contractIntel = contractIntelligence();
   const calc = calculateSeason(season.id);
-  const deadCap = deadCapForSeason(season.id);
   const capRemaining = calc.complete && calc.salaryCap !== null
     ? calc.capSpace
     : null;
 
   const activeCount = activeRosterPlayers().length;
   const minorsCount = farmSystemPlayers().length;
+  const irSummary =
+    typeof irRosterSummaryV3142 === 'function'
+      ? irRosterSummaryV3142(season)
+      : {
+          label:'IR',
+          count:0,
+          playerLimit:null,
+          currentCap:0,
+          missingSalaryCount:0,
+          countsTowardCap:true
+        };
   const minorsLimit = state.frontOffice.minorsLimit;
   const minorsOver =
     minorsLimit !== null
@@ -189,6 +216,22 @@ function renderOverview() {
         <span>
           <strong>${minorsCount - minorsLimit} player${minorsCount - minorsLimit === 1 ? '' : 's'} over the Minors limit</strong>
           <small>${minorsCount} assigned against a ${minorsLimit}-player maximum.</small>
+        </span>
+      </div>
+    `);
+  }
+
+  if (
+    irSummary.playerLimit !== null
+    && irSummary.playerLimit !== undefined
+    && irSummary.count > irSummary.playerLimit
+  ) {
+    attention.push(`
+      <div class="overview-attention-row warning">
+        <span class="overview-attention-icon">IR</span>
+        <span>
+          <strong>${irSummary.count - irSummary.playerLimit} player${irSummary.count - irSummary.playerLimit === 1 ? '' : 's'} over the ${escapeHtml(irSummary.label)} limit</strong>
+          <small>${irSummary.count} assigned against a ${irSummary.playerLimit}-player maximum.</small>
         </span>
       </div>
     `);
@@ -263,8 +306,8 @@ function renderOverview() {
         : `${Math.abs(openRosterSpots)} over`;
 
   el('overviewView').innerHTML = `
-    <div class="overview-v227 overview-v255 overview-dashboard-v3140">
-      ${renderCapDashboardV3140({
+    <div class="overview-v227 overview-v255 overview-dashboard-v3142">
+      ${renderCapDashboardV3142({
         season,
         yearCount:3,
         context:'overview'
@@ -280,7 +323,7 @@ function renderOverview() {
           >Open Roster →</button>
         </div>
 
-        <div class="overview-snapshot-grid-v227 overview-snapshot-grid-v3031">
+        <div class="overview-snapshot-grid-v227 overview-snapshot-grid-v3142">
           <div class="overview-snapshot-item">
             <span>Active</span>
             <strong>${escapeHtml(rosterMeta)}</strong>
@@ -293,10 +336,14 @@ function renderOverview() {
             <small>${minorsLimit === null || minorsLimit === undefined ? 'no limit set' : minorsOver ? `${Math.abs(minorsOpen)} over` : `${minorsOpen} open`}</small>
           </div>
 
-          <div class="overview-snapshot-item">
-            <span>Dead Cap</span>
-            <strong>${formatMoney(deadCap)}</strong>
-            <small>${deadCap ? 'on the books' : 'none'}</small>
+          <div class="overview-snapshot-item ir-snapshot-v3142">
+            <span>${escapeHtml(irSummary.label)}</span>
+            <strong>${irSummary.playerLimit === null || irSummary.playerLimit === undefined ? irSummary.count : `${irSummary.count} / ${irSummary.playerLimit}`}</strong>
+            <small>${
+              irSummary.countsTowardCap
+                ? `${formatMoney(irSummary.currentCap)} current cap${irSummary.missingSalaryCount ? ` · ${irSummary.missingSalaryCount} missing` : ''}`
+                : 'cap excluded'
+            }</small>
           </div>
         </div>
       </section>
@@ -325,7 +372,7 @@ function renderOverview() {
         </section>
       </div>
 
-      <div class="overview-cap-link-v3140">
+      <div class="overview-cap-link-v3142">
         <button
           id="overviewOpenCapBtn"
           class="overview-text-action"
