@@ -1,0 +1,511 @@
+/*
+RosterCap V3.14.0 — Cap Dashboard
+Shared presentation for Overview + Cap.
+
+No financial values are calculated in CSS. The JS feature uses the existing
+RosterCap domain functions and injects only display values/percentages.
+*/
+
+.rc-cap-dashboard-v3140 {
+  display:grid;
+  grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
+  gap:8px;
+  min-width:0;
+}
+
+.rc-cap-space-card-v3140,
+.rc-year-breakdown-card-v3140 {
+  min-width:0;
+  padding:11px;
+  overflow:hidden;
+  border:1px solid rgba(119,201,255,.18);
+  border-radius:12px;
+  background:
+    linear-gradient(180deg,rgba(13,28,40,.98),rgba(8,19,29,.98)),
+    #0b151e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+}
+
+.rc-cap-space-card-v3140 {
+  background:
+    radial-gradient(circle at 2% 0,rgba(50,173,255,.075),transparent 38%),
+    linear-gradient(180deg,rgba(13,28,40,.98),rgba(8,19,29,.98));
+}
+
+.rc-cap-space-card-v3140.tone-good {
+  border-color:rgba(82,215,194,.22);
+}
+
+.rc-cap-space-card-v3140.tone-warning {
+  border-color:rgba(242,198,109,.24);
+}
+
+.rc-cap-space-card-v3140.tone-danger {
+  border-color:rgba(246,123,123,.30);
+}
+
+.rc-cap-card-head-v3140 {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.rc-cap-card-head-v3140 .eyebrow {
+  margin:0 0 2px;
+  font-size:.49rem;
+}
+
+.rc-cap-card-head-v3140 > div > span,
+.rc-cap-card-head-v3140 > small {
+  display:block;
+  color:var(--muted);
+  font-size:.49rem;
+  line-height:1.2;
+}
+
+.rc-cap-space-body-v3140 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  min-height:92px;
+  padding:7px 0 6px;
+}
+
+.rc-cap-primary-v3140 {
+  min-width:0;
+}
+
+.rc-cap-primary-v3140 > strong {
+  display:block;
+  overflow:hidden;
+  color:var(--healthy);
+  font-size:clamp(1.38rem,4.8vw,2.25rem);
+  font-weight:950;
+  letter-spacing:-.045em;
+  line-height:.95;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+
+.rc-cap-primary-v3140 > strong.warning {
+  color:var(--warning);
+}
+
+.rc-cap-primary-v3140 > strong.danger {
+  color:var(--danger);
+}
+
+.rc-cap-primary-v3140 > span {
+  display:block;
+  margin-top:5px;
+  color:#AFC1CF;
+  font-size:.57rem;
+  font-weight:800;
+}
+
+.rc-cap-ring-v3140 {
+  --rc-ring-tone:var(--healthy);
+  width:78px;
+  aspect-ratio:1;
+  display:grid;
+  place-items:center;
+  padding:8px;
+  border-radius:50%;
+  background:
+    conic-gradient(
+      var(--rc-ring-tone) calc(var(--rc-cap-pct) * 1%),
+      rgba(119,201,255,.10) 0
+    );
+}
+
+.rc-cap-ring-v3140.tone-warning {
+  --rc-ring-tone:var(--warning);
+}
+
+.rc-cap-ring-v3140.tone-danger {
+  --rc-ring-tone:var(--danger);
+}
+
+.rc-cap-ring-v3140 > div {
+  width:100%;
+  height:100%;
+  display:grid;
+  place-content:center;
+  border-radius:50%;
+  background:#0B1721;
+  text-align:center;
+}
+
+.rc-cap-ring-v3140 strong,
+.rc-cap-ring-v3140 span {
+  display:block;
+}
+
+.rc-cap-ring-v3140 strong {
+  font-size:1rem;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+
+.rc-cap-ring-v3140 span {
+  margin-top:3px;
+  color:var(--muted);
+  font-size:.39rem;
+  font-weight:900;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+.rc-cap-mini-strip-v3140 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  overflow:hidden;
+  border-top:1px solid rgba(119,201,255,.10);
+}
+
+.rc-cap-mini-strip-v3140 > span {
+  min-width:0;
+  padding:7px 6px 0;
+}
+
+.rc-cap-mini-strip-v3140 > span:first-child {
+  padding-left:0;
+}
+
+.rc-cap-mini-strip-v3140 > span + span {
+  border-left:1px solid rgba(119,201,255,.08);
+}
+
+.rc-cap-mini-strip-v3140 small,
+.rc-cap-mini-strip-v3140 strong {
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.rc-cap-mini-strip-v3140 small {
+  color:var(--muted);
+  font-size:.40rem;
+  font-weight:850;
+  letter-spacing:.045em;
+  text-transform:uppercase;
+}
+
+.rc-cap-mini-strip-v3140 strong {
+  margin-top:2px;
+  font-size:.55rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.rc-year-breakdown-card-v3140 {
+  display:grid;
+  grid-template-rows:auto 1fr;
+  gap:7px;
+}
+
+.rc-year-breakdown-v3140 {
+  display:grid;
+  grid-template-columns:repeat(var(--rc-year-count),minmax(0,1fr));
+  align-items:stretch;
+  overflow:hidden;
+  border:1px solid rgba(119,201,255,.09);
+  border-radius:9px;
+  background:rgba(6,15,23,.34);
+}
+
+.rc-year-cell-v3140 {
+  display:grid;
+  align-content:center;
+  min-width:0;
+  padding:8px 7px;
+}
+
+.rc-year-cell-v3140 + .rc-year-cell-v3140 {
+  border-left:1px solid rgba(119,201,255,.08);
+}
+
+.rc-year-label-v3140,
+.rc-year-cell-v3140 > strong,
+.rc-year-cell-v3140 > small {
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.rc-year-label-v3140 {
+  color:var(--muted);
+  font-size:.43rem;
+  font-weight:850;
+}
+
+.rc-year-cell-v3140 > strong {
+  margin-top:6px;
+  font-size:.66rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.rc-year-cell-v3140 > small {
+  margin-top:5px;
+  color:#8193A2;
+  font-size:.39rem;
+}
+
+.rc-year-track-v3140 {
+  height:4px;
+  margin-top:6px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(119,201,255,.10);
+}
+
+.rc-year-track-v3140 > span {
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:var(--accent);
+}
+
+.rc-year-cell-v3140.good .rc-year-track-v3140 > span {
+  background:var(--healthy);
+}
+
+.rc-year-cell-v3140.warning .rc-year-track-v3140 > span {
+  background:var(--warning);
+}
+
+.rc-year-cell-v3140.danger .rc-year-track-v3140 > span {
+  background:var(--danger);
+}
+
+
+/* Overview integration -------------------------------------------------- */
+
+.overview-dashboard-v3140 {
+  gap:8px;
+}
+
+.overview-dashboard-v3140 .overview-snapshot-v227,
+.overview-dashboard-v3140 .overview-panel-v227 {
+  border-radius:12px;
+}
+
+.overview-cap-link-v3140 {
+  display:flex;
+  justify-content:flex-end;
+  margin-top:-2px;
+}
+
+
+/* Cap integration ------------------------------------------------------- */
+
+.cap-dashboard-page-v3140 {
+  display:grid;
+  gap:8px;
+}
+
+.cap-dashboard-page-v3140 .cap-page-heading-v228 {
+  margin-bottom:0;
+}
+
+.cap-horizon-panel-v3140 {
+  padding:10px 11px;
+}
+
+.cap-section-head-compact-v3140 {
+  margin-bottom:7px;
+}
+
+.rc-cap-horizon-scroll-v3140 {
+  width:100%;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding-bottom:2px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(119,201,255,.24) transparent;
+}
+
+.rc-cap-horizon-v3140 {
+  display:grid;
+  grid-template-columns:repeat(7,minmax(104px,1fr));
+  min-width:760px;
+  overflow:hidden;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:#0B151E;
+}
+
+.rc-cap-horizon-v3140 .rc-year-cell-v3140 {
+  padding:7px 8px;
+}
+
+
+/* Mobile --------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  .rc-cap-dashboard-v3140 {
+    grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+    gap:6px;
+  }
+
+  .rc-cap-space-card-v3140,
+  .rc-year-breakdown-card-v3140 {
+    padding:8px;
+    border-radius:10px;
+  }
+
+  .rc-cap-card-head-v3140 .eyebrow {
+    font-size:.43rem;
+  }
+
+  .rc-cap-card-head-v3140 > div > span,
+  .rc-cap-card-head-v3140 > small {
+    font-size:.42rem;
+  }
+
+  .rc-cap-card-head-v3140 > small {
+    display:none;
+  }
+
+  .rc-cap-space-body-v3140 {
+    min-height:72px;
+    gap:6px;
+    padding:5px 0;
+  }
+
+  .rc-cap-primary-v3140 > strong {
+    font-size:1.17rem;
+  }
+
+  .rc-cap-primary-v3140 > span {
+    margin-top:3px;
+    font-size:.48rem;
+  }
+
+  .rc-cap-ring-v3140 {
+    width:60px;
+    padding:6px;
+  }
+
+  .rc-cap-ring-v3140 strong {
+    font-size:.78rem;
+  }
+
+  .rc-cap-ring-v3140 span {
+    font-size:.31rem;
+  }
+
+  .rc-cap-mini-strip-v3140 > span {
+    padding:5px 4px 0;
+  }
+
+  .rc-cap-mini-strip-v3140 small {
+    font-size:.32rem;
+  }
+
+  .rc-cap-mini-strip-v3140 strong {
+    font-size:.43rem;
+  }
+
+  .rc-year-breakdown-card-v3140 {
+    gap:5px;
+  }
+
+  .rc-year-cell-v3140 {
+    padding:6px 4px;
+  }
+
+  .rc-year-label-v3140 {
+    font-size:.36rem;
+  }
+
+  .rc-year-cell-v3140 > strong {
+    margin-top:5px;
+    font-size:.51rem;
+  }
+
+  .rc-year-cell-v3140 > small {
+    margin-top:4px;
+    font-size:.31rem;
+  }
+
+  .rc-year-track-v3140 {
+    height:3px;
+    margin-top:5px;
+  }
+
+  .overview-dashboard-v3140 {
+    gap:7px;
+  }
+
+  .cap-dashboard-page-v3140 {
+    gap:7px;
+  }
+
+  .cap-horizon-panel-v3140 {
+    padding:8px;
+  }
+
+  .rc-cap-horizon-v3140 {
+    grid-template-columns:repeat(7,minmax(96px,1fr));
+    min-width:700px;
+  }
+}
+
+@media (max-width:390px) {
+  .rc-cap-dashboard-v3140 {
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  }
+
+  .rc-cap-space-card-v3140,
+  .rc-year-breakdown-card-v3140 {
+    padding:7px;
+  }
+
+  .rc-cap-space-body-v3140 {
+    grid-template-columns:minmax(0,1fr) 52px;
+  }
+
+  .rc-cap-ring-v3140 {
+    width:52px;
+    padding:5px;
+  }
+
+  .rc-cap-primary-v3140 > strong {
+    font-size:1.02rem;
+  }
+
+  .rc-cap-mini-strip-v3140 strong {
+    font-size:.39rem;
+  }
+
+  .rc-year-cell-v3140 {
+    padding-left:3px;
+    padding-right:3px;
+  }
+
+  .rc-year-cell-v3140 > strong {
+    font-size:.46rem;
+  }
+}
+
+@media (max-width:350px) {
+  .rc-cap-dashboard-v3140 {
+    grid-template-columns:1fr;
+  }
+
+  .rc-cap-space-body-v3140 {
+    grid-template-columns:minmax(0,1fr) 62px;
+  }
+
+  .rc-cap-ring-v3140 {
+    width:62px;
+  }
+}
