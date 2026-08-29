@@ -142,16 +142,14 @@ function renderOverview() {
 
   const activeCount = activeRosterPlayers().length;
   const minorsCount = farmSystemPlayers().length;
-  const irSummary =
-    typeof irRosterSummaryV3142 === 'function'
-      ? irRosterSummaryV3142(season)
+  const injuredSummary =
+    typeof injuredRosterSummaryV3143 === 'function'
+      ? injuredRosterSummaryV3143(season)
       : {
-          label:'IR',
+          label:'IR / IL',
           count:0,
-          playerLimit:null,
           currentCap:0,
-          missingSalaryCount:0,
-          countsTowardCap:true
+          missingSalaryCount:0
         };
   const minorsLimit = state.frontOffice.minorsLimit;
   const minorsOver =
@@ -221,21 +219,6 @@ function renderOverview() {
     `);
   }
 
-  if (
-    irSummary.playerLimit !== null
-    && irSummary.playerLimit !== undefined
-    && irSummary.count > irSummary.playerLimit
-  ) {
-    attention.push(`
-      <div class="overview-attention-row warning">
-        <span class="overview-attention-icon">IR</span>
-        <span>
-          <strong>${irSummary.count - irSummary.playerLimit} player${irSummary.count - irSummary.playerLimit === 1 ? '' : 's'} over the ${escapeHtml(irSummary.label)} limit</strong>
-          <small>${irSummary.count} assigned against a ${irSummary.playerLimit}-player maximum.</small>
-        </span>
-      </div>
-    `);
-  }
 
   if (missingPlayers.length) {
     const names = missingPlayers
@@ -337,13 +320,9 @@ function renderOverview() {
           </div>
 
           <div class="overview-snapshot-item ir-snapshot-v3142">
-            <span>${escapeHtml(irSummary.label)}</span>
-            <strong>${irSummary.playerLimit === null || irSummary.playerLimit === undefined ? irSummary.count : `${irSummary.count} / ${irSummary.playerLimit}`}</strong>
-            <small>${
-              irSummary.countsTowardCap
-                ? `${formatMoney(irSummary.currentCap)} current cap${irSummary.missingSalaryCount ? ` · ${irSummary.missingSalaryCount} missing` : ''}`
-                : 'cap excluded'
-            }</small>
+            <span>${escapeHtml(injuredSummary.label)}</span>
+            <strong>${injuredSummary.count}</strong>
+            <small>${formatMoney(injuredSummary.currentCap)} current cap${injuredSummary.missingSalaryCount ? ` · ${injuredSummary.missingSalaryCount} missing` : ''}</small>
           </div>
         </div>
       </section>
