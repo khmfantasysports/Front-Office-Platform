@@ -1,20 +1,20 @@
 /*
-RosterCap V3.14.0 — Cap Dashboard
+RosterCap V3.14.2 — Cap Dashboard
 Shared presentation for Overview + Cap.
 
 No financial values are calculated in CSS. The JS feature uses the existing
 RosterCap domain functions and injects only display values/percentages.
 */
 
-.rc-cap-dashboard-v3140 {
+.rc-cap-dashboard-v3142 {
   display:grid;
   grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);
   gap:8px;
   min-width:0;
 }
 
-.rc-cap-space-card-v3140,
-.rc-year-breakdown-card-v3140 {
+.rc-cap-space-card-v3142,
+.rc-year-breakdown-card-v3142 {
   min-width:0;
   padding:11px;
   overflow:hidden;
@@ -26,45 +26,45 @@ RosterCap domain functions and injects only display values/percentages.
   box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
 }
 
-.rc-cap-space-card-v3140 {
+.rc-cap-space-card-v3142 {
   background:
     radial-gradient(circle at 2% 0,rgba(50,173,255,.075),transparent 38%),
     linear-gradient(180deg,rgba(13,28,40,.98),rgba(8,19,29,.98));
 }
 
-.rc-cap-space-card-v3140.tone-good {
+.rc-cap-space-card-v3142.tone-good {
   border-color:rgba(82,215,194,.22);
 }
 
-.rc-cap-space-card-v3140.tone-warning {
+.rc-cap-space-card-v3142.tone-warning {
   border-color:rgba(242,198,109,.24);
 }
 
-.rc-cap-space-card-v3140.tone-danger {
+.rc-cap-space-card-v3142.tone-danger {
   border-color:rgba(246,123,123,.30);
 }
 
-.rc-cap-card-head-v3140 {
+.rc-cap-card-head-v3142 {
   display:flex;
   align-items:flex-start;
   justify-content:space-between;
   gap:8px;
 }
 
-.rc-cap-card-head-v3140 .eyebrow {
+.rc-cap-card-head-v3142 .eyebrow {
   margin:0 0 2px;
   font-size:.49rem;
 }
 
-.rc-cap-card-head-v3140 > div > span,
-.rc-cap-card-head-v3140 > small {
+.rc-cap-card-head-v3142 > div > span,
+.rc-cap-card-head-v3142 > small {
   display:block;
   color:var(--muted);
   font-size:.49rem;
   line-height:1.2;
 }
 
-.rc-cap-space-body-v3140 {
+.rc-cap-space-body-v3142 {
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   align-items:center;
@@ -73,11 +73,11 @@ RosterCap domain functions and injects only display values/percentages.
   padding:7px 0 6px;
 }
 
-.rc-cap-primary-v3140 {
+.rc-cap-primary-v3142 {
   min-width:0;
 }
 
-.rc-cap-primary-v3140 > strong {
+.rc-cap-primary-v3142 > strong {
   display:block;
   overflow:hidden;
   color:var(--healthy);
@@ -90,15 +90,15 @@ RosterCap domain functions and injects only display values/percentages.
   font-variant-numeric:tabular-nums;
 }
 
-.rc-cap-primary-v3140 > strong.warning {
+.rc-cap-primary-v3142 > strong.warning {
   color:var(--warning);
 }
 
-.rc-cap-primary-v3140 > strong.danger {
+.rc-cap-primary-v3142 > strong.danger {
   color:var(--danger);
 }
 
-.rc-cap-primary-v3140 > span {
+.rc-cap-primary-v3142 > span {
   display:block;
   margin-top:5px;
   color:#AFC1CF;
@@ -106,7 +106,7 @@ RosterCap domain functions and injects only display values/percentages.
   font-weight:800;
 }
 
-.rc-cap-ring-v3140 {
+.rc-cap-ring-v3142 {
   --rc-ring-tone:var(--healthy);
   width:78px;
   aspect-ratio:1;
@@ -121,15 +121,15 @@ RosterCap domain functions and injects only display values/percentages.
     );
 }
 
-.rc-cap-ring-v3140.tone-warning {
+.rc-cap-ring-v3142.tone-warning {
   --rc-ring-tone:var(--warning);
 }
 
-.rc-cap-ring-v3140.tone-danger {
+.rc-cap-ring-v3142.tone-danger {
   --rc-ring-tone:var(--danger);
 }
 
-.rc-cap-ring-v3140 > div {
+.rc-cap-ring-v3142 > div {
   width:100%;
   height:100%;
   display:grid;
@@ -139,18 +139,18 @@ RosterCap domain functions and injects only display values/percentages.
   text-align:center;
 }
 
-.rc-cap-ring-v3140 strong,
-.rc-cap-ring-v3140 span {
+.rc-cap-ring-v3142 strong,
+.rc-cap-ring-v3142 span {
   display:block;
 }
 
-.rc-cap-ring-v3140 strong {
+.rc-cap-ring-v3142 strong {
   font-size:1rem;
   line-height:1;
   font-variant-numeric:tabular-nums;
 }
 
-.rc-cap-ring-v3140 span {
+.rc-cap-ring-v3142 span {
   margin-top:3px;
   color:var(--muted);
   font-size:.39rem;
@@ -159,35 +159,35 @@ RosterCap domain functions and injects only display values/percentages.
   text-transform:uppercase;
 }
 
-.rc-cap-mini-strip-v3140 {
+.rc-cap-mini-strip-v3142 {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   overflow:hidden;
   border-top:1px solid rgba(119,201,255,.10);
 }
 
-.rc-cap-mini-strip-v3140 > span {
+.rc-cap-mini-strip-v3142 > span {
   min-width:0;
   padding:7px 6px 0;
 }
 
-.rc-cap-mini-strip-v3140 > span:first-child {
+.rc-cap-mini-strip-v3142 > span:first-child {
   padding-left:0;
 }
 
-.rc-cap-mini-strip-v3140 > span + span {
+.rc-cap-mini-strip-v3142 > span + span {
   border-left:1px solid rgba(119,201,255,.08);
 }
 
-.rc-cap-mini-strip-v3140 small,
-.rc-cap-mini-strip-v3140 strong {
+.rc-cap-mini-strip-v3142 small,
+.rc-cap-mini-strip-v3142 strong {
   display:block;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
-.rc-cap-mini-strip-v3140 small {
+.rc-cap-mini-strip-v3142 small {
   color:var(--muted);
   font-size:.40rem;
   font-weight:850;
@@ -195,19 +195,19 @@ RosterCap domain functions and injects only display values/percentages.
   text-transform:uppercase;
 }
 
-.rc-cap-mini-strip-v3140 strong {
+.rc-cap-mini-strip-v3142 strong {
   margin-top:2px;
   font-size:.55rem;
   font-variant-numeric:tabular-nums;
 }
 
-.rc-year-breakdown-card-v3140 {
+.rc-year-breakdown-card-v3142 {
   display:grid;
   grid-template-rows:auto 1fr;
   gap:7px;
 }
 
-.rc-year-breakdown-v3140 {
+.rc-year-breakdown-v3142 {
   display:grid;
   grid-template-columns:repeat(var(--rc-year-count),minmax(0,1fr));
   align-items:stretch;
@@ -217,45 +217,45 @@ RosterCap domain functions and injects only display values/percentages.
   background:rgba(6,15,23,.34);
 }
 
-.rc-year-cell-v3140 {
+.rc-year-cell-v3142 {
   display:grid;
   align-content:center;
   min-width:0;
   padding:8px 7px;
 }
 
-.rc-year-cell-v3140 + .rc-year-cell-v3140 {
+.rc-year-cell-v3142 + .rc-year-cell-v3142 {
   border-left:1px solid rgba(119,201,255,.08);
 }
 
-.rc-year-label-v3140,
-.rc-year-cell-v3140 > strong,
-.rc-year-cell-v3140 > small {
+.rc-year-label-v3142,
+.rc-year-cell-v3142 > strong,
+.rc-year-cell-v3142 > small {
   display:block;
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
 
-.rc-year-label-v3140 {
+.rc-year-label-v3142 {
   color:var(--muted);
   font-size:.43rem;
   font-weight:850;
 }
 
-.rc-year-cell-v3140 > strong {
+.rc-year-cell-v3142 > strong {
   margin-top:6px;
   font-size:.66rem;
   font-variant-numeric:tabular-nums;
 }
 
-.rc-year-cell-v3140 > small {
+.rc-year-cell-v3142 > small {
   margin-top:5px;
   color:#8193A2;
   font-size:.39rem;
 }
 
-.rc-year-track-v3140 {
+.rc-year-track-v3142 {
   height:4px;
   margin-top:6px;
   overflow:hidden;
@@ -263,38 +263,38 @@ RosterCap domain functions and injects only display values/percentages.
   background:rgba(119,201,255,.10);
 }
 
-.rc-year-track-v3140 > span {
+.rc-year-track-v3142 > span {
   display:block;
   height:100%;
   border-radius:999px;
   background:var(--accent);
 }
 
-.rc-year-cell-v3140.good .rc-year-track-v3140 > span {
+.rc-year-cell-v3142.good .rc-year-track-v3142 > span {
   background:var(--healthy);
 }
 
-.rc-year-cell-v3140.warning .rc-year-track-v3140 > span {
+.rc-year-cell-v3142.warning .rc-year-track-v3142 > span {
   background:var(--warning);
 }
 
-.rc-year-cell-v3140.danger .rc-year-track-v3140 > span {
+.rc-year-cell-v3142.danger .rc-year-track-v3142 > span {
   background:var(--danger);
 }
 
 
 /* Overview integration -------------------------------------------------- */
 
-.overview-dashboard-v3140 {
+.overview-dashboard-v3142 {
   gap:8px;
 }
 
-.overview-dashboard-v3140 .overview-snapshot-v227,
-.overview-dashboard-v3140 .overview-panel-v227 {
+.overview-dashboard-v3142 .overview-snapshot-v227,
+.overview-dashboard-v3142 .overview-panel-v227 {
   border-radius:12px;
 }
 
-.overview-cap-link-v3140 {
+.overview-cap-link-v3142 {
   display:flex;
   justify-content:flex-end;
   margin-top:-2px;
@@ -303,24 +303,24 @@ RosterCap domain functions and injects only display values/percentages.
 
 /* Cap integration ------------------------------------------------------- */
 
-.cap-dashboard-page-v3140 {
+.cap-dashboard-page-v3142 {
   display:grid;
   gap:8px;
 }
 
-.cap-dashboard-page-v3140 .cap-page-heading-v228 {
+.cap-dashboard-page-v3142 .cap-page-heading-v228 {
   margin-bottom:0;
 }
 
-.cap-horizon-panel-v3140 {
+.cap-horizon-panel-v3142 {
   padding:10px 11px;
 }
 
-.cap-section-head-compact-v3140 {
+.cap-section-head-compact-v3142 {
   margin-bottom:7px;
 }
 
-.rc-cap-horizon-scroll-v3140 {
+.rc-cap-horizon-scroll-v3142 {
   width:100%;
   max-width:100%;
   overflow-x:auto;
@@ -332,17 +332,17 @@ RosterCap domain functions and injects only display values/percentages.
   scrollbar-color:rgba(119,201,255,.24) transparent;
 }
 
-.rc-cap-horizon-v3140 {
+.rc-cap-horizon-v3142 {
   display:grid;
-  grid-template-columns:repeat(7,minmax(104px,1fr));
-  min-width:760px;
+  grid-template-columns:repeat(var(--rc-horizon-count),minmax(104px,1fr));
+  min-width:max(100%,calc(var(--rc-horizon-count) * 104px));
   overflow:hidden;
   border:1px solid rgba(119,201,255,.10);
   border-radius:9px;
   background:#0B151E;
 }
 
-.rc-cap-horizon-v3140 .rc-year-cell-v3140 {
+.rc-cap-horizon-v3142 .rc-year-cell-v3142 {
   padding:7px 8px;
 }
 
@@ -350,162 +350,355 @@ RosterCap domain functions and injects only display values/percentages.
 /* Mobile --------------------------------------------------------------- */
 
 @media (max-width:720px) {
-  .rc-cap-dashboard-v3140 {
+  .rc-cap-dashboard-v3142 {
     grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
     gap:6px;
   }
 
-  .rc-cap-space-card-v3140,
-  .rc-year-breakdown-card-v3140 {
+  .rc-cap-space-card-v3142,
+  .rc-year-breakdown-card-v3142 {
     padding:8px;
     border-radius:10px;
   }
 
-  .rc-cap-card-head-v3140 .eyebrow {
+  .rc-cap-card-head-v3142 .eyebrow {
     font-size:.43rem;
   }
 
-  .rc-cap-card-head-v3140 > div > span,
-  .rc-cap-card-head-v3140 > small {
+  .rc-cap-card-head-v3142 > div > span,
+  .rc-cap-card-head-v3142 > small {
     font-size:.42rem;
   }
 
-  .rc-cap-card-head-v3140 > small {
+  .rc-cap-card-head-v3142 > small {
     display:none;
   }
 
-  .rc-cap-space-body-v3140 {
+  .rc-cap-space-body-v3142 {
     min-height:72px;
     gap:6px;
     padding:5px 0;
   }
 
-  .rc-cap-primary-v3140 > strong {
+  .rc-cap-primary-v3142 > strong {
     font-size:1.17rem;
   }
 
-  .rc-cap-primary-v3140 > span {
+  .rc-cap-primary-v3142 > span {
     margin-top:3px;
     font-size:.48rem;
   }
 
-  .rc-cap-ring-v3140 {
+  .rc-cap-ring-v3142 {
     width:60px;
     padding:6px;
   }
 
-  .rc-cap-ring-v3140 strong {
+  .rc-cap-ring-v3142 strong {
     font-size:.78rem;
   }
 
-  .rc-cap-ring-v3140 span {
+  .rc-cap-ring-v3142 span {
     font-size:.31rem;
   }
 
-  .rc-cap-mini-strip-v3140 > span {
+  .rc-cap-mini-strip-v3142 > span {
     padding:5px 4px 0;
   }
 
-  .rc-cap-mini-strip-v3140 small {
+  .rc-cap-mini-strip-v3142 small {
     font-size:.32rem;
   }
 
-  .rc-cap-mini-strip-v3140 strong {
+  .rc-cap-mini-strip-v3142 strong {
     font-size:.43rem;
   }
 
-  .rc-year-breakdown-card-v3140 {
+  .rc-year-breakdown-card-v3142 {
     gap:5px;
   }
 
-  .rc-year-cell-v3140 {
+  .rc-year-cell-v3142 {
     padding:6px 4px;
   }
 
-  .rc-year-label-v3140 {
+  .rc-year-label-v3142 {
     font-size:.36rem;
   }
 
-  .rc-year-cell-v3140 > strong {
+  .rc-year-cell-v3142 > strong {
     margin-top:5px;
     font-size:.51rem;
   }
 
-  .rc-year-cell-v3140 > small {
+  .rc-year-cell-v3142 > small {
     margin-top:4px;
     font-size:.31rem;
   }
 
-  .rc-year-track-v3140 {
+  .rc-year-track-v3142 {
     height:3px;
     margin-top:5px;
   }
 
-  .overview-dashboard-v3140 {
+  .overview-dashboard-v3142 {
     gap:7px;
   }
 
-  .cap-dashboard-page-v3140 {
+  .cap-dashboard-page-v3142 {
     gap:7px;
   }
 
-  .cap-horizon-panel-v3140 {
+  .cap-horizon-panel-v3142 {
     padding:8px;
   }
 
-  .rc-cap-horizon-v3140 {
-    grid-template-columns:repeat(7,minmax(96px,1fr));
-    min-width:700px;
+  .rc-cap-horizon-v3142 {
+    grid-template-columns:repeat(var(--rc-horizon-count),minmax(96px,1fr));
+    min-width:max(100%,calc(var(--rc-horizon-count) * 96px));
   }
 }
 
 @media (max-width:390px) {
-  .rc-cap-dashboard-v3140 {
+  .rc-cap-dashboard-v3142 {
     grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
   }
 
-  .rc-cap-space-card-v3140,
-  .rc-year-breakdown-card-v3140 {
+  .rc-cap-space-card-v3142,
+  .rc-year-breakdown-card-v3142 {
     padding:7px;
   }
 
-  .rc-cap-space-body-v3140 {
+  .rc-cap-space-body-v3142 {
     grid-template-columns:minmax(0,1fr) 52px;
   }
 
-  .rc-cap-ring-v3140 {
+  .rc-cap-ring-v3142 {
     width:52px;
     padding:5px;
   }
 
-  .rc-cap-primary-v3140 > strong {
+  .rc-cap-primary-v3142 > strong {
     font-size:1.02rem;
   }
 
-  .rc-cap-mini-strip-v3140 strong {
+  .rc-cap-mini-strip-v3142 strong {
     font-size:.39rem;
   }
 
-  .rc-year-cell-v3140 {
+  .rc-year-cell-v3142 {
     padding-left:3px;
     padding-right:3px;
   }
 
-  .rc-year-cell-v3140 > strong {
+  .rc-year-cell-v3142 > strong {
     font-size:.46rem;
   }
 }
 
 @media (max-width:350px) {
-  .rc-cap-dashboard-v3140 {
+  .rc-cap-dashboard-v3142 {
     grid-template-columns:1fr;
   }
 
-  .rc-cap-space-body-v3140 {
+  .rc-cap-space-body-v3142 {
     grid-template-columns:minmax(0,1fr) 62px;
   }
 
-  .rc-cap-ring-v3140 {
+  .rc-cap-ring-v3142 {
     width:62px;
+  }
+}
+
+
+/* V3.14.2 — downstream dashboard compression ---------------------------- */
+
+.overview-snapshot-grid-v3142 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+
+.overview-snapshot-grid-v3142 .overview-snapshot-item {
+  min-height:82px;
+}
+
+.overview-section-head-compact-v3142 {
+  margin-bottom:7px;
+}
+
+.contract-watch-compact-v3142 {
+  padding-bottom:10px;
+}
+
+.contract-watch-strip-v3142,
+.contract-intel-strip-v3142 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  overflow:hidden;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:10px;
+  background:rgba(7,16,24,.30);
+}
+
+.contract-watch-strip-v3142 > div,
+.contract-intel-strip-v3142 > div {
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  min-width:0;
+  min-height:70px;
+  padding:8px 6px;
+  text-align:center;
+}
+
+.contract-watch-strip-v3142 > div + div,
+.contract-intel-strip-v3142 > div + div {
+  border-left:1px solid rgba(119,201,255,.09);
+}
+
+.contract-watch-strip-v3142 span,
+.contract-watch-strip-v3142 strong,
+.contract-watch-strip-v3142 small,
+.contract-intel-strip-v3142 span,
+.contract-intel-strip-v3142 strong,
+.contract-intel-strip-v3142 small {
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.contract-watch-strip-v3142 span,
+.contract-intel-strip-v3142 span {
+  color:#AAB8C6;
+  font-size:.49rem;
+  font-weight:900;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+.contract-watch-strip-v3142 strong,
+.contract-intel-strip-v3142 strong {
+  margin-top:3px;
+  color:var(--text);
+  font-size:1rem;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+
+.contract-watch-strip-v3142 small,
+.contract-intel-strip-v3142 small {
+  margin-top:4px;
+  color:var(--muted);
+  font-size:.43rem;
+  line-height:1.15;
+}
+
+.contract-watch-strip-v3142 > .warning,
+.contract-intel-strip-v3142 > .warning {
+  background:rgba(242,198,109,.035);
+}
+
+.contract-watch-strip-v3142 > .warning strong,
+.contract-intel-strip-v3142 > .warning strong {
+  color:var(--warning);
+}
+
+.contract-watch-footer-compact-v3142 {
+  margin-top:6px;
+}
+
+/* Remove the old large summary-grid footprint when the compact strip is used. */
+.contract-intelligence-panel .contract-intel-strip-v3142 {
+  margin-bottom:9px;
+}
+
+@media (max-width:720px) {
+  .overview-snapshot-grid-v3142 {
+    gap:6px;
+  }
+
+  .overview-snapshot-grid-v3142 .overview-snapshot-item {
+    min-height:68px;
+  }
+
+  .contract-watch-strip-v3142,
+  .contract-intel-strip-v3142 {
+    border-radius:9px;
+  }
+
+  .contract-watch-strip-v3142 > div,
+  .contract-intel-strip-v3142 > div {
+    min-height:58px;
+    padding:6px 4px;
+  }
+
+  .contract-watch-strip-v3142 span,
+  .contract-intel-strip-v3142 span {
+    font-size:.40rem;
+  }
+
+  .contract-watch-strip-v3142 strong,
+  .contract-intel-strip-v3142 strong {
+    font-size:.78rem;
+  }
+
+  .contract-watch-strip-v3142 small,
+  .contract-intel-strip-v3142 small {
+    font-size:.34rem;
+  }
+}
+
+@media (max-width:390px) {
+  .contract-watch-strip-v3142 > div,
+  .contract-intel-strip-v3142 > div {
+    min-height:55px;
+    padding-left:3px;
+    padding-right:3px;
+  }
+
+  .contract-watch-strip-v3142 span,
+  .contract-intel-strip-v3142 span {
+    font-size:.36rem;
+    letter-spacing:.035em;
+  }
+
+  .contract-watch-strip-v3142 strong,
+  .contract-intel-strip-v3142 strong {
+    font-size:.72rem;
+  }
+
+  .contract-watch-strip-v3142 small,
+  .contract-intel-strip-v3142 small {
+    font-size:.31rem;
+  }
+}
+
+
+/* V3.14.2 — IR Team Snapshot -------------------------------------------- */
+
+.overview-snapshot-grid-v3142 .ir-snapshot-v3142 {
+  border-color:rgba(119,201,255,.14);
+}
+
+.overview-snapshot-grid-v3142 .ir-snapshot-v3142 small {
+  white-space:normal;
+  line-height:1.2;
+}
+
+@media (max-width:390px) {
+  .overview-snapshot-grid-v3142 {
+    gap:5px;
+  }
+
+  .overview-snapshot-grid-v3142 .overview-snapshot-item {
+    padding-left:6px;
+    padding-right:6px;
+  }
+
+  .overview-snapshot-grid-v3142 .ir-snapshot-v3142 small {
+    font-size:.31rem;
   }
 }
