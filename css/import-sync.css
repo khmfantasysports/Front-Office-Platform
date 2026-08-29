@@ -1,0 +1,350 @@
+/*
+RosterCap V3.15.0 — Import / Export Sync Review
+
+Additive presentation only.
+Loaded after workspace-dialogs.css.
+*/
+
+
+/* Review summary -------------------------------------------------------- */
+
+#importDialog .import-sync-review-summary-v3150 {
+  margin-bottom:8px;
+}
+
+#importDialog .import-sync-review-summary-v3150 > div {
+  min-height:67px;
+}
+
+
+/* Toolbar --------------------------------------------------------------- */
+
+#importDialog .import-sync-toolbar-v3150 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  margin:10px 0 5px;
+}
+
+#importDialog .import-sync-filters-v3150 {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  overflow-x:auto;
+  padding:1px 0 3px;
+  scrollbar-width:thin;
+}
+
+#importDialog .import-sync-filter-v3150 {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  flex:0 0 auto;
+  min-height:28px;
+  padding:4px 8px;
+  border:1px solid var(--border-soft);
+  border-radius:999px;
+  background:#0A151E;
+  color:#B8C7D2;
+  font:inherit;
+  font-size:.53rem;
+  font-weight:850;
+  cursor:pointer;
+}
+
+#importDialog .import-sync-filter-v3150 strong {
+  display:grid;
+  place-items:center;
+  min-width:18px;
+  min-height:18px;
+  padding:0 4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.045);
+  color:#DCEAF4;
+  font-size:.48rem;
+  font-variant-numeric:tabular-nums;
+}
+
+#importDialog .import-sync-filter-v3150.active {
+  border-color:rgba(50,173,255,.34);
+  background:rgba(50,173,255,.08);
+  color:#D8EEFF;
+}
+
+#importDialog .import-sync-filter-v3150.active strong {
+  background:rgba(50,173,255,.14);
+  color:#BFE4FF;
+}
+
+#importDialog .import-sync-search-v3150 {
+  flex:0 1 270px;
+  min-width:170px;
+}
+
+#importDialog .import-sync-search-v3150 input {
+  width:100%;
+  min-height:31px;
+  padding:6px 9px;
+  border-radius:8px;
+  font-size:.58rem;
+}
+
+#importDialog .import-sync-toolbar-status-v3150 {
+  display:grid;
+  grid-template-columns:auto auto 1fr;
+  align-items:baseline;
+  gap:5px 9px;
+  margin:0 1px 6px;
+}
+
+#importDialog .import-sync-toolbar-status-v3150 strong {
+  color:#DCEAF4;
+  font-size:.68rem;
+}
+
+#importDialog .import-sync-toolbar-status-v3150 span {
+  color:#A8C9DF;
+  font-size:.54rem;
+  font-weight:850;
+}
+
+#importDialog .import-sync-toolbar-status-v3150 small {
+  color:var(--muted);
+  font-size:.52rem;
+  line-height:1.25;
+}
+
+
+/* Full player review ---------------------------------------------------- */
+
+#importDialog .import-review-table-wrap-v3150 {
+  max-height:none !important;
+  overflow:auto;
+  border-radius:10px;
+}
+
+#importDialog .import-review-table-v3150 {
+  min-width:1160px;
+}
+
+#importDialog .import-review-table-v3150 th,
+#importDialog .import-review-table-v3150 td {
+  vertical-align:middle;
+}
+
+#importDialog .import-review-table-v3150 thead th {
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#0B1721;
+  box-shadow:0 1px 0 var(--border-soft);
+}
+
+#importDialog .import-review-table-v3150 tbody tr {
+  transition:
+    opacity .12s ease,
+    background .12s ease;
+}
+
+#importDialog .import-review-table-v3150
+  .import-sync-same-v3150 {
+  opacity:.68;
+}
+
+#importDialog .import-review-table-v3150
+  .import-sync-change-v3150 {
+  background:rgba(50,173,255,.022);
+}
+
+#importDialog .import-review-table-v3150
+  .import-sync-new-v3150 {
+  background:rgba(82,215,194,.022);
+}
+
+#importDialog .import-review-table-v3150
+  .import-sync-issue-v3150 {
+  background:rgba(246,123,123,.035);
+}
+
+#importDialog .import-sync-row-number-v3150 {
+  color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+
+#importDialog .import-sync-player-v3150 {
+  min-width:165px;
+}
+
+#importDialog .import-sync-name-change-v3150 {
+  max-width:220px;
+  white-space:normal;
+}
+
+#importDialog .import-sync-field-change-v3150 {
+  max-width:190px;
+  white-space:normal;
+}
+
+#importDialog .import-sync-field-change-v3150 > span {
+  overflow:hidden;
+  max-width:84px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#importDialog .import-sync-static-v3150 {
+  color:#CFDDE7;
+}
+
+#importDialog .import-sync-subchange-v3150 {
+  display:block;
+  margin-top:2px;
+  max-width:175px;
+  overflow:hidden;
+  color:#A8C9DF;
+  font-size:.47rem;
+  line-height:1.2;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#importDialog .import-sync-summary-v3150 {
+  min-width:135px;
+}
+
+#importDialog .import-sync-check-v3150 {
+  min-width:120px;
+}
+
+#importDialog .import-sync-state-v3150 {
+  display:inline-flex;
+  align-items:center;
+  min-height:20px;
+  padding:2px 6px;
+  border:1px solid var(--border-soft);
+  border-radius:999px;
+  font-size:.49rem;
+  font-weight:900;
+  letter-spacing:.02em;
+  white-space:nowrap;
+}
+
+#importDialog .import-sync-state-v3150.changed {
+  border-color:rgba(50,173,255,.28);
+  background:rgba(50,173,255,.055);
+  color:#A9DCFF;
+}
+
+#importDialog .import-sync-state-v3150.new {
+  border-color:rgba(82,215,194,.28);
+  background:rgba(82,215,194,.05);
+  color:var(--healthy);
+}
+
+#importDialog .import-sync-state-v3150.same {
+  color:#9AAAB6;
+  background:rgba(255,255,255,.018);
+}
+
+#importDialog .import-sync-state-v3150.issue {
+  border-color:rgba(246,123,123,.30);
+  background:rgba(246,123,123,.05);
+  color:#FFB8B8;
+}
+
+#importDialog .import-sync-change-list-v3150 {
+  display:block;
+  margin-top:3px;
+  max-width:190px;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.47rem;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#importDialog .import-sync-empty-v3150 {
+  margin-top:7px;
+  padding:9px 10px;
+  border:1px dashed var(--border-soft);
+  border-radius:9px;
+  color:var(--muted);
+  font-size:.57rem;
+  text-align:center;
+}
+
+#importDialog .import-sync-all-rows-note-v3150 {
+  padding:7px 2px 0;
+  color:var(--muted);
+  font-size:.52rem;
+  text-align:right;
+}
+
+
+/* Export additions ------------------------------------------------------ */
+
+#exportSnapshotBtnV3150,
+#rosterSnapshotExportBtnV3150,
+#settingsSnapshotExportBtnV3150 {
+  white-space:nowrap;
+}
+
+
+@media (max-width:820px) {
+  #importDialog .import-sync-toolbar-v3150 {
+    display:grid;
+    grid-template-columns:1fr;
+  }
+
+  #importDialog .import-sync-search-v3150 {
+    width:100%;
+    min-width:0;
+  }
+
+  #importDialog .import-sync-toolbar-status-v3150 {
+    grid-template-columns:auto auto;
+  }
+
+  #importDialog .import-sync-toolbar-status-v3150 small {
+    grid-column:1 / -1;
+  }
+}
+
+
+@media (max-width:560px) {
+  #importDialog .import-sync-review-summary-v3150 > div {
+    min-height:61px;
+  }
+
+  #importDialog .import-sync-filters-v3150 {
+    margin-right:-2px;
+  }
+
+  #importDialog .import-sync-filter-v3150 {
+    min-height:27px;
+    padding:4px 7px;
+    font-size:.49rem;
+  }
+
+  #importDialog .import-sync-search-v3150 input {
+    min-height:34px;
+    font-size:.56rem;
+  }
+
+  #importDialog .import-review-table-v3150 {
+    min-width:1080px;
+  }
+
+  #importDialog .import-review-table-v3150 th,
+  #importDialog .import-review-table-v3150 td {
+    padding:7px 8px;
+  }
+
+  #importDialog .import-sync-all-rows-note-v3150 {
+    text-align:left;
+  }
+}
