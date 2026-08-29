@@ -1,0 +1,259 @@
+/*
+RosterCap V3.14.3 — IR / IL via Roster Status
+*/
+
+#rosterView .injured-roster-section-v3143 {
+  display:grid;
+  gap:6px;
+  min-width:0;
+  margin-top:8px;
+  padding:8px;
+  border:1px solid rgba(119,201,255,.15);
+  border-radius:11px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15,30,42,.96),
+      rgba(9,20,29,.96)
+    );
+}
+
+#rosterView .injured-roster-head-v3143 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+}
+
+#rosterView .injured-roster-head-v3143 > div {
+  min-width:0;
+}
+
+#rosterView .injured-roster-head-v3143 .eyebrow {
+  margin:0 0 1px;
+}
+
+#rosterView .injured-roster-head-v3143 h4 {
+  margin:0;
+  font-size:.77rem;
+  line-height:1.05;
+}
+
+#rosterView .injured-roster-head-v3143 small {
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:.49rem;
+  line-height:1.2;
+}
+
+#rosterView .injured-roster-head-v3143 > .btn {
+  flex:0 0 auto;
+  min-height:26px;
+  padding:3px 7px;
+  font-size:.49rem;
+}
+
+#rosterView .injured-roster-list-v3143 {
+  overflow:hidden;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:8px;
+  background:#0D1822;
+}
+
+#rosterView .injured-player-row-v3143 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  padding:6px 7px;
+  border-bottom:1px solid rgba(119,201,255,.09);
+}
+
+#rosterView .injured-player-row-v3143:last-child {
+  border-bottom:0;
+}
+
+#rosterView .injured-player-main-v3143 {
+  display:grid;
+  gap:2px;
+  min-width:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+
+#rosterView .injured-player-title-v3143 {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+
+#rosterView .injured-player-title-v3143 strong {
+  overflow:hidden;
+  min-width:0;
+  color:var(--text);
+  font-size:.65rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#rosterView .injured-player-title-v3143 em {
+  flex:0 0 auto;
+  padding:1px 5px;
+  border:1px solid rgba(242,198,109,.18);
+  border-radius:999px;
+  color:#E8CB85;
+  font-size:.39rem;
+  font-style:normal;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+#rosterView .injured-player-main-v3143 > span:not(.injured-player-title-v3143),
+#rosterView .injured-player-main-v3143 > small {
+  display:block;
+  overflow:hidden;
+  max-width:100%;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#rosterView .injured-player-main-v3143 > span:not(.injured-player-title-v3143) {
+  color:var(--muted);
+  font-size:.46rem;
+}
+
+#rosterView .injured-player-main-v3143 > small {
+  color:#B9CBD8;
+  font-size:.45rem;
+  font-weight:700;
+}
+
+#rosterView .injured-activate-btn-v3143 {
+  min-height:29px;
+  padding:3px 8px;
+  font-size:.47rem;
+}
+
+#rosterView .injured-roster-empty-v3143 {
+  display:grid;
+  gap:2px;
+  padding:7px 8px;
+  border:1px dashed rgba(119,201,255,.12);
+  border-radius:8px;
+  background:rgba(255,255,255,.01);
+}
+
+#rosterView .injured-roster-empty-v3143 strong {
+  color:#C8D5DF;
+  font-size:.55rem;
+}
+
+#rosterView .injured-roster-empty-v3143 small {
+  color:var(--muted);
+  font-size:.47rem;
+  line-height:1.25;
+}
+
+
+/* Settings -------------------------------------------------------------- */
+
+#settingsView [data-settings-section="roster-rules"]
+  .status-setting-compact {
+  grid-template-columns:
+    minmax(120px,1fr)
+    minmax(118px,.85fr)
+    minmax(128px,.9fr)
+    auto;
+}
+
+
+/* Move dialog ----------------------------------------------------------- */
+
+.injured-move-dialog-v3143
+  .injured-move-card-v3143 {
+  width:min(440px,calc(100vw - 18px));
+}
+
+.injured-move-body-v3143 {
+  display:grid;
+  gap:9px;
+}
+
+.injured-move-body-v3143 label {
+  display:grid;
+  gap:4px;
+}
+
+.injured-move-note-v3143 {
+  padding:7px 8px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:8px;
+  background:rgba(50,173,255,.025);
+  color:var(--muted);
+  font-size:.53rem;
+  line-height:1.35;
+}
+
+
+@media (max-width:720px) {
+  #rosterView .injured-roster-section-v3143 {
+    margin-top:7px;
+    padding:7px;
+  }
+
+  #rosterView .injured-player-row-v3143 {
+    padding:6px;
+  }
+
+  #settingsView [data-settings-section="roster-rules"]
+    .status-setting-compact {
+    grid-template-columns:1fr;
+  }
+
+  #settingsView [data-settings-section="roster-rules"]
+    .status-setting-compact > button {
+    justify-self:start;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .injured-roster-head-v3143 {
+    gap:5px;
+  }
+
+  #rosterView .injured-roster-head-v3143 small {
+    font-size:.44rem;
+  }
+
+  #rosterView .injured-player-row-v3143 {
+    gap:5px;
+  }
+
+  #rosterView .injured-player-title-v3143 strong {
+    font-size:.61rem;
+  }
+
+  #rosterView .injured-player-main-v3143
+    > span:not(.injured-player-title-v3143),
+  #rosterView .injured-player-main-v3143
+    > small {
+    font-size:.42rem;
+  }
+
+  #rosterView .injured-activate-btn-v3143 {
+    min-height:27px;
+    padding-left:6px;
+    padding-right:6px;
+    font-size:.44rem;
+  }
+}
