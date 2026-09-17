@@ -168,25 +168,30 @@ function currentSeasonControlMarkup(snapshot) {
 }
 
 // -----------------------------------------------------------------------------
-// RosterCap V3.16.0 — Fantrax user-triggered connection preview
+// RosterCap V3.16.1 — Fantrax league selector + read-only roster preview
 //
-// This is intentionally a read-only connection test:
-// - Fantrax is contacted only when the user presses Test Connection.
-// - The User Secret ID is sent only to the authenticated Edge Function request.
-// - This phase does not persist the User Secret ID or modify RosterCap data.
-// - The raw upstream JSON is returned redacted so beta response contracts can be
-//   inspected before permanent connection storage or roster sync is introduced.
+// User-triggered only:
+// - getLeagues runs only when the user presses Test Connection.
+// - getTeamRosters runs only when the user presses Preview Selected Roster.
+// - no polling, scheduler, background refresh or automatic roster writes.
+// - the User Secret ID is never persisted by this frontend.
+// - roster preview is diagnostic only; the established import/apply path remains
+//   authoritative until the API roster contract is explicitly mapped.
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3160 = '3.16.0';
+const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3161 = '3.16.1';
 
-let fantraxConnectionPreviewV3160 = {
+let fantraxConnectionPreviewV3161 = {
   status:'idle',
   data:null,
-  error:''
+  error:'',
+  selectedKey:'',
+  rosterStatus:'idle',
+  rosterData:null,
+  rosterError:''
 };
 
-function fantraxPreviewTechnicalJsonV3160(value) {
+function fantraxPreviewTechnicalJsonV3161(value, limit = 120000) {
   let text = '';
 
   try {
@@ -195,50 +200,236 @@ function fantraxPreviewTechnicalJsonV3160(value) {
     text = String(value ?? '');
   }
 
-  const limit = 50000;
   return text.length > limit
     ? `${text.slice(0, limit)}\n… response truncated in the browser preview …`
     : text;
 }
 
-function fantraxPreviewLeagueRowsV3160(data) {
-  return Array.isArray(data?.leagues)
-    ? data.leagues.filter((league) => league && (league.leagueId || league.leagueName))
-    : [];
+function fantraxCleanDisplayTextV3161(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
-function fantraxPreviewLeagueMarkupV3160(data) {
-  const leagues = fantraxPreviewLeagueRowsV3160(data);
+function fantraxConnectionKeyV3161(connection) {
+  return `${String(connection?.leagueId || '')}::${String(connection?.teamId || '')}`;
+}
 
-  if (!leagues.length) {
-    return `<p class="settings-card-copy">Fantrax responded, but this beta response did not match the league fields RosterCap recognizes yet. Open Technical response below so we can map the exact contract without guessing.</p>`;
+function fantraxNormalizeConnectionV3161(row) {
+  if (!row || typeof row !== 'object') return null;
+
+  const leagueId = String(row.leagueId || '').trim();
+  const teamId = String(row.teamId || '').trim();
+  const leagueName = fantraxCleanDisplayTextV3161(row.leagueName);
+  const teamName = fantraxCleanDisplayTextV3161(row.teamName);
+  const sport = String(row.sport || '').trim().toUpperCase();
+
+  if (!leagueId || !teamId) return null;
+
+  return {
+    leagueId,
+    teamId,
+    leagueName:leagueName || 'Fantrax league',
+    teamName:teamName || 'Owned team',
+    sport
+  };
+}
+
+function fantraxConnectionRowsV3161(data) {
+  const normalized = [];
+
+  if (Array.isArray(data?.connections)) {
+    data.connections.forEach((row) => {
+      const connection = fantraxNormalizeConnectionV3161(row);
+      if (connection) normalized.push(connection);
+    });
   }
 
-  return leagues.map((league) => {
-    const teams = Array.isArray(league.teams) ? league.teams : [];
-    const teamText = teams.length
-      ? teams.map((team) => {
-          const name = team.teamName || 'Owned team';
-          const id = team.teamId ? ` · ${team.teamId}` : '';
-          return `${name}${id}`;
-        }).join(' · ')
-      : 'No owned-team fields recognized';
+  if (!normalized.length && Array.isArray(data?.payload?.leagues)) {
+    data.payload.leagues.forEach((row) => {
+      const connection = fantraxNormalizeConnectionV3161(row);
+      if (connection) normalized.push(connection);
+    });
+  }
 
-    return `<div class="settings-context-strip">
-      <div class="settings-context-item"><span>League</span><strong>${escapeHtml(league.leagueName || 'Fantrax league')}</strong></div>
-      <div class="settings-context-item"><span>League ID</span><strong>${escapeHtml(league.leagueId || '—')}</strong></div>
-      <div class="settings-context-item"><span>Owned team</span><strong>${escapeHtml(teamText)}</strong></div>
-    </div>`;
-  }).join('');
+  const unique = new Map();
+  normalized.forEach((connection) => {
+    unique.set(fantraxConnectionKeyV3161(connection), connection);
+  });
+
+  return [...unique.values()];
 }
 
-function fantraxPreviewResultMarkupV3160() {
-  const preview = fantraxConnectionPreviewV3160;
+function fantraxCurrentSportV3161() {
+  return String(state?.frontOffice?.sport || 'NHL').trim().toUpperCase();
+}
+
+function fantraxSportConnectionsV3161(data = fantraxConnectionPreviewV3161.data) {
+  const sport = fantraxCurrentSportV3161();
+  return fantraxConnectionRowsV3161(data)
+    .filter((connection) => !connection.sport || connection.sport === sport)
+    .sort((a,b) =>
+      a.leagueName.localeCompare(b.leagueName)
+      || a.teamName.localeCompare(b.teamName)
+      || a.leagueId.localeCompare(b.leagueId)
+      || a.teamId.localeCompare(b.teamId)
+    );
+}
+
+function fantraxComparableNameV3161(value) {
+  return fantraxCleanDisplayTextV3161(value).toLowerCase();
+}
+
+function fantraxSuggestedConnectionKeyV3161(connections) {
+  const league = fantraxComparableNameV3161(state?.frontOffice?.leagueName);
+  const team = fantraxComparableNameV3161(state?.frontOffice?.teamName);
+
+  const exact = (connections || []).find((connection) =>
+    fantraxComparableNameV3161(connection.leagueName) === league
+    && fantraxComparableNameV3161(connection.teamName) === team
+  );
+
+  return exact ? fantraxConnectionKeyV3161(exact) : '';
+}
+
+function fantraxSelectedConnectionV3161() {
+  const connections = fantraxSportConnectionsV3161();
+  const selectedKey = fantraxConnectionPreviewV3161.selectedKey;
+  return connections.find((connection) =>
+    fantraxConnectionKeyV3161(connection) === selectedKey
+  ) || null;
+}
+
+function fantraxEnsureSelectionV3161() {
+  const connections = fantraxSportConnectionsV3161();
+
+  if (!connections.length) {
+    fantraxConnectionPreviewV3161.selectedKey = '';
+    return;
+  }
+
+  const current = connections.find((connection) =>
+    fantraxConnectionKeyV3161(connection)
+      === fantraxConnectionPreviewV3161.selectedKey
+  );
+
+  if (current) return;
+
+  fantraxConnectionPreviewV3161.selectedKey =
+    fantraxSuggestedConnectionKeyV3161(connections)
+    || (connections.length === 1
+      ? fantraxConnectionKeyV3161(connections[0])
+      : '');
+}
+
+function fantraxConnectionSelectorMarkupV3161() {
+  const connections = fantraxSportConnectionsV3161();
+  const sport = fantraxCurrentSportV3161();
+
+  if (!connections.length) {
+    return `<div class="settings-health-panel has-warning">
+      <div class="settings-health-head"><div><span>${escapeHtml(sport)} leagues</span><strong>No selectable owned team found</strong></div><span class="settings-health-badge">Review</span></div>
+      <p>Fantrax responded, but no owned ${escapeHtml(sport)} league/team pair was returned for this Front Office sport.</p>
+    </div>`;
+  }
+
+  fantraxEnsureSelectionV3161();
+
+  const suggestedKey = fantraxSuggestedConnectionKeyV3161(connections);
+  const options = connections.map((connection) => {
+    const key = fantraxConnectionKeyV3161(connection);
+    const suggested = key === suggestedKey ? ' · Suggested match' : '';
+    return `<option value="${escapeAttr(key)}" ${key === fantraxConnectionPreviewV3161.selectedKey ? 'selected' : ''}>${escapeHtml(`${connection.leagueName} — ${connection.teamName}${suggested}`)}</option>`;
+  }).join('');
+
+  const selected = fantraxSelectedConnectionV3161();
+
+  return `<div class="settings-health-panel is-good">
+    <div class="settings-health-head">
+      <div><span>${escapeHtml(sport)} leagues</span><strong>${connections.length} owned team${connections.length === 1 ? '' : 's'} available</strong></div>
+      <span class="settings-health-badge">Manual</span>
+    </div>
+    <p>Only leagues matching this Front Office sport are shown. A league can legitimately appear more than once when you own more than one team.</p>
+  </div>
+  <div class="settings-fields">
+    <label>League / owned team
+      <select id="fantraxConnectionSelectV3161">
+        <option value="">Choose a Fantrax league/team…</option>
+        ${options}
+      </select>
+    </label>
+  </div>
+  ${selected ? `<div class="settings-context-strip">
+    <div class="settings-context-item"><span>League</span><strong>${escapeHtml(selected.leagueName)}</strong></div>
+    <div class="settings-context-item"><span>Owned team</span><strong>${escapeHtml(selected.teamName)}</strong></div>
+    <div class="settings-context-item"><span>League ID</span><strong>${escapeHtml(selected.leagueId)}</strong></div>
+    <div class="settings-context-item"><span>Team ID</span><strong>${escapeHtml(selected.teamId)}</strong></div>
+  </div>` : ''}
+  <div class="transaction-rules-footer">
+    <span>Preview Selected Roster calls Fantrax getTeamRosters for this league. It does not save or modify any RosterCap player, contract, cap or asset data.</span>
+    <button id="fantraxPreviewRosterBtnV3161" class="btn btn-primary btn-small" type="button" ${selected ? '' : 'disabled'}>Preview Selected Roster</button>
+  </div>`;
+}
+
+function fantraxRosterResultMarkupV3161() {
+  const preview = fantraxConnectionPreviewV3161;
+
+  if (preview.rosterStatus === 'testing') {
+    return `<div class="settings-health-panel">
+      <div class="settings-health-head"><div><span>Roster preview</span><strong>Contacting Fantrax…</strong></div><span class="settings-health-badge">Manual</span></div>
+      <p>RosterCap is making one user-triggered getTeamRosters request.</p>
+    </div>`;
+  }
+
+  if (preview.rosterStatus === 'error') {
+    return `<div class="settings-health-panel has-warning" role="alert">
+      <div class="settings-health-head"><div><span>Roster preview</span><strong>Could not load roster response</strong></div><span class="settings-health-badge">Review</span></div>
+      <p>${escapeHtml(preview.rosterError || 'Fantrax did not return a usable roster response.')}</p>
+    </div>`;
+  }
+
+  if (preview.rosterStatus !== 'success' || !preview.rosterData) return '';
+
+  const data = preview.rosterData;
+  const selected = fantraxSelectedConnectionV3161();
+  const receivedAt = data.receivedAt
+    ? new Date(data.receivedAt).toLocaleString()
+    : 'Just now';
+  const teamMatches = Array.isArray(data.selectedTeamMatches)
+    ? data.selectedTeamMatches
+    : [];
+  const selectedJson = fantraxPreviewTechnicalJsonV3161(teamMatches, 80000);
+  const rawJson = fantraxPreviewTechnicalJsonV3161(data.payload, 160000);
+
+  return `<div class="settings-health-panel is-good">
+    <div class="settings-health-head">
+      <div><span>Roster preview</span><strong>Fantrax roster response received</strong></div>
+      <span class="settings-health-badge">${escapeHtml(String(data.upstreamStatus || 200))}</span>
+    </div>
+    <p>Response received ${escapeHtml(receivedAt)} for ${escapeHtml(selected?.teamName || data.teamId || 'the selected team')}. No RosterCap roster data was changed.</p>
+  </div>
+  <div class="settings-context-strip">
+    <div class="settings-context-item"><span>Selected-team matches</span><strong>${escapeHtml(String(data.selectedTeamMatchCount ?? teamMatches.length))}</strong></div>
+    <div class="settings-context-item"><span>League ID</span><strong>${escapeHtml(data.leagueId || selected?.leagueId || '—')}</strong></div>
+    <div class="settings-context-item"><span>Team ID</span><strong>${escapeHtml(data.teamId || selected?.teamId || '—')}</strong></div>
+  </div>
+  <details class="advanced-contract" open>
+    <summary>Selected-team response</summary>
+    <p class="settings-card-copy">RosterCap searched the beta response for the selected Fantrax Team ID. This is diagnostic only so the exact roster contract can be mapped before any sync writes are introduced.</p>
+    <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(selectedJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>Full technical roster response</summary>
+    <p class="settings-card-copy">Raw redacted getTeamRosters response. This can be large because Fantrax returns all team rosters for the league.</p>
+    <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(rawJson)}</pre>
+  </details>`;
+}
+
+function fantraxPreviewResultMarkupV3161() {
+  const preview = fantraxConnectionPreviewV3161;
 
   if (preview.status === 'testing') {
     return `<div class="settings-health-panel">
       <div class="settings-health-head"><div><span>Connection test</span><strong>Contacting Fantrax…</strong></div><span class="settings-health-badge">Manual</span></div>
-      <p>RosterCap is making one authenticated, user-triggered request to Fantrax.</p>
+      <p>RosterCap is making one authenticated, user-triggered getLeagues request to Fantrax.</p>
     </div>`;
   }
 
@@ -250,13 +441,13 @@ function fantraxPreviewResultMarkupV3160() {
   }
 
   if (preview.status !== 'success' || !preview.data) {
-    return `<p class="settings-card-copy">Nothing is saved during this preview. Your User Secret ID is cleared from this page after each test.</p>`;
+    return `<p class="settings-card-copy">Nothing is saved during this preview. Your User Secret ID is cleared from this page after each connection test.</p>`;
   }
 
-  const raw = fantraxPreviewTechnicalJsonV3160(preview.data.payload);
   const receivedAt = preview.data.receivedAt
     ? new Date(preview.data.receivedAt).toLocaleString()
     : 'Just now';
+  const leagueJson = fantraxPreviewTechnicalJsonV3161(preview.data.payload, 80000);
 
   return `<div class="settings-health-panel is-good">
     <div class="settings-health-head">
@@ -265,35 +456,36 @@ function fantraxPreviewResultMarkupV3160() {
     </div>
     <p>Response received ${escapeHtml(receivedAt)}. No RosterCap roster data was changed.</p>
   </div>
-  ${fantraxPreviewLeagueMarkupV3160(preview.data)}
+  ${fantraxConnectionSelectorMarkupV3161()}
+  <div id="fantraxRosterResultV3161">${fantraxRosterResultMarkupV3161()}</div>
   <details class="advanced-contract">
-    <summary>Technical response</summary>
-    <p class="settings-card-copy">Temporary beta diagnostic. Sensitive User Secret ID values are redacted by the server before this response reaches the browser.</p>
-    <pre style="max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(raw)}</pre>
+    <summary>Technical league response</summary>
+    <p class="settings-card-copy">Raw redacted getLeagues response. The User Secret ID is not included.</p>
+    <pre style="max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(leagueJson)}</pre>
   </details>`;
 }
 
-function fantraxConnectionMarkupV3160() {
+function fantraxConnectionMarkupV3161() {
   return `<details class="settings-disclosure" data-settings-section="fantrax-connection">
-    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>User-triggered API connection preview</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
+    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Choose a league and preview its roster</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
     <div class="settings-disclosure-body">
-      <p class="settings-card-copy">Test the Fantrax beta API before we save a permanent connection. Fantrax is contacted only when you press Test Connection; there is no polling, scheduler or background sync.</p>
+      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues; Preview Selected Roster then reads the selected league roster. Neither action changes RosterCap data.</p>
       <div class="settings-fields">
         <label>Fantrax User Secret ID
-          <input id="fantraxUserSecretIdV3160" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
+          <input id="fantraxUserSecretIdV3161" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
         </label>
       </div>
       <div class="transaction-rules-footer">
-        <span>This preview calls Fantrax getLeagues through an authenticated Supabase Edge Function. RosterCap does not write the secret to its database in this phase.</span>
-        <button id="fantraxTestConnectionBtnV3160" class="btn btn-primary btn-small" type="button">Test Connection</button>
+        <span>The secret is used only for the manual getLeagues connection test and is not written to the RosterCap database in this phase.</span>
+        <button id="fantraxTestConnectionBtnV3161" class="btn btn-primary btn-small" type="button">Test Connection</button>
       </div>
-      <div id="fantraxConnectionResultV3160">${fantraxPreviewResultMarkupV3160()}</div>
+      <div id="fantraxConnectionResultV3161">${fantraxPreviewResultMarkupV3161()}</div>
     </div>
   </details>`;
 }
 
-async function fantraxPreviewErrorMessageV3160(error) {
-  if (!error) return 'Fantrax connection failed.';
+async function fantraxPreviewErrorMessageV3161(error) {
+  if (!error) return 'Fantrax request failed.';
 
   try {
     const context = error.context;
@@ -307,12 +499,19 @@ async function fantraxPreviewErrorMessageV3160(error) {
     // Fall through to the public Supabase error message.
   }
 
-  return error.message || 'Fantrax connection failed.';
+  return error.message || 'Fantrax request failed.';
 }
 
-async function testFantraxConnectionV3160() {
-  const input = el('fantraxUserSecretIdV3160');
-  const button = el('fantraxTestConnectionBtnV3160');
+function fantraxRenderConnectionResultV3161() {
+  const result = el('fantraxConnectionResultV3161');
+  if (!result) return;
+  result.innerHTML = fantraxPreviewResultMarkupV3161();
+  bindFantraxConnectionResultV3161();
+}
+
+async function testFantraxConnectionV3161() {
+  const input = el('fantraxUserSecretIdV3161');
+  const button = el('fantraxTestConnectionBtnV3161');
   const secret = String(input?.value || '').trim();
 
   if (!secret) {
@@ -326,10 +525,14 @@ async function testFantraxConnectionV3160() {
     return;
   }
 
-  fantraxConnectionPreviewV3160 = {
+  fantraxConnectionPreviewV3161 = {
     status:'testing',
     data:null,
-    error:''
+    error:'',
+    selectedKey:'',
+    rosterStatus:'idle',
+    rosterData:null,
+    rosterError:''
   };
 
   if (button) {
@@ -338,15 +541,16 @@ async function testFantraxConnectionV3160() {
   }
 
   setSettingsSectionFeedback('fantrax-connection', 'saving', 'Testing…');
-
-  const result = el('fantraxConnectionResultV3160');
-  if (result) result.innerHTML = fantraxPreviewResultMarkupV3160();
+  fantraxRenderConnectionResultV3161();
 
   try {
     const { data, error } = await db.functions.invoke(
       'fantrax-connect-preview',
       {
-        body:{ userSecretId:secret }
+        body:{
+          action:'getLeagues',
+          userSecretId:secret
+        }
       }
     );
 
@@ -355,33 +559,26 @@ async function testFantraxConnectionV3160() {
       throw new Error(data?.message || 'Fantrax did not return a successful response.');
     }
 
-    fantraxConnectionPreviewV3160 = {
-      status:'success',
-      data,
-      error:''
-    };
+    fantraxConnectionPreviewV3161.status = 'success';
+    fantraxConnectionPreviewV3161.data = data;
+    fantraxConnectionPreviewV3161.error = '';
+    fantraxEnsureSelectionV3161();
 
     setSettingsSectionFeedback('fantrax-connection', 'saved', 'Connection works');
   } catch (error) {
-    const message = await fantraxPreviewErrorMessageV3160(error);
+    const message = await fantraxPreviewErrorMessageV3161(error);
 
-    fantraxConnectionPreviewV3160 = {
-      status:'error',
-      data:null,
-      error:message
-    };
+    fantraxConnectionPreviewV3161.status = 'error';
+    fantraxConnectionPreviewV3161.data = null;
+    fantraxConnectionPreviewV3161.error = message;
 
     setSettingsSectionFeedback('fantrax-connection', 'error', 'Test failed');
     console.error('Fantrax connection preview failed', error);
   } finally {
     if (input) input.value = '';
+    fantraxRenderConnectionResultV3161();
 
-    const currentResult = el('fantraxConnectionResultV3160');
-    if (currentResult) {
-      currentResult.innerHTML = fantraxPreviewResultMarkupV3160();
-    }
-
-    const currentButton = el('fantraxTestConnectionBtnV3160');
+    const currentButton = el('fantraxTestConnectionBtnV3161');
     if (currentButton) {
       currentButton.disabled = false;
       currentButton.textContent = 'Test Connection';
@@ -389,17 +586,104 @@ async function testFantraxConnectionV3160() {
   }
 }
 
-function bindFantraxConnectionV3160() {
-  const button = el('fantraxTestConnectionBtnV3160');
-  const input = el('fantraxUserSecretIdV3160');
+async function previewFantraxRosterV3161() {
+  const selected = fantraxSelectedConnectionV3161();
+  const button = el('fantraxPreviewRosterBtnV3161');
 
-  button?.addEventListener('click', testFantraxConnectionV3160);
+  if (!selected) {
+    alert('Choose a Fantrax league/team first.');
+    return;
+  }
+
+  if (!session?.user) {
+    alert('Sign in to RosterCap before previewing the Fantrax roster.');
+    return;
+  }
+
+  fantraxConnectionPreviewV3161.rosterStatus = 'testing';
+  fantraxConnectionPreviewV3161.rosterData = null;
+  fantraxConnectionPreviewV3161.rosterError = '';
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Loading Roster…';
+  }
+
+  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Loading roster…');
+  const rosterResult = el('fantraxRosterResultV3161');
+  if (rosterResult) rosterResult.innerHTML = fantraxRosterResultMarkupV3161();
+
+  try {
+    const { data, error } = await db.functions.invoke(
+      'fantrax-connect-preview',
+      {
+        body:{
+          action:'getTeamRosters',
+          leagueId:selected.leagueId,
+          teamId:selected.teamId
+        }
+      }
+    );
+
+    if (error) throw error;
+    if (!data?.ok) {
+      throw new Error(data?.message || 'Fantrax did not return a successful roster response.');
+    }
+
+    fantraxConnectionPreviewV3161.rosterStatus = 'success';
+    fantraxConnectionPreviewV3161.rosterData = data;
+    fantraxConnectionPreviewV3161.rosterError = '';
+    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Roster response works');
+  } catch (error) {
+    const message = await fantraxPreviewErrorMessageV3161(error);
+    fantraxConnectionPreviewV3161.rosterStatus = 'error';
+    fantraxConnectionPreviewV3161.rosterData = null;
+    fantraxConnectionPreviewV3161.rosterError = message;
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Roster preview failed');
+    console.error('Fantrax roster preview failed', error);
+  } finally {
+    const currentRosterResult = el('fantraxRosterResultV3161');
+    if (currentRosterResult) {
+      currentRosterResult.innerHTML = fantraxRosterResultMarkupV3161();
+    }
+
+    const currentButton = el('fantraxPreviewRosterBtnV3161');
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Preview Selected Roster';
+    }
+  }
+}
+
+function bindFantraxConnectionResultV3161() {
+  const select = el('fantraxConnectionSelectV3161');
+  select?.addEventListener('change', () => {
+    fantraxConnectionPreviewV3161.selectedKey = select.value || '';
+    fantraxConnectionPreviewV3161.rosterStatus = 'idle';
+    fantraxConnectionPreviewV3161.rosterData = null;
+    fantraxConnectionPreviewV3161.rosterError = '';
+    fantraxRenderConnectionResultV3161();
+  });
+
+  el('fantraxPreviewRosterBtnV3161')?.addEventListener(
+    'click',
+    previewFantraxRosterV3161
+  );
+}
+
+function bindFantraxConnectionV3161() {
+  const button = el('fantraxTestConnectionBtnV3161');
+  const input = el('fantraxUserSecretIdV3161');
+
+  button?.addEventListener('click', testFantraxConnectionV3161);
 
   input?.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    testFantraxConnectionV3160();
+    testFantraxConnectionV3161();
   });
+
+  bindFantraxConnectionResultV3161();
 }
 
 // League, roster, cap and transaction-rule settings.
@@ -466,13 +750,13 @@ function renderSettings() {
       </div>
     </details>
 
-    ${fantraxConnectionMarkupV3160()}
+    ${fantraxConnectionMarkupV3161()}
 
     <details class="settings-disclosure" data-settings-section="data-export">
       <summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Health, refresh, CSV import and backups</span></span>${settingsFeedbackMarkup('data-export', 'Ready')}</summary>
       <div class="settings-disclosure-body">
         ${settingsDataHealthMarkup(snapshot)}
-        <p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Existing Fantrax / CSV import remains available while the API connection is tested separately above.</p>
+        <p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Existing Fantrax / CSV import remains available while the API league and roster contracts are tested separately above.</p>
         <div class="settings-data-actions"><button id="settingsRefreshBtn" class="btn btn-secondary" type="button">Refresh Front Office</button><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div>
       </div>
     </details>
@@ -491,7 +775,7 @@ function renderSettings() {
 
   restoreOpenSettingsDisclosures();
   bindTeamIdentitySettings();
-  bindFantraxConnectionV3160();
+  bindFantraxConnectionV3161();
 
   el('waiverPenaltyMode').value = state.frontOffice.waiverPenaltyMode || 'NONE';
   el('waiverPenaltyScope').value = state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON';
