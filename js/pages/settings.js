@@ -168,20 +168,20 @@ function currentSeasonControlMarkup(snapshot) {
 }
 
 // -----------------------------------------------------------------------------
-// RosterCap V3.16.5 — Fantrax roster + league-info + player-ID sync preview
+// RosterCap V3.17.0 — Fantrax user-triggered roster sync
 //
 // User-triggered only:
 // - getLeagues runs only when the user presses Test Connection.
-// - getTeamRosters + getLeagueInfo + getPlayerIds run only when the user presses Preview Sync Data.
-// - no polling, scheduler, background refresh or automatic roster writes.
+// - getTeamRosters + getLeagueInfo + getPlayerIds run only when the user presses Sync Now.
+// - no polling, scheduler, background refresh or automatic writes.
 // - the User Secret ID is never persisted by this frontend.
-// - this phase validates player-ID coverage, roster, eligibility, status, salary and league metadata
-//   before the established import/apply path is allowed to write anything.
+// - API data is normalized into the established Import / Sync review.
+// - nothing is saved until the user presses Apply Sync in that review.
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3165 = '3.16.5';
+const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3162 = '3.17.0';
 
-let fantraxConnectionPreviewV3165 = {
+let fantraxConnectionPreviewV3162 = {
   status:'idle',
   data:null,
   error:'',
@@ -191,7 +191,7 @@ let fantraxConnectionPreviewV3165 = {
   rosterError:''
 };
 
-function fantraxPreviewTechnicalJsonV3165(value, limit = 120000) {
+function fantraxPreviewTechnicalJsonV3162(value, limit = 120000) {
   let text = '';
 
   try {
@@ -205,21 +205,21 @@ function fantraxPreviewTechnicalJsonV3165(value, limit = 120000) {
     : text;
 }
 
-function fantraxCleanDisplayTextV3165(value) {
+function fantraxCleanDisplayTextV3162(value) {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
-function fantraxConnectionKeyV3165(connection) {
+function fantraxConnectionKeyV3162(connection) {
   return `${String(connection?.leagueId || '')}::${String(connection?.teamId || '')}`;
 }
 
-function fantraxNormalizeConnectionV3165(row) {
+function fantraxNormalizeConnectionV3162(row) {
   if (!row || typeof row !== 'object') return null;
 
   const leagueId = String(row.leagueId || '').trim();
   const teamId = String(row.teamId || '').trim();
-  const leagueName = fantraxCleanDisplayTextV3165(row.leagueName);
-  const teamName = fantraxCleanDisplayTextV3165(row.teamName);
+  const leagueName = fantraxCleanDisplayTextV3162(row.leagueName);
+  const teamName = fantraxCleanDisplayTextV3162(row.teamName);
   const sport = String(row.sport || '').trim().toUpperCase();
 
   if (!leagueId || !teamId) return null;
@@ -233,38 +233,38 @@ function fantraxNormalizeConnectionV3165(row) {
   };
 }
 
-function fantraxConnectionRowsV3165(data) {
+function fantraxConnectionRowsV3162(data) {
   const normalized = [];
 
   if (Array.isArray(data?.connections)) {
     data.connections.forEach((row) => {
-      const connection = fantraxNormalizeConnectionV3165(row);
+      const connection = fantraxNormalizeConnectionV3162(row);
       if (connection) normalized.push(connection);
     });
   }
 
   if (!normalized.length && Array.isArray(data?.payload?.leagues)) {
     data.payload.leagues.forEach((row) => {
-      const connection = fantraxNormalizeConnectionV3165(row);
+      const connection = fantraxNormalizeConnectionV3162(row);
       if (connection) normalized.push(connection);
     });
   }
 
   const unique = new Map();
   normalized.forEach((connection) => {
-    unique.set(fantraxConnectionKeyV3165(connection), connection);
+    unique.set(fantraxConnectionKeyV3162(connection), connection);
   });
 
   return [...unique.values()];
 }
 
-function fantraxCurrentSportV3165() {
+function fantraxCurrentSportV3162() {
   return String(state?.frontOffice?.sport || 'NHL').trim().toUpperCase();
 }
 
-function fantraxSportConnectionsV3165(data = fantraxConnectionPreviewV3165.data) {
-  const sport = fantraxCurrentSportV3165();
-  return fantraxConnectionRowsV3165(data)
+function fantraxSportConnectionsV3162(data = fantraxConnectionPreviewV3162.data) {
+  const sport = fantraxCurrentSportV3162();
+  return fantraxConnectionRowsV3162(data)
     .filter((connection) => !connection.sport || connection.sport === sport)
     .sort((a,b) =>
       a.leagueName.localeCompare(b.leagueName)
@@ -274,55 +274,55 @@ function fantraxSportConnectionsV3165(data = fantraxConnectionPreviewV3165.data)
     );
 }
 
-function fantraxComparableNameV3165(value) {
-  return fantraxCleanDisplayTextV3165(value).toLowerCase();
+function fantraxComparableNameV3162(value) {
+  return fantraxCleanDisplayTextV3162(value).toLowerCase();
 }
 
-function fantraxSuggestedConnectionKeyV3165(connections) {
-  const league = fantraxComparableNameV3165(state?.frontOffice?.leagueName);
-  const team = fantraxComparableNameV3165(state?.frontOffice?.teamName);
+function fantraxSuggestedConnectionKeyV3162(connections) {
+  const league = fantraxComparableNameV3162(state?.frontOffice?.leagueName);
+  const team = fantraxComparableNameV3162(state?.frontOffice?.teamName);
 
   const exact = (connections || []).find((connection) =>
-    fantraxComparableNameV3165(connection.leagueName) === league
-    && fantraxComparableNameV3165(connection.teamName) === team
+    fantraxComparableNameV3162(connection.leagueName) === league
+    && fantraxComparableNameV3162(connection.teamName) === team
   );
 
-  return exact ? fantraxConnectionKeyV3165(exact) : '';
+  return exact ? fantraxConnectionKeyV3162(exact) : '';
 }
 
-function fantraxSelectedConnectionV3165() {
-  const connections = fantraxSportConnectionsV3165();
-  const selectedKey = fantraxConnectionPreviewV3165.selectedKey;
+function fantraxSelectedConnectionV3162() {
+  const connections = fantraxSportConnectionsV3162();
+  const selectedKey = fantraxConnectionPreviewV3162.selectedKey;
   return connections.find((connection) =>
-    fantraxConnectionKeyV3165(connection) === selectedKey
+    fantraxConnectionKeyV3162(connection) === selectedKey
   ) || null;
 }
 
-function fantraxEnsureSelectionV3165() {
-  const connections = fantraxSportConnectionsV3165();
+function fantraxEnsureSelectionV3162() {
+  const connections = fantraxSportConnectionsV3162();
 
   if (!connections.length) {
-    fantraxConnectionPreviewV3165.selectedKey = '';
+    fantraxConnectionPreviewV3162.selectedKey = '';
     return;
   }
 
   const current = connections.find((connection) =>
-    fantraxConnectionKeyV3165(connection)
-      === fantraxConnectionPreviewV3165.selectedKey
+    fantraxConnectionKeyV3162(connection)
+      === fantraxConnectionPreviewV3162.selectedKey
   );
 
   if (current) return;
 
-  fantraxConnectionPreviewV3165.selectedKey =
-    fantraxSuggestedConnectionKeyV3165(connections)
+  fantraxConnectionPreviewV3162.selectedKey =
+    fantraxSuggestedConnectionKeyV3162(connections)
     || (connections.length === 1
-      ? fantraxConnectionKeyV3165(connections[0])
+      ? fantraxConnectionKeyV3162(connections[0])
       : '');
 }
 
-function fantraxConnectionSelectorMarkupV3165() {
-  const connections = fantraxSportConnectionsV3165();
-  const sport = fantraxCurrentSportV3165();
+function fantraxConnectionSelectorMarkupV3162() {
+  const connections = fantraxSportConnectionsV3162();
+  const sport = fantraxCurrentSportV3162();
 
   if (!connections.length) {
     return `<div class="settings-health-panel has-warning">
@@ -331,16 +331,16 @@ function fantraxConnectionSelectorMarkupV3165() {
     </div>`;
   }
 
-  fantraxEnsureSelectionV3165();
+  fantraxEnsureSelectionV3162();
 
-  const suggestedKey = fantraxSuggestedConnectionKeyV3165(connections);
+  const suggestedKey = fantraxSuggestedConnectionKeyV3162(connections);
   const options = connections.map((connection) => {
-    const key = fantraxConnectionKeyV3165(connection);
+    const key = fantraxConnectionKeyV3162(connection);
     const suggested = key === suggestedKey ? ' · Suggested match' : '';
-    return `<option value="${escapeAttr(key)}" ${key === fantraxConnectionPreviewV3165.selectedKey ? 'selected' : ''}>${escapeHtml(`${connection.leagueName} — ${connection.teamName}${suggested}`)}</option>`;
+    return `<option value="${escapeAttr(key)}" ${key === fantraxConnectionPreviewV3162.selectedKey ? 'selected' : ''}>${escapeHtml(`${connection.leagueName} — ${connection.teamName}${suggested}`)}</option>`;
   }).join('');
 
-  const selected = fantraxSelectedConnectionV3165();
+  const selected = fantraxSelectedConnectionV3162();
 
   return `<div class="settings-health-panel is-good">
     <div class="settings-health-head">
@@ -351,7 +351,7 @@ function fantraxConnectionSelectorMarkupV3165() {
   </div>
   <div class="settings-fields">
     <label>League / owned team
-      <select id="fantraxConnectionSelectV3165">
+      <select id="fantraxConnectionSelectV3162">
         <option value="">Choose a Fantrax league/team…</option>
         ${options}
       </select>
@@ -364,18 +364,18 @@ function fantraxConnectionSelectorMarkupV3165() {
     <div class="settings-context-item"><span>Team ID</span><strong>${escapeHtml(selected.teamId)}</strong></div>
   </div>` : ''}
   <div class="transaction-rules-footer">
-    <span>Preview Sync Data makes three read-only Fantrax calls: getTeamRosters for roster/salary/status, getLeagueInfo for eligibility/settings context, and getPlayerIds for player-ID mapping diagnostics. Nothing is saved to RosterCap.</span>
-    <button id="fantraxPreviewRosterBtnV3165" class="btn btn-primary btn-small" type="button" ${selected ? '' : 'disabled'}>Preview Sync Data</button>
+    <span>Sync Now makes read-only Fantrax calls for the selected roster, eligibility and player IDs, then opens the existing RosterCap review. Nothing is saved until you approve that review.</span>
+    <button id="fantraxPreviewRosterBtnV3162" class="btn btn-primary btn-small" type="button" ${selected ? '' : 'disabled'}>Sync Now</button>
   </div>`;
 }
 
-function fantraxRosterResultMarkupV3165() {
-  const preview = fantraxConnectionPreviewV3165;
+function fantraxRosterResultMarkupV3162() {
+  const preview = fantraxConnectionPreviewV3162;
 
   if (preview.rosterStatus === 'testing') {
     return `<div class="settings-health-panel">
       <div class="settings-health-head"><div><span>Sync preview</span><strong>Contacting Fantrax…</strong></div><span class="settings-health-badge">Manual</span></div>
-      <p>RosterCap is making one user-triggered preview consisting of getTeamRosters + getLeagueInfo + getPlayerIds.</p>
+      <p>RosterCap is loading the selected Fantrax roster, eligibility and player-ID data for the review.</p>
     </div>`;
   }
 
@@ -389,21 +389,16 @@ function fantraxRosterResultMarkupV3165() {
   if (preview.rosterStatus !== 'success' || !preview.rosterData) return '';
 
   const data = preview.rosterData;
-  const selected = fantraxSelectedConnectionV3165();
+  const selected = fantraxSelectedConnectionV3162();
   const receivedAt = data.receivedAt
     ? new Date(data.receivedAt).toLocaleString()
     : 'Just now';
 
   const roster = data.rosterSummary || {};
-  const playerInfoCoverage = data.identitySummary || {};
-  const playerIdsCoverage = data.playerIdsSummary || {};
+  const identity = data.identitySummary || {};
   const statusCounts = roster.statusCounts || {};
-
-  const missingPlayerInfoIds = Array.isArray(playerInfoCoverage.missingPlayerIds)
-    ? playerInfoCoverage.missingPlayerIds
-    : [];
-  const missingPlayerIds = Array.isArray(playerIdsCoverage.missingPlayerIds)
-    ? playerIdsCoverage.missingPlayerIds
+  const missingIds = Array.isArray(identity.missingPlayerIds)
+    ? identity.missingPlayerIds
     : [];
 
   const statusText = Object.entries(statusCounts)
@@ -412,32 +407,20 @@ function fantraxRosterResultMarkupV3165() {
     .join(' · ')
     || 'No roster statuses returned';
 
-  const normalizedRosterJson = fantraxPreviewTechnicalJsonV3165(
+  const normalizedRosterJson = fantraxPreviewTechnicalJsonV3162(
     data.selectedRoster?.rosterItems || [],
     90000
   );
-  const playerInfoMatchesJson = fantraxPreviewTechnicalJsonV3165(
+  const identityJson = fantraxPreviewTechnicalJsonV3162(
     data.identityMatches || [],
     120000
   );
-  const playerInfoSampleJson = fantraxPreviewTechnicalJsonV3165(
+  const playerInfoSampleJson = fantraxPreviewTechnicalJsonV3162(
     data.playerInfoSample || null,
     80000
   );
-  const leagueMetaJson = fantraxPreviewTechnicalJsonV3165(
+  const leagueMetaJson = fantraxPreviewTechnicalJsonV3162(
     data.leagueInfoMeta || null,
-    60000
-  );
-  const playerIdMatchesJson = fantraxPreviewTechnicalJsonV3165(
-    data.playerIdMatches || [],
-    120000
-  );
-  const playerIdsSampleJson = fantraxPreviewTechnicalJsonV3165(
-    data.playerIdsSample || null,
-    90000
-  );
-  const playerIdsMetaJson = fantraxPreviewTechnicalJsonV3165(
-    data.playerIdsMeta || null,
     60000
   );
 
@@ -445,49 +428,31 @@ function fantraxRosterResultMarkupV3165() {
     ? 'Not supplied'
     : (typeof formatMoney === 'function' ? formatMoney(roster.salaryCap) : String(roster.salaryCap));
 
-  const playerIdsTone = playerIdsCoverage.missingCount ? 'has-warning' : 'is-good';
-  const playerInfoTone = playerInfoCoverage.missingCount ? 'has-warning' : 'is-good';
+  const identityTone = identity.missingCount ? 'has-warning' : 'is-good';
 
   return `<div class="settings-health-panel is-good">
     <div class="settings-health-head">
-      <div><span>Sync preview</span><strong>Fantrax roster + league info + player IDs received</strong></div>
+      <div><span>Sync preview</span><strong>Fantrax sync data received</strong></div>
       <span class="settings-health-badge">Read only</span>
     </div>
     <p>Response received ${escapeHtml(receivedAt)} for ${escapeHtml(selected?.teamName || data.teamName || 'the selected team')}. No RosterCap roster, contract, cap or asset data was changed.</p>
   </div>
   <div class="settings-summary-grid settings-summary-grid-roster">
     <div class="settings-summary-item"><span>Roster players</span><strong>${escapeHtml(String(roster.playerCount ?? 0))}</strong></div>
-    <div class="settings-summary-item ${playerIdsTone}"><span>getPlayerIds matches</span><strong>${escapeHtml(`${playerIdsCoverage.matchedCount ?? 0} / ${playerIdsCoverage.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
-    <div class="settings-summary-item ${playerInfoTone}"><span>playerInfo matches</span><strong>${escapeHtml(`${playerInfoCoverage.matchedCount ?? 0} / ${playerInfoCoverage.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
+    <div class="settings-summary-item ${identityTone}"><span>playerInfo matches</span><strong>${escapeHtml(`${identity.matchedCount ?? 0} / ${identity.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
+    <div class="settings-summary-item ${identity.missingCount ? 'warning' : 'good'}"><span>Missing playerInfo</span><strong>${escapeHtml(String(identity.missingCount ?? 0))}</strong></div>
     <div class="settings-summary-item"><span>Fantrax salary cap</span><strong>${escapeHtml(salaryCapText)}</strong></div>
   </div>
   <div class="settings-context-strip">
     <div class="settings-context-item"><span>Roster statuses</span><strong>${escapeHtml(statusText)}</strong></div>
     <div class="settings-context-item"><span>Roster API</span><strong>${escapeHtml(String(data.rosterUpstreamStatus || 200))}</strong></div>
     <div class="settings-context-item"><span>League Info API</span><strong>${escapeHtml(String(data.leagueInfoUpstreamStatus || 200))}</strong></div>
-    <div class="settings-context-item"><span>Player IDs API</span><strong>${escapeHtml(String(data.playerIdsUpstreamStatus || 200))}</strong></div>
   </div>
-  ${missingPlayerIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>getPlayerIds coverage</span><strong>${missingPlayerIds.length} roster player ID${missingPlayerIds.length === 1 ? '' : 's'} not located in getPlayerIds</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingPlayerIds.join(', '))}</p></div>` : ''}
-  ${missingPlayerInfoIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>playerInfo coverage</span><strong>${missingPlayerInfoIds.length} roster player ID${missingPlayerInfoIds.length === 1 ? '' : 's'} not located in getLeagueInfo.playerInfo</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingPlayerInfoIds.join(', '))}</p></div>` : ''}
+  ${missingIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>Identity coverage</span><strong>${missingIds.length} roster player ID${missingIds.length === 1 ? '' : 's'} not located in getLeagueInfo</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingIds.join(', '))}</p></div>` : ''}
   <details class="advanced-contract" open>
-    <summary>getPlayerIds roster matches</summary>
-    <p class="settings-card-copy">Diagnostic matches between selected-roster Fantrax IDs and the sport-level getPlayerIds response. The Fantrax fields are preserved rather than guessed so we can confirm the real identity contract.</p>
-    <pre style="max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerIdMatchesJson)}</pre>
-  </details>
-  <details class="advanced-contract">
-    <summary>getPlayerIds sample</summary>
-    <p class="settings-card-copy">Small unnormalized sample of the getPlayerIds response for this Front Office sport.</p>
-    <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerIdsSampleJson)}</pre>
-  </details>
-  <details class="advanced-contract">
-    <summary>getPlayerIds metadata</summary>
-    <p class="settings-card-copy">Top-level shape of the getPlayerIds response without returning the entire sport player list to the page.</p>
-    <pre style="max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerIdsMetaJson)}</pre>
-  </details>
-  <details class="advanced-contract">
     <summary>League playerInfo matches</summary>
-    <p class="settings-card-copy">Matches between selected-roster Fantrax IDs and getLeagueInfo.playerInfo. This endpoint has confirmed eligibility/status context; it is no longer labeled as full player identity.</p>
-    <pre style="max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerInfoMatchesJson)}</pre>
+    <p class="settings-card-copy">Matches between selected-roster Fantrax IDs and getLeagueInfo.playerInfo. This endpoint supplies eligibility/status context; full player identity comes from getPlayerIds.</p>
+    <pre style="max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(identityJson)}</pre>
   </details>
   <details class="advanced-contract">
     <summary>Normalized selected roster</summary>
@@ -495,8 +460,8 @@ function fantraxRosterResultMarkupV3165() {
     <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(normalizedRosterJson)}</pre>
   </details>
   <details class="advanced-contract">
-    <summary>League playerInfo sample</summary>
-    <p class="settings-card-copy">Small sample of getLeagueInfo.playerInfo. Current evidence shows eligibility and league-status fields; RosterCap does not assume names or real-team data are present here.</p>
+    <summary>playerInfo sample</summary>
+    <p class="settings-card-copy">Small diagnostic sample of Fantrax playerInfo so we can confirm names, real teams and eligibility fields without returning the entire league player pool.</p>
     <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerInfoSampleJson)}</pre>
   </details>
   <details class="advanced-contract">
@@ -506,8 +471,8 @@ function fantraxRosterResultMarkupV3165() {
   </details>`;
 }
 
-function fantraxPreviewResultMarkupV3165() {
-  const preview = fantraxConnectionPreviewV3165;
+function fantraxPreviewResultMarkupV3162() {
+  const preview = fantraxConnectionPreviewV3162;
 
   if (preview.status === 'testing') {
     return `<div class="settings-health-panel">
@@ -530,7 +495,7 @@ function fantraxPreviewResultMarkupV3165() {
   const receivedAt = preview.data.receivedAt
     ? new Date(preview.data.receivedAt).toLocaleString()
     : 'Just now';
-  const leagueJson = fantraxPreviewTechnicalJsonV3165(preview.data.payload, 80000);
+  const leagueJson = fantraxPreviewTechnicalJsonV3162(preview.data.payload, 80000);
 
   return `<div class="settings-health-panel is-good">
     <div class="settings-health-head">
@@ -539,8 +504,8 @@ function fantraxPreviewResultMarkupV3165() {
     </div>
     <p>Response received ${escapeHtml(receivedAt)}. No RosterCap roster data was changed.</p>
   </div>
-  ${fantraxConnectionSelectorMarkupV3165()}
-  <div id="fantraxRosterResultV3165">${fantraxRosterResultMarkupV3165()}</div>
+  ${fantraxConnectionSelectorMarkupV3162()}
+  <div id="fantraxRosterResultV3162">${fantraxRosterResultMarkupV3162()}</div>
   <details class="advanced-contract">
     <summary>Technical league response</summary>
     <p class="settings-card-copy">Raw redacted getLeagues response. The User Secret ID is not included.</p>
@@ -548,26 +513,26 @@ function fantraxPreviewResultMarkupV3165() {
   </details>`;
 }
 
-function fantraxConnectionMarkupV3165() {
+function fantraxConnectionMarkupV3162() {
   return `<details class="settings-disclosure" data-settings-section="fantrax-connection">
-    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Preview roster, salaries and player identity</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
+    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Manual roster and salary sync</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
     <div class="settings-disclosure-body">
-      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues. Preview Sync Data then reads the selected roster, league eligibility/settings context, and sport player-ID mapping so RosterCap can validate the exact API contracts before sync writes are enabled.</p>
+      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues. Sync Now reads the selected roster, eligibility and player IDs, then opens the existing RosterCap review so you can approve every change before anything is saved.</p>
       <div class="settings-fields">
         <label>Fantrax User Secret ID
-          <input id="fantraxUserSecretIdV3165" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
+          <input id="fantraxUserSecretIdV3162" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
         </label>
       </div>
       <div class="transaction-rules-footer">
         <span>The secret is used only for the manual getLeagues connection test and is not written to the RosterCap database in this phase.</span>
-        <button id="fantraxTestConnectionBtnV3165" class="btn btn-primary btn-small" type="button">Test Connection</button>
+        <button id="fantraxTestConnectionBtnV3162" class="btn btn-primary btn-small" type="button">Test Connection</button>
       </div>
-      <div id="fantraxConnectionResultV3165">${fantraxPreviewResultMarkupV3165()}</div>
+      <div id="fantraxConnectionResultV3162">${fantraxPreviewResultMarkupV3162()}</div>
     </div>
   </details>`;
 }
 
-async function fantraxPreviewErrorMessageV3165(error) {
+async function fantraxPreviewErrorMessageV3162(error) {
   if (!error) return 'Fantrax request failed.';
 
   try {
@@ -585,16 +550,16 @@ async function fantraxPreviewErrorMessageV3165(error) {
   return error.message || 'Fantrax request failed.';
 }
 
-function fantraxRenderConnectionResultV3165() {
-  const result = el('fantraxConnectionResultV3165');
+function fantraxRenderConnectionResultV3162() {
+  const result = el('fantraxConnectionResultV3162');
   if (!result) return;
-  result.innerHTML = fantraxPreviewResultMarkupV3165();
-  bindFantraxConnectionResultV3165();
+  result.innerHTML = fantraxPreviewResultMarkupV3162();
+  bindFantraxConnectionResultV3162();
 }
 
-async function testFantraxConnectionV3165() {
-  const input = el('fantraxUserSecretIdV3165');
-  const button = el('fantraxTestConnectionBtnV3165');
+async function testFantraxConnectionV3162() {
+  const input = el('fantraxUserSecretIdV3162');
+  const button = el('fantraxTestConnectionBtnV3162');
   const secret = String(input?.value || '').trim();
 
   if (!secret) {
@@ -608,7 +573,7 @@ async function testFantraxConnectionV3165() {
     return;
   }
 
-  fantraxConnectionPreviewV3165 = {
+  fantraxConnectionPreviewV3162 = {
     status:'testing',
     data:null,
     error:'',
@@ -624,7 +589,7 @@ async function testFantraxConnectionV3165() {
   }
 
   setSettingsSectionFeedback('fantrax-connection', 'saving', 'Testing…');
-  fantraxRenderConnectionResultV3165();
+  fantraxRenderConnectionResultV3162();
 
   try {
     const { data, error } = await db.functions.invoke(
@@ -642,26 +607,26 @@ async function testFantraxConnectionV3165() {
       throw new Error(data?.message || 'Fantrax did not return a successful response.');
     }
 
-    fantraxConnectionPreviewV3165.status = 'success';
-    fantraxConnectionPreviewV3165.data = data;
-    fantraxConnectionPreviewV3165.error = '';
-    fantraxEnsureSelectionV3165();
+    fantraxConnectionPreviewV3162.status = 'success';
+    fantraxConnectionPreviewV3162.data = data;
+    fantraxConnectionPreviewV3162.error = '';
+    fantraxEnsureSelectionV3162();
 
     setSettingsSectionFeedback('fantrax-connection', 'saved', 'Connection works');
   } catch (error) {
-    const message = await fantraxPreviewErrorMessageV3165(error);
+    const message = await fantraxPreviewErrorMessageV3162(error);
 
-    fantraxConnectionPreviewV3165.status = 'error';
-    fantraxConnectionPreviewV3165.data = null;
-    fantraxConnectionPreviewV3165.error = message;
+    fantraxConnectionPreviewV3162.status = 'error';
+    fantraxConnectionPreviewV3162.data = null;
+    fantraxConnectionPreviewV3162.error = message;
 
     setSettingsSectionFeedback('fantrax-connection', 'error', 'Test failed');
     console.error('Fantrax connection preview failed', error);
   } finally {
     if (input) input.value = '';
-    fantraxRenderConnectionResultV3165();
+    fantraxRenderConnectionResultV3162();
 
-    const currentButton = el('fantraxTestConnectionBtnV3165');
+    const currentButton = el('fantraxTestConnectionBtnV3162');
     if (currentButton) {
       currentButton.disabled = false;
       currentButton.textContent = 'Test Connection';
@@ -669,9 +634,9 @@ async function testFantraxConnectionV3165() {
   }
 }
 
-async function previewFantraxRosterV3165() {
-  const selected = fantraxSelectedConnectionV3165();
-  const button = el('fantraxPreviewRosterBtnV3165');
+async function previewFantraxRosterV3162() {
+  const selected = fantraxSelectedConnectionV3162();
+  const button = el('fantraxPreviewRosterBtnV3162');
 
   if (!selected) {
     alert('Choose a Fantrax league/team first.');
@@ -683,18 +648,18 @@ async function previewFantraxRosterV3165() {
     return;
   }
 
-  fantraxConnectionPreviewV3165.rosterStatus = 'testing';
-  fantraxConnectionPreviewV3165.rosterData = null;
-  fantraxConnectionPreviewV3165.rosterError = '';
+  fantraxConnectionPreviewV3162.rosterStatus = 'testing';
+  fantraxConnectionPreviewV3162.rosterData = null;
+  fantraxConnectionPreviewV3162.rosterError = '';
 
   if (button) {
     button.disabled = true;
-    button.textContent = 'Loading Sync Data…';
+    button.textContent = 'Loading Fantrax…';
   }
 
-  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Loading sync data…');
-  const rosterResult = el('fantraxRosterResultV3165');
-  if (rosterResult) rosterResult.innerHTML = fantraxRosterResultMarkupV3165();
+  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Loading Fantrax…');
+  const rosterResult = el('fantraxRosterResultV3162');
+  if (rosterResult) rosterResult.innerHTML = fantraxRosterResultMarkupV3162();
 
   try {
     const { data, error } = await db.functions.invoke(
@@ -705,7 +670,7 @@ async function previewFantraxRosterV3165() {
           leagueId:selected.leagueId,
           teamId:selected.teamId,
           teamName:selected.teamName,
-          sport:selected.sport || fantraxCurrentSportV3165()
+          sport:selected.sport || fantraxCurrentSportV3162()
         }
       }
     );
@@ -715,60 +680,70 @@ async function previewFantraxRosterV3165() {
       throw new Error(data?.message || 'Fantrax did not return successful sync-preview data.');
     }
 
-    fantraxConnectionPreviewV3165.rosterStatus = 'success';
-    fantraxConnectionPreviewV3165.rosterData = data;
-    fantraxConnectionPreviewV3165.rosterError = '';
-    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Sync preview works');
-  } catch (error) {
-    const message = await fantraxPreviewErrorMessageV3165(error);
-    fantraxConnectionPreviewV3165.rosterStatus = 'error';
-    fantraxConnectionPreviewV3165.rosterData = null;
-    fantraxConnectionPreviewV3165.rosterError = message;
-    setSettingsSectionFeedback('fantrax-connection', 'error', 'Sync preview failed');
-    console.error('Fantrax sync preview failed', error);
-  } finally {
-    const currentRosterResult = el('fantraxRosterResultV3165');
-    if (currentRosterResult) {
-      currentRosterResult.innerHTML = fantraxRosterResultMarkupV3165();
+    if (!window.RosterCapFantraxApiSync?.openReview) {
+      throw new Error('The Fantrax sync adapter is not loaded. Refresh RosterCap and try again.');
     }
 
-    const currentButton = el('fantraxPreviewRosterBtnV3165');
+    const review = window.RosterCapFantraxApiSync.openReview(data, selected);
+
+    fantraxConnectionPreviewV3162.rosterStatus = 'success';
+    fantraxConnectionPreviewV3162.rosterData = data;
+    fantraxConnectionPreviewV3162.rosterError = '';
+    setSettingsSectionFeedback(
+      'fantrax-connection',
+      review.issues ? 'saving' : 'saved',
+      review.issues ? `${review.issues} row${review.issues === 1 ? '' : 's'} need review` : 'Review ready'
+    );
+  } catch (error) {
+    const message = await fantraxPreviewErrorMessageV3162(error);
+    fantraxConnectionPreviewV3162.rosterStatus = 'error';
+    fantraxConnectionPreviewV3162.rosterData = null;
+    fantraxConnectionPreviewV3162.rosterError = message;
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Sync failed');
+    console.error('Fantrax sync failed', error);
+  } finally {
+    const currentRosterResult = el('fantraxRosterResultV3162');
+    if (currentRosterResult) {
+      currentRosterResult.innerHTML = fantraxRosterResultMarkupV3162();
+    }
+
+    const currentButton = el('fantraxPreviewRosterBtnV3162');
     if (currentButton) {
       currentButton.disabled = false;
-      currentButton.textContent = 'Preview Sync Data';
+      currentButton.textContent = 'Sync Now';
     }
   }
 }
 
-function bindFantraxConnectionResultV3165() {
-  const select = el('fantraxConnectionSelectV3165');
+function bindFantraxConnectionResultV3162() {
+  const select = el('fantraxConnectionSelectV3162');
   select?.addEventListener('change', () => {
-    fantraxConnectionPreviewV3165.selectedKey = select.value || '';
-    fantraxConnectionPreviewV3165.rosterStatus = 'idle';
-    fantraxConnectionPreviewV3165.rosterData = null;
-    fantraxConnectionPreviewV3165.rosterError = '';
-    fantraxRenderConnectionResultV3165();
+    fantraxConnectionPreviewV3162.selectedKey = select.value || '';
+    fantraxConnectionPreviewV3162.rosterStatus = 'idle';
+    fantraxConnectionPreviewV3162.rosterData = null;
+    fantraxConnectionPreviewV3162.rosterError = '';
+    fantraxRenderConnectionResultV3162();
   });
 
-  el('fantraxPreviewRosterBtnV3165')?.addEventListener(
+  el('fantraxPreviewRosterBtnV3162')?.addEventListener(
     'click',
-    previewFantraxRosterV3165
+    previewFantraxRosterV3162
   );
 }
 
-function bindFantraxConnectionV3165() {
-  const button = el('fantraxTestConnectionBtnV3165');
-  const input = el('fantraxUserSecretIdV3165');
+function bindFantraxConnectionV3162() {
+  const button = el('fantraxTestConnectionBtnV3162');
+  const input = el('fantraxUserSecretIdV3162');
 
-  button?.addEventListener('click', testFantraxConnectionV3165);
+  button?.addEventListener('click', testFantraxConnectionV3162);
 
   input?.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
-    testFantraxConnectionV3165();
+    testFantraxConnectionV3162();
   });
 
-  bindFantraxConnectionResultV3165();
+  bindFantraxConnectionResultV3162();
 }
 
 // League, roster, cap and transaction-rule settings.
@@ -835,7 +810,7 @@ function renderSettings() {
       </div>
     </details>
 
-    ${fantraxConnectionMarkupV3165()}
+    ${fantraxConnectionMarkupV3162()}
 
     <details class="settings-disclosure" data-settings-section="data-export">
       <summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Health, refresh, CSV import and backups</span></span>${settingsFeedbackMarkup('data-export', 'Ready')}</summary>
@@ -860,7 +835,7 @@ function renderSettings() {
 
   restoreOpenSettingsDisclosures();
   bindTeamIdentitySettings();
-  bindFantraxConnectionV3165();
+  bindFantraxConnectionV3162();
 
   el('waiverPenaltyMode').value = state.frontOffice.waiverPenaltyMode || 'NONE';
   el('waiverPenaltyScope').value = state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON';
