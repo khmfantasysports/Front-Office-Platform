@@ -1,592 +1,1188 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
-<title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v3.11.4" name="application-name"/>
-<meta content="RosterCap" name="apple-mobile-web-app-title"/>
-<meta content="#08131D" name="theme-color"/>
-<meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="description"/>
-<link href="https://rostercap.app/" rel="canonical"/>
-<link href="./manifest.webmanifest?v=20260823-v300-brand-domain" rel="manifest"/>
-<link href="./favicon.ico?v=20260823-v300-brand-domain" rel="icon" sizes="any"/>
-<link href="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain" rel="icon" type="image/svg+xml"/>
-<link href="./assets/apple-touch-icon.png?v=20260823-v300-brand-domain" rel="apple-touch-icon" sizes="180x180"/>
-<meta content="website" property="og:type"/>
-<meta content="RosterCap" property="og:site_name"/>
-<meta content="RosterCap — Fantasy Front Office" property="og:title"/>
-<meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." property="og:description"/>
-<meta content="https://rostercap.app/" property="og:url"/>
-<meta content="https://rostercap.app/assets/rostercap-icon-512.png" property="og:image"/>
-<meta content="summary_large_image" name="twitter:card"/>
-<meta content="RosterCap — Fantasy Front Office" name="twitter:title"/>
-<meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="twitter:description"/>
-<meta content="https://rostercap.app/assets/rostercap-icon-512.png" name="twitter:image"/>
-<link href="./css/base.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/shell.css?v=20260821-v286-navigation-polish" rel="stylesheet"/>
-<link href="./css/workspace.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/workspace-shared.css?v=20260823-v2982-left-nav" rel="stylesheet"/>
-<link href="./css/workspace-pages.css?v=20260826-v3113-decision-content-fit" rel="stylesheet"/>
-<link href="./css/workspace-dialogs.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/office-picker.css?v=20260825-v3090-picker-polish" rel="stylesheet"/>
-<link href="./css/depth-chart.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/lineup-configuration.css?v=20260825-v3042-lineup-actions-row" rel="stylesheet"/>
-<link href="./css/assets-landing.css?v=20260824-v3015-google-white" rel="stylesheet"/>
-<link href="./css/asset-manager.css?v=20260820-v270-asset-manager" rel="stylesheet"/>
-<link href="./css/draft-assets-hub.css?v=20260825-v3062-final-polish" rel="stylesheet"/>
-<link href="./css/overview-cap.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/cap-dashboard.css?v=20260828-v3142-ir-dashboard" rel="stylesheet"/>
-<link href="./css/injured-status.css?v=20260828-v3143-injured-status" rel="stylesheet"/>
-<link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
-<link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
-<link href="./css/legal.css?v=20260824-v3018-centered-footer" rel="stylesheet"/>
-</head>
-<body data-rostercap-version="3.11.4">
-<div class="app-shell" id="app">
-<header class="topbar app-menu-bar hidden" id="appHeader">
-<div aria-label="RosterCap" class="brand-lockup">
-<button aria-label="Back to My Front Offices" class="workspace-back-btn hidden" id="workspaceBackBtn" title="My Front Offices" type="button">←</button>
-<div aria-hidden="true" class="brand-mark platform-brand-mark"><img alt="" src="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain"/></div>
-<div class="brand-copy">
-<h1 class="platform-wordmark"><span class="roster">Roster</span><span class="cap">Cap</span></h1>
-<span class="platform-subtitle">Fantasy Front Office</span>
-</div>
-</div>
-<nav aria-label="Front office navigation" class="workspace-nav hidden" id="workspaceNav">
-<button class="nav-tab active" data-view="overview" type="button">Overview</button>
-<button class="nav-tab" data-view="roster" type="button">Roster</button>
-<button class="nav-tab" data-view="farm" type="button">Minors</button>
-<button class="nav-tab" data-view="assets" type="button">Draft &amp; Assets</button>
-<button class="nav-tab" data-view="cap" type="button">Cap</button>
-<button class="nav-tab" data-view="transactions" type="button">Transactions</button>
-<label class="workspace-page-select-shell" for="workspacePageSelect">
-<span class="workspace-page-select-label">Page</span>
-<select aria-label="Workspace page: Overview" id="workspacePageSelect">
-<option disabled="" value="">Pages</option>
-<option value="overview">Overview</option>
-<option value="roster">Roster</option>
-<option value="farm">Minors</option>
-<option value="assets">Draft &amp; Assets</option>
-<option value="cap">Cap</option>
-<option value="transactions">Transactions</option>
-</select>
-</label>
-</nav>
-<div class="topbar-actions hidden" id="topbarActions">
-<span class="cloud-pill" id="cloudStatus">Cloud</span>
-<details class="utility-menu">
-<summary aria-label="Workspace menu" title="Workspace menu">•••</summary>
-<div class="utility-menu-popover">
-<span class="user-email" id="userEmail"></span>
-<span class="utility-menu-section-label">Front Office</span>
-<button class="btn btn-ghost" id="backToOfficesBtn" type="button">My Front Offices</button>
-<button class="btn btn-secondary utility-settings-pill-v286" id="settingsMenuBtn" type="button">
-<span aria-hidden="true" class="utility-settings-icon-v286">⚙</span>
-<span>Settings</span>
-</button>
-<button class="btn btn-secondary" id="exportBtn" type="button">Export CSV</button>
-<button class="btn btn-danger hidden" id="deleteFrontOfficeBtn" type="button">Delete Front Office</button>
-<div class="utility-menu-divider"></div>
-<span class="utility-menu-section-label">Account</span>
-<button class="btn btn-ghost" id="signOutBtn" type="button">Sign out</button>
-<div class="utility-menu-divider"></div>
-<span class="utility-menu-section-label">RosterCap</span>
-<div class="utility-legal-links-v301" aria-label="RosterCap legal links">
-<a href="./privacy/" target="_blank" rel="noopener">Privacy</a>
-<a href="./terms/" target="_blank" rel="noopener">Terms</a>
-<a href="./about/" target="_blank" rel="noopener">About</a>
-</div>
-</div>
-</details>
-</div>
-</header>
-<main>
-<section class="landing-shell landing-shell-v275" id="authGate">
-<div class="landing-hero landing-hero-v275">
-<div class="landing-brand-row-v243">
-<div aria-hidden="true" class="landing-brand-mark-v243"><img alt="" src="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain"/></div>
-<div class="landing-brand-copy-v243">
-<strong class="platform-wordmark landing-wordmark-v243"><span class="roster">Roster</span><span class="cap">Cap</span></strong>
-<span class="landing-brand-subtitle-v243">Fantasy Front Office</span>
-</div>
-</div>
-<div class="landing-kicker">Fantasy roster · contract · cap management</div>
-<h2>Manage your roster, contracts and cap in one place.</h2>
-<p class="landing-lead">RosterCap gives fantasy managers one private workspace for team depth, multi-season contracts, future assets and transaction history.</p>
-</div>
-<div class="landing-feature-panel-v275">
-<p class="eyebrow">Front Office tools</p>
-<div aria-label="RosterCap platform features" class="landing-feature-grid">
-<div class="landing-feature"><span><strong>Roster &amp; Depth</strong><small>Organize active players, depth and minors.</small></span></div>
-<div class="landing-feature"><span><strong>Contracts &amp; Cap</strong><small>Track deals and future cap commitments.</small></span></div>
-<div class="landing-feature"><span><strong>Minors &amp; Assets</strong><small>Manage prospects, picks and future resources.</small></span></div>
-<div class="landing-feature"><span><strong>Transactions</strong><small>Keep a structured history of roster and cap moves.</small></span></div>
-</div>
-</div>
-<div class="landing-signin-card landing-signin-card-v275">
-<p class="eyebrow">Private workspace</p>
-<h3>Access every Front Office from one account.</h3>
-<p>Sign in with Google to open your teams and keep roster, contract and cap changes synced across devices.</p>
-<div class="google-identity-wrap">
-<div aria-label="Continue with Google" id="googleSignInButton"></div>
-</div>
-<p class="landing-legal-notice-v301">By continuing with Google, you agree to the <a href="./terms/">Terms of Use</a> and acknowledge the <a href="./privacy/">Privacy Policy</a>.</p>
-<div class="landing-security"><span class="security-dot"></span><span>Your team data stays private to your authenticated RosterCap account.</span></div>
-<div class="auth-error hidden" id="authError"></div>
-</div>
-</section>
-<section class="office-picker-shell hidden" id="officePicker">
-<div class="office-picker-hero">
-<div>
-<p class="eyebrow">Front Office Hub</p>
-<h2>My Front Offices</h2>
-<p>Open a team to continue managing its roster, contracts, cap and assets, or create a new workspace.</p>
-</div>
-<button class="btn btn-primary office-create-btn" id="newOfficeBtn" type="button">+ New Front Office</button>
-</div>
-<div class="office-picker-summary">
-<span><strong id="officeCountLabel">0</strong> front offices</span>
-<span class="office-picker-sync"><span class="security-dot"></span> Cloud synced</span>
-</div>
-<div class="office-list office-list-v219" id="officeList"></div>
-</section>
-<section aria-labelledby="onboardingTitle" class="panel onboarding-panel hidden" id="onboarding">
-<div class="onboarding-intro">
-<div>
-<span class="setup-badge">New Front Office</span>
-<h2 id="onboardingTitle">Set up the team. We’ll handle the structure.</h2>
-<p class="lead">Add the league essentials now. Roster, contract, cap and management tools will be ready when you open the workspace.</p>
-</div>
-<div aria-label="Front office features" class="feature-list">
-<div class="feature-item"><span class="feature-check">✓</span><span>Seven-season contracts &amp; cap</span></div>
-<div class="feature-item"><span class="feature-check">✓</span><span>Roster, depth chart &amp; minors</span></div>
-<div class="feature-item"><span class="feature-check">✓</span><span>Transactions &amp; asset tracking</span></div>
-</div>
-</div>
-<div class="onboarding-form-wrap">
-<div class="onboarding-form-heading">
-<h3>Create your Front Office</h3>
-<p>Only the essentials are required. Everything can be adjusted later.</p>
-</div>
-<form id="frontOfficeForm">
-<section class="form-section">
-<p class="form-section-title">Team</p>
-<div class="form-grid">
-<label>
-                  Team name
-                  <input id="teamName" name="teamName" placeholder="Red Deer Wolves" required=""/>
-</label>
-<label>
-                  League name
-                  <input id="leagueName" name="leagueName" placeholder="Ice Throne Dynasty" required=""/>
-</label>
-</div>
-</section>
-<section class="form-section">
-<p class="form-section-title">League setup</p>
-<div class="form-grid">
-<label>
-                  Sport
-                  <select id="sport" name="sport">
-<option value="NHL">NHL</option>
-</select>
-</label>
-<label>
-                  Current season
-                  <input id="currentSeason" name="currentSeason" pattern="\d{4}-\d{2}" required="" value="2026-27"/>
-</label>
-<label>
-                  Salary cap
-                  <input aria-label="Salary cap" autocomplete="off" id="salaryCap" inputmode="numeric" name="salaryCap" type="text" value="$119,600,000"/>
-</label>
-<label>
-                  Roster limit
-                  <input id="rosterLimit" min="0" name="rosterLimit" step="1" type="number" value="30"/>
-</label>
-<label>
-                  Minors / secondary roster name
-                  <input id="developmentRosterLabel" maxlength="80" name="developmentRosterLabel" placeholder="Minors" type="text" value="Minors"/>
-</label>
-<label>
-                  Currency
-                  <select id="currency" name="currency">
-<option value="USD">USD</option>
-<option value="CAD">CAD</option>
-</select>
-</label>
-</div>
-</section>
+'use strict';
 
-<section class="form-section position-setup-section-v282" id="positionSetupSection">
-<p class="form-section-title">Player positions</p>
-<div class="position-setup-head-v282">
-<div>
-<strong>Choose the positions this league uses</strong>
-<p>Only selected positions will appear when adding players and in positional Depth. Broad and specific positions can overlap if you choose both.</p>
-</div>
-<span class="position-setup-count-v282" id="positionSetupCount">0 positions selected</span>
-</div>
-<div class="position-setup-options-v282" id="positionSetupOptions"></div>
-</section>
-<div class="form-actions">
-<button class="btn btn-primary" type="submit">Create Front Office</button>
-</div>
-</form>
-</div>
-</section>
-<section class="hidden" id="workspace">
-<section class="workspace-heading">
-<div class="workspace-team-lockup-v231">
-<div class="workspace-team-logo-v231" id="workspaceTeamLogo"><span>FO</span></div>
-<div class="workspace-team-copy-v231">
-<p class="eyebrow" id="leagueLabel"></p>
-<h2 id="teamLabel"></h2>
-</div>
-</div>
-<label class="season-picker">
-            Season
-            <select id="seasonSelect"></select>
-</label>
-</section>
-<section aria-label="Front office summary" class="summary-grid" id="summaryCards"></section>
-<section class="view-panel" id="overviewView"></section>
-<section class="view-panel hidden" id="rosterView"></section>
-<section class="view-panel hidden" id="farmView"></section>
-<section class="view-panel hidden" id="assetsView"></section>
-<section class="view-panel hidden" id="capView"></section>
-<section class="view-panel hidden" id="transactionsView"></section>
-<section class="view-panel hidden" id="settingsView"></section>
-</section>
-</main>
-<footer class="site-legal-footer-v301" aria-label="RosterCap information">
-<div class="site-legal-footer-inner-v301">
-<img class="site-legal-logo-v301" alt="RosterCap" src="./assets/rostercap-mark.svg?v=20260823-v300-brand-domain"/>
-<div class="site-legal-footer-content-v301">
-<nav aria-label="Legal and product information" class="site-legal-nav-v301">
-<a href="./about/">About</a>
-<a href="./privacy/">Privacy</a>
-<a href="./terms/">Terms</a>
-</nav>
-<p>© 2026 KHM Fantasy Sports. RosterCap is an independent fantasy sports management tool.</p>
-</div>
-</div>
-</footer>
-</div>
-<dialog class="drawer-dialog" id="playerDialog">
-<form class="drawer-card" id="playerForm" method="dialog">
-<header class="drawer-header">
-<div class="drawer-header-copy">
-<p class="eyebrow">Roster player</p>
-<h3 id="playerDialogTitle">Add Player</h3>
-</div>
-<button aria-label="Close" class="icon-btn" id="closePlayerDialog" type="button">×</button>
-</header>
-<div class="drawer-body">
-<p class="player-intro" id="playerDialogIntro">Add the player first, then use the quick contract fields for the common salary setup. Advanced year-by-year overrides are optional.</p>
-<div class="player-basics-v18">
-<label class="player-name-field">
-            Player name
-            <input autocomplete="off" id="playerName" required=""/>
-</label>
-<label>
-            Position
-            <select id="playerPosition">
-<option value="C">C</option>
-<option value="LW">LW</option>
-<option value="RW">RW</option>
-<option value="F">F</option>
-<option value="D">D</option>
-<option value="G">G</option>
-</select>
-</label>
-<label>
-            Eligible
-            <input autocomplete="off" id="playerEligible" maxlength="40" placeholder="C,LW"/>
-</label>
-<label>
-            NHL team
-            <input autocomplete="off" id="realTeam" maxlength="8" placeholder="EDM"/>
-</label>
-<label>
-            Age
-            <input id="playerAge" inputmode="numeric" max="100" min="0" placeholder="26" step="1" type="number"/>
-</label>
-<label class="status-field">
-            Roster status
-            <select id="rosterStatus"></select>
-</label>
-<label class="prospect-check-field">
-<span>Player type</span>
-<span class="prospect-check"><input id="playerIsProspect" type="checkbox"/> Prospect</span>
-</label>
-<label>
-            Roster location
-            <select id="playerRosterGroup">
-<option value="ACTIVE">Active roster</option>
-<option value="FARM">Minors</option>
-</select>
-</label>
-</div>
-<section aria-labelledby="quickContractTitle" class="quick-contract">
-<div class="quick-contract-head">
-<div>
-<p class="eyebrow">Contract</p>
-<h4 id="quickContractTitle">Quick contract</h4>
-<p>Best for flat fantasy salaries. You can customize individual years below.</p>
-</div>
-</div>
-<div class="quick-contract-grid quick-contract-grid-v19">
-<label>
-              Starting salary
-              <input id="quickSalary" inputmode="numeric" placeholder="$6,000,000" type="text"/>
-</label>
-<label>
-              Years remaining
-              <input id="contractYearsRemaining" inputmode="numeric" min="1" placeholder="3" step="1" type="number"/>
-</label>
-<label>
-              Annual salary change
-              <select id="salaryChangeMode">
-<option value="same">Same salary</option>
-<option value="increase">Increase each year</option>
-<option value="decrease">Decrease each year</option>
-</select>
-</label>
-<label id="salaryChangePctLabel">
-              Change %
-              <input id="salaryChangePct" inputmode="decimal" max="100" min="0" step="0.01" type="number" value="0"/>
-</label>
-<label class="contract-through-field">
-              Contract through
-              <select id="contractEnd"></select>
-</label>
-<div class="quick-contract-action">
-<button class="btn btn-secondary" id="applyQuickContractBtn" type="button">Generate contract years</button>
-<small>Years remaining includes the current season. Percentage changes compound from the starting salary.</small>
-</div>
-</div>
-<details class="advanced-contract" id="advancedContract">
-<summary>Advanced yearly salaries &amp; cap overrides</summary>
-<p class="advanced-contract-copy">Use this only when salary changes by season or the cap charge differs from salary.</p>
-<div class="contract-grid" id="contractGrid"></div>
-</details>
-</section>
-<section class="player-notes-section">
-<label>
-            Notes
-            <textarea id="playerNotes" placeholder="Optional personal notes" rows="3"></textarea>
-</label>
-</section>
-<section aria-live="polite" class="warning-box hidden" id="playerWarnings"></section>
-</div>
-<footer class="drawer-footer">
-<button class="btn btn-danger hidden" id="deletePlayerBtn" type="button">Remove</button>
-<div class="drawer-footer-right">
-<span aria-live="polite" class="save-status" id="playerSaveStatus"></span>
-<button class="btn btn-ghost" id="cancelPlayerBtn" type="button">Cancel</button>
-<button class="btn btn-primary" id="savePlayerBtn" type="submit">Save Player</button>
-</div>
-</footer>
-</form>
-</dialog>
-<dialog class="modal-dialog" id="importDialog">
-<form class="modal-card" method="dialog">
-<header class="drawer-header">
-<div>
-<p class="eyebrow">Roster import</p>
-<h3>Import CSV</h3>
-</div>
-<button aria-label="Close" class="icon-btn" id="closeImportDialog" type="button">×</button>
-</header>
-<div class="modal-body">
-<p class="muted">RosterCap detects RosterCap backups and Fantrax Team Roster exports for NHL, NFL, NBA and MLB. Fantrax sections, positions, statuses and Minors are mapped for the current Front Office sport. Generic CSV import remains supported.</p>
-<label class="file-drop">
-<span>Select CSV file</span>
-<input accept=".csv,text/csv" id="csvFile" type="file"/>
-</label>
-<label class="import-options">
-<input checked="" id="importSalaryToggle" type="checkbox"/>
-<span>Update current-season salary when Fantrax supplies it<small>If the file has no Salary column, existing salary is preserved. Future salaries, cap overrides, contract end, notes and adjustments are never overwritten by a Fantrax roster import.</small></span>
-</label>
-<div class="import-preview hidden" id="importPreview"></div>
-</div>
-<footer class="drawer-footer">
-<button class="btn btn-ghost" id="cancelImportBtn" type="button">Cancel</button>
-<button class="btn btn-primary" disabled="" id="applyImportBtn" type="button">Apply Import</button>
-</footer>
-</form>
-</dialog>
-<dialog class="modal-dialog asset-dialog" id="assetDialog">
-<form class="modal-card" id="assetForm" method="dialog">
-<header class="drawer-header">
-<div><p class="eyebrow">Front office asset</p><h3 id="assetDialogTitle">Add Asset</h3></div>
-<button aria-label="Close" class="icon-btn" id="closeAssetDialog" type="button">×</button>
-</header>
-<div class="modal-body">
-<div class="form-grid compact">
-<label>Asset type
-            <select id="assetType">
-<option value="DRAFT_PICK">Draft Pick</option>
-<option value="PROSPECT_RIGHTS">Prospect Rights</option>
-<option value="PLAYER_RIGHTS">Player Rights</option>
-<option value="CONDITIONAL_ASSET">Conditional Asset</option>
-<option value="FUTURE_CONSIDERATIONS">Future Considerations</option>
-<option value="OTHER">Other</option>
-</select>
-</label>
-<label>Status
-            <select id="assetStatus">
-<option value="OWNED">Owned</option>
-<option value="CONDITIONAL">Conditional</option>
-<option value="TRADED_AWAY">Traded Away</option>
-<option value="EXPIRED">Expired</option>
-</select>
-</label>
-<label class="full-width">Asset name
-            <input id="assetLabel" placeholder="Optional for draft picks"/>
-</label>
-</div>
-<div class="asset-draft-fields" id="assetDraftFields" style="margin-top:12px">
-<label>Draft year<input id="assetDraftYear" max="2200" min="1900" placeholder="2028" step="1" type="number"/></label>
-<label>Round<input id="assetDraftRound" max="99" min="1" placeholder="1" step="1" type="number"/></label>
-<label>Original team<input id="assetOriginalTeam" placeholder="Fraser Valley"/></label>
-</div>
-<p class="asset-form-note" id="assetFormNote">Draft-pick identity is based on year, round and original team. The original team should never change when the pick is traded.</p>
-<label style="display:grid;gap:6px;margin-top:14px;color:var(--muted);font-size:.82rem;font-weight:700">Notes<textarea id="assetNotes" placeholder="Optional conditions, rights expiry or other details" rows="3"></textarea></label>
-</div>
-<footer class="drawer-footer">
-<button class="btn btn-danger asset-archive-btn hidden" id="archiveAssetBtn" type="button">Remove Asset</button>
-<button class="btn btn-ghost" id="cancelAssetBtn" type="button">Cancel</button>
-<button class="btn btn-primary" id="saveAssetBtn" type="submit">Save Asset</button>
-</footer>
-</form>
-</dialog>
-<dialog class="modal-dialog transaction-dialog" id="transactionDialog">
-<form class="modal-card" id="transactionForm" method="dialog">
-<header class="drawer-header">
-<div><p class="eyebrow">Front office ledger</p><h3 id="transactionDialogTitle">Record transaction</h3></div>
-<button aria-label="Close" class="icon-btn" id="closeTransactionDialog" type="button">×</button>
-</header>
-<div class="modal-body transaction-form-body">
-<div class="form-grid compact">
-<label>Type<select id="transactionType"><option>Trade</option><option>Signing</option><option>Extension</option><option>Call Up</option><option>Send Down</option><option>Waiver</option><option>Buyout</option><option>Release</option><option>Add</option><option>Drop</option><option>Other</option></select></label>
-<label>Date<input id="transactionDate" type="date"/></label>
-<div class="transaction-smart-note full-width" id="transactionTypeHelp"></div><div class="transaction-edit-note full-width hidden" id="transactionEditNotice"></div>
-<label class="full-width" id="transactionCounterpartyField">Counterparty / team<input id="transactionCounterparty" placeholder="Optional"/></label>
-<label id="transactionPlayerField">Player<select id="transactionPlayer"><option value="">None</option></select></label>
-<label id="transactionRosterActionField">Selected player action<select id="transactionRosterAction"><option value="NONE">No roster movement</option><option value="CALL_UP">Call up to active roster</option><option value="SEND_TO_FARM">Send to minors</option><option value="REMOVE">Remove from roster</option></select></label>
-<label id="transactionRosterStatusField">Roster status after move<select id="transactionRosterStatus"><option value="">Keep current status</option></select></label>
-<label class="full-width" id="transactionSummaryField">Summary<input id="transactionSummary" placeholder="Transaction summary" required=""/></label>
-<label class="full-width" id="transactionIncomingField">Incoming items<textarea id="transactionIncoming" placeholder="One player, pick or asset per line" rows="2"></textarea></label>
-<label class="full-width" id="transactionOutgoingField">Outgoing items<textarea id="transactionOutgoing" placeholder="One player, pick or asset per line" rows="2"></textarea></label>
-<label class="full-width">Notes<textarea id="transactionNotes" placeholder="Optional transaction notes" rows="2"></textarea></label>
-</div>
-<section class="trade-structured-section hidden" id="transactionTradeStructuredSection">
-<div class="trade-side-grid">
-<div class="trade-side">
-<div class="trade-side-head"><div><h4>Outgoing</h4><p>Select records currently owned by this Front Office.</p></div></div>
-<div><p class="eyebrow">Players</p><div class="trade-choice-list" id="tradeOutgoingPlayers"></div></div>
-<div><p class="eyebrow">Assets</p><div class="trade-choice-list" id="tradeOutgoingAssets"></div></div>
-</div>
-<div class="trade-side">
-<div class="trade-side-head"><div><h4>Incoming</h4><p>Create acquired players/assets or reacquire a previously traded asset.</p></div></div>
-<div><p class="eyebrow">Tracked assets available to reacquire</p><div class="trade-choice-list" id="tradeIncomingExistingAssets"></div></div>
-<div class="trade-builder-list" id="tradeIncomingPlayers"></div>
-<div class="trade-builder-list" id="tradeIncomingAssets"></div>
-<div class="trade-add-actions"><button class="btn btn-secondary" id="addTradeIncomingPlayerBtn" type="button">+ Incoming Player</button><button class="btn btn-secondary" id="addTradeIncomingAssetBtn" type="button">+ Incoming Asset</button></div>
-</div>
-</div>
-<div class="trade-edit-lock hidden" id="tradeEditLock">Structured trade items are locked while editing because they already changed roster and asset ownership. Delete and recreate the trade to change those items.</div>
-</section>
-<section aria-live="polite" class="transaction-player-snapshot hidden" id="transactionPlayerSnapshot">
-<div class="transaction-player-snapshot-head">
-<div><strong id="transactionPlayerSnapshotName"></strong><span id="transactionPlayerSnapshotMeta"></span></div>
-<span class="transaction-player-snapshot-badge" id="transactionPlayerSnapshotEnd"></span>
-</div>
-<div class="transaction-salary-grid" id="transactionSalaryGrid"></div>
-</section>
-<section class="transaction-financial-section hidden" id="transactionFinancialSection">
-<div><p class="eyebrow">Cap consequence</p><h4 id="transactionFinancialTitle">Financial impact</h4><p class="muted" id="transactionFinancialCopy"></p></div>
-<div class="transaction-rule-preview hidden" id="transactionRulePreview">
-<div class="transaction-rule-preview-head">
-<div><strong id="transactionRulePreviewTitle">Calculated from Settings</strong><span id="transactionRulePreviewCopy"></span></div>
-<button class="btn btn-secondary btn-small" id="recalculateTransactionPenaltyBtn" type="button">Recalculate</button>
-</div>
-</div>
-<div class="form-grid compact transaction-manual-financial-fields" id="transactionManualFinancialFields">
-<label class="full-width"><span class="transaction-dead-cap-label">Dead Cap description</span><input id="transactionAdjustmentDescription" placeholder="Retained salary, buyout penalty, waiver penalty…"/></label>
-</div>
-<div class="transaction-financial-grid" id="transactionFinancialGrid"></div>
-</section>
-</div>
-<footer class="drawer-footer">
-<button class="btn btn-ghost" id="cancelTransactionBtn" type="button">Cancel</button>
-<button class="btn btn-primary" id="saveTransactionBtn" type="submit">Save Transaction</button>
-</footer>
-</form>
-</dialog>
-<script>
-window.__ROSTERCAP_GOOGLE_GIS_READY__ = false;
+let settingsOpenDisclosureKeys = new Set();
+const settingsSectionFeedback = new Map();
 
-/*
- * V3.01.5
- * Keep the existing Google Identity Services / Supabase credential flow.
- * Presentation only: use Google's standard white "outline" pill so the
- * control reads cleanly against RosterCap's dark sign-in card.
- */
-window.__rostercapApplyGoogleWhiteButtonTheme = function () {
-  const identity = window.google?.accounts?.id;
-  if (!identity?.renderButton || identity.__rostercapWhiteThemePatched) return;
+function settingsDisclosureKey(detail) {
+  if (!detail) return '';
+  const explicitKey = detail.dataset?.settingsSection;
+  if (explicitKey) return explicitKey;
+  return (detail.querySelector('summary')?.textContent || '').replace(/\s+/g, ' ').trim();
+}
 
-  const originalRenderButton = identity.renderButton.bind(identity);
-  identity.renderButton = function (container, options) {
-    return originalRenderButton(container, {
-      ...(options || {}),
-      theme: 'outline',
-      shape: 'pill'
+function rememberOpenSettingsDisclosures() {
+  const view = el('settingsView');
+  if (!view) return;
+  const disclosures = [...view.querySelectorAll('details')];
+  if (!disclosures.length) return;
+  settingsOpenDisclosureKeys = new Set(
+    disclosures
+      .filter((detail) => detail.open)
+      .map(settingsDisclosureKey)
+      .filter(Boolean)
+  );
+}
+
+function restoreOpenSettingsDisclosures() {
+  const view = el('settingsView');
+  if (!view) return;
+
+  view.querySelectorAll('details').forEach((detail) => {
+    const key = settingsDisclosureKey(detail);
+    detail.open = Boolean(key && settingsOpenDisclosureKeys.has(key));
+
+    detail.addEventListener('toggle', () => {
+      const currentKey = settingsDisclosureKey(detail);
+      if (!currentKey) return;
+      if (detail.open) settingsOpenDisclosureKeys.add(currentKey);
+      else settingsOpenDisclosureKeys.delete(currentKey);
+    });
+  });
+}
+
+function settingsFeedbackMarkup(sectionKey, idleLabel = 'Auto-save') {
+  const feedback = settingsSectionFeedback.get(sectionKey) || { mode:'idle', label:idleLabel };
+  return `<span class="settings-save-status ${escapeAttr(feedback.mode || 'idle')}" data-settings-save-status="${escapeAttr(sectionKey)}" aria-live="polite">${escapeHtml(feedback.label || idleLabel)}</span>`;
+}
+
+function setSettingsSectionFeedback(sectionKey, mode, label) {
+  settingsSectionFeedback.set(sectionKey, { mode, label });
+  const node = document.querySelector(`[data-settings-save-status="${sectionKey}"]`);
+  if (!node) return;
+  node.className = `settings-save-status ${mode || 'idle'}`;
+  node.textContent = label || '';
+}
+
+async function saveSettingsChange(sectionKey, action, options = {}) {
+  const savingLabel = options.savingLabel || 'Saving…';
+  const successLabel = options.successLabel || 'Saved';
+  const errorLabel = options.errorLabel || 'Save failed';
+
+  setSettingsSectionFeedback(sectionKey, 'saving', savingLabel);
+  const success = await runCloudAction(action);
+  setSettingsSectionFeedback(sectionKey, success ? 'saved' : 'error', success ? successLabel : errorLabel);
+  return success;
+}
+
+function settingsRosterAndCapSnapshot() {
+  const current = currentSeason();
+  const horizon = contractHorizonSeasons();
+  const future = current ? horizon.filter((season) => season.startYear > current.startYear) : [];
+  const active = state.players.filter((player) => (player.rosterGroup || 'ACTIVE') === 'ACTIVE');
+  const minors = state.players.filter((player) => (player.rosterGroup || 'ACTIVE') === 'FARM');
+  const capCountingStatuses = state.statuses.filter((status) => status.countsTowardCap);
+  const currentCalc = current ? calculateSeason(current.id) : null;
+
+  const futureCapsEntered = future.filter((season) => season.salaryCap !== null && season.salaryCap !== undefined).length;
+  const missingFutureCaps = Math.max(0, future.length - futureCapsEntered);
+
+  const futureContractGapPlayers = current ? state.players.filter((player) => {
+    const endSeason = seasonById(player.contractEndSeasonId);
+    if (!endSeason || endSeason.startYear <= current.startYear) return false;
+    return future.some((season) =>
+      season.startYear <= endSeason.startYear &&
+      effectivePlayerCharge(player, season.id) === null
+    );
+  }) : [];
+
+  return {
+    current,
+    horizon,
+    future,
+    active,
+    minors,
+    capCountingStatuses,
+    currentCalc,
+    futureCapsEntered,
+    missingFutureCaps,
+    futureContractGapPlayers
+  };
+}
+
+function settingsLimitDisplay(count, limit) {
+  return limit === null || limit === undefined ? `${count} · no limit` : `${count} / ${limit}`;
+}
+
+function settingsRosterSummaryMarkup(snapshot) {
+  const rosterLimit = state.frontOffice.rosterLimit;
+  const minorsLimit = state.frontOffice.minorsLimit;
+  const activeOver = rosterLimit !== null && rosterLimit !== undefined && snapshot.active.length > rosterLimit;
+  const minorsOver = minorsLimit !== null && minorsLimit !== undefined && snapshot.minors.length > minorsLimit;
+
+  return `<div class="settings-summary-grid settings-summary-grid-roster">
+    <div class="settings-summary-item ${activeOver ? 'warning' : ''}"><span>Active roster</span><strong>${escapeHtml(settingsLimitDisplay(snapshot.active.length, rosterLimit))}</strong></div>
+    <div class="settings-summary-item ${minorsOver ? 'warning' : ''}"><span>Minors</span><strong>${escapeHtml(settingsLimitDisplay(snapshot.minors.length, minorsLimit))}</strong></div>
+    <div class="settings-summary-item"><span>Cap-counting statuses</span><strong>${snapshot.capCountingStatuses.length} / ${state.statuses.length}</strong></div>
+    <div class="settings-summary-item good"><span>Minors cap treatment</span><strong>Excluded</strong></div>
+  </div>`;
+}
+
+function settingsCapSummaryMarkup(snapshot) {
+  const calc = snapshot.currentCalc;
+  const currentCap = calc?.salaryCap === null || calc?.salaryCap === undefined ? 'Not set' : formatMoney(calc.salaryCap);
+  const currentUsed = !calc ? '—' : calc.complete ? formatMoney(calc.capUsed) : `${formatMoney(calc.knownCapUsed)} known`;
+  const capTone = calc && calc.salaryCap !== null && calc.complete && calc.capSpace < 0 ? 'warning' : '';
+
+  return `<div class="settings-summary-grid settings-summary-grid-cap">
+    <div class="settings-summary-item"><span>Current cap</span><strong>${escapeHtml(currentCap)}</strong></div>
+    <div class="settings-summary-item ${capTone}"><span>Current cap used</span><strong>${escapeHtml(currentUsed)}</strong></div>
+    <div class="settings-summary-item"><span>Future caps entered</span><strong>${snapshot.futureCapsEntered} / ${snapshot.future.length}</strong></div>
+    <div class="settings-summary-item ${snapshot.missingFutureCaps ? 'warning' : 'good'}"><span>Future caps missing</span><strong>${snapshot.missingFutureCaps}</strong></div>
+  </div>`;
+}
+
+function settingsDataHealthMarkup(snapshot) {
+  const currentMissing = snapshot.currentCalc?.missingPlayerIds?.length || 0;
+  const futureGapCount = snapshot.futureContractGapPlayers.length;
+  const healthIssueCount = currentMissing + futureGapCount + snapshot.missingFutureCaps;
+  const healthLabel = healthIssueCount ? 'Review recommended' : 'Looks complete';
+
+  return `<section class="settings-health-panel ${healthIssueCount ? 'has-warning' : 'is-good'}" aria-label="Front Office data health">
+    <div class="settings-health-head">
+      <div><span>Data health</span><strong>${escapeHtml(healthLabel)}</strong></div>
+      <span class="settings-health-badge">${state.players.length} players</span>
+    </div>
+    <div class="settings-health-grid">
+      <div><span>Active</span><strong>${snapshot.active.length}</strong></div>
+      <div><span>Minors</span><strong>${snapshot.minors.length}</strong></div>
+      <div class="${currentMissing ? 'warning' : ''}"><span>Missing current salary</span><strong>${currentMissing}</strong></div>
+      <div class="${futureGapCount ? 'warning' : ''}"><span>Future contract gaps</span><strong>${futureGapCount}</strong></div>
+    </div>
+    <p>Current-salary gaps only include players who are eligible to count toward cap. Minors are excluded from cap health.</p>
+  </section>`;
+}
+
+function currentSeasonControlMarkup(snapshot) {
+  const options = [...state.seasons]
+    .sort((a,b) => a.startYear - b.startYear)
+    .map((season) => `<option value="${season.id}" ${season.id === state.frontOffice.currentSeasonId ? 'selected' : ''}>${escapeHtml(seasonLabel(season.startYear))}</option>`)
+    .join('');
+
+  return `<div class="settings-current-season-control">
+    <label>Current season
+      <select id="settingsCurrentSeasonSelect">${options}</select>
+    </label>
+    <button id="setCurrentSeasonBtn" class="btn btn-secondary btn-small" type="button" disabled>Set Current</button>
+    <small>Changes the active season and rolling cap/contract horizon. Historical season data is kept.</small>
+  </div>`;
+}
+
+// -----------------------------------------------------------------------------
+// RosterCap V3.16.5 — Fantrax roster + league-info + player-ID sync preview
+//
+// User-triggered only:
+// - getLeagues runs only when the user presses Test Connection.
+// - getTeamRosters + getLeagueInfo + getPlayerIds run only when the user presses Preview Sync Data.
+// - no polling, scheduler, background refresh or automatic roster writes.
+// - the User Secret ID is never persisted by this frontend.
+// - this phase validates player-ID coverage, roster, eligibility, status, salary and league metadata
+//   before the established import/apply path is allowed to write anything.
+// -----------------------------------------------------------------------------
+
+const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3165 = '3.16.5';
+
+let fantraxConnectionPreviewV3165 = {
+  status:'idle',
+  data:null,
+  error:'',
+  selectedKey:'',
+  rosterStatus:'idle',
+  rosterData:null,
+  rosterError:''
+};
+
+function fantraxPreviewTechnicalJsonV3165(value, limit = 120000) {
+  let text = '';
+
+  try {
+    text = JSON.stringify(value ?? null, null, 2);
+  } catch {
+    text = String(value ?? '');
+  }
+
+  return text.length > limit
+    ? `${text.slice(0, limit)}\n… response truncated in the browser preview …`
+    : text;
+}
+
+function fantraxCleanDisplayTextV3165(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function fantraxConnectionKeyV3165(connection) {
+  return `${String(connection?.leagueId || '')}::${String(connection?.teamId || '')}`;
+}
+
+function fantraxNormalizeConnectionV3165(row) {
+  if (!row || typeof row !== 'object') return null;
+
+  const leagueId = String(row.leagueId || '').trim();
+  const teamId = String(row.teamId || '').trim();
+  const leagueName = fantraxCleanDisplayTextV3165(row.leagueName);
+  const teamName = fantraxCleanDisplayTextV3165(row.teamName);
+  const sport = String(row.sport || '').trim().toUpperCase();
+
+  if (!leagueId || !teamId) return null;
+
+  return {
+    leagueId,
+    teamId,
+    leagueName:leagueName || 'Fantrax league',
+    teamName:teamName || 'Owned team',
+    sport
+  };
+}
+
+function fantraxConnectionRowsV3165(data) {
+  const normalized = [];
+
+  if (Array.isArray(data?.connections)) {
+    data.connections.forEach((row) => {
+      const connection = fantraxNormalizeConnectionV3165(row);
+      if (connection) normalized.push(connection);
+    });
+  }
+
+  if (!normalized.length && Array.isArray(data?.payload?.leagues)) {
+    data.payload.leagues.forEach((row) => {
+      const connection = fantraxNormalizeConnectionV3165(row);
+      if (connection) normalized.push(connection);
+    });
+  }
+
+  const unique = new Map();
+  normalized.forEach((connection) => {
+    unique.set(fantraxConnectionKeyV3165(connection), connection);
+  });
+
+  return [...unique.values()];
+}
+
+function fantraxCurrentSportV3165() {
+  return String(state?.frontOffice?.sport || 'NHL').trim().toUpperCase();
+}
+
+function fantraxSportConnectionsV3165(data = fantraxConnectionPreviewV3165.data) {
+  const sport = fantraxCurrentSportV3165();
+  return fantraxConnectionRowsV3165(data)
+    .filter((connection) => !connection.sport || connection.sport === sport)
+    .sort((a,b) =>
+      a.leagueName.localeCompare(b.leagueName)
+      || a.teamName.localeCompare(b.teamName)
+      || a.leagueId.localeCompare(b.leagueId)
+      || a.teamId.localeCompare(b.teamId)
+    );
+}
+
+function fantraxComparableNameV3165(value) {
+  return fantraxCleanDisplayTextV3165(value).toLowerCase();
+}
+
+function fantraxSuggestedConnectionKeyV3165(connections) {
+  const league = fantraxComparableNameV3165(state?.frontOffice?.leagueName);
+  const team = fantraxComparableNameV3165(state?.frontOffice?.teamName);
+
+  const exact = (connections || []).find((connection) =>
+    fantraxComparableNameV3165(connection.leagueName) === league
+    && fantraxComparableNameV3165(connection.teamName) === team
+  );
+
+  return exact ? fantraxConnectionKeyV3165(exact) : '';
+}
+
+function fantraxSelectedConnectionV3165() {
+  const connections = fantraxSportConnectionsV3165();
+  const selectedKey = fantraxConnectionPreviewV3165.selectedKey;
+  return connections.find((connection) =>
+    fantraxConnectionKeyV3165(connection) === selectedKey
+  ) || null;
+}
+
+function fantraxEnsureSelectionV3165() {
+  const connections = fantraxSportConnectionsV3165();
+
+  if (!connections.length) {
+    fantraxConnectionPreviewV3165.selectedKey = '';
+    return;
+  }
+
+  const current = connections.find((connection) =>
+    fantraxConnectionKeyV3165(connection)
+      === fantraxConnectionPreviewV3165.selectedKey
+  );
+
+  if (current) return;
+
+  fantraxConnectionPreviewV3165.selectedKey =
+    fantraxSuggestedConnectionKeyV3165(connections)
+    || (connections.length === 1
+      ? fantraxConnectionKeyV3165(connections[0])
+      : '');
+}
+
+function fantraxConnectionSelectorMarkupV3165() {
+  const connections = fantraxSportConnectionsV3165();
+  const sport = fantraxCurrentSportV3165();
+
+  if (!connections.length) {
+    return `<div class="settings-health-panel has-warning">
+      <div class="settings-health-head"><div><span>${escapeHtml(sport)} leagues</span><strong>No selectable owned team found</strong></div><span class="settings-health-badge">Review</span></div>
+      <p>Fantrax responded, but no owned ${escapeHtml(sport)} league/team pair was returned for this Front Office sport.</p>
+    </div>`;
+  }
+
+  fantraxEnsureSelectionV3165();
+
+  const suggestedKey = fantraxSuggestedConnectionKeyV3165(connections);
+  const options = connections.map((connection) => {
+    const key = fantraxConnectionKeyV3165(connection);
+    const suggested = key === suggestedKey ? ' · Suggested match' : '';
+    return `<option value="${escapeAttr(key)}" ${key === fantraxConnectionPreviewV3165.selectedKey ? 'selected' : ''}>${escapeHtml(`${connection.leagueName} — ${connection.teamName}${suggested}`)}</option>`;
+  }).join('');
+
+  const selected = fantraxSelectedConnectionV3165();
+
+  return `<div class="settings-health-panel is-good">
+    <div class="settings-health-head">
+      <div><span>${escapeHtml(sport)} leagues</span><strong>${connections.length} owned team${connections.length === 1 ? '' : 's'} available</strong></div>
+      <span class="settings-health-badge">Manual</span>
+    </div>
+    <p>Only leagues matching this Front Office sport are shown. A league can legitimately appear more than once when you own more than one team.</p>
+  </div>
+  <div class="settings-fields">
+    <label>League / owned team
+      <select id="fantraxConnectionSelectV3165">
+        <option value="">Choose a Fantrax league/team…</option>
+        ${options}
+      </select>
+    </label>
+  </div>
+  ${selected ? `<div class="settings-context-strip">
+    <div class="settings-context-item"><span>League</span><strong>${escapeHtml(selected.leagueName)}</strong></div>
+    <div class="settings-context-item"><span>Owned team</span><strong>${escapeHtml(selected.teamName)}</strong></div>
+    <div class="settings-context-item"><span>League ID</span><strong>${escapeHtml(selected.leagueId)}</strong></div>
+    <div class="settings-context-item"><span>Team ID</span><strong>${escapeHtml(selected.teamId)}</strong></div>
+  </div>` : ''}
+  <div class="transaction-rules-footer">
+    <span>Preview Sync Data makes three read-only Fantrax calls: getTeamRosters for roster/salary/status, getLeagueInfo for eligibility/settings context, and getPlayerIds for player-ID mapping diagnostics. Nothing is saved to RosterCap.</span>
+    <button id="fantraxPreviewRosterBtnV3165" class="btn btn-primary btn-small" type="button" ${selected ? '' : 'disabled'}>Preview Sync Data</button>
+  </div>`;
+}
+
+function fantraxRosterResultMarkupV3165() {
+  const preview = fantraxConnectionPreviewV3165;
+
+  if (preview.rosterStatus === 'testing') {
+    return `<div class="settings-health-panel">
+      <div class="settings-health-head"><div><span>Sync preview</span><strong>Contacting Fantrax…</strong></div><span class="settings-health-badge">Manual</span></div>
+      <p>RosterCap is making one user-triggered preview consisting of getTeamRosters + getLeagueInfo + getPlayerIds.</p>
+    </div>`;
+  }
+
+  if (preview.rosterStatus === 'error') {
+    return `<div class="settings-health-panel has-warning" role="alert">
+      <div class="settings-health-head"><div><span>Sync preview</span><strong>Could not load Fantrax sync data</strong></div><span class="settings-health-badge">Review</span></div>
+      <p>${escapeHtml(preview.rosterError || 'Fantrax did not return usable sync data.')}</p>
+    </div>`;
+  }
+
+  if (preview.rosterStatus !== 'success' || !preview.rosterData) return '';
+
+  const data = preview.rosterData;
+  const selected = fantraxSelectedConnectionV3165();
+  const receivedAt = data.receivedAt
+    ? new Date(data.receivedAt).toLocaleString()
+    : 'Just now';
+
+  const roster = data.rosterSummary || {};
+  const playerInfoCoverage = data.identitySummary || {};
+  const playerIdsCoverage = data.playerIdsSummary || {};
+  const statusCounts = roster.statusCounts || {};
+
+  const missingPlayerInfoIds = Array.isArray(playerInfoCoverage.missingPlayerIds)
+    ? playerInfoCoverage.missingPlayerIds
+    : [];
+  const missingPlayerIds = Array.isArray(playerIdsCoverage.missingPlayerIds)
+    ? playerIdsCoverage.missingPlayerIds
+    : [];
+
+  const statusText = Object.entries(statusCounts)
+    .sort((a,b) => String(a[0]).localeCompare(String(b[0])))
+    .map(([key, count]) => `${key} ${count}`)
+    .join(' · ')
+    || 'No roster statuses returned';
+
+  const normalizedRosterJson = fantraxPreviewTechnicalJsonV3165(
+    data.selectedRoster?.rosterItems || [],
+    90000
+  );
+  const playerInfoMatchesJson = fantraxPreviewTechnicalJsonV3165(
+    data.identityMatches || [],
+    120000
+  );
+  const playerInfoSampleJson = fantraxPreviewTechnicalJsonV3165(
+    data.playerInfoSample || null,
+    80000
+  );
+  const leagueMetaJson = fantraxPreviewTechnicalJsonV3165(
+    data.leagueInfoMeta || null,
+    60000
+  );
+  const playerIdMatchesJson = fantraxPreviewTechnicalJsonV3165(
+    data.playerIdMatches || [],
+    120000
+  );
+  const playerIdsSampleJson = fantraxPreviewTechnicalJsonV3165(
+    data.playerIdsSample || null,
+    90000
+  );
+  const playerIdsMetaJson = fantraxPreviewTechnicalJsonV3165(
+    data.playerIdsMeta || null,
+    60000
+  );
+
+  const salaryCapText = roster.salaryCap === null || roster.salaryCap === undefined
+    ? 'Not supplied'
+    : (typeof formatMoney === 'function' ? formatMoney(roster.salaryCap) : String(roster.salaryCap));
+
+  const playerIdsTone = playerIdsCoverage.missingCount ? 'has-warning' : 'is-good';
+  const playerInfoTone = playerInfoCoverage.missingCount ? 'has-warning' : 'is-good';
+
+  return `<div class="settings-health-panel is-good">
+    <div class="settings-health-head">
+      <div><span>Sync preview</span><strong>Fantrax roster + league info + player IDs received</strong></div>
+      <span class="settings-health-badge">Read only</span>
+    </div>
+    <p>Response received ${escapeHtml(receivedAt)} for ${escapeHtml(selected?.teamName || data.teamName || 'the selected team')}. No RosterCap roster, contract, cap or asset data was changed.</p>
+  </div>
+  <div class="settings-summary-grid settings-summary-grid-roster">
+    <div class="settings-summary-item"><span>Roster players</span><strong>${escapeHtml(String(roster.playerCount ?? 0))}</strong></div>
+    <div class="settings-summary-item ${playerIdsTone}"><span>getPlayerIds matches</span><strong>${escapeHtml(`${playerIdsCoverage.matchedCount ?? 0} / ${playerIdsCoverage.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
+    <div class="settings-summary-item ${playerInfoTone}"><span>playerInfo matches</span><strong>${escapeHtml(`${playerInfoCoverage.matchedCount ?? 0} / ${playerInfoCoverage.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
+    <div class="settings-summary-item"><span>Fantrax salary cap</span><strong>${escapeHtml(salaryCapText)}</strong></div>
+  </div>
+  <div class="settings-context-strip">
+    <div class="settings-context-item"><span>Roster statuses</span><strong>${escapeHtml(statusText)}</strong></div>
+    <div class="settings-context-item"><span>Roster API</span><strong>${escapeHtml(String(data.rosterUpstreamStatus || 200))}</strong></div>
+    <div class="settings-context-item"><span>League Info API</span><strong>${escapeHtml(String(data.leagueInfoUpstreamStatus || 200))}</strong></div>
+    <div class="settings-context-item"><span>Player IDs API</span><strong>${escapeHtml(String(data.playerIdsUpstreamStatus || 200))}</strong></div>
+  </div>
+  ${missingPlayerIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>getPlayerIds coverage</span><strong>${missingPlayerIds.length} roster player ID${missingPlayerIds.length === 1 ? '' : 's'} not located in getPlayerIds</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingPlayerIds.join(', '))}</p></div>` : ''}
+  ${missingPlayerInfoIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>playerInfo coverage</span><strong>${missingPlayerInfoIds.length} roster player ID${missingPlayerInfoIds.length === 1 ? '' : 's'} not located in getLeagueInfo.playerInfo</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingPlayerInfoIds.join(', '))}</p></div>` : ''}
+  <details class="advanced-contract" open>
+    <summary>getPlayerIds roster matches</summary>
+    <p class="settings-card-copy">Diagnostic matches between selected-roster Fantrax IDs and the sport-level getPlayerIds response. The Fantrax fields are preserved rather than guessed so we can confirm the real identity contract.</p>
+    <pre style="max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerIdMatchesJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>getPlayerIds sample</summary>
+    <p class="settings-card-copy">Small unnormalized sample of the getPlayerIds response for this Front Office sport.</p>
+    <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerIdsSampleJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>getPlayerIds metadata</summary>
+    <p class="settings-card-copy">Top-level shape of the getPlayerIds response without returning the entire sport player list to the page.</p>
+    <pre style="max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerIdsMetaJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>League playerInfo matches</summary>
+    <p class="settings-card-copy">Matches between selected-roster Fantrax IDs and getLeagueInfo.playerInfo. This endpoint has confirmed eligibility/status context; it is no longer labeled as full player identity.</p>
+    <pre style="max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerInfoMatchesJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>Normalized selected roster</summary>
+    <p class="settings-card-copy">Known roster contract. Salaries are normalized to whole dollars for comparison; zero remains a supplied salary value.</p>
+    <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(normalizedRosterJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>League playerInfo sample</summary>
+    <p class="settings-card-copy">Small sample of getLeagueInfo.playerInfo. Current evidence shows eligibility and league-status fields; RosterCap does not assume names or real-team data are present here.</p>
+    <pre style="max-height:360px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(playerInfoSampleJson)}</pre>
+  </details>
+  <details class="advanced-contract">
+    <summary>League Info metadata</summary>
+    <p class="settings-card-copy">Top-level getLeagueInfo metadata with large nested player data omitted from this browser preview.</p>
+    <pre style="max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(leagueMetaJson)}</pre>
+  </details>`;
+}
+
+function fantraxPreviewResultMarkupV3165() {
+  const preview = fantraxConnectionPreviewV3165;
+
+  if (preview.status === 'testing') {
+    return `<div class="settings-health-panel">
+      <div class="settings-health-head"><div><span>Connection test</span><strong>Contacting Fantrax…</strong></div><span class="settings-health-badge">Manual</span></div>
+      <p>RosterCap is making one authenticated, user-triggered getLeagues request to Fantrax.</p>
+    </div>`;
+  }
+
+  if (preview.status === 'error') {
+    return `<div class="settings-health-panel has-warning" role="alert">
+      <div class="settings-health-head"><div><span>Connection test</span><strong>Could not connect</strong></div><span class="settings-health-badge">Review</span></div>
+      <p>${escapeHtml(preview.error || 'Fantrax did not return a usable response.')}</p>
+    </div>`;
+  }
+
+  if (preview.status !== 'success' || !preview.data) {
+    return `<p class="settings-card-copy">Nothing is saved during this preview. Your User Secret ID is cleared from this page after each connection test.</p>`;
+  }
+
+  const receivedAt = preview.data.receivedAt
+    ? new Date(preview.data.receivedAt).toLocaleString()
+    : 'Just now';
+  const leagueJson = fantraxPreviewTechnicalJsonV3165(preview.data.payload, 80000);
+
+  return `<div class="settings-health-panel is-good">
+    <div class="settings-health-head">
+      <div><span>Connection test</span><strong>Fantrax responded</strong></div>
+      <span class="settings-health-badge">${escapeHtml(String(preview.data.upstreamStatus || 200))}</span>
+    </div>
+    <p>Response received ${escapeHtml(receivedAt)}. No RosterCap roster data was changed.</p>
+  </div>
+  ${fantraxConnectionSelectorMarkupV3165()}
+  <div id="fantraxRosterResultV3165">${fantraxRosterResultMarkupV3165()}</div>
+  <details class="advanced-contract">
+    <summary>Technical league response</summary>
+    <p class="settings-card-copy">Raw redacted getLeagues response. The User Secret ID is not included.</p>
+    <pre style="max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(leagueJson)}</pre>
+  </details>`;
+}
+
+function fantraxConnectionMarkupV3165() {
+  return `<details class="settings-disclosure" data-settings-section="fantrax-connection">
+    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Preview roster, salaries and player identity</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
+    <div class="settings-disclosure-body">
+      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues. Preview Sync Data then reads the selected roster, league eligibility/settings context, and sport player-ID mapping so RosterCap can validate the exact API contracts before sync writes are enabled.</p>
+      <div class="settings-fields">
+        <label>Fantrax User Secret ID
+          <input id="fantraxUserSecretIdV3165" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
+        </label>
+      </div>
+      <div class="transaction-rules-footer">
+        <span>The secret is used only for the manual getLeagues connection test and is not written to the RosterCap database in this phase.</span>
+        <button id="fantraxTestConnectionBtnV3165" class="btn btn-primary btn-small" type="button">Test Connection</button>
+      </div>
+      <div id="fantraxConnectionResultV3165">${fantraxPreviewResultMarkupV3165()}</div>
+    </div>
+  </details>`;
+}
+
+async function fantraxPreviewErrorMessageV3165(error) {
+  if (!error) return 'Fantrax request failed.';
+
+  try {
+    const context = error.context;
+    if (context && typeof context.clone === 'function') {
+      const response = context.clone();
+      const body = await response.json();
+      if (body?.message) return String(body.message);
+      if (body?.error) return String(body.error);
+    }
+  } catch {
+    // Fall through to the public Supabase error message.
+  }
+
+  return error.message || 'Fantrax request failed.';
+}
+
+function fantraxRenderConnectionResultV3165() {
+  const result = el('fantraxConnectionResultV3165');
+  if (!result) return;
+  result.innerHTML = fantraxPreviewResultMarkupV3165();
+  bindFantraxConnectionResultV3165();
+}
+
+async function testFantraxConnectionV3165() {
+  const input = el('fantraxUserSecretIdV3165');
+  const button = el('fantraxTestConnectionBtnV3165');
+  const secret = String(input?.value || '').trim();
+
+  if (!secret) {
+    alert('Enter your Fantrax User Secret ID first.');
+    input?.focus();
+    return;
+  }
+
+  if (!session?.user) {
+    alert('Sign in to RosterCap before testing the Fantrax connection.');
+    return;
+  }
+
+  fantraxConnectionPreviewV3165 = {
+    status:'testing',
+    data:null,
+    error:'',
+    selectedKey:'',
+    rosterStatus:'idle',
+    rosterData:null,
+    rosterError:''
+  };
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Testing…';
+  }
+
+  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Testing…');
+  fantraxRenderConnectionResultV3165();
+
+  try {
+    const { data, error } = await db.functions.invoke(
+      'fantrax-connect-preview',
+      {
+        body:{
+          action:'getLeagues',
+          userSecretId:secret
+        }
+      }
+    );
+
+    if (error) throw error;
+    if (!data?.ok) {
+      throw new Error(data?.message || 'Fantrax did not return a successful response.');
+    }
+
+    fantraxConnectionPreviewV3165.status = 'success';
+    fantraxConnectionPreviewV3165.data = data;
+    fantraxConnectionPreviewV3165.error = '';
+    fantraxEnsureSelectionV3165();
+
+    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Connection works');
+  } catch (error) {
+    const message = await fantraxPreviewErrorMessageV3165(error);
+
+    fantraxConnectionPreviewV3165.status = 'error';
+    fantraxConnectionPreviewV3165.data = null;
+    fantraxConnectionPreviewV3165.error = message;
+
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Test failed');
+    console.error('Fantrax connection preview failed', error);
+  } finally {
+    if (input) input.value = '';
+    fantraxRenderConnectionResultV3165();
+
+    const currentButton = el('fantraxTestConnectionBtnV3165');
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Test Connection';
+    }
+  }
+}
+
+async function previewFantraxRosterV3165() {
+  const selected = fantraxSelectedConnectionV3165();
+  const button = el('fantraxPreviewRosterBtnV3165');
+
+  if (!selected) {
+    alert('Choose a Fantrax league/team first.');
+    return;
+  }
+
+  if (!session?.user) {
+    alert('Sign in to RosterCap before previewing Fantrax sync data.');
+    return;
+  }
+
+  fantraxConnectionPreviewV3165.rosterStatus = 'testing';
+  fantraxConnectionPreviewV3165.rosterData = null;
+  fantraxConnectionPreviewV3165.rosterError = '';
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Loading Sync Data…';
+  }
+
+  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Loading sync data…');
+  const rosterResult = el('fantraxRosterResultV3165');
+  if (rosterResult) rosterResult.innerHTML = fantraxRosterResultMarkupV3165();
+
+  try {
+    const { data, error } = await db.functions.invoke(
+      'fantrax-connect-preview',
+      {
+        body:{
+          action:'getSyncPreview',
+          leagueId:selected.leagueId,
+          teamId:selected.teamId,
+          teamName:selected.teamName,
+          sport:selected.sport || fantraxCurrentSportV3165()
+        }
+      }
+    );
+
+    if (error) throw error;
+    if (!data?.ok) {
+      throw new Error(data?.message || 'Fantrax did not return successful sync-preview data.');
+    }
+
+    fantraxConnectionPreviewV3165.rosterStatus = 'success';
+    fantraxConnectionPreviewV3165.rosterData = data;
+    fantraxConnectionPreviewV3165.rosterError = '';
+    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Sync preview works');
+  } catch (error) {
+    const message = await fantraxPreviewErrorMessageV3165(error);
+    fantraxConnectionPreviewV3165.rosterStatus = 'error';
+    fantraxConnectionPreviewV3165.rosterData = null;
+    fantraxConnectionPreviewV3165.rosterError = message;
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Sync preview failed');
+    console.error('Fantrax sync preview failed', error);
+  } finally {
+    const currentRosterResult = el('fantraxRosterResultV3165');
+    if (currentRosterResult) {
+      currentRosterResult.innerHTML = fantraxRosterResultMarkupV3165();
+    }
+
+    const currentButton = el('fantraxPreviewRosterBtnV3165');
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Preview Sync Data';
+    }
+  }
+}
+
+function bindFantraxConnectionResultV3165() {
+  const select = el('fantraxConnectionSelectV3165');
+  select?.addEventListener('change', () => {
+    fantraxConnectionPreviewV3165.selectedKey = select.value || '';
+    fantraxConnectionPreviewV3165.rosterStatus = 'idle';
+    fantraxConnectionPreviewV3165.rosterData = null;
+    fantraxConnectionPreviewV3165.rosterError = '';
+    fantraxRenderConnectionResultV3165();
+  });
+
+  el('fantraxPreviewRosterBtnV3165')?.addEventListener(
+    'click',
+    previewFantraxRosterV3165
+  );
+}
+
+function bindFantraxConnectionV3165() {
+  const button = el('fantraxTestConnectionBtnV3165');
+  const input = el('fantraxUserSecretIdV3165');
+
+  button?.addEventListener('click', testFantraxConnectionV3165);
+
+  input?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    testFantraxConnectionV3165();
+  });
+
+  bindFantraxConnectionResultV3165();
+}
+
+// League, roster, cap and transaction-rule settings.
+function renderSettings() {
+  rememberOpenSettingsDisclosures();
+  const snapshot = settingsRosterAndCapSnapshot();
+  const horizonSeasons = snapshot.horizon;
+
+  const seasonSettings = horizonSeasons.map((s) => {
+    const stateLabel = s.id === state.frontOffice.currentSeasonId ? 'Current' : (s.salaryCap === null ? 'Unset' : 'Set');
+    return `<div class="compact-cap-row" data-season-setting="${s.id}"><div class="season-name">${seasonLabel(s.startYear)}</div><label><input data-season-cap="${s.id}" type="number" step="1" value="${s.salaryCap ?? ''}" placeholder="Salary cap" /></label><div class="cap-state">${stateLabel}</div></div>`;
+  }).join('');
+
+  const statusSettings = state.statuses.map((s) => `<div class="status-setting-compact" data-status-setting="${s.id}"><input data-status-name="${s.id}" value="${escapeAttr(s.name)}" aria-label="Status name" /><select data-status-cap="${s.id}" aria-label="Cap rule for ${escapeAttr(s.name)}"><option value="true" ${s.countsTowardCap ? 'selected' : ''}>Counts toward cap</option><option value="false" ${!s.countsTowardCap ? 'selected' : ''}>Does not count</option></select><button class="btn btn-ghost btn-small" data-remove-status="${s.id}" type="button">×</button></div>`).join('');
+
+  el('settingsView').innerHTML = `<div class="settings-accordion">
+    ${renderTeamIdentitySettings()}
+
+    <details class="settings-disclosure" data-settings-section="team-league">
+      <summary><span class="settings-disclosure-title"><strong>Team & League</strong><span>Name, roster limits, season and currency</span></span>${settingsFeedbackMarkup('team-league')}</summary>
+      <div class="settings-disclosure-body">
+        <div class="settings-fields">
+          <label>Team name<input data-office-team type="text" value="${escapeAttr(state.frontOffice.teamName)}" /></label>
+          <label>League name<input data-office-league type="text" value="${escapeAttr(state.frontOffice.leagueName)}" /></label>
+          <label>Active roster limit<input data-office-roster-limit type="number" min="0" step="1" value="${state.frontOffice.rosterLimit ?? ''}" /></label>
+          <label>Max Minors spots<input data-office-minors-limit type="number" min="0" step="1" value="${state.frontOffice.minorsLimit ?? ''}" placeholder="No limit" /></label>
+          <label>Currency<input data-office-currency type="text" maxlength="3" value="${escapeAttr(state.frontOffice.currency || 'USD')}" /></label>
+        </div>
+        ${currentSeasonControlMarkup(snapshot)}
+        <div class="settings-context-strip">
+          <div class="settings-context-item"><span>Sport</span><strong>${escapeHtml(state.frontOffice.sport || 'NHL')}</strong></div>
+          <div class="settings-context-item"><span>Current season</span><strong>${escapeHtml(seasonLabel(snapshot.current?.startYear))}</strong></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="settings-disclosure" data-settings-section="roster-rules">
+      <summary><span class="settings-disclosure-title"><strong>Roster Rules</strong><span>Status names and cap treatment</span></span>${settingsFeedbackMarkup('roster-rules')}</summary>
+      <div class="settings-disclosure-body">
+        ${settingsRosterSummaryMarkup(snapshot)}
+        <div class="settings-card-head"><p class="settings-card-copy">Status cap rules apply to Active-roster players. Players in Minors are excluded from cap regardless of roster status.</p><button id="addStatusBtn" class="btn btn-secondary btn-small" type="button">+ Add Status</button></div>
+        <div class="status-settings-list">${statusSettings}</div>
+      </div>
+    </details>
+
+    <details class="settings-disclosure" data-settings-section="salary-caps">
+      <summary><span class="settings-disclosure-title"><strong>Salary Caps</strong><span>Current + six future seasons</span></span>${settingsFeedbackMarkup('salary-caps')}</summary>
+      <div class="settings-disclosure-body">
+        ${settingsCapSummaryMarkup(snapshot)}
+        <p class="settings-card-copy">Leave future caps blank until your league confirms them.</p>
+        <div class="cap-settings-list">${seasonSettings}</div>
+      </div>
+    </details>
+
+    <details class="settings-disclosure" data-settings-section="transaction-rules">
+      <summary><span class="settings-disclosure-title"><strong>Transaction Rules</strong><span>Automate waiver and buyout penalties</span></span>${settingsFeedbackMarkup('transaction-rules', 'Manual save')}</summary>
+      <div class="settings-disclosure-body">
+        <p class="settings-card-copy">These are league settings, not NHL rules. Choose how your league handles each penalty. Full Salary and Half Salary are included as quick options.</p>
+        <div class="transaction-rule-settings">
+          <div class="transaction-rule-card"><div><h4>Waiver penalty</h4><p>Applied automatically when you record a Waiver transaction.</p></div><label>Penalty method<select id="waiverPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="waiverPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="waiverPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="waiverPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
+          <div class="transaction-rule-card"><div><h4>Buyout penalty</h4><p>Applied automatically when you record a Buyout transaction.</p></div><label>Penalty method<select id="buyoutPenaltyMode"><option value="NONE">No automatic penalty</option><option value="FULL_SALARY">Full salary (100%)</option><option value="HALF_SALARY">Half salary (50%)</option><option value="CUSTOM_PERCENT">Custom percentage</option><option value="FLAT_AMOUNT">Flat amount</option></select></label><label>Applies to<select id="buyoutPenaltyScope"><option value="CURRENT_SEASON">Current season only</option><option value="REMAINING_CONTRACT">Remaining contract years</option></select></label><label id="buyoutPenaltyValueWrap" class="transaction-rule-value-wrap">Custom value<input id="buyoutPenaltyValue" type="number" min="0" step="0.01" placeholder="50 or 2000000" /></label></div>
+        </div>
+        <div class="transaction-rules-footer"><span>For Custom Percentage, enter 0–100. For Flat Amount, enter the dollar penalty per affected season.</span><button id="saveTransactionRulesBtn" class="btn btn-primary btn-small" type="button">Save Transaction Rules</button></div>
+      </div>
+    </details>
+
+    ${fantraxConnectionMarkupV3165()}
+
+    <details class="settings-disclosure" data-settings-section="data-export">
+      <summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Health, refresh, CSV import and backups</span></span>${settingsFeedbackMarkup('data-export', 'Ready')}</summary>
+      <div class="settings-disclosure-body">
+        ${settingsDataHealthMarkup(snapshot)}
+        <p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Existing Fantrax / CSV import remains available while the API roster, salary and player-identity contracts are validated separately above.</p>
+        <div class="settings-data-actions"><button id="settingsRefreshBtn" class="btn btn-secondary" type="button">Refresh Front Office</button><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div>
+      </div>
+    </details>
+
+    <details class="settings-disclosure settings-danger-zone" data-settings-section="danger-zone">
+      <summary><span class="settings-disclosure-title"><strong>Danger Zone</strong><span>Permanent Front Office actions</span></span></summary>
+      <div class="settings-disclosure-body settings-danger-zone-body">
+        <div class="settings-danger-copy">
+          <strong>Delete this Front Office</strong>
+          <p>Permanently removes this Front Office and its roster, contracts, assets, transactions and cap history. You will still have to type the team name exactly before deletion is allowed.</p>
+        </div>
+        <button id="settingsDeleteFrontOfficeBtn" class="btn btn-danger settings-danger-button" type="button">Delete Front Office</button>
+      </div>
+    </details>
+  </div>`;
+
+  restoreOpenSettingsDisclosures();
+  bindTeamIdentitySettings();
+  bindFantraxConnectionV3165();
+
+  el('waiverPenaltyMode').value = state.frontOffice.waiverPenaltyMode || 'NONE';
+  el('waiverPenaltyScope').value = state.frontOffice.waiverPenaltyScope || 'CURRENT_SEASON';
+  el('waiverPenaltyValue').value = state.frontOffice.waiverPenaltyValue ?? '';
+  el('buyoutPenaltyMode').value = state.frontOffice.buyoutPenaltyMode || 'NONE';
+  el('buyoutPenaltyScope').value = state.frontOffice.buyoutPenaltyScope || 'REMAINING_CONTRACT';
+  el('buyoutPenaltyValue').value = state.frontOffice.buyoutPenaltyValue ?? '';
+
+  const updatePenaltyValueVisibility = () => {
+    ['waiver','buyout'].forEach((prefix) => {
+      const mode = el(`${prefix}PenaltyMode`).value;
+      const wrap = el(`${prefix}PenaltyValueWrap`);
+      wrap.classList.toggle('hidden', !['CUSTOM_PERCENT','FLAT_AMOUNT'].includes(mode));
+      const input = el(`${prefix}PenaltyValue`);
+      input.placeholder = mode === 'CUSTOM_PERCENT' ? 'e.g. 50' : 'e.g. 2000000';
     });
   };
 
-  identity.__rostercapWhiteThemePatched = true;
-};
+  el('waiverPenaltyMode').addEventListener('change', updatePenaltyValueVisibility);
+  el('buyoutPenaltyMode').addEventListener('change', updatePenaltyValueVisibility);
+  updatePenaltyValueVisibility();
 
-window.__rostercapOnGoogleGISLoad = function () {
-  window.__ROSTERCAP_GOOGLE_GIS_READY__ = true;
-  window.__rostercapApplyGoogleWhiteButtonTheme();
+  el('saveTransactionRulesBtn').addEventListener('click', saveTransactionRuleSettings);
 
-  if (typeof window.initializeGoogleIdentity === 'function') {
-    window.initializeGoogleIdentity();
-  } else if (typeof initializeGoogleIdentity === 'function') {
-    initializeGoogleIdentity();
+  document.querySelectorAll('[data-office-team]').forEach((input) => input.addEventListener('change', async () => {
+    const value = input.value.trim() || state.frontOffice.teamName;
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.from('front_offices').update({ team_name:value }).eq('front_office_id', state.frontOffice.id);
+      if (error) throw error;
+      state.frontOffice.teamName = value;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-office-league]').forEach((input) => input.addEventListener('change', async () => {
+    const value = input.value.trim() || state.frontOffice.leagueName;
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.from('front_offices').update({ league_name:value }).eq('front_office_id', state.frontOffice.id);
+      if (error) throw error;
+      state.frontOffice.leagueName = value;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-office-roster-limit]').forEach((input) => input.addEventListener('change', async () => {
+    const value = nullableInteger(input.value);
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.from('front_offices').update({ roster_limit:value }).eq('front_office_id', state.frontOffice.id);
+      if (error) throw error;
+      state.frontOffice.rosterLimit = value;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-office-minors-limit]').forEach((input) => input.addEventListener('change', async () => {
+    const value = nullableInteger(input.value);
+    if (String(input.value).trim() !== '' && value === null) {
+      alert('Max Minors spots must be a whole number of 0 or greater.');
+      render();
+      return;
+    }
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.from('front_offices').update({ minors_limit:value }).eq('front_office_id', state.frontOffice.id);
+      if (error) throw error;
+      state.frontOffice.minorsLimit = value;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-office-currency]').forEach((input) => input.addEventListener('change', async () => {
+    const value = input.value.trim().toUpperCase();
+    if (!/^[A-Z]{3}$/.test(value)) {
+      alert('Currency must use a three-letter code such as USD or CAD.');
+      render();
+      return;
+    }
+    const success = await saveSettingsChange('team-league', async () => {
+      const { error } = await db.from('front_offices').update({ currency_code:value }).eq('front_office_id', state.frontOffice.id);
+      if (error) throw error;
+      state.frontOffice.currency = value;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-season-cap]').forEach((input) => input.addEventListener('change', async () => {
+    const value = nullableNumber(input.value);
+    const success = await saveSettingsChange('salary-caps', async () => {
+      const { error } = await db.from('front_office_seasons').update({ salary_cap:value }).eq('front_office_id', state.frontOffice.id).eq('front_office_season_id', input.dataset.seasonCap);
+      if (error) throw error;
+      seasonById(input.dataset.seasonCap).salaryCap = value;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-status-name]').forEach((input) => input.addEventListener('change', async () => {
+    const name = input.value.trim() || 'Status';
+    const success = await saveSettingsChange('roster-rules', async () => {
+      const { error } = await db.from('front_office_roster_statuses').update({ status_name:name }).eq('front_office_id', state.frontOffice.id).eq('roster_status_id', input.dataset.statusName);
+      if (error) throw error;
+      statusById(input.dataset.statusName).name = name;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-status-cap]').forEach((select) => select.addEventListener('change', async () => {
+    const counts = select.value === 'true';
+    const success = await saveSettingsChange('roster-rules', async () => {
+      const { error } = await db.from('front_office_roster_statuses').update({ counts_toward_cap:counts }).eq('front_office_id', state.frontOffice.id).eq('roster_status_id', select.dataset.statusCap);
+      if (error) throw error;
+      statusById(select.dataset.statusCap).countsTowardCap = counts;
+    });
+    if (success) render();
+  }));
+
+  document.querySelectorAll('[data-remove-status]').forEach((button) => button.addEventListener('click', () => removeStatus(button.dataset.removeStatus)));
+  el('addStatusBtn').addEventListener('click', addStatus);
+
+  const currentSeasonSelect = el('settingsCurrentSeasonSelect');
+  const setCurrentSeasonBtn = el('setCurrentSeasonBtn');
+  currentSeasonSelect.addEventListener('change', () => {
+    setCurrentSeasonBtn.disabled = currentSeasonSelect.value === state.frontOffice.currentSeasonId;
+  });
+  setCurrentSeasonBtn.addEventListener('click', setCurrentSeasonFromSettings);
+
+  el('settingsRefreshBtn').addEventListener('click', refreshCurrentFrontOfficeData);
+  el('settingsImportBtn').addEventListener('click', openImportDialog);
+  el('settingsExportBtn').addEventListener('click', exportRosterCsv);
+  el('settingsDeleteFrontOfficeBtn').addEventListener('click', deleteFrontOfficeFromSettings);
+}
+
+async function setCurrentSeasonFromSettings() {
+  const seasonId = el('settingsCurrentSeasonSelect')?.value;
+  const season = seasonById(seasonId);
+  if (!season || seasonId === state.frontOffice.currentSeasonId) return;
+
+  const confirmed = confirm(`Set ${seasonLabel(season.startYear)} as the current season?\n\nThis changes the active cap and contract-planning horizon. Existing historical season data is kept.`);
+  if (!confirmed) {
+    renderSettings();
+    return;
   }
-};
-</script>
-<script async defer src="https://accounts.google.com/gsi/client" onload="window.__rostercapOnGoogleGISLoad()"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="./js/core.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/utils.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/domain.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/data.js?v=20260824-v3015-google-white"></script>
-<script src="./js/features/cap-dashboard.js?v=20260828-v3142-ir-dashboard"></script>
-<script src="./js/pages/overview.js?v=20260828-v3143-injured-status"></script>
-<script src="./js/features/depth-chart.js?v=20260821-v285-position-editor"></script>
-<script src="./js/pages/roster.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/features/player-editor.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/features/import.js?v=20260823-v2991-superflex"></script>
-<script src="./js/pages/minors.js?v=20260824-v3017-minors-expiry-badge-cleanup"></script>
-<script src="./js/pages/assets.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/features/asset-manager.js?v=20260820-v270-asset-manager"></script>
-<script src="./js/pages/transactions.js?v=20260828-v3138-player-meta"></script>
-<script src="./js/features/transaction-contracts.js?v=20260822-v2961-contract-percentage"></script>
-<script src="./js/features/draft-assets-hub.js?v=20260825-v3062-final-polish"></script>
-<script src="./js/pages/cap.js?v=20260828-v3142-ir-dashboard"></script>
-<script src="./js/pages/settings.js?v=20260919-v3165-fantrax-playerids-preview"></script>
-<script src="./js/features/sport-foundation.js?v=20260823-v299-multisport-csv"></script>
-<script src="./js/features/lineup-configuration.js?v=20260823-v2991-superflex"></script>
-<script src="./js/features/injured-status.js?v=20260828-v3143-injured-status"></script>
-<script src="./js/features/office-picker.js?v=20260822-v295-logo-cache"></script>
-<script src="./js/features/season-rollover.js?v=20260820-v267-season-rollover"></script>
-<script src="./js/app.js?v=20260826-v3114-penalty-semantics"></script>
-</body>
-</html>
+
+  const button = el('setCurrentSeasonBtn');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Setting…';
+  }
+
+  const frontOfficeId = state.frontOffice.id;
+  const success = await saveSettingsChange('team-league', async () => {
+    const { error } = await db.rpc('set_current_front_office_season_v2', {
+      p_front_office_id: frontOfficeId,
+      p_front_office_season_id: seasonId
+    });
+    if (error) throw error;
+    await loadOffice(frontOfficeId, false);
+    if (state.frontOffice?.currentSeasonId !== seasonId) {
+      throw new Error('The current season was saved, but the Front Office did not reload the new season correctly.');
+    }
+  }, { savingLabel:'Changing season…', successLabel:'Season updated' });
+
+  if (!success && el('setCurrentSeasonBtn')) {
+    el('setCurrentSeasonBtn').disabled = false;
+    el('setCurrentSeasonBtn').textContent = 'Set Current';
+  }
+}
+
+async function refreshCurrentFrontOfficeData() {
+  const frontOfficeId = state.frontOffice?.id;
+  const button = el('settingsRefreshBtn');
+  if (!frontOfficeId || !button || button.disabled) return;
+
+  button.disabled = true;
+  button.textContent = 'Refreshing…';
+  setCloudStatus('Refreshing…', 'busy');
+  setSettingsSectionFeedback('data-export', 'saving', 'Refreshing…');
+
+  try {
+    await loadOffice(frontOfficeId, false);
+    if (el('cloudStatus')?.classList.contains('error')) {
+      setSettingsSectionFeedback('data-export', 'error', 'Refresh failed');
+      return;
+    }
+    setSettingsSectionFeedback('data-export', 'saved', 'Refreshed');
+  } catch (error) {
+    console.error('Front Office refresh failed', error);
+    setCloudStatus('Refresh error', 'error');
+    setSettingsSectionFeedback('data-export', 'error', 'Refresh failed');
+    alert(error?.message || 'Unable to refresh Front Office data.');
+  } finally {
+    const currentButton = el('settingsRefreshBtn');
+    if (currentButton) {
+      currentButton.disabled = false;
+      currentButton.textContent = 'Refresh Front Office';
+    }
+  }
+}
+
+async function deleteFrontOfficeFromSettings() {
+  const button = el('settingsDeleteFrontOfficeBtn');
+  if (!button || button.disabled) return;
+  button.disabled = true;
+  try {
+    await deleteCurrentFrontOffice();
+  } finally {
+    const currentButton = el('settingsDeleteFrontOfficeBtn');
+    if (currentButton) currentButton.disabled = false;
+  }
+}
+
+async function saveTransactionRuleSettings() {
+  const waiverMode = el('waiverPenaltyMode').value;
+  const waiverScope = el('waiverPenaltyScope').value;
+  const waiverValue = ['CUSTOM_PERCENT','FLAT_AMOUNT'].includes(waiverMode) ? nullableNumber(el('waiverPenaltyValue').value) : null;
+  const buyoutMode = el('buyoutPenaltyMode').value;
+  const buyoutScope = el('buyoutPenaltyScope').value;
+  const buyoutValue = ['CUSTOM_PERCENT','FLAT_AMOUNT'].includes(buyoutMode) ? nullableNumber(el('buyoutPenaltyValue').value) : null;
+
+  if (waiverMode === 'CUSTOM_PERCENT' && (waiverValue === null || waiverValue < 0 || waiverValue > 100)) { alert('Waiver custom percentage must be between 0 and 100.'); return; }
+  if (buyoutMode === 'CUSTOM_PERCENT' && (buyoutValue === null || buyoutValue < 0 || buyoutValue > 100)) { alert('Buyout custom percentage must be between 0 and 100.'); return; }
+  if (waiverMode === 'FLAT_AMOUNT' && (waiverValue === null || waiverValue < 0)) { alert('Enter a valid waiver flat amount.'); return; }
+  if (buyoutMode === 'FLAT_AMOUNT' && (buyoutValue === null || buyoutValue < 0)) { alert('Enter a valid buyout flat amount.'); return; }
+
+  const button = el('saveTransactionRulesBtn');
+  button.disabled = true;
+  button.textContent = 'Saving…';
+
+  try {
+    const success = await saveSettingsChange('transaction-rules', async () => {
+      const payload = {
+        waiver_penalty_mode:waiverMode,
+        waiver_penalty_value:waiverValue,
+        waiver_penalty_scope:waiverScope,
+        buyout_penalty_mode:buyoutMode,
+        buyout_penalty_value:buyoutValue,
+        buyout_penalty_scope:buyoutScope
+      };
+      const { error } = await db.from('front_offices').update(payload).eq('front_office_id', state.frontOffice.id);
+      if (error) throw error;
+      state.frontOffice.waiverPenaltyMode = waiverMode;
+      state.frontOffice.waiverPenaltyValue = waiverValue;
+      state.frontOffice.waiverPenaltyScope = waiverScope;
+      state.frontOffice.buyoutPenaltyMode = buyoutMode;
+      state.frontOffice.buyoutPenaltyValue = buyoutValue;
+      state.frontOffice.buyoutPenaltyScope = buyoutScope;
+      state.activity.unshift(activity('Updated transaction penalty rules'));
+    });
+
+    if (success) renderSettings();
+  } finally {
+    if (el('saveTransactionRulesBtn')) {
+      el('saveTransactionRulesBtn').disabled = false;
+      el('saveTransactionRulesBtn').textContent = 'Save Transaction Rules';
+    }
+  }
+}
+
+async function addSeason() {
+  const maxYear = Math.max(...state.seasons.map((s) => s.startYear));
+  await saveSettingsChange('salary-caps', async () => {
+    const { error } = await db.from('front_office_seasons').insert({
+      front_office_id: state.frontOffice.id,
+      season_start_year: maxYear + 1,
+      salary_cap: null,
+      sort_order: (state.seasons.length + 1) * 10,
+      is_current: false
+    });
+    if (error) throw error;
+    await loadOffice(state.frontOffice.id, false);
+  });
+}
+
+async function removeSeason(id) {
+  if (contractHorizonSeasons().some((season) => season.id === id)) {
+    alert('The current season and next six seasons are maintained automatically.');
+    return;
+  }
+  const season = seasonById(id);
+  if (!confirm(`Remove ${seasonLabel(season.startYear)} and its salary/adjustment values?`)) return;
+
+  await saveSettingsChange('salary-caps', async () => {
+    const { error } = await db.rpc('remove_front_office_season_v1', {
+      p_front_office_id: state.frontOffice.id,
+      p_front_office_season_id: id
+    });
+    if (error) throw error;
+    await loadOffice(state.frontOffice.id, false);
+  });
+}
+
+async function addStatus() {
+  const existing = new Set(state.statuses.map((s) => s.name.toLowerCase()));
+  let index = 1;
+  let name = 'New Status';
+  while (existing.has(name.toLowerCase())) name = `New Status ${++index}`;
+
+  await saveSettingsChange('roster-rules', async () => {
+    const { error } = await db.from('front_office_roster_statuses').insert({
+      front_office_id: state.frontOffice.id,
+      status_name: name,
+      counts_toward_cap: true,
+      sort_order: (state.statuses.length + 1) * 10,
+      is_active: true
+    });
+    if (error) throw error;
+    await loadOffice(state.frontOffice.id, false);
+  });
+}
+
+async function removeStatus(id) {
+  const status = statusById(id);
+  if (!status) return;
+  if (state.players.some((p) => p.statusId === id)) {
+    alert('This status is currently assigned to one or more players. Reassign them before removing it.');
+    return;
+  }
+
+  await saveSettingsChange('roster-rules', async () => {
+    const { error } = await db.rpc('archive_roster_status_v1', {
+      p_front_office_id: state.frontOffice.id,
+      p_roster_status_id: id
+    });
+    if (error) throw error;
+    await loadOffice(state.frontOffice.id, false);
+  });
+}
