@@ -1,7 +1,7 @@
 'use strict';
 
 // ============================================================================
-// RosterCap V2.99 — Multi-sport CSV adapters + Roster Backup V2
+// RosterCap V3.17.0 — Multi-sport CSV adapters + Fantrax API Sync + Roster Backup V2
 //
 // Supported external Fantrax Team Roster adapters:
 // - NHL
@@ -21,7 +21,7 @@
 //   remain protected from Fantrax imports.
 // ============================================================================
 
-const ROSTERCAP_IMPORT_VERSION_V299 = 'V2.99.1';
+const ROSTERCAP_IMPORT_VERSION_V299 = 'V3.17.0';
 const ROSTERCAP_BACKUP_V1 = 'ROSTERCAP_ROSTER_BACKUP_V1';
 const ROSTERCAP_BACKUP_V2 = 'ROSTERCAP_ROSTER_BACKUP_V2';
 
@@ -1164,21 +1164,22 @@ function mapFantraxStatus(value, fallbackStatusId = null) {
     .toLowerCase()
     .replace(/[^a-z+]/g, '');
 
-  const codeMap = {
-    act: 'Active',
-    active: 'Active',
-    res: 'Reserve',
-    reserve: 'Reserve',
-    ir: 'IR',
-    'ir+': 'IR',
-    inj: 'IR',
-    injured: 'IR'
-  };
-
-  const desired = codeMap[normalizedCode] || raw;
+  const desiredNames = {
+    act: ['Active'],
+    active: ['Active'],
+    res: ['Reserve'],
+    reserve: ['Reserve'],
+    ir: ['IR', 'Injured Reserve'],
+    'ir+': ['IR', 'Injured Reserve'],
+    inj: ['IR', 'Injured Reserve'],
+    injured: ['IR', 'Injured Reserve'],
+    injuredreserve: ['IR', 'Injured Reserve']
+  }[normalizedCode] || [raw];
 
   const status = state.statuses.find((item) =>
-    item.name.toLowerCase() === String(desired).toLowerCase()
+    desiredNames.some((desired) =>
+      item.name.toLowerCase() === String(desired).toLowerCase()
+    )
   );
 
   return {
@@ -1228,6 +1229,272 @@ function findExistingImportPlayer(
     && importTeamsCompatibleV299(player.realTeam, realTeam)
   ) || null;
 }
+
+// ---------------------------------------------------------------------------
+// Fantrax API sync adapter — V3.17.0
+//
+// Converts the verified Fantrax API contracts into the same pendingImport row
+// contract used by the existing CSV review/apply workflow. The API adapter does
+// not save anything itself; Apply Import remains the only persistence gate.
+// ---------------------------------------------------------------------------
+
+function fantraxApiDisplayNameV3170(value) {
+  const raw = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!raw || !raw.includes(',')) return raw;
+
+  const parts = raw.split(',');
+  const family = String(parts.shift() || '').trim();
+  const given = parts.join(',').trim();
+
+  if (!family || !given) return raw;
+  return `${given} ${family}`.replace(/\s+/g, ' ').trim();
+}
+
+function fantraxApiMatchMapV3170(matches) {
+  const map = new Map();
+
+  (Array.isArray(matches) ? matches : []).forEach((match) => {
+    const playerId = String(match?.playerId || '').trim();
+    if (!playerId || map.has(playerId)) return;
+    map.set(playerId, match?.record && typeof match.record === 'object'
+      ? match.record
+      : {});
+  });
+
+  return map;
+}
+
+function fantraxApiWholeDollarV3170(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? Math.round(numeric) : null;
+}
+
+function fantraxApiImportRowsV3170(syncData, connection = null) {
+  const sport = String(
+    syncData?.sport
+    || connection?.sport
+    || activeImportSportV299()
+  ).trim().toUpperCase();
+
+  if (sport !== activeImportSportV299()) {
+    throw new Error(
+      `This Fantrax sync is for ${sport || 'another sport'}, but the current Front Office is ${activeImportSportV299()}.`
+    );
+  }
+
+  const rosterItems = Array.isArray(syncData?.selectedRoster?.rosterItems)
+    ? syncData.selectedRoster.rosterItems
+    : [];
+
+  if (!rosterItems.length) {
+    throw new Error('Fantrax did not return any players for the selected roster.');
+  }
+
+  const identityById = fantraxApiMatchMapV3170(syncData?.playerIdMatches);
+  const playerInfoById = fantraxApiMatchMapV3170(syncData?.identityMatches);
+
+  const sectionCounts = {};
+  let minors = 0;
+
+  const rows = rosterItems.map((item, index) => {
+    const sourceId = String(item?.id || '').trim();
+    const identity = identityById.get(sourceId) || {};
+    const playerInfo = playerInfoById.get(sourceId) || {};
+
+    const sourceName = String(identity.name || '').trim();
+    const name = fantraxApiDisplayNameV3170(sourceName);
+    const realTeam = normalizeSourceTeamV299(identity.team, sport);
+    const existing = findExistingImportPlayer(sourceId, name, realTeam);
+
+    const rawPos = String(
+      identity.position
+      || item?.position
+      || existing?.position
+      || ''
+    ).trim().toUpperCase();
+
+    const rawEligible = String(
+      playerInfo.eligiblePos
+      || identity.eligiblePos
+      || identity.position
+      || item?.position
+      || existing?.eligiblePositions
+      || ''
+    ).trim().toUpperCase();
+
+    const position = chooseFantraxPrimaryPositionV299(
+      sport,
+      rawPos,
+      rawEligible,
+      existing
+    );
+
+    const eligiblePositions = chooseFantraxEligibilityV299(
+      sport,
+      rawEligible,
+      position,
+      existing
+    );
+
+    const positionWarning = fantraxPositionWarningV299(
+      sport,
+      rawPos,
+      rawEligible,
+      position,
+      eligiblePositions
+    );
+
+    const statusRaw = String(item?.status || '').trim().toUpperCase();
+    const isMinors = isFantraxMinorsStatus(statusRaw);
+    const statusResult = mapFantraxStatus(
+      statusRaw,
+      existing?.statusId || null
+    );
+
+    const lineupSlotKey = fantraxLineupSlotKeyV299(rawPos, sport);
+    const positionChoices = fantraxSlotPositionChoicesV299(
+      lineupSlotKey,
+      sport
+    );
+
+    const requiresPositionResolution = Boolean(
+      sport === 'NFL'
+      && lineupSlotKey === 'SUPERFLEX'
+      && !position
+      && positionChoices.length
+    );
+
+    let settingsWarning = '';
+    const activePositions = new Set(importActivePositionCodesV299());
+
+    if (
+      position
+      && activePositions.size
+      && !activePositions.has(position)
+    ) {
+      settingsWarning =
+        `${position} is not currently enabled in this Front Office's Position Settings.`;
+    }
+
+    const section = statusRaw || 'Players';
+    sectionCounts[section] = (sectionCounts[section] || 0) + 1;
+    if (isMinors) minors += 1;
+
+    const importRow = {
+      sourceRow:index + 1,
+      sourceType:'FANTRAX',
+      sourceId,
+      name,
+      position,
+      eligiblePositions,
+      realTeam,
+      ageSnapshot:null,
+      statusId:statusResult.statusId,
+      statusRaw,
+      statusWarning:statusResult.warning || '',
+      positionWarning:positionWarning || '',
+      settingsWarning,
+      isProspect:isMinors ? true : Boolean(existing?.isProspect),
+      rosterGroup:isMinors ? 'FARM' : 'ACTIVE',
+      isMinors,
+      salary:fantraxApiWholeDollarV3170(item?.salary),
+      salaries:{},
+      capOverrides:{},
+      section,
+      fantraxPosRaw:rawPos,
+      fantraxEligibleRaw:rawEligible,
+      fantraxLineupSlotKey:lineupSlotKey,
+      positionChoices,
+      requiresPositionResolution,
+      fantraxContractRaw:'',
+      fantraxApiSourceName:sourceName,
+      existingPlayerId:existing?.id || null,
+      action:existing ? 'Update' : 'Add',
+      valid:false,
+      warning:''
+    };
+
+    refreshFantraxRowValidityV299(importRow);
+    return importRow;
+  });
+
+  const incomingIds = new Set(
+    rows.map((row) => row.sourceId).filter(Boolean)
+  );
+
+  const linkedPlayersMissingFromFantrax = state.players
+    .filter((player) =>
+      player.fantraxId
+      && !incomingIds.has(String(player.fantraxId).trim())
+    )
+    .map((player) => ({
+      id:player.id,
+      name:player.name,
+      fantraxId:player.fantraxId
+    }));
+
+  const hasSalary = rows.some((row) =>
+    row.salary !== null && row.salary !== undefined
+  );
+
+  return {
+    rows,
+    meta:{
+      ...blankImportMetaV299(),
+      type:'fantrax',
+      sourceMode:'api',
+      sport,
+      players:rows.length,
+      minors,
+      sections:Object.keys(sectionCounts),
+      sectionCounts,
+      hasSalary,
+      fantraxLeagueId:String(syncData?.leagueId || connection?.leagueId || '').trim(),
+      fantraxTeamId:String(syncData?.teamId || connection?.teamId || '').trim(),
+      fantraxLeagueName:String(connection?.leagueName || '').trim(),
+      fantraxTeamName:String(
+        syncData?.selectedRoster?.teamName
+        || syncData?.teamName
+        || connection?.teamName
+        || ''
+      ).trim(),
+      fantraxSalaryCap:fantraxApiWholeDollarV3170(
+        syncData?.selectedRoster?.salaryCap
+        ?? syncData?.rosterSummary?.salaryCap
+      ),
+      linkedPlayersMissingFromFantrax
+    }
+  };
+}
+
+function openFantraxApiImportReviewV3170(syncData, connection = null) {
+  const mapped = fantraxApiImportRowsV3170(syncData, connection);
+
+  openImportDialog();
+
+  pendingImport = mapped.rows;
+  pendingImportMeta = mapped.meta;
+  importPreviewFileName = 'Fantrax API Sync';
+
+  const fileLabel = importDialog.querySelector('.file-drop > span');
+  if (fileLabel) fileLabel.textContent = 'Fantrax API Sync';
+
+  renderImportPreview();
+
+  return {
+    players:mapped.rows.length,
+    ready:mapped.rows.filter((row) => row.valid).length,
+    issues:mapped.rows.filter((row) => !row.valid).length,
+    missingLinkedPlayers:mapped.meta.linkedPlayersMissingFromFantrax.length
+  };
+}
+
+window.RosterCapFantraxApiSync = Object.freeze({
+  version:'3.17.0',
+  openReview:openFantraxApiImportReviewV3170,
+  mapRows:fantraxApiImportRowsV3170
+});
 
 // ---------------------------------------------------------------------------
 // Generic CSV compatibility
@@ -1522,18 +1789,25 @@ function importSafetyMarkupV299(fantrax, backup = false) {
   }
 
   if (fantrax) {
+    const apiSync = pendingImportMeta.sourceMode === 'api';
     const salaryText = pendingImportMeta.hasSalary
       ? 'Current-season salary can also update when the option above is enabled.'
-      : 'This Fantrax file does not include Salary, so existing salary data is preserved.';
+      : (apiSync
+          ? 'Fantrax did not supply a usable current salary for these rows, so saved salary is preserved.'
+          : 'This Fantrax file does not include Salary, so existing salary data is preserved.');
+
+    const identityText = apiSync
+      ? `Player name, Fantrax ID, real ${sport} team, primary position, eligible positions, roster status and Active/${importDevelopmentLabelV299()} location.`
+      : `Player identity, real player position/eligibility, ${sport} team, age, roster status, Fantrax link and Active/${importDevelopmentLabelV299()} location.`;
 
     return `<div class="import-safety-panel">
       <div>
         <span class="import-safety-icon">✓</span>
-        <span><strong>What this Fantrax ${escapeHtml(sport)} import updates</strong><small>Player identity, real player position/eligibility, ${escapeHtml(sport)} team, age, roster status, Fantrax link and Active/${escapeHtml(importDevelopmentLabelV299())} location. NFL SFX is treated as the Superflex lineup allocation; if Fantrax omits the underlying position, the import review asks the user to choose QB/RB/WR/TE. ${escapeHtml(salaryText)}</small></span>
+        <span><strong>What this Fantrax ${escapeHtml(sport)} ${apiSync ? 'sync' : 'import'} updates</strong><small>${escapeHtml(identityText)} NFL SFX is treated as the Superflex lineup allocation; if Fantrax omits the underlying position, the import review asks the user to choose QB/RB/WR/TE. ${escapeHtml(salaryText)}</small></span>
       </div>
       <div>
         <span class="import-safety-icon protected">◆</span>
-        <span><strong>Protected data</strong><small>Future salaries, cap overrides, contract end, notes and financial adjustments are preserved. Fantrax Contract text is not guessed into RosterCap contract years. Players missing from this file are not removed.</small></span>
+        <span><strong>Protected data</strong><small>Future salaries, cap overrides, contract end, notes and financial adjustments are preserved. Fantrax Contract data is not guessed into RosterCap contract years. Players missing from Fantrax are never removed automatically.</small></span>
       </div>
     </div>`;
   }
@@ -1578,7 +1852,7 @@ function renderImportPreview() {
   if (dialogTitle) {
     dialogTitle.textContent = backup
       ? 'Restore Roster Backup'
-      : 'Import Roster';
+      : (fantrax && pendingImportMeta.sourceMode === 'api' ? 'Review Fantrax Sync' : 'Import Roster');
   }
 
   const intro = importDialog.querySelector('.modal-body > p.muted');
@@ -1588,7 +1862,9 @@ function renderImportPreview() {
         'Review the listed player, roster and contract changes. Transactions, Assets and financial history will not be touched.';
     } else if (fantrax) {
       intro.textContent =
-        `Fantrax ${pendingImportMeta.sport} Team Roster detected. Review the mapped positions, statuses, locations and salary behavior before applying.`;
+        pendingImportMeta.sourceMode === 'api'
+          ? `Fantrax ${pendingImportMeta.sport} sync data loaded. Review every roster, position, status and current-salary change before applying.`
+          : `Fantrax ${pendingImportMeta.sport} Team Roster detected. Review the mapped positions, statuses, locations and salary behavior before applying.`;
     } else {
       intro.textContent =
         'Generic CSV detected. Review every mapped row before applying.';
@@ -1619,7 +1895,7 @@ function renderImportPreview() {
   const detector = backup
     ? `<div class="import-detect"><span class="import-chip primary">RosterCap Roster Backup</span><span class="import-chip">${escapeHtml(pendingImportMeta.backupVersion || '')}</span>${pendingImportMeta.backupSport ? `<span class="import-chip">${escapeHtml(pendingImportMeta.backupSport)}</span>` : ''}<span class="import-chip">${pendingImportMeta.players} players</span><span class="import-chip">${pendingImportMeta.minors} ${escapeHtml(importDevelopmentLabelV299().toLowerCase())}</span>${pendingImportMeta.backupTeam ? `<span class="import-chip">${escapeHtml(pendingImportMeta.backupTeam)}</span>` : ''}${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`
     : fantrax
-      ? `<div class="import-detect"><span class="import-chip primary">Fantrax ${escapeHtml(pendingImportMeta.sport)} Team Roster</span><span class="import-chip">${pendingImportMeta.players} players</span><span class="import-chip">${sectionCount} section${sectionCount === 1 ? '' : 's'}</span><span class="import-chip">${pendingImportMeta.minors} ${escapeHtml(importDevelopmentLabelV299().toLowerCase())}</span><span class="import-chip">${pendingImportMeta.hasSalary ? 'Salary included' : 'No salary column'}</span>${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`
+      ? `<div class="import-detect"><span class="import-chip primary">${pendingImportMeta.sourceMode === 'api' ? 'Fantrax API Sync' : `Fantrax ${escapeHtml(pendingImportMeta.sport)} Team Roster`}</span><span class="import-chip">${pendingImportMeta.players} players</span><span class="import-chip">${sectionCount} section${sectionCount === 1 ? '' : 's'}</span><span class="import-chip">${pendingImportMeta.minors} ${escapeHtml(importDevelopmentLabelV299().toLowerCase())}</span><span class="import-chip">${pendingImportMeta.hasSalary ? 'Salary included' : (pendingImportMeta.sourceMode === 'api' ? 'No usable salary' : 'No salary column')}</span>${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`
       : `<div class="import-detect"><span class="import-chip primary">Generic CSV</span><span class="import-chip">${pendingImportMeta.players} rows</span>${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`;
 
   const movementDetail = (fantrax || backup)
@@ -1655,6 +1931,21 @@ function renderImportPreview() {
     (row) => row.requiresPositionResolution
   ).length;
 
+  const missingLinkedPlayers = fantrax && pendingImportMeta.sourceMode === 'api'
+    && Array.isArray(pendingImportMeta.linkedPlayersMissingFromFantrax)
+      ? pendingImportMeta.linkedPlayersMissingFromFantrax
+      : [];
+
+  const missingLinkedNote = missingLinkedPlayers.length
+    ? `<div class="import-review-warning"><strong>${missingLinkedPlayers.length} linked RosterCap player${missingLinkedPlayers.length === 1 ? '' : 's'} ${missingLinkedPlayers.length === 1 ? 'is' : 'are'} not on the current Fantrax roster.</strong><span>They will be kept. This sync never removes players automatically.${missingLinkedPlayers.length <= 8 ? ` ${escapeHtml(missingLinkedPlayers.map((player) => player.name).join(', '))}` : ''}</span></div>`
+    : '';
+
+  const fantraxCapNote = fantrax && pendingImportMeta.sourceMode === 'api'
+    && pendingImportMeta.fantraxSalaryCap !== null
+    && pendingImportMeta.fantraxSalaryCap !== undefined
+      ? `<div class="import-review-warning"><strong>Fantrax salary cap: ${escapeHtml(formatMoney(pendingImportMeta.fantraxSalaryCap))}</strong><span>Shown for comparison only. This player sync does not overwrite RosterCap league settings or future caps.</span></div>`
+      : '';
+
   const invalidNote = invalid
     ? `<div class="import-review-warning"><strong>${invalid} row${invalid === 1 ? '' : 's'} need${invalid === 1 ? 's' : ''} review.</strong><span>${backup
         ? 'Restore requires matching sport, season columns, group keys and roster-status names.'
@@ -1673,6 +1964,8 @@ function renderImportPreview() {
     ${reviewSummary}
     ${importSafetyMarkupV299(fantrax, backup)}
     ${backupWarnings}
+    ${missingLinkedNote}
+    ${fantraxCapNote}
     ${invalidNote}
     <div class="import-review-table-head"><strong>Player review</strong><span>Nothing is saved until you press Apply Import.</span></div>
     <div class="table-wrap import-review-table-wrap">
@@ -1704,7 +1997,9 @@ function renderImportPreview() {
     ? (
         backup
           ? `Restore ${valid.length} Player${valid.length === 1 ? '' : 's'}`
-          : `Apply ${valid.length} Row${valid.length === 1 ? '' : 's'}`
+          : (fantrax && pendingImportMeta.sourceMode === 'api'
+              ? `Apply Sync (${valid.length})`
+              : `Apply ${valid.length} Row${valid.length === 1 ? '' : 's'}`)
       )
     : 'Apply Import';
 }
