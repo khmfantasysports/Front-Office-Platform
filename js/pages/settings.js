@@ -168,18 +168,18 @@ function currentSeasonControlMarkup(snapshot) {
 }
 
 // -----------------------------------------------------------------------------
-// RosterCap V3.17.0 — Fantrax user-triggered roster sync
+// RosterCap V3.17.1 — Fantrax modular sync + contract interpretation
 //
 // User-triggered only:
 // - getLeagues runs only when the user presses Test Connection.
-// - getTeamRosters + getLeagueInfo + getPlayerIds run only when the user presses Sync Now.
+// - getTeamRosters + getLeagueInfo + getPlayerIds run only when the user presses a sync button.
 // - no polling, scheduler, background refresh or automatic writes.
 // - the User Secret ID is never persisted by this frontend.
 // - API data is normalized into the established Import / Sync review.
 // - nothing is saved until the user presses Apply Sync in that review.
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3162 = '3.17.0';
+const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3162 = '3.17.1';
 
 let fantraxConnectionPreviewV3162 = {
   status:'idle',
@@ -190,6 +190,66 @@ let fantraxConnectionPreviewV3162 = {
   rosterData:null,
   rosterError:''
 };
+
+
+let fantraxSyncOptionsV3171 = {
+  roster:true,
+  salaries:true,
+  contracts:true,
+  contractNumericMode:'remaining'
+};
+
+function fantraxReadSyncOptionsV3171() {
+  const roster = el('fantraxSyncRosterV3171');
+  const salaries = el('fantraxSyncSalariesV3171');
+  const contracts = el('fantraxSyncContractsV3171');
+  const numericMode = el('fantraxContractNumericModeV3171');
+
+  fantraxSyncOptionsV3171 = {
+    roster: roster ? roster.checked : fantraxSyncOptionsV3171.roster,
+    salaries: salaries ? salaries.checked : fantraxSyncOptionsV3171.salaries,
+    contracts: contracts ? contracts.checked : fantraxSyncOptionsV3171.contracts,
+    contractNumericMode: numericMode?.value === 'contract_year'
+      ? 'contract_year'
+      : 'remaining'
+  };
+
+  return { ...fantraxSyncOptionsV3171 };
+}
+
+function fantraxSelectAllAvailableV3171() {
+  fantraxSyncOptionsV3171 = {
+    ...fantraxSyncOptionsV3171,
+    roster:true,
+    salaries:true,
+    contracts:true
+  };
+}
+
+function fantraxSyncOptionsMarkupV3171() {
+  const options = fantraxSyncOptionsV3171;
+
+  return `<div class="settings-health-panel">
+    <div class="settings-health-head">
+      <div><span>Sync modules</span><strong>Choose what Fantrax may update</strong></div>
+      <span class="settings-health-badge">Manual</span>
+    </div>
+    <div class="settings-fields">
+      <label><span><input id="fantraxSyncRosterV3171" type="checkbox" ${options.roster ? 'checked' : ''} /> Roster & player info</span><small>Name, Fantrax ID, real team, position/eligibility, status and Active/Minors location.</small></label>
+      <label><span><input id="fantraxSyncSalariesV3171" type="checkbox" ${options.salaries ? 'checked' : ''} /> Salaries</span><small>Current-season salary only when Fantrax supplies it. Future salaries and cap overrides remain protected.</small></label>
+      <label><span><input id="fantraxSyncContractsV3171" type="checkbox" ${options.contracts ? 'checked' : ''} /> Contracts</span><small>Recognized contract values update contract end. Blank or unrecognized values preserve the saved end date.</small></label>
+      <label>Numeric Contract values mean
+        <select id="fantraxContractNumericModeV3171" ${options.contracts ? '' : 'disabled'}>
+          <option value="remaining" ${options.contractNumericMode === 'remaining' ? 'selected' : ''}>Years remaining</option>
+          <option value="contract_year" ${options.contractNumericMode === 'contract_year' ? 'selected' : ''}>Current contract year</option>
+        </select>
+        <small>Example: 2 can mean 2 seasons remaining (current season included) or Year 2 of the contract. Current-contract-year mode never guesses an end date.</small>
+      </label>
+      <label><span><input type="checkbox" disabled /> League settings</span><small>Shown here as a planned module; field-by-field Fantrax mapping is not enabled until the exact returned settings contract is verified.</small></label>
+      <label><span><input type="checkbox" disabled /> Draft picks</span><small>Planned module using getDraftPicks after its exact response contract is verified.</small></label>
+    </div>
+  </div>`;
+}
 
 function fantraxPreviewTechnicalJsonV3162(value, limit = 120000) {
   let text = '';
@@ -363,9 +423,13 @@ function fantraxConnectionSelectorMarkupV3162() {
     <div class="settings-context-item"><span>League ID</span><strong>${escapeHtml(selected.leagueId)}</strong></div>
     <div class="settings-context-item"><span>Team ID</span><strong>${escapeHtml(selected.teamId)}</strong></div>
   </div>` : ''}
+  ${selected ? fantraxSyncOptionsMarkupV3171() : ''}
   <div class="transaction-rules-footer">
-    <span>Sync Now makes read-only Fantrax calls for the selected roster, eligibility and player IDs, then opens the existing RosterCap review. Nothing is saved until you approve that review.</span>
-    <button id="fantraxPreviewRosterBtnV3162" class="btn btn-primary btn-small" type="button" ${selected ? '' : 'disabled'}>Sync Now</button>
+    <span>Fantrax remains read-only until the RosterCap review is approved. Sync Selected uses only the checked modules; Sync All Available selects roster, salary and contract modules.</span>
+    <div class="settings-data-actions">
+      <button id="fantraxSyncAllBtnV3171" class="btn btn-secondary btn-small" type="button" ${selected ? '' : 'disabled'}>Sync All Available</button>
+      <button id="fantraxPreviewRosterBtnV3162" class="btn btn-primary btn-small" type="button" ${selected ? '' : 'disabled'}>Sync Selected</button>
+    </div>
   </div>`;
 }
 
@@ -375,7 +439,7 @@ function fantraxRosterResultMarkupV3162() {
   if (preview.rosterStatus === 'testing') {
     return `<div class="settings-health-panel">
       <div class="settings-health-head"><div><span>Sync preview</span><strong>Contacting Fantrax…</strong></div><span class="settings-health-badge">Manual</span></div>
-      <p>RosterCap is loading the selected Fantrax roster, eligibility and player-ID data for the review.</p>
+      <p>RosterCap is loading the selected Fantrax data for the requested sync modules.</p>
     </div>`;
   }
 
@@ -396,8 +460,12 @@ function fantraxRosterResultMarkupV3162() {
 
   const roster = data.rosterSummary || {};
   const identity = data.identitySummary || {};
+  const playerIds = data.playerIdsSummary || {};
   const statusCounts = roster.statusCounts || {};
-  const missingIds = Array.isArray(identity.missingPlayerIds)
+  const missingIds = Array.isArray(playerIds.missingPlayerIds)
+    ? playerIds.missingPlayerIds
+    : [];
+  const missingPlayerInfoIds = Array.isArray(identity.missingPlayerIds)
     ? identity.missingPlayerIds
     : [];
 
@@ -429,6 +497,7 @@ function fantraxRosterResultMarkupV3162() {
     : (typeof formatMoney === 'function' ? formatMoney(roster.salaryCap) : String(roster.salaryCap));
 
   const identityTone = identity.missingCount ? 'has-warning' : 'is-good';
+  const playerIdsTone = playerIds.missingCount ? 'has-warning' : 'is-good';
 
   return `<div class="settings-health-panel is-good">
     <div class="settings-health-head">
@@ -439,16 +508,18 @@ function fantraxRosterResultMarkupV3162() {
   </div>
   <div class="settings-summary-grid settings-summary-grid-roster">
     <div class="settings-summary-item"><span>Roster players</span><strong>${escapeHtml(String(roster.playerCount ?? 0))}</strong></div>
+    <div class="settings-summary-item ${playerIdsTone}"><span>getPlayerIds matches</span><strong>${escapeHtml(`${playerIds.matchedCount ?? 0} / ${playerIds.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
     <div class="settings-summary-item ${identityTone}"><span>playerInfo matches</span><strong>${escapeHtml(`${identity.matchedCount ?? 0} / ${identity.rosterPlayerCount ?? roster.playerCount ?? 0}`)}</strong></div>
-    <div class="settings-summary-item ${identity.missingCount ? 'warning' : 'good'}"><span>Missing playerInfo</span><strong>${escapeHtml(String(identity.missingCount ?? 0))}</strong></div>
     <div class="settings-summary-item"><span>Fantrax salary cap</span><strong>${escapeHtml(salaryCapText)}</strong></div>
   </div>
   <div class="settings-context-strip">
     <div class="settings-context-item"><span>Roster statuses</span><strong>${escapeHtml(statusText)}</strong></div>
     <div class="settings-context-item"><span>Roster API</span><strong>${escapeHtml(String(data.rosterUpstreamStatus || 200))}</strong></div>
     <div class="settings-context-item"><span>League Info API</span><strong>${escapeHtml(String(data.leagueInfoUpstreamStatus || 200))}</strong></div>
+    <div class="settings-context-item"><span>Player IDs API</span><strong>${escapeHtml(String(data.playerIdsUpstreamStatus || 200))}</strong></div>
   </div>
-  ${missingIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>Identity coverage</span><strong>${missingIds.length} roster player ID${missingIds.length === 1 ? '' : 's'} not located in getLeagueInfo</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingIds.join(', '))}</p></div>` : ''}
+  ${missingIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>Player-ID coverage</span><strong>${missingIds.length} roster player ID${missingIds.length === 1 ? '' : 's'} not located in getPlayerIds</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingIds.join(', '))}</p></div>` : ''}
+  ${missingPlayerInfoIds.length ? `<div class="settings-health-panel has-warning"><div class="settings-health-head"><div><span>playerInfo coverage</span><strong>${missingPlayerInfoIds.length} roster player ID${missingPlayerInfoIds.length === 1 ? '' : 's'} not located in getLeagueInfo.playerInfo</strong></div><span class="settings-health-badge">Review</span></div><p>${escapeHtml(missingPlayerInfoIds.join(', '))}</p></div>` : ''}
   <details class="advanced-contract" open>
     <summary>League playerInfo matches</summary>
     <p class="settings-card-copy">Matches between selected-roster Fantrax IDs and getLeagueInfo.playerInfo. This endpoint supplies eligibility/status context; full player identity comes from getPlayerIds.</p>
@@ -515,9 +586,9 @@ function fantraxPreviewResultMarkupV3162() {
 
 function fantraxConnectionMarkupV3162() {
   return `<details class="settings-disclosure" data-settings-section="fantrax-connection">
-    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Manual roster and salary sync</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
+    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Manual modular sync</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
     <div class="settings-disclosure-body">
-      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues. Sync Now reads the selected roster, eligibility and player IDs, then opens the existing RosterCap review so you can approve every change before anything is saved.</p>
+      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues. Choose the roster, salary and contract modules you want, then open the existing RosterCap review before anything is saved.</p>
       <div class="settings-fields">
         <label>Fantrax User Secret ID
           <input id="fantraxUserSecretIdV3162" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
@@ -634,9 +705,24 @@ async function testFantraxConnectionV3162() {
   }
 }
 
-async function previewFantraxRosterV3162() {
+async function previewFantraxRosterV3162(syncAll = false) {
   const selected = fantraxSelectedConnectionV3162();
   const button = el('fantraxPreviewRosterBtnV3162');
+  const allButton = el('fantraxSyncAllBtnV3171');
+
+  if (syncAll) {
+    fantraxSelectAllAvailableV3171();
+    if (el('fantraxSyncRosterV3171')) el('fantraxSyncRosterV3171').checked = true;
+    if (el('fantraxSyncSalariesV3171')) el('fantraxSyncSalariesV3171').checked = true;
+    if (el('fantraxSyncContractsV3171')) el('fantraxSyncContractsV3171').checked = true;
+  }
+
+  const requestedOptions = fantraxReadSyncOptionsV3171();
+
+  if (!requestedOptions.roster && !requestedOptions.salaries && !requestedOptions.contracts) {
+    alert('Choose at least one Fantrax sync module.');
+    return;
+  }
 
   if (!selected) {
     alert('Choose a Fantrax league/team first.');
@@ -656,6 +742,7 @@ async function previewFantraxRosterV3162() {
     button.disabled = true;
     button.textContent = 'Loading Fantrax…';
   }
+  if (allButton) allButton.disabled = true;
 
   setSettingsSectionFeedback('fantrax-connection', 'saving', 'Loading Fantrax…');
   const rosterResult = el('fantraxRosterResultV3162');
@@ -684,7 +771,11 @@ async function previewFantraxRosterV3162() {
       throw new Error('The Fantrax sync adapter is not loaded. Refresh RosterCap and try again.');
     }
 
-    const review = window.RosterCapFantraxApiSync.openReview(data, selected);
+    const review = window.RosterCapFantraxApiSync.openReview(
+      data,
+      selected,
+      requestedOptions
+    );
 
     fantraxConnectionPreviewV3162.rosterStatus = 'success';
     fantraxConnectionPreviewV3162.rosterData = data;
@@ -710,8 +801,10 @@ async function previewFantraxRosterV3162() {
     const currentButton = el('fantraxPreviewRosterBtnV3162');
     if (currentButton) {
       currentButton.disabled = false;
-      currentButton.textContent = 'Sync Now';
+      currentButton.textContent = 'Sync Selected';
     }
+    const currentAllButton = el('fantraxSyncAllBtnV3171');
+    if (currentAllButton) currentAllButton.disabled = false;
   }
 }
 
@@ -725,9 +818,23 @@ function bindFantraxConnectionResultV3162() {
     fantraxRenderConnectionResultV3162();
   });
 
+  ['fantraxSyncRosterV3171','fantraxSyncSalariesV3171','fantraxSyncContractsV3171','fantraxContractNumericModeV3171']
+    .forEach((id) => {
+      el(id)?.addEventListener('change', () => {
+        fantraxReadSyncOptionsV3171();
+        const mode = el('fantraxContractNumericModeV3171');
+        if (mode) mode.disabled = !fantraxSyncOptionsV3171.contracts;
+      });
+    });
+
   el('fantraxPreviewRosterBtnV3162')?.addEventListener(
     'click',
-    previewFantraxRosterV3162
+    () => previewFantraxRosterV3162(false)
+  );
+
+  el('fantraxSyncAllBtnV3171')?.addEventListener(
+    'click',
+    () => previewFantraxRosterV3162(true)
   );
 }
 
