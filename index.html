@@ -405,10 +405,30 @@
 <span>Select CSV file</span>
 <input accept=".csv,text/csv" id="csvFile" type="file"/>
 </label>
-<label class="import-options">
-<input checked="" id="importSalaryToggle" type="checkbox"/>
-<span>Update current-season salary when Fantrax supplies it<small>If the file has no Salary column, existing salary is preserved. Future salaries, cap overrides, contract end, notes and adjustments are never overwritten by a Fantrax roster import.</small></span>
+<div class="hidden" id="importFantraxOptionsV3171">
+<div class="import-options" style="display:grid;gap:8px">
+<label id="importRosterOptionV3171" style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start">
+<input checked="" id="importRosterToggle" type="checkbox"/>
+<span>Roster &amp; player info<small>Sync player identity, real team, position/eligibility, roster status and Active/Minors location.</small></span>
 </label>
+<label id="importSalaryOptionV3171" style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start">
+<input checked="" id="importSalaryToggle" type="checkbox"/>
+<span>Current salary<small>Only updates the current season when Fantrax supplies a salary. Future salaries and cap overrides stay untouched.</small></span>
+</label>
+<label id="importContractOptionV3171" style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start">
+<input checked="" id="importContractToggle" type="checkbox"/>
+<span>Contracts<small>Uses recognized Fantrax contract values. Blank or unrecognized values never clear an existing contract end.</small></span>
+</label>
+<label id="importContractNumericModeWrapV3171" style="display:grid;gap:6px">
+<span>Numeric Contract values mean</span>
+<select id="importContractNumericModeV3171">
+<option value="remaining">Years remaining</option>
+<option value="contract_year">Current contract year</option>
+</select>
+<small>Years remaining includes the current season. Current contract year values such as 2 are kept as context and do not guess an end date.</small>
+</label>
+</div>
+</div>
 <div class="import-preview hidden" id="importPreview"></div>
 </div>
 <footer class="drawer-footer">
@@ -573,7 +593,7 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/features/depth-chart.js?v=20260821-v285-position-editor"></script>
 <script src="./js/pages/roster.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/features/player-editor.js?v=20260819-v245-identity-css-bundle"></script>
-<script src="./js/features/import.js?v=20260919-v3170-fantrax-api-sync"></script>
+<script src="./js/features/import.js?v=20260919-v3171-fantrax-modular-contracts"></script>
 <script src="./js/pages/minors.js?v=20260824-v3017-minors-expiry-badge-cleanup"></script>
 <script src="./js/pages/assets.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/features/asset-manager.js?v=20260820-v270-asset-manager"></script>
@@ -581,7 +601,7 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/features/transaction-contracts.js?v=20260822-v2961-contract-percentage"></script>
 <script src="./js/features/draft-assets-hub.js?v=20260825-v3062-final-polish"></script>
 <script src="./js/pages/cap.js?v=20260828-v3142-ir-dashboard"></script>
-<script src="./js/pages/settings.js?v=20260919-v3170-fantrax-api-sync"></script>
+<script src="./js/pages/settings.js?v=20260919-v3171-fantrax-modular-contracts"></script>
 <script src="./js/features/sport-foundation.js?v=20260823-v299-multisport-csv"></script>
 <script src="./js/features/lineup-configuration.js?v=20260823-v2991-superflex"></script>
 <script src="./js/features/injured-status.js?v=20260828-v3143-injured-status"></script>
