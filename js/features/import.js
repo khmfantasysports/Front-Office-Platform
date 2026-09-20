@@ -1,7 +1,7 @@
 'use strict';
 
 // ============================================================================
-// RosterCap V3.17.0 — Multi-sport CSV adapters + Fantrax API Sync + Roster Backup V2
+// RosterCap V3.17.1 — Safer Fantrax matching + modular sync + contract parsing
 //
 // Supported external Fantrax Team Roster adapters:
 // - NHL
@@ -21,7 +21,7 @@
 //   remain protected from Fantrax imports.
 // ============================================================================
 
-const ROSTERCAP_IMPORT_VERSION_V299 = 'V3.17.0';
+const ROSTERCAP_IMPORT_VERSION_V299 = 'V3.17.1';
 const ROSTERCAP_BACKUP_V1 = 'ROSTERCAP_ROSTER_BACKUP_V1';
 const ROSTERCAP_BACKUP_V2 = 'ROSTERCAP_ROSTER_BACKUP_V2';
 
@@ -36,6 +36,13 @@ function blankImportMetaV299() {
     sections: [],
     sectionCounts: {},
     hasSalary: false,
+    hasContract: false,
+    syncOptions: {
+      roster: true,
+      salaries: true,
+      contracts: true
+    },
+    contractNumericMode: 'remaining',
     backupVersion: '',
     backupSport: '',
     backupTeam: '',
@@ -86,6 +93,328 @@ function importPrimaryRosterLabelV299() {
     || 'Active roster';
 }
 
+
+function importFantraxSyncOptionsV3171() {
+  const options = pendingImportMeta?.syncOptions || {};
+  return {
+    roster: options.roster !== false,
+    salaries: options.salaries !== false,
+    contracts: options.contracts !== false
+  };
+}
+
+function importContractNumericModeV3171() {
+  return pendingImportMeta?.contractNumericMode === 'contract_year'
+    ? 'contract_year'
+    : 'remaining';
+}
+
+function importCanonicalPlayerNameV3171(value) {
+  let raw = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!raw) return '';
+
+  if (raw.includes(',')) {
+    const parts = raw.split(',');
+    const family = String(parts.shift() || '').trim();
+    const given = parts.join(',').trim();
+    if (family && given) raw = `${given} ${family}`;
+  }
+
+  return raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\b(?:jr|sr|ii|iii|iv)\.?$/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function importPositionCompatibleV3171(player, position) {
+  const target = String(position || '').trim().toUpperCase();
+  if (!target) return true;
+
+  const primary = String(player?.position || '').trim().toUpperCase();
+  if (primary === target) return true;
+
+  const eligible = String(player?.eligiblePositions || '')
+    .toUpperCase()
+    .split(/[,/|\s]+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  return eligible.includes(target);
+}
+
+function resolveExistingImportPlayerV3171(
+  sourceId,
+  name,
+  realTeam,
+  position = '',
+  backupPlayerId = null
+) {
+  if (backupPlayerId) {
+    const exact = state.players.find((player) => player.id === backupPlayerId);
+    if (exact) {
+      return { player:exact, conflict:false, candidates:[exact], reason:'backup-id' };
+    }
+  }
+
+  const normalizedSourceId = String(sourceId || '').trim();
+  const sourceLinked = normalizedSourceId
+    ? state.players.filter((player) =>
+        String(player?.fantraxId || '').trim() === normalizedSourceId
+      )
+    : [];
+
+  const canonicalName = importCanonicalPlayerNameV3171(name);
+  const nameCandidates = canonicalName
+    ? state.players.filter((player) =>
+        importCanonicalPlayerNameV3171(player?.name) === canonicalName
+      )
+    : [];
+
+  if (sourceLinked.length > 1) {
+    return {
+      player:null,
+      conflict:true,
+      candidates:sourceLinked,
+      reason:'duplicate-fantrax-id'
+    };
+  }
+
+  if (sourceLinked.length === 1) {
+    const linked = sourceLinked[0];
+    const sameNameOthers = nameCandidates.filter((player) => player.id !== linked.id);
+
+    if (sameNameOthers.length) {
+      return {
+        player:null,
+        conflict:true,
+        candidates:[linked, ...sameNameOthers],
+        reason:'possible-existing-duplicate'
+      };
+    }
+
+    return { player:linked, conflict:false, candidates:[linked], reason:'fantrax-id' };
+  }
+
+  if (nameCandidates.length === 1) {
+    return {
+      player:nameCandidates[0],
+      conflict:false,
+      candidates:nameCandidates,
+      reason:'unique-normalized-name'
+    };
+  }
+
+  if (nameCandidates.length > 1) {
+    const teamCandidates = nameCandidates.filter((player) =>
+      importTeamsCompatibleV299(player?.realTeam, realTeam)
+    );
+
+    if (teamCandidates.length === 1) {
+      return {
+        player:teamCandidates[0],
+        conflict:false,
+        candidates:teamCandidates,
+        reason:'name-team'
+      };
+    }
+
+    const positionPool = teamCandidates.length ? teamCandidates : nameCandidates;
+    const positionCandidates = positionPool.filter((player) =>
+      importPositionCompatibleV3171(player, position)
+    );
+
+    if (positionCandidates.length === 1) {
+      return {
+        player:positionCandidates[0],
+        conflict:false,
+        candidates:positionCandidates,
+        reason:'name-position'
+      };
+    }
+
+    return {
+      player:null,
+      conflict:true,
+      candidates:positionCandidates.length ? positionCandidates : positionPool,
+      reason:'ambiguous-name'
+    };
+  }
+
+  return { player:null, conflict:false, candidates:[], reason:'new-player' };
+}
+
+function importMatchConflictWarningV3171(match) {
+  if (!match?.conflict) return '';
+
+  const labels = (match.candidates || [])
+    .slice(0, 4)
+    .map((player) => {
+      const team = String(player?.realTeam || '').trim();
+      const linked = String(player?.fantraxId || '').trim();
+      return `${player?.name || 'Unnamed'}${team ? ` (${team})` : ''}${linked ? ' · Fantrax linked' : ''}`;
+    });
+
+  const prefix = match.reason === 'possible-existing-duplicate'
+    ? 'Possible duplicate already exists in RosterCap.'
+    : 'Multiple existing RosterCap players could match this Fantrax player.';
+
+  return `${prefix} Resolve the duplicate before syncing so RosterCap does not create or relink the wrong record.${labels.length ? ` Candidates: ${labels.join('; ')}.` : ''}`;
+}
+
+function fantraxContractSeasonByStartYearV3171(year) {
+  const numeric = Number(year);
+  if (!Number.isInteger(numeric)) return null;
+  return state.seasons.find((season) => Number(season.startYear) === numeric) || null;
+}
+
+function fantraxContractFourDigitYearV3171(value) {
+  const numeric = Number(value);
+  if (!Number.isInteger(numeric)) return null;
+  if (numeric >= 2000 && numeric <= 2099) return numeric;
+  if (numeric >= 20 && numeric <= 99) return 2000 + numeric;
+  return null;
+}
+
+function parseFantraxContractV3171(rawValue, mode = importContractNumericModeV3171()) {
+  const raw = String(rawValue ?? '').trim();
+  const result = {
+    raw,
+    contractType:'',
+    endYear:null,
+    endSeasonId:null,
+    yearsRemaining:null,
+    contractYear:null,
+    recognized:false,
+    canUpdateEnd:false,
+    warning:''
+  };
+
+  if (!raw) return result;
+
+  const compact = raw.toUpperCase().replace(/\s+/g, '');
+  const typed = compact.match(/^(RFA|UFA)(\d{2}|\d{4})$/);
+
+  if (typed) {
+    result.contractType = typed[1];
+    result.endYear = fantraxContractFourDigitYearV3171(typed[2]);
+    result.recognized = Boolean(result.endYear);
+  } else if (/^(RFA|UFA)$/.test(compact)) {
+    result.contractType = compact;
+    result.recognized = true;
+  } else if (/^\d{4}$/.test(compact)) {
+    result.endYear = fantraxContractFourDigitYearV3171(compact);
+    result.recognized = Boolean(result.endYear);
+  } else if (/^\d{2}$/.test(compact) && Number(compact) >= 20) {
+    result.endYear = fantraxContractFourDigitYearV3171(compact);
+    result.recognized = Boolean(result.endYear);
+  } else if (/^\d{1,2}$/.test(compact)) {
+    const count = Number(compact);
+    if (count >= 1 && count <= 19) {
+      result.recognized = true;
+      if (mode === 'contract_year') {
+        result.contractYear = count;
+      } else {
+        result.yearsRemaining = count;
+        const current = currentSeason();
+        if (current?.startYear !== null && current?.startYear !== undefined) {
+          result.endYear = Number(current.startYear) + count - 1;
+        }
+      }
+    }
+  }
+
+  if (!result.recognized) {
+    result.warning = `Unrecognized Fantrax Contract value: ${raw}. Existing contract end will be kept.`;
+    return result;
+  }
+
+  if (result.endYear !== null) {
+    const season = fantraxContractSeasonByStartYearV3171(result.endYear);
+    if (season) {
+      result.endSeasonId = season.id;
+      result.canUpdateEnd = true;
+    } else {
+      result.warning = `Contract end ${result.endYear} is outside this Front Office's configured season horizon. Existing contract end will be kept.`;
+    }
+  }
+
+  return result;
+}
+
+function explicitContractInputV3171(record, headers = []) {
+  const find = (...names) => headers.find((header) =>
+    names.some((name) => normalizeHeader(header) === normalizeHeader(name))
+  ) || null;
+
+  const contract = find('Contract');
+  const end = find('Contract End', 'End Year', 'Contract End Year');
+  const remaining = find('Years Remaining', 'Contract Years Remaining');
+  const contractYear = find('Contract Year', 'Current Contract Year');
+
+  if (end && String(record[end] ?? '').trim()) {
+    return { raw:String(record[end]).trim(), mode:'end_year', sourceHeader:end };
+  }
+
+  if (remaining && String(record[remaining] ?? '').trim()) {
+    return { raw:String(record[remaining]).trim(), mode:'remaining', sourceHeader:remaining };
+  }
+
+  if (contractYear && String(record[contractYear] ?? '').trim()) {
+    return { raw:String(record[contractYear]).trim(), mode:'contract_year', sourceHeader:contractYear };
+  }
+
+  if (contract && String(record[contract] ?? '').trim()) {
+    return { raw:String(record[contract]).trim(), mode:'auto', sourceHeader:contract };
+  }
+
+  return { raw:'', mode:'auto', sourceHeader:'' };
+}
+
+function parseImportContractRowV3171(row) {
+  const raw = String(row?.fantraxContractRaw ?? row?.contractRaw ?? '').trim();
+  const inputMode = row?.contractInputMode || 'auto';
+
+  let mode = importContractNumericModeV3171();
+  if (inputMode === 'remaining') mode = 'remaining';
+  if (inputMode === 'contract_year') mode = 'contract_year';
+
+  let parseRaw = raw;
+  if (inputMode === 'end_year' && /^\d{1,2}$/.test(raw) && Number(raw) < 20) {
+    const parsed = {
+      raw,
+      contractType:'',
+      endYear:null,
+      endSeasonId:null,
+      yearsRemaining:null,
+      contractYear:null,
+      recognized:false,
+      canUpdateEnd:false,
+      warning:`Contract End value ${raw} is not a valid end year. Existing contract end will be kept.`
+    };
+    row.contractParsed = parsed;
+    row.contractEndSeasonId = null;
+    row.contractWarning = parsed.warning;
+    return parsed;
+  }
+
+  const parsed = parseFantraxContractV3171(parseRaw, mode);
+  row.contractParsed = parsed;
+  row.contractEndSeasonId = parsed.canUpdateEnd ? parsed.endSeasonId : null;
+  row.contractWarning = parsed.warning || '';
+  return parsed;
+}
+
+function refreshImportContractRowsV3171() {
+  pendingImport.forEach((row) => {
+    if (row.sourceType === 'FANTRAX' || row.contractRaw || row.fantraxContractRaw) {
+      parseImportContractRowV3171(row);
+      if (row.sourceType === 'FANTRAX') refreshFantraxRowValidityV299(row);
+    }
+  });
+}
+
 function openImportDialog() {
   pendingImport = [];
   pendingImportMeta = blankImportMetaV299();
@@ -93,10 +422,29 @@ function openImportDialog() {
 
   el('csvFile').value = '';
 
+  const rosterToggle = el('importRosterToggle');
   const salaryToggle = el('importSalaryToggle');
-  salaryToggle.checked = true;
-  salaryToggle.disabled = false;
-  salaryToggle.closest('.import-options')?.classList.add('hidden');
+  const contractToggle = el('importContractToggle');
+  const contractMode = el('importContractNumericModeV3171');
+  const fantraxOptions = el('importFantraxOptionsV3171');
+
+  if (rosterToggle) {
+    rosterToggle.checked = true;
+    rosterToggle.disabled = false;
+  }
+  if (salaryToggle) {
+    salaryToggle.checked = true;
+    salaryToggle.disabled = false;
+  }
+  if (contractToggle) {
+    contractToggle.checked = true;
+    contractToggle.disabled = false;
+  }
+  if (contractMode) {
+    contractMode.value = 'remaining';
+    contractMode.disabled = false;
+  }
+  fantraxOptions?.classList.add('hidden');
 
   const fileLabel = importDialog.querySelector('.file-drop > span');
   if (fileLabel) fileLabel.textContent = 'Choose RosterCap, Fantrax or CSV file';
@@ -123,13 +471,36 @@ function openImportDialog() {
 }
 
 function bindImportReviewEvents() {
-  const salaryToggle = el('importSalaryToggle');
-  if (!salaryToggle.dataset.importPreviewBound) {
-    salaryToggle.dataset.importPreviewBound = 'true';
-    salaryToggle.addEventListener('change', () => {
-      if (pendingImport.length) renderImportPreview();
+  const optionIds = [
+    'importRosterToggle',
+    'importSalaryToggle',
+    'importContractToggle',
+    'importContractNumericModeV3171'
+  ];
+
+  optionIds.forEach((id) => {
+    const control = el(id);
+    if (!control || control.dataset.importPreviewBound) return;
+
+    control.dataset.importPreviewBound = 'true';
+    control.addEventListener('change', () => {
+      if (!pendingImport.length) return;
+
+      pendingImportMeta.syncOptions = {
+        ...(pendingImportMeta.syncOptions || {}),
+        roster: el('importRosterToggle')?.checked !== false,
+        salaries: el('importSalaryToggle')?.checked !== false,
+        contracts: el('importContractToggle')?.checked !== false
+      };
+      pendingImportMeta.contractNumericMode =
+        el('importContractNumericModeV3171')?.value === 'contract_year'
+          ? 'contract_year'
+          : 'remaining';
+
+      refreshImportContractRowsV3171();
+      renderImportPreview();
     });
-  }
+  });
 
   const dropZone = importDialog.querySelector('.file-drop');
   if (dropZone && !dropZone.dataset.importDropBound) {
@@ -214,9 +585,13 @@ async function loadImportFile(file) {
         minors: fantrax.minors,
         sections: fantrax.sections,
         sectionCounts: fantrax.sectionCounts,
-        hasSalary: fantrax.hasSalary
+        hasSalary: fantrax.hasSalary,
+        hasContract: fantrax.hasContract,
+        syncOptions: { roster:true, salaries:true, contracts:true },
+        contractNumericMode: 'remaining'
       };
       pendingImport = fantrax.rows;
+      refreshImportContractRowsV3171();
     } else {
       pendingImportMeta = {
         ...blankImportMetaV299(),
@@ -229,6 +604,16 @@ async function loadImportFile(file) {
         .map((row, index) => mapImportRow(headers, row, index + 2));
 
       pendingImportMeta.players = pendingImport.length;
+      pendingImportMeta.hasContract = pendingImport.some((row) =>
+        Boolean(String(row.contractRaw || '').trim())
+      );
+      pendingImportMeta.syncOptions = {
+        roster:true,
+        salaries:true,
+        contracts:true
+      };
+      pendingImportMeta.contractNumericMode = 'remaining';
+      refreshImportContractRowsV3171();
     }
 
     renderImportPreview();
@@ -745,13 +1130,32 @@ function fantraxSlotPositionChoicesV299(slotKey, sport) {
 function refreshFantraxRowValidityV299(row) {
   if (!row || row.sourceType !== 'FANTRAX') return row;
 
+  const syncOptions = importFantraxSyncOptionsV3171();
+  const existing = state.players.find((player) => player.id === row.existingPlayerId) || null;
   const identityReady = Boolean(row.name && row.sourceId);
   const statusReady = Boolean(row.statusId);
   const positionReady = Boolean(row.position && row.eligiblePositions);
+  const rosterRequirementsReady = !syncOptions.roster || (statusReady && positionReady);
+  const newPlayerAllowed = Boolean(existing || syncOptions.roster);
 
-  row.valid = identityReady && statusReady && positionReady;
+  row.valid = Boolean(
+    identityReady
+    && rosterRequirementsReady
+    && newPlayerAllowed
+    && !row.matchConflict
+  );
 
-  if (row.requiresPositionResolution && !row.position) {
+  if (row.matchConflict) {
+    row.warning = row.matchWarning || 'Possible duplicate player match. Resolve it before syncing.';
+    return row;
+  }
+
+  if (!existing && !syncOptions.roster) {
+    row.warning = 'This is a new player. Enable Roster & player info to add new players.';
+    return row;
+  }
+
+  if (syncOptions.roster && row.requiresPositionResolution && !row.position) {
     const slotLabel = row.fantraxLineupSlotKey === 'SUPERFLEX'
       ? 'Superflex'
       : (row.fantraxLineupSlotKey || row.fantraxPosRaw || 'lineup slot');
@@ -760,11 +1164,13 @@ function refreshFantraxRowValidityV299(row) {
       `Fantrax supplied ${slotLabel} instead of the player position. `
       + 'Choose the underlying position.';
   } else {
-    row.requiresPositionResolution = false;
+    if (!syncOptions.roster) row.requiresPositionResolution = false;
+
     row.warning = [
-      row.positionWarning || '',
-      row.statusWarning || '',
-      row.settingsWarning || ''
+      syncOptions.roster ? (row.positionWarning || '') : '',
+      syncOptions.roster ? (row.statusWarning || '') : '',
+      syncOptions.roster ? (row.settingsWarning || '') : '',
+      syncOptions.contracts ? (row.contractWarning || '') : ''
     ].filter(Boolean).join(' ');
   }
 
@@ -977,6 +1383,7 @@ function parseFantraxTeamRoster(rows) {
   let currentSection = '';
   let headers = null;
   let hasSalary = false;
+  let hasContract = false;
   let minors = 0;
 
   for (let i = 0; i < rows.length; i += 1) {
@@ -994,6 +1401,10 @@ function parseFantraxTeamRoster(rows) {
       detectedHeaders += 1;
       hasSalary = hasSalary || headers.some(
         (header) => header.toLowerCase() === 'salary'
+      );
+      hasContract = hasContract || headers.some((header) =>
+        ['Contract','Contract End','End Year','Contract End Year','Years Remaining','Contract Years Remaining','Contract Year','Current Contract Year']
+          .some((name) => normalizeHeader(header) === normalizeHeader(name))
       );
 
       if (!currentSection) currentSection = 'Players';
@@ -1013,10 +1424,15 @@ function parseFantraxTeamRoster(rows) {
     if ((!sourceId && !name) || /^totals?$/i.test(sourceId)) continue;
 
     const realTeam = normalizeSourceTeamV299(record.Team, sport);
-    const existing = findExistingImportPlayer(sourceId, name, realTeam);
-
     const rawPos = String(record.Pos || '').trim().toUpperCase();
     const rawEligible = String(record.Eligible || '').trim().toUpperCase();
+    const match = resolveExistingImportPlayerV3171(
+      sourceId,
+      name,
+      realTeam,
+      rawPos
+    );
+    const existing = match.player;
 
     const position = chooseFantraxPrimaryPositionV299(
       sport,
@@ -1078,6 +1494,8 @@ function parseFantraxTeamRoster(rows) {
         `${position} is not currently enabled in this Front Office's Position Settings.`;
     }
 
+    const contractInput = explicitContractInputV3171(record, headers);
+
     const importRow = {
       sourceRow: i + 1,
       sourceType: 'FANTRAX',
@@ -1104,13 +1522,23 @@ function parseFantraxTeamRoster(rows) {
       fantraxLineupSlotKey: lineupSlotKey,
       positionChoices,
       requiresPositionResolution,
-      fantraxContractRaw: String(record.Contract || '').trim(),
+      fantraxContractRaw: contractInput.raw,
+      contractInputMode: contractInput.mode,
+      contractSourceHeader: contractInput.sourceHeader,
+      contractParsed: null,
+      contractEndSeasonId: null,
+      contractWarning: '',
+      matchConflict: Boolean(match.conflict),
+      matchConflictReason: match.reason || '',
+      matchCandidates: (match.candidates || []).map((player) => player.id),
+      matchWarning: importMatchConflictWarningV3171(match),
       existingPlayerId: existing?.id || null,
       action: existing ? 'Update' : 'Add',
       valid: false,
       warning: ''
     };
 
+    parseImportContractRowV3171(importRow);
     refreshFantraxRowValidityV299(importRow);
     output.push(importRow);
 
@@ -1126,6 +1554,7 @@ function parseFantraxTeamRoster(rows) {
     players: output.length,
     minors,
     hasSalary,
+    hasContract,
     sections: Object.keys(sectionCounts),
     sectionCounts
   };
@@ -1210,24 +1639,16 @@ function findExistingImportPlayer(
   sourceId,
   name,
   realTeam,
-  backupPlayerId = null
+  backupPlayerId = null,
+  position = ''
 ) {
-  if (backupPlayerId) {
-    const exact = state.players.find((player) => player.id === backupPlayerId);
-    if (exact) return exact;
-  }
-
-  if (sourceId) {
-    const linked = state.players.find((player) => player.fantraxId === sourceId);
-    if (linked) return linked;
-  }
-
-  const normalizedName = String(name || '').trim().toLowerCase();
-
-  return state.players.find((player) =>
-    String(player.name || '').trim().toLowerCase() === normalizedName
-    && importTeamsCompatibleV299(player.realTeam, realTeam)
-  ) || null;
+  return resolveExistingImportPlayerV3171(
+    sourceId,
+    name,
+    realTeam,
+    position,
+    backupPlayerId
+  ).player;
 }
 
 // ---------------------------------------------------------------------------
@@ -1270,7 +1691,7 @@ function fantraxApiWholeDollarV3170(value) {
   return Number.isFinite(numeric) ? Math.round(numeric) : null;
 }
 
-function fantraxApiImportRowsV3170(syncData, connection = null) {
+function fantraxApiImportRowsV3170(syncData, connection = null, requestedOptions = null) {
   const sport = String(
     syncData?.sport
     || connection?.sport
@@ -1305,11 +1726,21 @@ function fantraxApiImportRowsV3170(syncData, connection = null) {
     const sourceName = String(identity.name || '').trim();
     const name = fantraxApiDisplayNameV3170(sourceName);
     const realTeam = normalizeSourceTeamV299(identity.team, sport);
-    const existing = findExistingImportPlayer(sourceId, name, realTeam);
-
-    const rawPos = String(
+    const sourcePosition = String(
       identity.position
       || item?.position
+      || ''
+    ).trim().toUpperCase();
+    const match = resolveExistingImportPlayerV3171(
+      sourceId,
+      name,
+      realTeam,
+      sourcePosition
+    );
+    const existing = match.player;
+
+    const rawPos = String(
+      sourcePosition
       || existing?.position
       || ''
     ).trim().toUpperCase();
@@ -1408,7 +1839,16 @@ function fantraxApiImportRowsV3170(syncData, connection = null) {
       positionChoices,
       requiresPositionResolution,
       fantraxContractRaw:'',
+      contractInputMode:'auto',
+      contractSourceHeader:'',
+      contractParsed:null,
+      contractEndSeasonId:null,
+      contractWarning:'',
       fantraxApiSourceName:sourceName,
+      matchConflict:Boolean(match.conflict),
+      matchConflictReason:match.reason || '',
+      matchCandidates:(match.candidates || []).map((player) => player.id),
+      matchWarning:importMatchConflictWarningV3171(match),
       existingPlayerId:existing?.id || null,
       action:existing ? 'Update' : 'Add',
       valid:false,
@@ -1450,6 +1890,15 @@ function fantraxApiImportRowsV3170(syncData, connection = null) {
       sections:Object.keys(sectionCounts),
       sectionCounts,
       hasSalary,
+      hasContract:false,
+      syncOptions:{
+        roster:requestedOptions?.roster !== false,
+        salaries:requestedOptions?.salaries !== false,
+        contracts:requestedOptions?.contracts !== false
+      },
+      contractNumericMode:requestedOptions?.contractNumericMode === 'contract_year'
+        ? 'contract_year'
+        : 'remaining',
       fantraxLeagueId:String(syncData?.leagueId || connection?.leagueId || '').trim(),
       fantraxTeamId:String(syncData?.teamId || connection?.teamId || '').trim(),
       fantraxLeagueName:String(connection?.leagueName || '').trim(),
@@ -1468,14 +1917,30 @@ function fantraxApiImportRowsV3170(syncData, connection = null) {
   };
 }
 
-function openFantraxApiImportReviewV3170(syncData, connection = null) {
-  const mapped = fantraxApiImportRowsV3170(syncData, connection);
+function openFantraxApiImportReviewV3170(syncData, connection = null, requestedOptions = null) {
+  const mapped = fantraxApiImportRowsV3170(syncData, connection, requestedOptions);
 
   openImportDialog();
 
   pendingImport = mapped.rows;
   pendingImportMeta = mapped.meta;
   importPreviewFileName = 'Fantrax API Sync';
+
+  if (el('importRosterToggle')) {
+    el('importRosterToggle').checked = pendingImportMeta.syncOptions.roster;
+  }
+  if (el('importSalaryToggle')) {
+    el('importSalaryToggle').checked = pendingImportMeta.syncOptions.salaries;
+  }
+  if (el('importContractToggle')) {
+    el('importContractToggle').checked = pendingImportMeta.syncOptions.contracts;
+  }
+  if (el('importContractNumericModeV3171')) {
+    el('importContractNumericModeV3171').value = pendingImportMeta.contractNumericMode;
+  }
+
+  refreshImportContractRowsV3171();
+  pendingImport.forEach((row) => refreshFantraxRowValidityV299(row));
 
   const fileLabel = importDialog.querySelector('.file-drop > span');
   if (fileLabel) fileLabel.textContent = 'Fantrax API Sync';
@@ -1491,7 +1956,7 @@ function openFantraxApiImportReviewV3170(syncData, connection = null) {
 }
 
 window.RosterCapFantraxApiSync = Object.freeze({
-  version:'3.17.0',
+  version:'3.17.1',
   openReview:openFantraxApiImportReviewV3170,
   mapRows:fantraxApiImportRowsV3170
 });
@@ -1570,11 +2035,18 @@ function mapImportRow(headers, row, sourceRow) {
       : null;
   });
 
-  const existing = findExistingImportPlayer(sourceId, name, realTeam);
+  const match = resolveExistingImportPlayerV3171(
+    sourceId,
+    name,
+    realTeam,
+    position
+  );
+  const existing = match.player;
+  const contractInput = explicitContractInputV3171(record, headers);
 
-  return {
+  const importRow = {
     sourceRow,
-    sourceType: sourceId ? 'FANTRAX' : null,
+    sourceType: sourceId ? 'FANTRAX' : 'GENERIC',
     sourceId,
     name,
     position,
@@ -1589,11 +2061,27 @@ function mapImportRow(headers, row, sourceRow) {
     section: '',
     rosterGroup: existing?.rosterGroup || 'ACTIVE',
     isMinors: false,
+    contractRaw: contractInput.raw,
+    contractInputMode: contractInput.mode,
+    contractSourceHeader: contractInput.sourceHeader,
+    contractParsed: null,
+    contractEndSeasonId: null,
+    contractWarning: '',
+    matchConflict: Boolean(match.conflict),
+    matchConflictReason: match.reason || '',
+    matchCandidates: (match.candidates || []).map((player) => player.id),
+    matchWarning: importMatchConflictWarningV3171(match),
     existingPlayerId: existing?.id || null,
     action: existing ? 'Update' : 'Add',
-    valid: Boolean(name && position && status?.id),
-    warning: ''
+    valid: Boolean(name && position && status?.id && !match.conflict),
+    warning: match.conflict ? importMatchConflictWarningV3171(match) : ''
   };
+
+  parseImportContractRowV3171(importRow);
+  if (!importRow.warning && importRow.contractWarning) {
+    importRow.warning = importRow.contractWarning;
+  }
+  return importRow;
 }
 
 // ---------------------------------------------------------------------------
@@ -1650,8 +2138,9 @@ function importSalaryWillApply(row, current) {
 
   if (pendingImportMeta.type === 'fantrax') {
     return Boolean(
-      pendingImportMeta.hasSalary
-      && el('importSalaryToggle').checked
+      importFantraxSyncOptionsV3171().salaries
+      && pendingImportMeta.hasSalary
+      && el('importSalaryToggle')?.checked
       && row.salary !== null
       && row.salary !== undefined
     );
@@ -1665,6 +2154,13 @@ function importRosterMovement(row) {
   if (
     pendingImportMeta.type !== 'fantrax'
     && pendingImportMeta.type !== 'rostercap_backup'
+  ) {
+    return null;
+  }
+
+  if (
+    pendingImportMeta.type === 'fantrax'
+    && !importFantraxSyncOptionsV3171().roster
   ) {
     return null;
   }
@@ -1696,6 +2192,14 @@ function importLocationPreviewMarkup(row) {
   const targetLabel = rosterGroupLabelV299(target);
 
   if (
+    pendingImportMeta.type === 'fantrax'
+    && !importFantraxSyncOptionsV3171().roster
+  ) {
+    const kept = existing?.rosterGroup || 'ACTIVE';
+    return `<span class="import-kept">${escapeHtml(rosterGroupLabelV299(kept))}<small>roster sync off</small></span>`;
+  }
+
+  if (
     pendingImportMeta.type !== 'fantrax'
     && pendingImportMeta.type !== 'rostercap_backup'
   ) {
@@ -1725,9 +2229,12 @@ function importSalaryPreviewMarkup(row, current) {
 
   if (
     pendingImportMeta.type === 'fantrax'
-    && (!pendingImportMeta.hasSalary || !el('importSalaryToggle').checked)
+    && (!importFantraxSyncOptionsV3171().salaries || !pendingImportMeta.hasSalary || !el('importSalaryToggle')?.checked)
   ) {
-    return `<span class="import-kept">${saved === null ? '—' : formatMoney(saved)}<small>${pendingImportMeta.hasSalary ? 'kept' : 'not supplied'}</small></span>`;
+    const reason = !importFantraxSyncOptionsV3171().salaries
+      ? 'salary sync off'
+      : (pendingImportMeta.hasSalary ? 'kept' : 'not supplied');
+    return `<span class="import-kept">${saved === null ? '—' : formatMoney(saved)}<small>${reason}</small></span>`;
   }
 
   if (incoming === null || incoming === undefined) {
@@ -1745,6 +2252,107 @@ function importSalaryPreviewMarkup(row, current) {
   return `<span class="import-change money-change"><span>${saved === null ? '—' : formatMoney(saved)}</span><strong>→</strong><span>${formatMoney(incoming)}</span></span>`;
 }
 
+
+function importContractWillApplyV3171(row) {
+  if (pendingImportMeta.type === 'rostercap_backup') return true;
+
+  const contractsSelected = pendingImportMeta.type === 'fantrax'
+    ? importFantraxSyncOptionsV3171().contracts
+    : (el('importContractToggle')?.checked !== false);
+
+  if (!contractsSelected) return false;
+
+  const parsed = row.contractParsed || parseImportContractRowV3171(row);
+  return Boolean(parsed?.canUpdateEnd && parsed?.endSeasonId);
+}
+
+function importContractChangesV3171(row) {
+  if (!importContractWillApplyV3171(row)) return false;
+
+  const existing = importExistingPlayer(row);
+
+  if (pendingImportMeta.type === 'rostercap_backup') {
+    const incoming = row.contractEndSeasonId || null;
+    if (!existing) return Boolean(incoming);
+    return String(existing.contractEndSeasonId || '') !== String(incoming || '');
+  }
+
+  const incoming = row.contractParsed?.endSeasonId || row.contractEndSeasonId || null;
+  if (!incoming) return false;
+  if (!existing) return true;
+  return String(existing.contractEndSeasonId || '') !== String(incoming);
+}
+
+function importContractPreviewMarkupV3171(row) {
+  const existing = importExistingPlayer(row);
+  const existingSeason = existing?.contractEndSeasonId
+    ? seasonById(existing.contractEndSeasonId)
+    : null;
+  const existingLabel = existingSeason
+    ? seasonLabel(existingSeason.startYear)
+    : '—';
+
+  if (pendingImportMeta.type === 'rostercap_backup') {
+    const targetSeason = row.contractEndSeasonId
+      ? seasonById(row.contractEndSeasonId)
+      : null;
+    const targetLabel = targetSeason
+      ? seasonLabel(targetSeason.startYear)
+      : '—';
+
+    if (!existing) {
+      return `<span class="import-new-value">${escapeHtml(targetLabel)}<small>restore</small></span>`;
+    }
+
+    if (String(existing.contractEndSeasonId || '') === String(row.contractEndSeasonId || '')) {
+      return `<span class="import-kept">${escapeHtml(targetLabel)}<small>no change</small></span>`;
+    }
+
+    return `<span class="import-change"><span>${escapeHtml(existingLabel)}</span><strong>→</strong><span>${escapeHtml(targetLabel)}</span><small>restore</small></span>`;
+  }
+
+  const raw = String(row.fantraxContractRaw ?? row.contractRaw ?? '').trim();
+  const parsed = row.contractParsed || parseImportContractRowV3171(row);
+  const contractsSelected = pendingImportMeta.type === 'fantrax'
+    ? importFantraxSyncOptionsV3171().contracts
+    : (el('importContractToggle')?.checked !== false);
+
+  if (!raw) {
+    return `<span class="import-kept">${escapeHtml(existingLabel)}<small>not supplied</small></span>`;
+  }
+
+  if (!contractsSelected) {
+    return `<span class="import-kept">${escapeHtml(existingLabel)}<small>contracts sync off · ${escapeHtml(raw)}</small></span>`;
+  }
+
+  if (parsed?.contractYear !== null && parsed?.contractYear !== undefined) {
+    return `<span class="import-kept">${escapeHtml(existingLabel)}<small>Fantrax Year ${escapeHtml(String(parsed.contractYear))} · end kept</small></span>`;
+  }
+
+  if (!parsed?.canUpdateEnd || !parsed?.endSeasonId) {
+    const context = parsed?.contractType
+      ? `${parsed.contractType}${parsed.endYear ? ` ${parsed.endYear}` : ''}`
+      : raw;
+    return `<span class="import-kept">${escapeHtml(existingLabel)}<small>${escapeHtml(context)} · end kept</small></span>`;
+  }
+
+  const targetSeason = seasonById(parsed.endSeasonId);
+  const targetLabel = targetSeason
+    ? seasonLabel(targetSeason.startYear)
+    : String(parsed.endYear || raw);
+  const prefix = parsed.contractType ? `${parsed.contractType} · ` : '';
+
+  if (!existing) {
+    return `<span class="import-new-value">${escapeHtml(targetLabel)}<small>${escapeHtml(prefix)}set</small></span>`;
+  }
+
+  if (String(existing.contractEndSeasonId || '') === String(parsed.endSeasonId)) {
+    return `<span class="import-kept">${escapeHtml(targetLabel)}<small>${escapeHtml(prefix)}no change</small></span>`;
+  }
+
+  return `<span class="import-change"><span>${escapeHtml(existingLabel)}</span><strong>→</strong><span>${escapeHtml(targetLabel)}</span><small>${escapeHtml(prefix)}${escapeHtml(raw)}</small></span>`;
+}
+
 function importReviewStats(valid, invalid, current) {
   const adds = valid.filter((row) => !importExistingPlayer(row)).length;
   const updates = valid.length - adds;
@@ -1760,6 +2368,10 @@ function importReviewStats(valid, invalid, current) {
     importSalaryChanges(row, current)
   ).length;
 
+  const contractChanges = valid.filter((row) =>
+    importContractChangesV3171(row)
+  ).length;
+
   return {
     ready: valid.length,
     invalid,
@@ -1768,7 +2380,8 @@ function importReviewStats(valid, invalid, current) {
     rosterMoves: rosterMoves.length,
     toMinors,
     toActive,
-    salaryChanges
+    salaryChanges,
+    contractChanges
   };
 }
 
@@ -1790,15 +2403,24 @@ function importSafetyMarkupV299(fantrax, backup = false) {
 
   if (fantrax) {
     const apiSync = pendingImportMeta.sourceMode === 'api';
+    const syncOptions = importFantraxSyncOptionsV3171();
     const salaryText = pendingImportMeta.hasSalary
-      ? 'Current-season salary can also update when the option above is enabled.'
+      ? (syncOptions.salaries
+          ? 'Current-season salary can update when Fantrax supplies it.'
+          : 'Salary sync is off, so saved salary is preserved.')
       : (apiSync
           ? 'Fantrax did not supply a usable current salary for these rows, so saved salary is preserved.'
           : 'This Fantrax file does not include Salary, so existing salary data is preserved.');
 
-    const identityText = apiSync
-      ? `Player name, Fantrax ID, real ${sport} team, primary position, eligible positions, roster status and Active/${importDevelopmentLabelV299()} location.`
-      : `Player identity, real player position/eligibility, ${sport} team, age, roster status, Fantrax link and Active/${importDevelopmentLabelV299()} location.`;
+    const identityText = syncOptions.roster
+      ? (apiSync
+          ? `Player name, Fantrax ID, real ${sport} team, primary position, eligible positions, roster status and Active/${importDevelopmentLabelV299()} location.`
+          : `Player identity, real player position/eligibility, ${sport} team, age, roster status, Fantrax link and Active/${importDevelopmentLabelV299()} location.`)
+      : 'Roster & player-info sync is off, so existing roster identity and location fields are preserved.';
+
+    const contractText = syncOptions.contracts
+      ? 'Recognized Contract values can update contract end. UFA28/RFA28, 2028 and 28 map to an end year. Numeric values such as 1 or 2 follow the selected Years remaining / Current contract year interpretation.'
+      : 'Contract sync is off, so existing contract end is preserved.';
 
     return `<div class="import-safety-panel">
       <div>
@@ -1807,7 +2429,7 @@ function importSafetyMarkupV299(fantrax, backup = false) {
       </div>
       <div>
         <span class="import-safety-icon protected">◆</span>
-        <span><strong>Protected data</strong><small>Future salaries, cap overrides, contract end, notes and financial adjustments are preserved. Fantrax Contract data is not guessed into RosterCap contract years. Players missing from Fantrax are never removed automatically.</small></span>
+        <span><strong>Contract + protected data</strong><small>${escapeHtml(contractText)} Blank, unrecognized or out-of-horizon contract values never clear an existing contract. Future salaries, cap overrides, notes and financial adjustments are preserved. Players missing from Fantrax are never removed automatically.</small></span>
       </div>
     </div>`;
   }
@@ -1815,11 +2437,11 @@ function importSafetyMarkupV299(fantrax, backup = false) {
   return `<div class="import-safety-panel">
     <div>
       <span class="import-safety-icon">✓</span>
-      <span><strong>What this generic CSV updates</strong><small>Matched player identity/status fields and any recognized season salary columns. New valid rows are added.</small></span>
+      <span><strong>What this generic CSV updates</strong><small>Matched player identity/status fields, recognized season salary columns and recognized contract columns such as Contract End, End Year, Years Remaining or Contract Year. New valid rows are added.</small></span>
     </div>
     <div>
       <span class="import-safety-icon protected">◆</span>
-      <span><strong>Protected data</strong><small>Existing roster location, contract end, notes and cap overrides are preserved. Players missing from this file are not removed.</small></span>
+      <span><strong>Protected data</strong><small>Blank or unrecognized contract values preserve the existing contract end. Existing roster location, notes and cap overrides are preserved. Players missing from this file are not removed.</small></span>
     </div>
   </div>`;
 }
@@ -1837,16 +2459,38 @@ function renderImportPreview() {
   const stats = importReviewStats(valid, invalid, current);
   const previewRows = pendingImport.slice(0, 30);
 
-  const salaryOption = el('importSalaryToggle').closest('.import-options');
+  const fantraxOptions = el('importFantraxOptionsV3171');
+  const rosterOption = el('importRosterOptionV3171');
+  const salaryOption = el('importSalaryOptionV3171');
+  const contractOption = el('importContractOptionV3171');
+  const contractModeWrap = el('importContractNumericModeWrapV3171');
+  const rosterToggle = el('importRosterToggle');
+  const salaryToggle = el('importSalaryToggle');
+  const contractToggle = el('importContractToggle');
+  const contractMode = el('importContractNumericModeV3171');
 
-  if (salaryOption) {
-    salaryOption.classList.toggle(
-      'hidden',
-      !(fantrax && pendingImportMeta.hasSalary)
-    );
+  const showModularOptions = fantrax || (!backup && pendingImportMeta.hasContract);
+  fantraxOptions?.classList.toggle('hidden', !showModularOptions);
+
+  if (rosterOption) rosterOption.classList.toggle('hidden', !fantrax);
+  if (salaryOption) salaryOption.classList.toggle('hidden', !fantrax);
+  if (contractOption) contractOption.classList.toggle('hidden', !showModularOptions);
+  if (contractModeWrap) contractModeWrap.classList.toggle('hidden', !showModularOptions);
+
+  if (fantrax) {
+    const syncOptions = importFantraxSyncOptionsV3171();
+    if (rosterToggle) rosterToggle.checked = syncOptions.roster;
+    if (salaryToggle) salaryToggle.checked = syncOptions.salaries;
+    if (contractToggle) contractToggle.checked = syncOptions.contracts;
   }
 
-  el('importSalaryToggle').disabled = !(fantrax && pendingImportMeta.hasSalary);
+  if (rosterToggle) rosterToggle.disabled = !fantrax;
+  if (salaryToggle) salaryToggle.disabled = !(fantrax && pendingImportMeta.hasSalary);
+  if (contractToggle) contractToggle.disabled = !showModularOptions;
+  if (contractMode) {
+    contractMode.disabled = !showModularOptions || !contractToggle?.checked;
+    contractMode.value = importContractNumericModeV3171();
+  }
 
   const dialogTitle = importDialog.querySelector('.drawer-header h3');
   if (dialogTitle) {
@@ -1863,8 +2507,8 @@ function renderImportPreview() {
     } else if (fantrax) {
       intro.textContent =
         pendingImportMeta.sourceMode === 'api'
-          ? `Fantrax ${pendingImportMeta.sport} sync data loaded. Review every roster, position, status and current-salary change before applying.`
-          : `Fantrax ${pendingImportMeta.sport} Team Roster detected. Review the mapped positions, statuses, locations and salary behavior before applying.`;
+          ? `Fantrax ${pendingImportMeta.sport} sync data loaded. Review the selected roster, salary and contract modules before applying.`
+          : `Fantrax ${pendingImportMeta.sport} Team Roster detected. Review the selected roster, salary and contract modules before applying.`;
     } else {
       intro.textContent =
         'Generic CSV detected. Review every mapped row before applying.';
@@ -1873,18 +2517,26 @@ function renderImportPreview() {
 
   const rows = previewRows.map((row) => {
     const existing = importExistingPlayer(row);
-    const actionLabel = backup && existing
-      ? 'Restore'
-      : (existing ? 'Update' : 'Add');
+    const actionLabel = row.matchConflict
+      ? 'Review'
+      : (backup && existing
+          ? 'Restore'
+          : (existing ? 'Update' : 'Add'));
+    const matchNote = row.matchConflict
+      ? '<small class="import-row-note">Possible duplicate</small>'
+      : (existing
+          ? '<small class="import-row-note">Matched existing</small>'
+          : '<small class="import-row-note">New player</small>');
 
     return `<tr class="${row.valid ? '' : 'import-invalid-row'}">
       <td>${row.sourceRow}</td>
-      <td><strong>${escapeHtml(row.name || 'Missing name')}</strong>${existing ? '<small class="import-row-note">Matched existing</small>' : '<small class="import-row-note">New player</small>'}</td>
+      <td><strong>${escapeHtml(row.name || 'Missing name')}</strong>${matchNote}</td>
       <td>${importPositionCellMarkupV299(row)}</td>
       <td>${escapeHtml(row.realTeam || '—')}</td>
       <td>${escapeHtml(statusById(row.statusId)?.name || row.statusRaw || 'Unmapped')}</td>
       <td>${importLocationPreviewMarkup(row)}</td>
       <td>${importSalaryPreviewMarkup(row, current)}</td>
+      <td>${importContractPreviewMarkupV3171(row)}</td>
       <td><span class="import-action-badge ${existing ? 'update' : 'add'}">${actionLabel}</span></td>
       <td>${row.valid ? `<span class="import-ready">${row.warning ? 'Ready*' : 'Ready'}</span>${row.warning ? `<small class="import-row-note">${escapeHtml(row.warning)}</small>` : ''}` : `<span class="danger">${escapeHtml(row.warning || 'Needs review')}</span>`}</td>
     </tr>`;
@@ -1895,20 +2547,28 @@ function renderImportPreview() {
   const detector = backup
     ? `<div class="import-detect"><span class="import-chip primary">RosterCap Roster Backup</span><span class="import-chip">${escapeHtml(pendingImportMeta.backupVersion || '')}</span>${pendingImportMeta.backupSport ? `<span class="import-chip">${escapeHtml(pendingImportMeta.backupSport)}</span>` : ''}<span class="import-chip">${pendingImportMeta.players} players</span><span class="import-chip">${pendingImportMeta.minors} ${escapeHtml(importDevelopmentLabelV299().toLowerCase())}</span>${pendingImportMeta.backupTeam ? `<span class="import-chip">${escapeHtml(pendingImportMeta.backupTeam)}</span>` : ''}${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`
     : fantrax
-      ? `<div class="import-detect"><span class="import-chip primary">${pendingImportMeta.sourceMode === 'api' ? 'Fantrax API Sync' : `Fantrax ${escapeHtml(pendingImportMeta.sport)} Team Roster`}</span><span class="import-chip">${pendingImportMeta.players} players</span><span class="import-chip">${sectionCount} section${sectionCount === 1 ? '' : 's'}</span><span class="import-chip">${pendingImportMeta.minors} ${escapeHtml(importDevelopmentLabelV299().toLowerCase())}</span><span class="import-chip">${pendingImportMeta.hasSalary ? 'Salary included' : (pendingImportMeta.sourceMode === 'api' ? 'No usable salary' : 'No salary column')}</span>${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`
+      ? `<div class="import-detect"><span class="import-chip primary">${pendingImportMeta.sourceMode === 'api' ? 'Fantrax API Sync' : `Fantrax ${escapeHtml(pendingImportMeta.sport)} Team Roster`}</span><span class="import-chip">${pendingImportMeta.players} players</span><span class="import-chip">${sectionCount} section${sectionCount === 1 ? '' : 's'}</span><span class="import-chip">${pendingImportMeta.minors} ${escapeHtml(importDevelopmentLabelV299().toLowerCase())}</span><span class="import-chip">${pendingImportMeta.hasSalary ? 'Salary included' : (pendingImportMeta.sourceMode === 'api' ? 'No usable salary' : 'No salary column')}</span><span class="import-chip">${pendingImportMeta.hasContract ? 'Contract data included' : (pendingImportMeta.sourceMode === 'api' ? 'No API contract data' : 'No contract column')}</span>${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`
       : `<div class="import-detect"><span class="import-chip primary">Generic CSV</span><span class="import-chip">${pendingImportMeta.players} rows</span>${importPreviewFileName ? `<span class="import-chip file">${escapeHtml(importPreviewFileName)}</span>` : ''}</div>`;
 
-  const movementDetail = (fantrax || backup)
-    ? (
-        stats.rosterMoves
-          ? `${stats.rosterMoves} · ${stats.toMinors} to ${importDevelopmentLabelV299()} · ${stats.toActive} to ${importPrimaryRosterLabelV299()}`
-          : '0 · no location changes'
-      )
-    : 'Not changed';
+  const movementDetail = fantrax && !importFantraxSyncOptionsV3171().roster
+    ? 'sync off'
+    : ((fantrax || backup)
+        ? (
+            stats.rosterMoves
+              ? `${stats.rosterMoves} · ${stats.toMinors} to ${importDevelopmentLabelV299()} · ${stats.toActive} to ${importPrimaryRosterLabelV299()}`
+              : '0 · no location changes'
+          )
+        : 'Not changed');
 
-  const salarySummary = fantrax && !pendingImportMeta.hasSalary
-    ? 'not supplied'
-    : (current ? seasonLabel(current.startYear) : 'current season');
+  const salarySummary = fantrax && !importFantraxSyncOptionsV3171().salaries
+    ? 'sync off'
+    : (fantrax && !pendingImportMeta.hasSalary
+        ? 'not supplied'
+        : (current ? seasonLabel(current.startYear) : 'current season'));
+
+  const contractSummary = fantrax && !importFantraxSyncOptionsV3171().contracts
+    ? 'sync off'
+    : (pendingImportMeta.hasContract ? 'recognized values only' : 'not supplied');
 
   const reviewSummary = `<div class="import-review-summary">
     <div><span>Ready</span><strong>${stats.ready}</strong><small>valid rows</small></div>
@@ -1916,6 +2576,7 @@ function renderImportPreview() {
     <div><span>${backup ? 'Restore' : 'Update'}</span><strong>${stats.updates}</strong><small>matched players</small></div>
     <div class="${stats.rosterMoves ? 'attention' : ''}"><span>Roster moves</span><strong>${(fantrax || backup) ? stats.rosterMoves : '—'}</strong><small>${escapeHtml(movementDetail)}</small></div>
     <div class="${stats.salaryChanges ? 'attention' : ''}"><span>Salary changes</span><strong>${stats.salaryChanges}</strong><small>${escapeHtml(salarySummary)}</small></div>
+    <div class="${stats.contractChanges ? 'attention' : ''}"><span>Contract changes</span><strong>${stats.contractChanges}</strong><small>${escapeHtml(contractSummary)}</small></div>
     <div class="${stats.invalid ? 'warning' : ''}"><span>Skipped</span><strong>${stats.invalid}</strong><small>needs review</small></div>
   </div>`;
 
@@ -1946,8 +2607,12 @@ function renderImportPreview() {
       ? `<div class="import-review-warning"><strong>Fantrax salary cap: ${escapeHtml(formatMoney(pendingImportMeta.fantraxSalaryCap))}</strong><span>Shown for comparison only. This player sync does not overwrite RosterCap league settings or future caps.</span></div>`
       : '';
 
+  const duplicateConflictRows = pendingImport.filter((row) => row.matchConflict).length;
+
   const invalidNote = invalid
-    ? `<div class="import-review-warning"><strong>${invalid} row${invalid === 1 ? '' : 's'} need${invalid === 1 ? 's' : ''} review.</strong><span>${backup
+    ? `<div class="import-review-warning"><strong>${invalid} row${invalid === 1 ? '' : 's'} need${invalid === 1 ? 's' : ''} review.</strong><span>${duplicateConflictRows
+        ? `${duplicateConflictRows} row${duplicateConflictRows === 1 ? '' : 's'} ${duplicateConflictRows === 1 ? 'has' : 'have'} a possible duplicate match. Remove or resolve the duplicate in RosterCap before applying this sync. `
+        : ''}${backup
         ? 'Restore requires matching sport, season columns, group keys and roster-status names.'
         : (
             unresolvedPositionRows
@@ -1967,10 +2632,10 @@ function renderImportPreview() {
     ${missingLinkedNote}
     ${fantraxCapNote}
     ${invalidNote}
-    <div class="import-review-table-head"><strong>Player review</strong><span>Nothing is saved until you press Apply Import.</span></div>
+    <div class="import-review-table-head"><strong>Player review</strong><span>Nothing is saved until you press the apply button.</span></div>
     <div class="table-wrap import-review-table-wrap">
       <table class="import-review-table">
-        <thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Team</th><th>Status</th><th>Location</th><th>${current ? escapeHtml(seasonLabel(current.startYear)) : 'Salary'}</th><th>Action</th><th>Check</th></tr></thead>
+        <thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Team</th><th>Status</th><th>Location</th><th>${current ? escapeHtml(seasonLabel(current.startYear)) : 'Salary'}</th><th>Contract</th><th>Action</th><th>Check</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -2065,11 +2730,22 @@ async function applyImport() {
 
   const backup = pendingImportMeta.type === 'rostercap_backup';
   const fantrax = pendingImportMeta.type === 'fantrax';
+  const syncOptions = importFantraxSyncOptionsV3171();
 
+  const updateRoster = Boolean(fantrax && syncOptions.roster);
   const updateSalary = Boolean(
     fantrax
+    && syncOptions.salaries
     && pendingImportMeta.hasSalary
-    && el('importSalaryToggle').checked
+    && el('importSalaryToggle')?.checked
+  );
+  const updateContracts = Boolean(
+    !backup
+    && (
+      fantrax
+        ? syncOptions.contracts
+        : (pendingImportMeta.hasContract && el('importContractToggle')?.checked)
+    )
   );
 
   const button = el('applyImportBtn');
@@ -2134,47 +2810,74 @@ async function applyImport() {
         };
       });
 
-      const finalPosition =
-        row.position
-        || existing?.position
-        || importDefaultPositionV299();
+      const preserveRosterFields = fantrax && !updateRoster && existing;
 
-      const finalEligibility =
-        row.eligiblePositions
-        || existing?.eligiblePositions
-        || finalPosition;
+      const finalPosition = preserveRosterFields
+        ? (existing.position || importDefaultPositionV299())
+        : (
+            row.position
+            || existing?.position
+            || importDefaultPositionV299()
+          );
 
-      const finalAge =
-        backup
-          ? (row.ageSnapshot ?? null)
-          : (row.ageSnapshot ?? existing?.ageSnapshot ?? null);
+      const finalEligibility = preserveRosterFields
+        ? (existing.eligiblePositions || existing.position || finalPosition)
+        : (
+            row.eligiblePositions
+            || existing?.eligiblePositions
+            || finalPosition
+          );
+
+      const finalAge = backup
+        ? (row.ageSnapshot ?? null)
+        : (preserveRosterFields
+            ? (existing?.ageSnapshot ?? null)
+            : (row.ageSnapshot ?? existing?.ageSnapshot ?? null));
+
+      const parsedContract = row.contractParsed || parseImportContractRowV3171(row);
+      const finalContractEndSeasonId = backup
+        ? (row.contractEndSeasonId || null)
+        : (
+            updateContracts
+            && parsedContract?.canUpdateEnd
+            && parsedContract?.endSeasonId
+              ? parsedContract.endSeasonId
+              : (existing?.contractEndSeasonId || null)
+          );
 
       const { data: savedPlayerId, error } = await db.rpc(
         'save_front_office_player_v2',
         {
           p_front_office_id: frontOfficeId,
           p_front_office_player_id: existing?.id || null,
-          p_player_name: row.name,
+          p_player_name: preserveRosterFields
+            ? existing.name
+            : row.name,
           p_position: finalPosition,
           p_eligible_positions: finalEligibility,
           p_real_team: backup
             ? (row.realTeam || null)
-            : (row.realTeam || existing?.realTeam || null),
+            : (preserveRosterFields
+                ? (existing?.realTeam || null)
+                : (row.realTeam || existing?.realTeam || null)),
           p_age_snapshot: finalAge,
           p_age_as_of: backup
             ? (row.ageAsOf || null)
+            : (preserveRosterFields
+                ? (existing?.ageAsOf || null)
+                : (
+                    finalAge === null || finalAge === undefined
+                      ? null
+                      : todayIsoDate()
+                  )),
+          p_roster_status_id: preserveRosterFields
+            ? (existing?.statusId || state.statuses[0]?.id)
             : (
-                finalAge === null || finalAge === undefined
-                  ? null
-                  : todayIsoDate()
+                row.statusId
+                || existing?.statusId
+                || state.statuses[0]?.id
               ),
-          p_roster_status_id:
-            row.statusId
-            || existing?.statusId
-            || state.statuses[0]?.id,
-          p_contract_end_season_id: backup
-            ? (row.contractEndSeasonId || null)
-            : (existing?.contractEndSeasonId || null),
+          p_contract_end_season_id: finalContractEndSeasonId,
           p_notes: backup
             ? (row.notes || null)
             : (existing?.notes || null),
@@ -2193,7 +2896,7 @@ async function applyImport() {
         throw new Error(`Could not resolve the saved player ID for ${row.name}.`);
       }
 
-      if (fantrax || backup) {
+      if (backup || (fantrax && updateRoster)) {
         const targetGroup = backup
           ? row.rosterGroup
           : (row.isMinors ? 'FARM' : 'ACTIVE');
