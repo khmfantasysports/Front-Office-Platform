@@ -179,7 +179,7 @@ function currentSeasonControlMarkup(snapshot) {
 // - nothing is saved until the user presses Apply Sync in that review.
 // -----------------------------------------------------------------------------
 
-const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3162 = '3.17.1';
+const ROSTERCAP_FANTRAX_PREVIEW_VERSION_V3162 = '3.17.2';
 
 let fantraxConnectionPreviewV3162 = {
   status:'idle',
@@ -249,6 +249,142 @@ function fantraxSyncOptionsMarkupV3171() {
       <label><span><input type="checkbox" disabled /> Draft picks</span><small>Planned module using getDraftPicks after its exact response contract is verified.</small></label>
     </div>
   </div>`;
+}
+
+
+let fantraxCredentialStateV3172 = {
+  status:'unknown',
+  saved:false,
+  lastVerifiedAt:'',
+  error:''
+};
+
+function fantraxCredentialStatusMarkupV3172() {
+  const credential = fantraxCredentialStateV3172;
+
+  if (credential.status === 'loading' || credential.status === 'unknown') {
+    return `<div class="settings-health-panel">
+      <div class="settings-health-head"><div><span>Saved credential</span><strong>Checking…</strong></div><span class="settings-health-badge">Secure</span></div>
+      <p>RosterCap is checking whether this account already has a saved Fantrax Secret ID. No Fantrax API call is made.</p>
+    </div>`;
+  }
+
+  if (credential.status === 'error') {
+    return `<div class="settings-health-panel has-warning">
+      <div class="settings-health-head"><div><span>Saved credential</span><strong>Status unavailable</strong></div><span class="settings-health-badge">Review</span></div>
+      <p>${escapeHtml(credential.error || 'RosterCap could not check the saved Fantrax credential.')}</p>
+    </div>`;
+  }
+
+  if (!credential.saved) {
+    return `<div class="settings-health-panel">
+      <div class="settings-health-head"><div><span>Saved credential</span><strong>None saved</strong></div><span class="settings-health-badge">Optional</span></div>
+      <p>Enter your Fantrax User Secret ID below. You can use it once or choose to save it securely for future manual syncs.</p>
+    </div>`;
+  }
+
+  const verified = credential.lastVerifiedAt
+    ? new Date(credential.lastVerifiedAt).toLocaleString()
+    : 'Previously verified';
+
+  return `<div class="settings-health-panel is-good">
+    <div class="settings-health-head"><div><span>Saved credential</span><strong>Secret ID saved securely</strong></div><span class="settings-health-badge">Ready</span></div>
+    <p>Last verified ${escapeHtml(verified)}. The Secret ID itself is never returned to the browser.</p>
+  </div>`;
+}
+
+function fantraxUpdateCredentialUiV3172() {
+  const status = el('fantraxCredentialStatusV3172');
+  if (status) status.innerHTML = fantraxCredentialStatusMarkupV3172();
+
+  const forget = el('fantraxForgetSecretBtnV3172');
+  forget?.classList.toggle('hidden', !fantraxCredentialStateV3172.saved);
+
+  const input = el('fantraxUserSecretIdV3162');
+  if (input) {
+    input.placeholder = fantraxCredentialStateV3172.saved
+      ? 'Optional — enter a new Secret ID to replace the saved one'
+      : 'Enter your Fantrax User Secret ID';
+  }
+}
+
+async function loadFantraxCredentialStatusV3172() {
+  if (!session?.user) return;
+  if (fantraxCredentialStateV3172.status !== 'unknown') return;
+
+  fantraxCredentialStateV3172.status = 'loading';
+  fantraxUpdateCredentialUiV3172();
+
+  try {
+    const { data, error } = await db.functions.invoke(
+      'fantrax-connect-preview',
+      { body:{ action:'credentialStatus' } }
+    );
+
+    if (error) throw error;
+    if (!data?.ok) throw new Error(data?.message || 'Credential status request failed.');
+
+    fantraxCredentialStateV3172 = {
+      status:data.saved ? 'saved' : 'none',
+      saved:Boolean(data.saved),
+      lastVerifiedAt:String(data.lastVerifiedAt || ''),
+      error:''
+    };
+  } catch (error) {
+    fantraxCredentialStateV3172 = {
+      status:'error',
+      saved:false,
+      lastVerifiedAt:'',
+      error:error?.message || 'Could not check saved Fantrax credential.'
+    };
+  }
+
+  fantraxUpdateCredentialUiV3172();
+}
+
+async function forgetFantraxCredentialV3172() {
+  if (!fantraxCredentialStateV3172.saved) return;
+
+  const confirmed = confirm(
+    'Forget the saved Fantrax Secret ID for this RosterCap account?\n\nYou can enter it again later. This does not change any roster or league data.'
+  );
+  if (!confirmed) return;
+
+  const button = el('fantraxForgetSecretBtnV3172');
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Forgetting…';
+  }
+
+  try {
+    const { data, error } = await db.functions.invoke(
+      'fantrax-connect-preview',
+      { body:{ action:'deleteCredential' } }
+    );
+
+    if (error) throw error;
+    if (!data?.ok) throw new Error(data?.message || 'Could not forget the saved Fantrax credential.');
+
+    fantraxCredentialStateV3172 = {
+      status:'none',
+      saved:false,
+      lastVerifiedAt:'',
+      error:''
+    };
+    fantraxUpdateCredentialUiV3172();
+    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Credential forgotten');
+  } catch (error) {
+    fantraxCredentialStateV3172.status = 'error';
+    fantraxCredentialStateV3172.error = error?.message || 'Could not forget the saved Fantrax credential.';
+    fantraxUpdateCredentialUiV3172();
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Forget failed');
+  } finally {
+    const current = el('fantraxForgetSecretBtnV3172');
+    if (current) {
+      current.disabled = false;
+      current.textContent = 'Forget Saved ID';
+    }
+  }
 }
 
 function fantraxPreviewTechnicalJsonV3162(value, limit = 120000) {
@@ -560,7 +696,7 @@ function fantraxPreviewResultMarkupV3162() {
   }
 
   if (preview.status !== 'success' || !preview.data) {
-    return `<p class="settings-card-copy">Nothing is saved during this preview. Your User Secret ID is cleared from this page after each connection test.</p>`;
+    return `<p class="settings-card-copy">Nothing is saved to your roster during this preview. A newly entered Secret ID is cleared from the page after the request; when Remember is enabled, only the encrypted server-side credential is retained.</p>`;
   }
 
   const receivedAt = preview.data.receivedAt
@@ -588,15 +724,20 @@ function fantraxConnectionMarkupV3162() {
   return `<details class="settings-disclosure" data-settings-section="fantrax-connection">
     <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Manual modular sync</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
     <div class="settings-disclosure-body">
-      <p class="settings-card-copy">Fantrax remains user-triggered only. Test Connection loads your owned leagues. Choose the roster, salary and contract modules you want, then open the existing RosterCap review before anything is saved.</p>
+      <p class="settings-card-copy">Fantrax remains user-triggered only. Load Leagues reads your owned Fantrax leagues only when you press the button. Choose the roster, salary and contract modules you want, then review every player before anything is saved.</p>
+      <div id="fantraxCredentialStatusV3172">${fantraxCredentialStatusMarkupV3172()}</div>
       <div class="settings-fields">
         <label>Fantrax User Secret ID
-          <input id="fantraxUserSecretIdV3162" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="Enter your Fantrax User Secret ID" />
+          <input id="fantraxUserSecretIdV3162" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="256" placeholder="${fantraxCredentialStateV3172.saved ? 'Optional — enter a new Secret ID to replace the saved one' : 'Enter your Fantrax User Secret ID'}" />
         </label>
+        <label><span><input id="fantraxRememberSecretV3172" type="checkbox" checked /> Remember this Secret ID securely</span><small>When you enter a Secret ID, RosterCap can encrypt it server-side and save it to your signed-in account. It is never stored in browser storage or returned to the page.</small></label>
       </div>
       <div class="transaction-rules-footer">
-        <span>The secret is used only for the manual getLeagues connection test and is not written to the RosterCap database in this phase.</span>
-        <button id="fantraxTestConnectionBtnV3162" class="btn btn-primary btn-small" type="button">Test Connection</button>
+        <span>Leave the Secret ID blank when a saved credential is available. Saving is optional; uncheck Remember to use a newly entered ID only for this request.</span>
+        <div class="settings-data-actions">
+          <button id="fantraxForgetSecretBtnV3172" class="btn btn-ghost btn-small ${fantraxCredentialStateV3172.saved ? '' : 'hidden'}" type="button">Forget Saved ID</button>
+          <button id="fantraxTestConnectionBtnV3162" class="btn btn-primary btn-small" type="button">Load Leagues</button>
+        </div>
       </div>
       <div id="fantraxConnectionResultV3162">${fantraxPreviewResultMarkupV3162()}</div>
     </div>
@@ -632,15 +773,19 @@ async function testFantraxConnectionV3162() {
   const input = el('fantraxUserSecretIdV3162');
   const button = el('fantraxTestConnectionBtnV3162');
   const secret = String(input?.value || '').trim();
+  const useSavedCredential = !secret && fantraxCredentialStateV3172.saved;
+  const rememberCredential = Boolean(
+    secret && el('fantraxRememberSecretV3172')?.checked
+  );
 
-  if (!secret) {
-    alert('Enter your Fantrax User Secret ID first.');
+  if (!secret && !useSavedCredential) {
+    alert('Enter your Fantrax User Secret ID first, or save one securely for this account.');
     input?.focus();
     return;
   }
 
   if (!session?.user) {
-    alert('Sign in to RosterCap before testing the Fantrax connection.');
+    alert('Sign in to RosterCap before loading Fantrax leagues.');
     return;
   }
 
@@ -656,21 +801,22 @@ async function testFantraxConnectionV3162() {
 
   if (button) {
     button.disabled = true;
-    button.textContent = 'Testing…';
+    button.textContent = 'Loading…';
   }
 
-  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Testing…');
+  setSettingsSectionFeedback('fantrax-connection', 'saving', 'Loading leagues…');
   fantraxRenderConnectionResultV3162();
 
   try {
+    const requestBody = {
+      action:'getLeagues',
+      ...(secret ? { userSecretId:secret } : { useSavedCredential:true }),
+      ...(secret ? { rememberCredential } : {})
+    };
+
     const { data, error } = await db.functions.invoke(
       'fantrax-connect-preview',
-      {
-        body:{
-          action:'getLeagues',
-          userSecretId:secret
-        }
-      }
+      { body:requestBody }
     );
 
     if (error) throw error;
@@ -683,7 +829,17 @@ async function testFantraxConnectionV3162() {
     fantraxConnectionPreviewV3162.error = '';
     fantraxEnsureSelectionV3162();
 
-    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Connection works');
+    if (data?.credential?.saved) {
+      fantraxCredentialStateV3172 = {
+        status:'saved',
+        saved:true,
+        lastVerifiedAt:String(data.credential.lastVerifiedAt || new Date().toISOString()),
+        error:''
+      };
+    }
+
+    fantraxUpdateCredentialUiV3172();
+    setSettingsSectionFeedback('fantrax-connection', 'saved', 'Leagues loaded');
   } catch (error) {
     const message = await fantraxPreviewErrorMessageV3162(error);
 
@@ -691,16 +847,17 @@ async function testFantraxConnectionV3162() {
     fantraxConnectionPreviewV3162.data = null;
     fantraxConnectionPreviewV3162.error = message;
 
-    setSettingsSectionFeedback('fantrax-connection', 'error', 'Test failed');
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Connection failed');
     console.error('Fantrax connection preview failed', error);
   } finally {
     if (input) input.value = '';
+    fantraxUpdateCredentialUiV3172();
     fantraxRenderConnectionResultV3162();
 
     const currentButton = el('fantraxTestConnectionBtnV3162');
     if (currentButton) {
       currentButton.disabled = false;
-      currentButton.textContent = 'Test Connection';
+      currentButton.textContent = 'Load Leagues';
     }
   }
 }
@@ -843,6 +1000,7 @@ function bindFantraxConnectionV3162() {
   const input = el('fantraxUserSecretIdV3162');
 
   button?.addEventListener('click', testFantraxConnectionV3162);
+  el('fantraxForgetSecretBtnV3172')?.addEventListener('click', forgetFantraxCredentialV3172);
 
   input?.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
@@ -851,6 +1009,7 @@ function bindFantraxConnectionV3162() {
   });
 
   bindFantraxConnectionResultV3162();
+  loadFantraxCredentialStatusV3172();
 }
 
 // League, roster, cap and transaction-rule settings.
