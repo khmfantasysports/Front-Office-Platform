@@ -1,7 +1,7 @@
 'use strict';
 
 // ============================================================================
-// RosterCap V3.17.1 — Safer Fantrax matching + modular sync + contract parsing
+// RosterCap V3.17.2 — Review decisions + safer Fantrax matching + modular sync + contract parsing
 //
 // Supported external Fantrax Team Roster adapters:
 // - NHL
@@ -21,7 +21,7 @@
 //   remain protected from Fantrax imports.
 // ============================================================================
 
-const ROSTERCAP_IMPORT_VERSION_V299 = 'V3.17.1';
+const ROSTERCAP_IMPORT_VERSION_V299 = 'V3.17.2';
 const ROSTERCAP_BACKUP_V1 = 'ROSTERCAP_ROSTER_BACKUP_V1';
 const ROSTERCAP_BACKUP_V2 = 'ROSTERCAP_ROSTER_BACKUP_V2';
 
@@ -107,6 +107,61 @@ function importContractNumericModeV3171() {
   return pendingImportMeta?.contractNumericMode === 'contract_year'
     ? 'contract_year'
     : 'remaining';
+}
+
+
+function importEnsureRowDecisionV3172(row) {
+  if (!row) return 'skip';
+
+  if (!['include','skip'].includes(row.applyDecision)) {
+    row.applyDecision = 'include';
+  }
+
+  // Possible-duplicate rows are intentionally blocked until the duplicate is
+  // resolved in RosterCap. They must never become an automatic Add.
+  if (row.matchConflict) row.applyDecision = 'skip';
+
+  return row.applyDecision;
+}
+
+function importRowWillApplyV3172(row) {
+  return Boolean(
+    row?.valid
+    && importEnsureRowDecisionV3172(row) === 'include'
+  );
+}
+
+function importDecisionCellMarkupV3172(row, existing, backup = false) {
+  importEnsureRowDecisionV3172(row);
+
+  if (!row.valid) {
+    const reason = row.matchConflict
+      ? 'Skip — possible duplicate'
+      : 'Skip — needs review';
+
+    return `<select disabled aria-label="Decision for ${escapeAttr(row.name || 'player')}">
+      <option>${escapeHtml(reason)}</option>
+    </select>`;
+  }
+
+  const includeLabel = backup
+    ? (existing ? 'Restore player' : 'Add from backup')
+    : (existing ? 'Apply changes' : 'Add player');
+
+  return `<select
+    data-import-decision-row="${row.sourceRow}"
+    aria-label="Decision for ${escapeAttr(row.name || 'player')}"
+  >
+    <option value="include" ${row.applyDecision === 'include' ? 'selected' : ''}>${escapeHtml(includeLabel)}</option>
+    <option value="skip" ${row.applyDecision === 'skip' ? 'selected' : ''}>Skip player</option>
+  </select>`;
+}
+
+function importSetDecisionV3172(row, decision) {
+  if (!row) return;
+  row.applyDecision = decision === 'include' && row.valid && !row.matchConflict
+    ? 'include'
+    : 'skip';
 }
 
 function importCanonicalPlayerNameV3171(value) {
@@ -1146,6 +1201,7 @@ function refreshFantraxRowValidityV299(row) {
   );
 
   if (row.matchConflict) {
+    row.applyDecision = 'skip';
     row.warning = row.matchWarning || 'Possible duplicate player match. Resolve it before syncing.';
     return row;
   }
@@ -2429,7 +2485,7 @@ function importSafetyMarkupV299(fantrax, backup = false) {
       </div>
       <div>
         <span class="import-safety-icon protected">◆</span>
-        <span><strong>Contract + protected data</strong><small>${escapeHtml(contractText)} Blank, unrecognized or out-of-horizon contract values never clear an existing contract. Future salaries, cap overrides, notes and financial adjustments are preserved. Players missing from Fantrax are never removed automatically.</small></span>
+        <span><strong>Contract + protected data</strong><small>${escapeHtml(contractText)} Blank, unrecognized or out-of-horizon contract values never clear an existing contract. Each player can be included or skipped in review. Future salaries, cap overrides, notes and financial adjustments are preserved. Players missing from Fantrax are never removed automatically.</small></span>
       </div>
     </div>`;
   }
@@ -2437,11 +2493,11 @@ function importSafetyMarkupV299(fantrax, backup = false) {
   return `<div class="import-safety-panel">
     <div>
       <span class="import-safety-icon">✓</span>
-      <span><strong>What this generic CSV updates</strong><small>Matched player identity/status fields, recognized season salary columns and recognized contract columns such as Contract End, End Year, Years Remaining or Contract Year. New valid rows are added.</small></span>
+      <span><strong>What this generic CSV updates</strong><small>Matched player identity/status fields, recognized season salary columns and recognized contract data. Fantrax uses the Contract column; optional explicit Contract End / Years Remaining columns are also accepted when a custom file supplies them. New valid rows are added only when included in review.</small></span>
     </div>
     <div>
       <span class="import-safety-icon protected">◆</span>
-      <span><strong>Protected data</strong><small>Blank or unrecognized contract values preserve the existing contract end. Existing roster location, notes and cap overrides are preserved. Players missing from this file are not removed.</small></span>
+      <span><strong>Protected data</strong><small>Blank or unrecognized contract values preserve the existing contract end. Each review row can be included or skipped. Existing roster location, notes and cap overrides are preserved. Players missing from this file are not removed.</small></span>
     </div>
   </div>`;
 }
@@ -2449,14 +2505,18 @@ function importSafetyMarkupV299(fantrax, backup = false) {
 function renderImportPreview() {
   if (!pendingImport.length) return;
 
+  pendingImport.forEach(importEnsureRowDecisionV3172);
+
   const valid = pendingImport.filter((row) => row.valid);
+  const includedValid = valid.filter(importRowWillApplyV3172);
+  const skippedValid = valid.length - includedValid.length;
   const invalid = pendingImport.length - valid.length;
   const current = currentSeason();
 
   const fantrax = pendingImportMeta.type === 'fantrax';
   const backup = pendingImportMeta.type === 'rostercap_backup';
 
-  const stats = importReviewStats(valid, invalid, current);
+  const stats = importReviewStats(includedValid, invalid, current);
   const previewRows = pendingImport.slice(0, 30);
 
   const fantraxOptions = el('importFantraxOptionsV3171');
@@ -2528,7 +2588,9 @@ function renderImportPreview() {
           ? '<small class="import-row-note">Matched existing</small>'
           : '<small class="import-row-note">New player</small>');
 
-    return `<tr class="${row.valid ? '' : 'import-invalid-row'}">
+    const included = importRowWillApplyV3172(row);
+
+    return `<tr class="${row.valid ? '' : 'import-invalid-row'}" ${row.valid && !included ? 'style="opacity:.58"' : ''}>
       <td>${row.sourceRow}</td>
       <td><strong>${escapeHtml(row.name || 'Missing name')}</strong>${matchNote}</td>
       <td>${importPositionCellMarkupV299(row)}</td>
@@ -2538,7 +2600,8 @@ function renderImportPreview() {
       <td>${importSalaryPreviewMarkup(row, current)}</td>
       <td>${importContractPreviewMarkupV3171(row)}</td>
       <td><span class="import-action-badge ${existing ? 'update' : 'add'}">${actionLabel}</span></td>
-      <td>${row.valid ? `<span class="import-ready">${row.warning ? 'Ready*' : 'Ready'}</span>${row.warning ? `<small class="import-row-note">${escapeHtml(row.warning)}</small>` : ''}` : `<span class="danger">${escapeHtml(row.warning || 'Needs review')}</span>`}</td>
+      <td>${importDecisionCellMarkupV3172(row, existing, backup)}</td>
+      <td>${row.valid ? `<span class="import-ready">${included ? (row.warning ? 'Ready*' : 'Ready') : 'Skipped'}</span>${row.warning ? `<small class="import-row-note">${escapeHtml(row.warning)}</small>` : ''}` : `<span class="danger">${escapeHtml(row.warning || 'Needs review')}</span>`}</td>
     </tr>`;
   }).join('');
 
@@ -2571,17 +2634,18 @@ function renderImportPreview() {
     : (pendingImportMeta.hasContract ? 'recognized values only' : 'not supplied');
 
   const reviewSummary = `<div class="import-review-summary">
-    <div><span>Ready</span><strong>${stats.ready}</strong><small>valid rows</small></div>
-    <div><span>Add</span><strong>${stats.adds}</strong><small>new players</small></div>
-    <div><span>${backup ? 'Restore' : 'Update'}</span><strong>${stats.updates}</strong><small>matched players</small></div>
+    <div><span>Included</span><strong>${stats.ready}</strong><small>will apply</small></div>
+    <div><span>Add</span><strong>${stats.adds}</strong><small>included new players</small></div>
+    <div><span>${backup ? 'Restore' : 'Update'}</span><strong>${stats.updates}</strong><small>included matched players</small></div>
     <div class="${stats.rosterMoves ? 'attention' : ''}"><span>Roster moves</span><strong>${(fantrax || backup) ? stats.rosterMoves : '—'}</strong><small>${escapeHtml(movementDetail)}</small></div>
     <div class="${stats.salaryChanges ? 'attention' : ''}"><span>Salary changes</span><strong>${stats.salaryChanges}</strong><small>${escapeHtml(salarySummary)}</small></div>
     <div class="${stats.contractChanges ? 'attention' : ''}"><span>Contract changes</span><strong>${stats.contractChanges}</strong><small>${escapeHtml(contractSummary)}</small></div>
-    <div class="${stats.invalid ? 'warning' : ''}"><span>Skipped</span><strong>${stats.invalid}</strong><small>needs review</small></div>
+    <div class="${skippedValid ? 'attention' : ''}"><span>User skipped</span><strong>${skippedValid}</strong><small>valid rows excluded</small></div>
+    <div class="${stats.invalid ? 'warning' : ''}"><span>Needs review</span><strong>${stats.invalid}</strong><small>blocked rows</small></div>
   </div>`;
 
   const rowLimitNote = pendingImport.length > previewRows.length
-    ? `<div class="import-preview-limit">Showing the first ${previewRows.length} of ${pendingImport.length} rows. All ${stats.ready} valid rows will be applied.</div>`
+    ? `<div class="import-preview-limit">Showing the first ${previewRows.length} of ${pendingImport.length} rows. ${includedValid.length} included valid row${includedValid.length === 1 ? '' : 's'} will be applied; skipped and blocked rows will not be written.</div>`
     : '';
 
   const backupWarnings = backup && pendingImportMeta.backupWarnings?.length
@@ -2632,10 +2696,17 @@ function renderImportPreview() {
     ${missingLinkedNote}
     ${fantraxCapNote}
     ${invalidNote}
+    <div class="transaction-rules-footer" style="margin-top:10px">
+      <span>Choose what happens for each player. Skipping a row means RosterCap writes nothing for that player.</span>
+      <div class="settings-data-actions">
+        <button class="btn btn-secondary btn-small" data-import-bulk-decision="include-safe" type="button">Include All Safe</button>
+        <button class="btn btn-ghost btn-small" data-import-bulk-decision="skip-new" type="button">Skip New Players</button>
+      </div>
+    </div>
     <div class="import-review-table-head"><strong>Player review</strong><span>Nothing is saved until you press the apply button.</span></div>
     <div class="table-wrap import-review-table-wrap">
       <table class="import-review-table">
-        <thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Team</th><th>Status</th><th>Location</th><th>${current ? escapeHtml(seasonLabel(current.startYear)) : 'Salary'}</th><th>Contract</th><th>Action</th><th>Check</th></tr></thead>
+        <thead><tr><th>Row</th><th>Player</th><th>Pos</th><th>Team</th><th>Status</th><th>Location</th><th>${current ? escapeHtml(seasonLabel(current.startYear)) : 'Salary'}</th><th>Contract</th><th>Action</th><th>Decision</th><th>Check</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -2656,15 +2727,44 @@ function renderImportPreview() {
     });
   });
 
+  preview.querySelectorAll('[data-import-decision-row]').forEach((select) => {
+    select.addEventListener('change', () => {
+      const sourceRow = Number(select.dataset.importDecisionRow);
+      const row = pendingImport.find(
+        (candidate) => Number(candidate.sourceRow) === sourceRow
+      );
+
+      if (!row) return;
+      importSetDecisionV3172(row, select.value);
+      renderImportPreview();
+    });
+  });
+
+  preview.querySelector('[data-import-bulk-decision="include-safe"]')
+    ?.addEventListener('click', () => {
+      pendingImport.forEach((row) => {
+        if (row.valid && !row.matchConflict) row.applyDecision = 'include';
+      });
+      renderImportPreview();
+    });
+
+  preview.querySelector('[data-import-bulk-decision="skip-new"]')
+    ?.addEventListener('click', () => {
+      pendingImport.forEach((row) => {
+        if (row.valid && !importExistingPlayer(row)) row.applyDecision = 'skip';
+      });
+      renderImportPreview();
+    });
+
   const applyButton = el('applyImportBtn');
-  applyButton.disabled = valid.length === 0;
-  applyButton.textContent = valid.length
+  applyButton.disabled = includedValid.length === 0;
+  applyButton.textContent = includedValid.length
     ? (
         backup
-          ? `Restore ${valid.length} Player${valid.length === 1 ? '' : 's'}`
+          ? `Restore ${includedValid.length} Player${includedValid.length === 1 ? '' : 's'}`
           : (fantrax && pendingImportMeta.sourceMode === 'api'
-              ? `Apply Sync (${valid.length})`
-              : `Apply ${valid.length} Row${valid.length === 1 ? '' : 's'}`)
+              ? `Apply Sync (${includedValid.length})`
+              : `Apply ${includedValid.length} Row${includedValid.length === 1 ? '' : 's'}`)
       )
     : 'Apply Import';
 }
@@ -2719,7 +2819,7 @@ async function restoreBackupDepthCharts(savedRows) {
 }
 
 async function applyImport() {
-  const rows = pendingImport.filter((row) => row.valid);
+  const rows = pendingImport.filter(importRowWillApplyV3172);
   if (!rows.length) return;
 
   const frontOfficeId = state.frontOffice?.id;
