@@ -4135,6 +4135,16 @@ Load after workspace-shared.css.
    -------------------------------------------------------------------------- */
 
 @media (max-width:720px) {
+  #overviewView .overview-attention-row {
+    grid-template-columns:27px minmax(0,1fr);
+  }
+
+  #overviewView .overview-attention-action {
+    grid-column:2;
+    justify-self:start;
+    margin-top:2px;
+  }
+
   #overviewView .overview-v227.overview-v255 {
     gap:7px;
   }
