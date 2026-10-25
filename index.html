@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <title>RosterCap — Fantasy Front Office</title>
-<meta content="RosterCap v3.11.4" name="application-name"/>
+<meta content="RosterCap v3.17.2" name="application-name"/>
 <meta content="RosterCap" name="apple-mobile-web-app-title"/>
 <meta content="#08131D" name="theme-color"/>
 <meta content="Fantasy Front Office for roster, contracts, cap, assets and transactions." name="description"/>
@@ -27,7 +27,7 @@
 <link href="./css/shell.css?v=20260821-v286-navigation-polish" rel="stylesheet"/>
 <link href="./css/workspace.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/workspace-shared.css?v=20260823-v2982-left-nav" rel="stylesheet"/>
-<link href="./css/workspace-pages.css?v=20260826-v3113-decision-content-fit" rel="stylesheet"/>
+<link href="./css/workspace-pages.css?v=20261024-phase1-actions" rel="stylesheet"/>
 <link href="./css/workspace-dialogs.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/office-picker.css?v=20260825-v3090-picker-polish" rel="stylesheet"/>
 <link href="./css/depth-chart.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
@@ -42,7 +42,7 @@
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
 <link href="./css/legal.css?v=20260824-v3018-centered-footer" rel="stylesheet"/>
 </head>
-<body data-rostercap-version="3.11.4">
+<body data-rostercap-version="3.17.2">
 <div class="app-shell" id="app">
 <header class="topbar app-menu-bar hidden" id="appHeader">
 <div aria-label="RosterCap" class="brand-lockup">
@@ -162,6 +162,7 @@
 <div class="feature-item"><span class="feature-check">✓</span><span>Seven-season contracts &amp; cap</span></div>
 <div class="feature-item"><span class="feature-check">✓</span><span>Roster, depth chart &amp; minors</span></div>
 <div class="feature-item"><span class="feature-check">✓</span><span>Transactions &amp; asset tracking</span></div>
+<div class="feature-item"><span class="feature-check">✓</span><span>Fantrax sync &amp; CSV import</span></div>
 </div>
 </div>
 <div class="onboarding-form-wrap">
@@ -589,19 +590,19 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/domain.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/data.js?v=20260824-v3015-google-white"></script>
 <script src="./js/features/cap-dashboard.js?v=20260828-v3142-ir-dashboard"></script>
-<script src="./js/pages/overview.js?v=20260828-v3143-injured-status"></script>
+<script src="./js/pages/overview.js?v=20261024-phase1-actions"></script>
 <script src="./js/features/depth-chart.js?v=20260821-v285-position-editor"></script>
-<script src="./js/pages/roster.js?v=20260819-v245-identity-css-bundle"></script>
+<script src="./js/pages/roster.js?v=20261024-phase1-fantrax"></script>
 <script src="./js/features/player-editor.js?v=20260819-v245-identity-css-bundle"></script>
 <script src="./js/features/import.js?v=20260919-v3172-fantrax-review-credential"></script>
 <script src="./js/pages/minors.js?v=20260824-v3017-minors-expiry-badge-cleanup"></script>
-<script src="./js/pages/assets.js?v=20260819-v245-identity-css-bundle"></script>
+<script src="./js/pages/assets.js?v=20261024-phase1-copy"></script>
 <script src="./js/features/asset-manager.js?v=20260820-v270-asset-manager"></script>
 <script src="./js/pages/transactions.js?v=20260828-v3138-player-meta"></script>
 <script src="./js/features/transaction-contracts.js?v=20260822-v2961-contract-percentage"></script>
 <script src="./js/features/draft-assets-hub.js?v=20260825-v3062-final-polish"></script>
 <script src="./js/pages/cap.js?v=20260828-v3142-ir-dashboard"></script>
-<script src="./js/pages/settings.js?v=20260919-v3172-fantrax-review-credential"></script>
+<script src="./js/pages/settings.js?v=20261024-v3172-phase1"></script>
 <script src="./js/features/sport-foundation.js?v=20260823-v299-multisport-csv"></script>
 <script src="./js/features/lineup-configuration.js?v=20260823-v2991-superflex"></script>
 <script src="./js/features/injured-status.js?v=20260828-v3143-injured-status"></script>
