@@ -4060,8 +4060,14 @@ Load after workspace-shared.css.
 }
 
 #overviewView .overview-attention-row {
-  grid-template-columns:27px minmax(0,1fr);
+  grid-template-columns:27px minmax(0,1fr) auto;
   gap:8px;
+  align-items:center;
+}
+
+#overviewView .overview-attention-action {
+  align-self:center;
+  white-space:nowrap;
 }
 
 #overviewView .overview-attention-icon {
