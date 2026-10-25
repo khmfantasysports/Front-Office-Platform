@@ -187,6 +187,7 @@ function renderOverview() {
           <strong>${formatMoney(Math.abs(capRemaining))} over the salary cap</strong>
           <small>Cap relief is required for ${seasonLabel(season.startYear)}.</small>
         </span>
+        <button class="overview-text-action overview-attention-action" data-overview-view="cap" type="button">Open Cap →</button>
       </div>
     `);
   }
@@ -203,6 +204,7 @@ function renderOverview() {
           <strong>${activeCount - rosterLimit} player${activeCount - rosterLimit === 1 ? '' : 's'} over the roster limit</strong>
           <small>${activeCount} active players against a ${rosterLimit}-player limit.</small>
         </span>
+        <button class="overview-text-action overview-attention-action" data-overview-view="roster" type="button">Open Roster →</button>
       </div>
     `);
   }
@@ -215,6 +217,7 @@ function renderOverview() {
           <strong>${minorsCount - minorsLimit} player${minorsCount - minorsLimit === 1 ? '' : 's'} over the Minors limit</strong>
           <small>${minorsCount} assigned against a ${minorsLimit}-player maximum.</small>
         </span>
+        <button class="overview-text-action overview-attention-action" data-overview-view="farm" type="button">Open Minors →</button>
       </div>
     `);
   }
@@ -238,6 +241,7 @@ function renderOverview() {
           <strong>${missingPlayers.length} missing current-season salar${missingPlayers.length === 1 ? 'y' : 'ies'}</strong>
           <small>${escapeHtml(names)}${escapeHtml(extra)}</small>
         </span>
+        <button class="overview-text-action overview-attention-action" data-overview-view="roster" type="button">Review Players →</button>
       </div>
     `);
   }
@@ -333,8 +337,8 @@ function renderOverview() {
         <section class="overview-panel-v227">
           <div class="overview-section-head-v227">
             <div>
-              <p class="eyebrow">Attention</p>
-              <h3>Front office status</h3>
+              <p class="eyebrow">Front Office Health</p>
+              <h3>Status &amp; actions</h3>
             </div>
           </div>
           <div class="overview-attention-list">${attention.join('')}</div>
@@ -381,4 +385,11 @@ function renderOverview() {
       () => switchView('cap')
     );
   }
+
+  document.querySelectorAll('#overviewView [data-overview-view]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = button.dataset.overviewView;
+      if (target) switchView(target);
+    });
+  });
 }
