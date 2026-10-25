@@ -1,0 +1,7462 @@
+/*
+RosterCap workspace-pages.css
+Consolidated page styles from V2.47–V2.64.
+
+Owns:
+- Overview
+- Roster / Depth / Cap Grid
+- Minors
+- Assets
+- Cap
+- Transactions history
+- Settings
+
+Load after workspace-shared.css.
+*/
+
+.settings-data-actions {
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.settings-save-status {
+  flex:0 0 auto; min-width:64px; margin-left:auto; margin-right:4px; color:var(--muted); font-size:.59rem; font-weight:850; text-align:right; white-space:nowrap;
+}
+
+.settings-save-status.saving {
+  color:var(--accent);
+}
+
+.settings-save-status.saved {
+  color:var(--healthy);
+}
+
+.settings-save-status.error {
+  color:var(--danger);
+}
+
+.settings-summary-grid {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-top:12px; margin-bottom:11px;
+}
+
+.settings-summary-item {
+  min-width:0; padding:9px 10px; border:1px solid var(--border-soft); border-radius:10px; background:#0B151E;
+}
+
+.settings-summary-item span {
+  display:block; overflow:hidden; color:var(--muted); font-size:.56rem; font-weight:850; letter-spacing:.035em; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap;
+}
+
+.settings-summary-item strong {
+  display:block; margin-top:4px; overflow:hidden; color:var(--text); font-size:.78rem; font-weight:900; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.settings-summary-item.good {
+  border-color:rgba(82,215,194,.24); background:rgba(82,215,194,.045);
+}
+
+.settings-summary-item.good strong {
+  color:var(--healthy);
+}
+
+.settings-summary-item.warning {
+  border-color:rgba(242,198,109,.30); background:rgba(242,198,109,.045);
+}
+
+.settings-summary-item.warning strong {
+  color:var(--warning);
+}
+
+.settings-current-season-control {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; align-items:end; margin-top:10px; padding:10px; border:1px solid var(--border-soft); border-radius:10px; background:#0B151E;
+}
+
+.settings-current-season-control label {
+  display:grid; gap:5px; min-width:0; color:var(--muted); font-size:.72rem; font-weight:700;
+}
+
+.settings-current-season-control select {
+  min-width:0;
+}
+
+.settings-current-season-control small {
+  grid-column:1 / -1; color:var(--muted); font-size:.61rem; line-height:1.4;
+}
+
+.settings-health-panel {
+  margin-top:12px; margin-bottom:11px; padding:11px; border:1px solid var(--border-soft); border-radius:11px; background:#0B151E;
+}
+
+.settings-health-panel.is-good {
+  border-color:rgba(82,215,194,.25); background:linear-gradient(180deg,rgba(82,215,194,.045),#0B151E 72%);
+}
+
+.settings-health-panel.has-warning {
+  border-color:rgba(242,198,109,.30); background:linear-gradient(180deg,rgba(242,198,109,.045),#0B151E 72%);
+}
+
+.settings-health-head {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+}
+
+.settings-health-head > div span {
+  display:block; color:var(--muted); font-size:.56rem; font-weight:850; letter-spacing:.05em; text-transform:uppercase;
+}
+
+.settings-health-head > div strong {
+  display:block; margin-top:3px; font-size:.83rem;
+}
+
+.settings-health-badge {
+  flex:0 0 auto; padding:4px 7px; border:1px solid var(--border-soft); border-radius:999px; color:#CFEAFF; background:rgba(50,173,255,.05); font-size:.58rem; font-weight:850;
+}
+
+.settings-health-grid {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; margin-top:9px;
+}
+
+.settings-health-grid > div {
+  min-width:0; padding:7px 8px; border:1px solid rgba(255,255,255,.055); border-radius:8px; background:rgba(255,255,255,.018);
+}
+
+.settings-health-grid span {
+  display:block; color:var(--muted); font-size:.54rem; line-height:1.25;
+}
+
+.settings-health-grid strong {
+  display:block; margin-top:3px; font-size:.76rem;
+}
+
+.settings-health-grid .warning strong {
+  color:var(--warning);
+}
+
+.settings-health-panel > p {
+  margin:9px 0 0; color:var(--muted); font-size:.60rem; line-height:1.4;
+}
+
+.settings-danger-zone {
+  border:1.5px solid rgba(255,96,96,.70) !important; background:linear-gradient(180deg,rgba(255,72,72,.075),rgba(13,24,34,.88) 70%) !important; box-shadow:0 0 0 1px rgba(255,96,96,.09), inset 3px 0 0 rgba(255,96,96,.58);
+}
+
+.settings-danger-zone > summary {
+  color:#FFD6D6; background:rgba(255,68,68,.035);
+}
+
+.settings-danger-zone > summary::after {
+  color:#FF7D7D;
+}
+
+.settings-danger-zone .settings-disclosure-title strong {
+  color:#FF8E8E;
+}
+
+.settings-danger-zone .settings-disclosure-title span {
+  color:#D69A9A;
+}
+
+.settings-danger-zone-body {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px; align-items:center; border-top-color:rgba(255,96,96,.26) !important;
+}
+
+.settings-danger-copy strong {
+  display:block; color:#FFD1D1; font-size:.82rem;
+}
+
+.settings-danger-copy p {
+  margin:4px 0 0; max-width:760px; color:#CFA2A2; font-size:.65rem; line-height:1.45;
+}
+
+.settings-danger-button {
+  min-width:164px; border-color:rgba(255,96,96,.72) !important; box-shadow:0 0 0 1px rgba(255,96,96,.10);
+}
+
+@media (max-width:720px) {
+  .settings-data-actions {
+    grid-template-columns:1fr 1fr;
+  }
+  .settings-save-status {
+    min-width:52px; margin-right:2px; font-size:.54rem;
+  }
+  .settings-summary-grid,
+    .settings-health-grid {
+    grid-template-columns:1fr 1fr;
+  }
+  .settings-current-season-control {
+    grid-template-columns:minmax(0,1fr) auto; padding:9px;
+  }
+  .settings-danger-zone-body {
+    grid-template-columns:1fr; gap:10px;
+  }
+  .settings-danger-button {
+    width:100%; min-width:0;
+  }
+}
+
+@media (max-width:390px) {
+  .settings-data-actions {
+    grid-template-columns:1fr;
+  }
+  .settings-disclosure > summary {
+    gap:6px;
+  }
+  .settings-save-status {
+    max-width:62px; overflow:hidden; text-overflow:ellipsis;
+  }
+  .settings-summary-grid,
+    .settings-health-grid {
+    gap:5px;
+  }
+  .settings-summary-item {
+    padding:8px;
+  }
+  .settings-summary-item span {
+    font-size:.51rem;
+  }
+  .settings-summary-item strong {
+    font-size:.70rem;
+  }
+  .settings-current-season-control {
+    grid-template-columns:1fr; align-items:stretch;
+  }
+  .settings-current-season-control .btn {
+    width:100%;
+  }
+}
+
+.roster-contract-summary {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin:9px 0 10px;
+}
+
+.roster-contract-summary > div {
+  min-width:0; padding:9px 10px; border:1px solid var(--border-soft); border-radius:10px; background:#0B151E;
+}
+
+.roster-contract-summary > div.warning {
+  border-color:rgba(242,198,109,.30); background:rgba(242,198,109,.045);
+}
+
+.roster-contract-summary span,
+.contract-intel-summary span {
+  display:block; overflow:hidden; color:var(--muted); font-size:.55rem; font-weight:850; letter-spacing:.04em; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap;
+}
+
+.roster-contract-summary strong,
+.contract-intel-summary strong {
+  display:block; margin-top:3px; color:var(--text); font-size:.82rem; font-weight:900;
+}
+
+.roster-contract-summary small,
+.contract-intel-summary small {
+  display:block; margin-top:2px; color:var(--muted); font-size:.56rem; line-height:1.3;
+}
+
+.roster-contract-summary .warning strong,
+.contract-intel-summary .warning strong {
+  color:var(--warning);
+}
+
+.roster-list-name {
+  flex-wrap:wrap; row-gap:4px;
+}
+
+.contract-signal-badge {
+  display:inline-flex; align-items:center; min-height:18px; padding:2px 6px; border:1px solid rgba(255,255,255,.10); border-radius:999px; color:#B9C9D8; background:rgba(255,255,255,.025); font-size:.52rem; font-weight:850; line-height:1; white-space:nowrap;
+}
+
+.contract-signal-badge.expiry {
+  border-color:rgba(242,198,109,.32); color:#F4D389; background:rgba(242,198,109,.06);
+}
+
+.contract-signal-badge.next {
+  border-color:rgba(50,173,255,.28); color:#8DCCFF; background:rgba(50,173,255,.055);
+}
+
+.contract-signal-badge.warning {
+  border-color:rgba(255,170,84,.34); color:#FFC27B; background:rgba(255,170,84,.06);
+}
+
+.contract-gap-cell {
+  background:rgba(242,198,109,.055) !important;
+}
+
+.contract-gap-mark {
+  display:inline-grid; place-items:center; width:18px; height:18px; border:1px solid rgba(242,198,109,.42); border-radius:999px; color:var(--warning); background:rgba(242,198,109,.08); font-size:.60rem; font-weight:950;
+}
+
+.roster-contract-grid-note {
+  display:flex; align-items:center; gap:6px; margin-top:7px; color:var(--muted); font-size:.60rem;
+}
+
+.contract-intelligence-panel {
+  overflow:hidden;
+}
+
+.contract-intelligence-head {
+  margin-bottom:10px;
+}
+
+.contract-intel-summary {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-bottom:10px;
+}
+
+.contract-intel-summary > div {
+  min-width:0; padding:9px 10px; border:1px solid var(--border-soft); border-radius:10px; background:#0B151E;
+}
+
+.contract-intel-summary > div.warning {
+  border-color:rgba(242,198,109,.30); background:rgba(242,198,109,.045);
+}
+
+.contract-intel-columns {
+  display:grid; grid-template-columns:1fr 1fr; gap:9px;
+}
+
+.contract-intel-block {
+  min-width:0; overflow:hidden; border:1px solid var(--border-soft); border-radius:10px; background:#0A141C;
+}
+
+.contract-intel-block-head {
+  display:flex; align-items:flex-start; justify-content:space-between; gap:8px; padding:9px 10px; border-bottom:1px solid var(--border-soft);
+}
+
+.contract-intel-block-head span {
+  color:var(--text); font-size:.68rem; font-weight:900;
+}
+
+.contract-intel-block-head small {
+  color:var(--muted); font-size:.55rem; text-align:right;
+}
+
+.contract-intel-list {
+  display:grid;
+}
+
+.contract-intel-row,
+.contract-gap-row {
+  width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; padding:8px 10px; border:0; border-bottom:1px solid rgba(255,255,255,.045); color:var(--text); background:transparent; text-align:left; cursor:pointer;
+}
+
+.contract-intel-row:last-child,
+.contract-gap-row:last-child {
+  border-bottom:0;
+}
+
+.contract-intel-row:hover,
+.contract-gap-row:hover {
+  background:rgba(255,255,255,.025);
+}
+
+.contract-intel-row > span,
+.contract-gap-row > span {
+  min-width:0;
+}
+
+.contract-intel-row > span:last-child,
+.contract-gap-row > span:last-child {
+  text-align:right;
+}
+
+.contract-intel-row strong,
+.contract-gap-row strong {
+  display:block; overflow:hidden; font-size:.68rem; font-weight:900; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.contract-intel-row small,
+.contract-gap-row small {
+  display:block; margin-top:2px; overflow:hidden; color:var(--muted); font-size:.55rem; line-height:1.3; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.contract-intel-row.minors {
+  background:rgba(50,173,255,.018);
+}
+
+.contract-intel-empty {
+  padding:10px; color:var(--muted); font-size:.62rem;
+}
+
+.contract-intel-empty.good {
+  color:var(--healthy);
+}
+
+.contract-intel-disclosure {
+  margin-top:9px; overflow:hidden; border:1px solid var(--border-soft); border-radius:10px; background:#0A141C;
+}
+
+.contract-intel-disclosure > summary {
+  display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 10px; cursor:pointer; list-style:none;
+}
+
+.contract-intel-disclosure > summary::-webkit-details-marker {
+  display:none;
+}
+
+.contract-intel-disclosure > summary::after {
+  content:"›"; color:var(--muted); font-size:1rem; font-weight:900; transform:rotate(90deg); transition:transform .15s ease;
+}
+
+.contract-intel-disclosure[open] > summary::after {
+  transform:rotate(-90deg);
+}
+
+.contract-intel-disclosure > summary span {
+  min-width:0;
+}
+
+.contract-intel-disclosure > summary strong {
+  display:block; font-size:.68rem; font-weight:900;
+}
+
+.contract-intel-disclosure > summary small {
+  display:block; margin-top:2px; overflow:hidden; color:var(--muted); font-size:.55rem; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.contract-intel-detail-body {
+  border-top:1px solid var(--border-soft);
+}
+
+.farm-cap-excluded {
+  border-color:rgba(82,215,194,.24) !important; background:rgba(82,215,194,.045) !important;
+}
+
+.farm-cap-excluded strong {
+  color:var(--healthy) !important;
+}
+
+.farm-player-name-signals {
+  display:flex; flex-wrap:wrap; align-items:center; gap:5px;
+}
+
+.farm-player-name-signals > strong {
+  min-width:0;
+}
+
+@media (max-width:820px) {
+  .contract-intel-columns {
+    grid-template-columns:1fr;
+  }
+}
+
+@media (max-width:720px) {
+  .roster-contract-summary,
+    .contract-intel-summary {
+    grid-template-columns:1fr 1fr;
+  }
+  .contract-intel-row,
+    .contract-gap-row {
+    gap:8px;
+  }
+}
+
+@media (max-width:430px) {
+  .roster-contract-summary,
+    .contract-intel-summary {
+    gap:5px;
+  }
+  .roster-contract-summary > div,
+    .contract-intel-summary > div {
+    padding:8px;
+  }
+  .contract-intel-block-head {
+    display:block;
+  }
+  .contract-intel-block-head small {
+    display:block; margin-top:2px; text-align:left;
+  }
+  .contract-intel-row,
+    .contract-gap-row {
+    grid-template-columns:minmax(0,1fr) minmax(86px,auto); padding:8px;
+  }
+  .contract-intel-row small,
+    .contract-gap-row small {
+    white-space:normal;
+  }
+}
+
+.roster-page .view-switch.v25.v29 {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+}
+
+.roster-page .view-switch.v25.v29 > button {
+  width:100%; min-width:0;
+}
+
+.roster-page-heading-v252 {
+  display:flex; align-items:flex-end; justify-content:space-between; gap:14px; flex-wrap:wrap;
+}
+
+.roster-page-heading-copy-v252 {
+  min-width:0; flex:1 1 360px;
+}
+
+.roster-page-heading-copy-v252 .eyebrow {
+  margin-bottom:3px;
+}
+
+.roster-page-heading-copy-v252 h3 {
+  margin:0; font-size:1.22rem;
+}
+
+.roster-page-heading-copy-v252 .page-copy {
+  margin:5px 0 0; max-width:620px;
+}
+
+.roster-header-actions-v252 {
+  display:flex; align-items:center; justify-content:flex-end; gap:8px; flex:0 0 auto;
+}
+
+.roster-header-actions-v252 .btn,
+.roster-header-actions-v252 .tools-menu > summary {
+  min-height:40px;
+}
+
+.roster-summary-grid-v252 {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); overflow:hidden; border:1px solid var(--border); border-radius:13px; background:rgba(13,24,34,.82);
+}
+
+.roster-summary-grid-v252 > div {
+  min-width:0; padding:10px 12px; border-right:1px solid var(--border);
+}
+
+.roster-summary-grid-v252 > div:last-child {
+  border-right:0;
+}
+
+.roster-summary-grid-v252 > div.warning {
+  background:rgba(242,198,109,.045);
+}
+
+.roster-summary-grid-v252 > div.good {
+  background:rgba(82,215,194,.035);
+}
+
+.roster-summary-grid-v252 span {
+  display:block; overflow:hidden; color:var(--muted); font-size:.56rem; font-weight:850; letter-spacing:.05em; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap;
+}
+
+.roster-summary-grid-v252 strong {
+  display:block; margin-top:4px; color:var(--text); font-size:.86rem; font-weight:950;
+}
+
+.roster-summary-grid-v252 small {
+  display:block; margin-top:3px; overflow:hidden; color:var(--muted); font-size:.57rem; line-height:1.3; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.roster-summary-grid-v252 .warning strong {
+  color:var(--warning);
+}
+
+.roster-summary-grid-v252 .good strong {
+  color:var(--healthy);
+}
+
+.roster-view-switch-v252 {
+  display:grid; width:100%; grid-template-columns:repeat(2,minmax(0,1fr)) !important; border-radius:11px;
+}
+
+.roster-view-switch-v252 > button {
+  width:100%; min-height:40px;
+}
+
+.roster-filterbar-v252 {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:38px;
+}
+
+.roster-filter-result-v252 {
+  margin-left:auto; color:var(--muted); font-size:.66rem; font-weight:750; white-space:nowrap;
+}
+
+.roster-filter-result-v252.hidden {
+  display:none;
+}
+
+.roster-page .roster-commandbar {
+  display:none !important;
+}
+
+@media (max-width:720px) {
+  .roster-page-heading-v252 {
+    display:grid; grid-template-columns:1fr; gap:10px; align-items:stretch;
+  }
+  .roster-page-heading-copy-v252 {
+    flex:auto;
+  }
+  .roster-page-heading-copy-v252 h3 {
+    font-size:1.16rem;
+  }
+  .roster-page-heading-copy-v252 .page-copy {
+    font-size:.72rem; line-height:1.45;
+  }
+  .roster-header-actions-v252 {
+    display:grid; grid-template-columns:1fr 1fr; width:100%;
+  }
+  .roster-header-actions-v252 .tools-menu,
+    .roster-header-actions-v252 .tools-menu > summary,
+    .roster-header-actions-v252 .btn {
+    width:100%;
+  }
+  .roster-summary-grid-v252 {
+    grid-template-columns:1fr 1fr;
+  }
+  .roster-summary-grid-v252 > div {
+    padding:9px 10px; border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+  }
+  .roster-summary-grid-v252 > div:nth-child(2n) {
+    border-right:0;
+  }
+  .roster-summary-grid-v252 > div:nth-last-child(-n/**/+2) {
+    border-bottom:0;
+  }
+  .roster-view-switch-v252 > button {
+    min-height:38px; font-size:.72rem;
+  }
+  .roster-filterbar-v252 {
+    min-height:36px;
+  }
+}
+
+@media (max-width:390px) {
+  .roster-header-actions-v252 {
+    gap:6px;
+  }
+  .roster-header-actions-v252 .tools-menu > summary,
+    .roster-header-actions-v252 .btn {
+    min-height:38px; padding:7px 9px; font-size:.68rem;
+  }
+  .roster-summary-grid-v252 {
+    border-radius:11px;
+  }
+  .roster-summary-grid-v252 > div {
+    padding:8px 9px;
+  }
+  .roster-summary-grid-v252 span {
+    font-size:.51rem;
+  }
+  .roster-summary-grid-v252 strong {
+    font-size:.78rem;
+  }
+  .roster-summary-grid-v252 small {
+    font-size:.53rem;
+  }
+}
+
+#farmView .farm-page-v228 {
+  gap:7px;
+}
+
+#farmView .farm-page-heading-v228 {
+  align-items:flex-end; gap:10px; margin-bottom:0;
+}
+
+#farmView .farm-page-heading-v228 > div:first-child {
+  min-width:0;
+}
+
+#farmView .farm-page-heading-v228 .eyebrow {
+  margin-bottom:3px;
+}
+
+#farmView .farm-page-heading-v228 h3 {
+  margin:0; font-size:1.20rem; line-height:1.1;
+}
+
+#farmView .farm-page-heading-v228 .page-copy {
+  margin-top:4px; max-width:600px; font-size:.70rem; line-height:1.38;
+}
+
+#farmView .farm-page-heading-v228 .inline-actions {
+  display:flex; align-items:center; justify-content:flex-end; gap:6px; flex:0 0 auto;
+}
+
+#farmView .farm-page-heading-v228 .inline-actions .btn {
+  min-height:36px; padding:6px 10px; font-size:.66rem; white-space:nowrap;
+}
+
+#farmView .farm-summary-grid-v228 > div {
+  padding:8px 9px;
+}
+
+#farmView .farm-summary-grid-v228 strong {
+  margin-top:3px; font-size:.86rem;
+}
+
+#farmView .farm-summary-grid-v228 small {
+  margin-top:2px; font-size:.51rem;
+}
+
+#farmView .farm-panel-v228 {
+  gap:6px; padding:9px 10px; border-radius:11px;
+}
+
+#farmView .farm-section-head-v228 {
+  gap:8px;
+}
+
+#farmView .farm-section-head-v228 .eyebrow {
+  margin-bottom:2px;
+}
+
+#farmView .farm-section-head-v228 h3 {
+  font-size:.82rem;
+}
+
+#farmView .farm-section-head-v228 > span {
+  font-size:.55rem;
+}
+
+#farmView .farm-player-list-v228 {
+  gap:5px;
+}
+
+#farmView .farm-player-card-v228 {
+  gap:6px; padding:6px 7px; border-radius:10px;
+}
+
+#farmView .farm-player-main {
+  gap:8px; padding:2px;
+}
+
+#farmView .farm-player-copy-v228 strong {
+  font-size:.78rem; line-height:1.15;
+}
+
+#farmView .farm-player-copy-v228 small {
+  margin-top:2px; font-size:.60rem; line-height:1.25;
+}
+
+#farmView .farm-player-copy-v228 em {
+  margin-top:2px; font-size:.51rem;
+}
+
+#farmView .farm-player-card-v228 .farm-player-cap strong {
+  font-size:.69rem;
+}
+
+#farmView .farm-player-card-v228 .farm-player-cap small {
+  margin-top:2px; font-size:.48rem;
+}
+
+#farmView .farm-player-card-v228 [data-call-up] {
+  min-width:82px; min-height:32px; padding:5px 8px; font-size:.61rem; border-radius:9px;
+}
+
+#farmView .farm-active-prospect-v228 {
+  padding:7px 8px; border-radius:9px;
+}
+
+#transactionsView .transactions-page-v228 {
+  gap:7px;
+}
+
+#transactionsView .tx-page-heading-v228 {
+  align-items:flex-end; gap:10px; margin-bottom:0;
+}
+
+#transactionsView .tx-page-heading-v228 > div {
+  min-width:0;
+}
+
+#transactionsView .tx-page-heading-v228 .eyebrow {
+  margin-bottom:3px;
+}
+
+#transactionsView .tx-page-heading-v228 h3 {
+  margin:0; font-size:1.20rem; line-height:1.1;
+}
+
+#transactionsView .tx-page-heading-v228 .page-copy {
+  margin-top:4px; max-width:620px; font-size:.70rem; line-height:1.38;
+}
+
+#transactionsView #recordTransactionBtn {
+  min-width:154px; min-height:36px; padding:6px 10px; font-size:.66rem; box-shadow:none; white-space:nowrap;
+}
+
+#transactionsView .tx-summary-grid-v228 > div {
+  padding:8px 9px;
+}
+
+#transactionsView .tx-summary-grid-v228 strong {
+  margin-top:3px; font-size:.86rem;
+}
+
+#transactionsView .tx-summary-grid-v228 small {
+  margin-top:2px; font-size:.51rem;
+}
+
+#transactionsView .transaction-list-v228 {
+  gap:5px;
+}
+
+#transactionsView .transaction-card-v228 {
+  padding:8px 9px; border-radius:10px;
+}
+
+#transactionsView .tx-ledger-head-v228 {
+  gap:8px;
+}
+
+#transactionsView .tx-ledger-title-v228 .transaction-type {
+  font-size:.54rem; letter-spacing:.07em;
+}
+
+#transactionsView .tx-ledger-title-v228 h4 {
+  margin-top:2px; font-size:.79rem; line-height:1.24;
+}
+
+#transactionsView .tx-ledger-title-v228 p {
+  margin-top:2px; font-size:.56rem;
+}
+
+#transactionsView .tx-ledger-head-v228 time {
+  font-size:.55rem;
+}
+
+#transactionsView .tx-ledger-body-v228 {
+  gap:3px; margin-top:5px; padding-top:5px;
+}
+
+#transactionsView .tx-ledger-flow-v228 {
+  grid-template-columns:44px minmax(0,1fr); gap:5px;
+}
+
+#transactionsView .tx-ledger-direction-v228 {
+  font-size:.47rem;
+}
+
+#transactionsView .tx-ledger-flow-v228 > span:last-child {
+  gap:4px;
+}
+
+#transactionsView .tx-ledger-flow-v228 em {
+  padding:2px 5px; border-radius:6px; font-size:.54rem;
+}
+
+#transactionsView .tx-ledger-flow-v228.financial strong {
+  font-size:.58rem;
+}
+
+#transactionsView .tx-ledger-notes-v228 {
+  margin-top:5px; font-size:.56rem; line-height:1.3;
+}
+
+#transactionsView .tx-ledger-actions-v228 {
+  gap:5px; margin-top:5px; padding-top:0; border-top:0;
+}
+
+#transactionsView .tx-ledger-actions-v228 .btn {
+  min-height:27px; padding:4px 7px; font-size:.59rem; border-radius:8px;
+}
+
+#assetsView .asset-hero-v230 {
+  gap:10px; padding-top:0; padding-bottom:2px; align-items:end;
+}
+
+#assetsView .asset-hero-copy-v230 .eyebrow {
+  margin-bottom:3px;
+}
+
+#assetsView .asset-hero-copy-v230 h3 {
+  font-size:1.22rem;
+}
+
+#assetsView .asset-hero-copy-v230 p:last-child {
+  margin-top:4px; font-size:.70rem;
+}
+
+#assetsView .asset-add-btn-v230 {
+  min-height:36px; padding:6px 10px; font-size:.66rem;
+}
+
+#assetsView .asset-summary-grid-v230 > div {
+  padding:8px 9px;
+}
+
+#assetsView .asset-summary-grid-v230 strong {
+  margin-top:3px; font-size:.94rem;
+}
+
+#capView .cap-page-heading-v228 {
+  align-items:flex-end; gap:10px; margin-bottom:0;
+}
+
+#capView .cap-page-heading-v228 .eyebrow {
+  margin-bottom:3px;
+}
+
+#capView .cap-page-heading-v228 h3 {
+  margin:0; font-size:1.20rem;
+}
+
+#capView .cap-page-heading-v228 .page-copy {
+  margin-top:4px; font-size:.70rem; line-height:1.38;
+}
+
+@media (max-width:720px) {
+  #farmView .farm-page-heading-v228 {
+    display:grid; grid-template-columns:1fr; align-items:stretch; gap:8px;
+  }
+  #farmView .farm-page-heading-v228 .inline-actions {
+    display:grid; grid-template-columns:1fr 1fr; width:100%; gap:6px;
+  }
+  #farmView .farm-page-heading-v228 .inline-actions .btn {
+    width:100%; min-height:35px;
+  }
+  #farmView .farm-summary-grid-v228 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #farmView .farm-summary-grid-v228 > div {
+    padding:7px 8px;
+  }
+  #farmView .farm-player-card-v228 {
+    padding:6px;
+  }
+  #farmView .farm-player-main {
+    gap:6px;
+  }
+  #farmView .farm-player-card-v228 [data-call-up] {
+    min-width:78px; min-height:31px; padding-left:7px; padding-right:7px;
+  }
+  #transactionsView .tx-page-heading-v228 {
+    display:grid; grid-template-columns:1fr; align-items:stretch; gap:8px;
+  }
+  #transactionsView #recordTransactionBtn {
+    width:auto; min-width:154px; min-height:35px; justify-self:start;
+  }
+  #transactionsView .tx-summary-grid-v228 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #transactionsView .tx-summary-grid-v228 > div {
+    padding:7px 8px;
+  }
+  #transactionsView .transaction-card-v228 {
+    padding:8px;
+  }
+  #transactionsView .tx-ledger-flow-v228 {
+    grid-template-columns:42px minmax(0,1fr);
+  }
+  #assetsView .asset-hero-v230 {
+    gap:8px;
+  }
+  #assetsView .asset-hero-copy-v230 h3 {
+    font-size:1.16rem;
+  }
+  #assetsView .asset-summary-grid-v230 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  #assetsView .asset-summary-grid-v230 > div {
+    padding:7px 8px;
+  }
+  #capView .cap-page-heading-v228 h3 {
+    font-size:1.16rem;
+  }
+}
+
+@media (max-width:390px) {
+  #farmView .farm-page-heading-v228 .page-copy,
+    #transactionsView .tx-page-heading-v228 .page-copy,
+    #capView .cap-page-heading-v228 .page-copy {
+    font-size:.66rem;
+  }
+  #farmView .farm-player-card-v228 [data-call-up] {
+    min-width:74px;
+  }
+  #transactionsView .tx-ledger-title-v228 h4 {
+    font-size:.76rem;
+  }
+  #transactionsView .tx-ledger-actions-v228 .btn {
+    min-height:26px; padding:3px 7px;
+  }
+}
+
+.roster-filterbar-v252 {
+  display:none !important;
+}
+
+.roster-cap-grid-head-v254 {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:rgba(13,24,34,.84);
+}
+
+.roster-cap-grid-horizon-v254 {
+  min-width:0;
+}
+
+.roster-cap-grid-horizon-v254 strong {
+  display:block; color:#DCE8F2; font-size:.68rem; font-weight:900; line-height:1.25;
+}
+
+.roster-cap-grid-horizon-v254 span {
+  display:inline; color:var(--muted); font-size:.63rem; line-height:1.3;
+}
+
+.roster-cap-grid-horizon-v254 small {
+  display:block; margin-top:5px; color:var(--muted); font-size:.61rem; line-height:1.25;
+}
+
+.roster-cap-grid-filter-actions-v254 {
+  display:flex; align-items:center; justify-content:flex-end; gap:7px; min-width:0;
+}
+
+.roster-cap-grid-filter-actions-v254 .filter-menu > summary {
+  min-height:34px; padding:5px 9px; border-radius:8px; font-size:.64rem;
+}
+
+.roster-cap-grid-filter-actions-v254 .filter-popover {
+  right:0 !important;
+}
+
+.roster-cap-grid-result-v254 {
+  flex:0 0 auto; color:var(--muted); font-size:.58rem; font-weight:800; white-space:nowrap;
+}
+
+.roster-cap-grid-result-v254.hidden {
+  display:none;
+}
+
+@media (max-width:720px) {
+  .roster-cap-grid-head-v254 {
+    gap:8px; padding:9px 10px;
+  }
+  .roster-cap-grid-horizon-v254 strong {
+    font-size:.65rem;
+  }
+  .roster-cap-grid-horizon-v254 span,
+    .roster-cap-grid-horizon-v254 small {
+    font-size:.58rem;
+  }
+  .roster-cap-grid-filter-actions-v254 {
+    gap:5px;
+  }
+  .roster-cap-grid-filter-actions-v254 .filter-menu > summary {
+    min-height:32px; padding:5px 8px; font-size:.61rem;
+  }
+  .roster-cap-grid-filter-actions-v254 .filter-popover {
+    right:0 !important;
+  }
+}
+
+@media (max-width:430px) {
+  .roster-cap-grid-head-v254 {
+    grid-template-columns:minmax(0,1fr) auto; align-items:start;
+  }
+  .roster-cap-grid-horizon-v254 span {
+    display:block; margin-top:1px;
+  }
+  .roster-cap-grid-result-v254 {
+    display:none !important;
+  }
+}
+
+#overviewView .overview-v255 {
+  gap:7px;
+}
+
+#overviewView .overview-v255 .overview-hero-v227 {
+  padding:13px 14px;
+}
+
+#overviewView .overview-v255 .overview-hero-top .eyebrow {
+  margin-bottom:5px;
+}
+
+#overviewView .overview-v255 .overview-primary-number {
+  font-size:clamp(1.9rem,4.6vw,2.7rem);
+}
+
+#overviewView .overview-v255 .overview-progress-v227 {
+  margin-top:11px;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 {
+  margin-top:10px;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 > div {
+  padding-top:8px;
+}
+
+#overviewView .overview-compact-panel-v255 {
+  padding:9px 10px;
+}
+
+#overviewView .overview-section-head-compact-v255 {
+  align-items:center; margin-bottom:6px;
+}
+
+#overviewView .overview-section-head-compact-v255 > .eyebrow {
+  margin:0;
+}
+
+#overviewView .overview-section-head-compact-v255 .overview-text-action {
+  padding:2px 0;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+  padding:8px 9px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+  margin-top:3px; font-size:.92rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item small {
+  margin-top:2px; font-size:.55rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+  gap:6px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-card {
+  padding:8px 9px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-value {
+  margin-top:7px; font-size:.88rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-track {
+  margin-top:7px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-footer {
+  margin-top:5px;
+}
+
+@media (max-width:720px) {
+  #overviewView .overview-v255 {
+    gap:6px;
+  }
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:10px 11px;
+  }
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.82rem;
+  }
+  #overviewView .overview-v255 .overview-primary-label {
+    margin-top:4px; font-size:.63rem;
+  }
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    padding:6px 8px;
+  }
+  #overviewView .overview-v255 .overview-progress-v227 {
+    margin-top:9px;
+  }
+  #overviewView .overview-v255 .overview-progress-meta-v227 {
+    margin-top:5px;
+  }
+  #overviewView .overview-v255 .overview-finance-strip-v227 {
+    margin-top:8px;
+  }
+  #overviewView .overview-v255 .overview-finance-strip-v227 > div {
+    padding:7px 6px 0;
+  }
+  #overviewView .overview-compact-panel-v255 {
+    padding:8px 9px;
+  }
+  #overviewView .overview-section-head-compact-v255 {
+    margin-bottom:5px;
+  }
+  #overviewView .overview-section-head-compact-v255 .eyebrow {
+    font-size:.62rem;
+  }
+  #overviewView .overview-section-head-compact-v255 .overview-text-action {
+    font-size:.59rem;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+    padding:7px 6px;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+    grid-template-columns:repeat(7,106px); gap:5px;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-outlook-card {
+    padding:8px;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-outlook-value {
+    margin-top:6px; font-size:.80rem;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-outlook-caption {
+    font-size:.50rem;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-outlook-track {
+    margin-top:6px;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-outlook-footer {
+    margin-top:5px; font-size:.44rem;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.72rem;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+    padding:7px 5px;
+  }
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+    font-size:.78rem;
+  }
+}
+
+#overviewView .contract-watch-v246 {
+  padding:9px 10px;
+}
+
+#overviewView .contract-watch-v246 .overview-section-head-v227 {
+  align-items:center; margin-bottom:6px;
+}
+
+#overviewView .contract-watch-v246 .overview-section-head-v227 h3 {
+  margin-top:3px; font-size:.88rem; line-height:1.18;
+}
+
+#overviewView .contract-watch-metrics-v246 {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); overflow:hidden; border:1px solid var(--border); border-radius:11px; background:rgba(13,24,34,.82);
+}
+
+#overviewView .contract-watch-metrics-v246 > div {
+  min-width:0; padding:8px 9px; border-right:1px solid var(--border);
+}
+
+#overviewView .contract-watch-metrics-v246 > div:last-child {
+  border-right:0;
+}
+
+#overviewView .contract-watch-metrics-v246 > div.warning {
+  background:rgba(242,198,109,.045);
+}
+
+#overviewView .contract-watch-metrics-v246 > div > span {
+  display:block; overflow:hidden; color:var(--muted); font-size:.54rem; font-weight:850; letter-spacing:.045em; line-height:1.2; text-overflow:ellipsis; text-transform:uppercase; white-space:nowrap;
+}
+
+#overviewView .contract-watch-metrics-v246 > div > strong {
+  display:block; margin-top:3px; color:var(--text); font-size:.86rem; font-weight:950; line-height:1.15;
+}
+
+#overviewView .contract-watch-metrics-v246 > div.warning > strong {
+  color:var(--warning);
+}
+
+#overviewView .contract-watch-metrics-v246 > div > small {
+  display:block; margin-top:2px; overflow:hidden; color:var(--muted); font-size:.53rem; line-height:1.25; text-overflow:ellipsis; white-space:nowrap;
+}
+
+#overviewView .contract-watch-footer-v246 {
+  margin-top:6px;
+}
+
+#overviewView .contract-watch-priority {
+  display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:7px; width:100%; padding:7px 9px; border:1px solid var(--border-soft); border-radius:9px; background:rgba(255,255,255,.018);
+}
+
+#overviewView .contract-watch-priority::before {
+  content:"•"; display:grid; place-items:center; width:18px; height:18px; border:1px solid rgba(255,255,255,.10); border-radius:6px; color:var(--muted); font-size:.72rem; font-weight:950;
+}
+
+#overviewView .contract-watch-priority.warning {
+  border-color:rgba(242,198,109,.25); background:rgba(242,198,109,.035);
+}
+
+#overviewView .contract-watch-priority.warning::before {
+  content:"!"; border-color:rgba(242,198,109,.28); color:var(--warning);
+}
+
+#overviewView .contract-watch-priority.good {
+  border-color:rgba(82,215,194,.22); background:rgba(82,215,194,.03);
+}
+
+#overviewView .contract-watch-priority.good::before {
+  content:"✓"; border-color:rgba(82,215,194,.25); color:var(--healthy);
+}
+
+#overviewView .contract-watch-priority > strong {
+  display:block; color:var(--text); font-size:.64rem; font-weight:900; line-height:1.2;
+}
+
+#overviewView .contract-watch-priority > small {
+  display:block; margin-top:1px; color:var(--muted); font-size:.53rem; line-height:1.25;
+}
+
+#overviewView .overview-snapshot-v227 .overview-snapshot-grid-v227 {
+  overflow:hidden; border:1px solid var(--border); border-radius:11px;
+}
+
+@media (max-width:720px) {
+  #overviewView .contract-watch-v246 {
+    padding:8px 9px;
+  }
+  #overviewView .contract-watch-v246 .overview-section-head-v227 {
+    margin-bottom:5px;
+  }
+  #overviewView .contract-watch-v246 .overview-section-head-v227 h3 {
+    font-size:.82rem;
+  }
+  #overviewView .contract-watch-metrics-v246 {
+    grid-template-columns:1fr 1fr;
+  }
+  #overviewView .contract-watch-metrics-v246 > div {
+    padding:7px 8px; border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+  }
+  #overviewView .contract-watch-metrics-v246 > div:nth-child(2n) {
+    border-right:0;
+  }
+  #overviewView .contract-watch-metrics-v246 > div:nth-last-child(-n/**/+2) {
+    border-bottom:0;
+  }
+  #overviewView .contract-watch-metrics-v246 > div > strong {
+    font-size:.80rem;
+  }
+  #overviewView .contract-watch-metrics-v246 > div > span {
+    font-size:.51rem;
+  }
+  #overviewView .contract-watch-metrics-v246 > div > small {
+    font-size:.51rem;
+  }
+  #overviewView .contract-watch-priority {
+    padding:6px 8px;
+  }
+  #overviewView .contract-watch-priority > strong {
+    font-size:.61rem;
+  }
+  #overviewView .contract-watch-priority > small {
+    font-size:.50rem;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .contract-watch-metrics-v246 > div {
+    padding:7px;
+  }
+  #overviewView .contract-watch-priority {
+    gap:6px;
+  }
+}
+
+.draft-history-card {
+  border-color:rgba(50,173,255,.22) !important; box-shadow:inset 2px 0 0 rgba(50,173,255,.34);
+}
+
+.draft-history-card .transaction-type {
+  color:#8DCCFF;
+}
+
+.draft-history-card .draft-pick-flow .tx-ledger-direction-v228 {
+  color:#8DCCFF;
+}
+
+.asset-status.used,
+.asset-status.used-drafted {
+  border-color:rgba(134,159,180,.26); color:#AFC1D1; background:rgba(134,159,180,.055);
+}
+
+#transactionsView .tx-summary-grid-v228 {
+  display:none !important;
+}
+
+#transactionsView .tx-history-toolbar-v259 {
+  display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0;
+}
+
+#transactionsView .tx-history-filters-v259 {
+  display:flex; align-items:center; gap:5px; min-width:0; overflow-x:auto; overflow-y:hidden; padding:1px 1px 3px; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+
+#transactionsView .tx-history-filters-v259::-webkit-scrollbar {
+  display:none;
+}
+
+#transactionsView .tx-history-filter-v259 {
+  display:inline-flex; align-items:center; justify-content:center; gap:5px; flex:0 0 auto; min-height:30px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; background:rgba(13,24,34,.78); color:var(--muted); font-size:.59rem; font-weight:850; line-height:1; white-space:nowrap; cursor:pointer;
+}
+
+#transactionsView .tx-history-filter-v259 strong {
+  display:grid; place-items:center; min-width:17px; height:17px; padding:0 4px; border-radius:999px; background:rgba(255,255,255,.045); color:#C9D7E3; font-size:.52rem; font-weight:950;
+}
+
+#transactionsView .tx-history-filter-v259:hover,
+#transactionsView .tx-history-filter-v259:focus-visible {
+  border-color:rgba(119,201,255,.36); color:#DCEBFA; outline:none;
+}
+
+#transactionsView .tx-history-filter-v259.active {
+  border-color:rgba(50,173,255,.40); background:rgba(50,173,255,.10); color:#D9EEFF;
+}
+
+#transactionsView .tx-history-filter-v259.active strong {
+  background:rgba(50,173,255,.17); color:#A9D9FF;
+}
+
+#transactionsView .tx-history-status-v259 {
+  flex:0 0 auto; color:var(--muted); font-size:.55rem; font-weight:750; white-space:nowrap;
+}
+
+#transactionsView .transaction-list-v228 {
+  gap:4px;
+}
+
+#transactionsView .transaction-card-v228 {
+  padding:6px 8px; border-radius:9px;
+}
+
+#transactionsView .transaction-card-v228[hidden] {
+  display:none !important;
+}
+
+#transactionsView .tx-ledger-head-v228 {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:7px;
+}
+
+#transactionsView .tx-ledger-title-v228 .transaction-type {
+  font-size:.49rem; line-height:1.05;
+}
+
+#transactionsView .tx-ledger-title-v228 h4 {
+  margin-top:1px; font-size:.74rem; line-height:1.18;
+}
+
+#transactionsView .tx-ledger-title-v228 p {
+  margin-top:1px; font-size:.52rem; line-height:1.2;
+}
+
+#transactionsView .tx-ledger-meta-v259 {
+  display:grid; justify-items:end; gap:3px; min-width:max-content;
+}
+
+#transactionsView .tx-ledger-meta-v259 time {
+  color:var(--muted); font-size:.50rem; line-height:1;
+}
+
+#transactionsView .tx-ledger-actions-inline-v259 {
+  display:flex; align-items:center; justify-content:flex-end; gap:3px; margin:0; padding:0; border:0;
+}
+
+#transactionsView .tx-ledger-actions-inline-v259 .btn {
+  min-height:23px; padding:2px 6px; border-radius:6px; font-size:.52rem; line-height:1;
+}
+
+#transactionsView .tx-ledger-body-v228 {
+  gap:2px; margin-top:4px; padding-top:4px;
+}
+
+#transactionsView .tx-ledger-flow-v228 {
+  grid-template-columns:38px minmax(0,1fr); gap:4px;
+}
+
+#transactionsView .tx-ledger-direction-v228 {
+  font-size:.43rem;
+}
+
+#transactionsView .tx-ledger-flow-v228 > span:last-child {
+  gap:3px;
+}
+
+#transactionsView .tx-ledger-flow-v228 em {
+  padding:1px 4px; border-radius:5px; font-size:.50rem; line-height:1.25;
+}
+
+#transactionsView .tx-ledger-flow-v228.financial strong {
+  font-size:.54rem;
+}
+
+#transactionsView .tx-ledger-notes-v228 {
+  margin-top:4px; font-size:.52rem; line-height:1.25;
+}
+
+#transactionsView .transaction-card-v228 > .tx-ledger-actions-v228 {
+  margin-top:3px; padding-top:0; border-top:0;
+}
+
+#transactionsView .draft-history-card {
+  box-shadow:inset 2px 0 0 rgba(50,173,255,.28);
+}
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v228 {
+    gap:6px;
+  }
+  #transactionsView .tx-page-heading-v228 {
+    gap:7px;
+  }
+  #transactionsView .tx-page-heading-v228 .page-copy {
+    font-size:.66rem; line-height:1.32;
+  }
+  #transactionsView #recordTransactionBtn {
+    min-height:33px; padding:5px 9px;
+  }
+  #transactionsView .tx-history-toolbar-v259 {
+    display:block;
+  }
+  #transactionsView .tx-history-filters-v259 {
+    width:100%; gap:4px; padding-bottom:2px;
+  }
+  #transactionsView .tx-history-filter-v259 {
+    min-height:28px; padding:4px 7px; font-size:.56rem;
+  }
+  #transactionsView .tx-history-status-v259 {
+    display:none;
+  }
+  #transactionsView .transaction-card-v228 {
+    padding:6px 7px;
+  }
+  #transactionsView .tx-ledger-head-v228 {
+    gap:5px;
+  }
+  #transactionsView .tx-ledger-title-v228 h4 {
+    font-size:.71rem;
+  }
+  #transactionsView .tx-ledger-meta-v259 {
+    gap:2px;
+  }
+  #transactionsView .tx-ledger-actions-inline-v259 .btn {
+    min-height:22px; padding:2px 5px; font-size:.49rem;
+  }
+  #transactionsView .tx-ledger-body-v228 {
+    margin-top:3px; padding-top:3px;
+  }
+  #transactionsView .tx-ledger-flow-v228 {
+    grid-template-columns:36px minmax(0,1fr);
+  }
+}
+
+@media (max-width:390px) {
+  #transactionsView .tx-history-filter-v259 {
+    min-height:27px; padding-left:6px; padding-right:6px;
+  }
+  #transactionsView .tx-ledger-title-v228 h4 {
+    font-size:.69rem;
+  }
+  #transactionsView .tx-ledger-actions-inline-v259 .btn {
+    padding-left:4px; padding-right:4px;
+  }
+}
+
+#farmView .farm-page-v260 {
+  gap:6px;
+}
+
+#farmView .farm-page-v260 .farm-page-heading-v228 {
+  gap:8px;
+}
+
+#farmView .farm-page-v260 .farm-page-heading-v228 .page-copy {
+  margin-top:3px;
+}
+
+#farmView .farm-page-v260 .farm-panel-v228 {
+  padding:8px 9px;
+}
+
+#farmView .farm-page-v260 .farm-section-head-v228 {
+  padding-bottom:1px;
+}
+
+#farmView .farm-page-v260 .farm-section-head-v228 h3 {
+  font-size:.79rem;
+}
+
+#farmView .farm-page-v260 .farm-player-list-v228 {
+  gap:4px;
+}
+
+#assetsView .assets-page-v260 {
+  gap:6px;
+}
+
+#assetsView .assets-page-v260 .asset-hero-v230 {
+  gap:8px; padding-bottom:0;
+}
+
+#assetsView .assets-page-v260 .asset-tabs {
+  display:flex; align-items:center; gap:4px; min-width:0; overflow-x:auto; overflow-y:hidden; padding:3px; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+
+#assetsView .assets-page-v260 .asset-tabs::-webkit-scrollbar {
+  display:none;
+}
+
+#assetsView .assets-page-v260 .asset-tab {
+  display:inline-flex; align-items:center; justify-content:center; gap:5px; flex:1 0 auto; min-width:max-content; min-height:30px; padding:4px 8px; white-space:nowrap;
+}
+
+#assetsView .asset-tab-count-v260 {
+  display:grid; place-items:center; min-width:17px; height:17px; padding:0 4px; border-radius:999px; background:rgba(255,255,255,.045); color:#C8D6E2; font-size:.50rem; font-weight:950; line-height:1;
+}
+
+#assetsView .asset-tab.active .asset-tab-count-v260 {
+  background:rgba(50,173,255,.17); color:#A9D9FF;
+}
+
+#assetsView .assets-page-v260 .asset-sections-v230,
+#assetsView .assets-page-v260 .asset-section {
+  gap:6px;
+}
+
+#assetsView .assets-page-v260 .asset-portfolio-panel-v230,
+#assetsView .assets-page-v260 .asset-portfolio-panel-v228 {
+  padding:8px 9px;
+}
+
+#assetsView .assets-page-v260 .asset-grid {
+  gap:5px;
+}
+
+#assetsView .assets-page-v260 .asset-card {
+  min-height:78px; gap:5px; padding:8px; border-radius:10px;
+}
+
+#assetsView .assets-page-v260 .asset-card h5 {
+  font-size:.78rem;
+}
+
+#assetsView .assets-page-v260 .asset-card-meta {
+  font-size:.58rem;
+}
+
+#assetsView .assets-page-v260 .asset-round-badge {
+  min-width:32px; height:32px; font-size:.63rem;
+}
+
+#capView .cap-page-v260 {
+  gap:6px;
+}
+
+#capView .cap-page-v260 .cap-hero-v228 {
+  padding:10px 11px;
+}
+
+#capView .cap-page-v260 .cap-hero-primary-v228 {
+  font-size:1.78rem;
+}
+
+#capView .cap-page-v260 .cap-hero-progress-v228 {
+  margin-top:8px;
+}
+
+#capView .cap-page-v260 .cap-hero-strip-v228 {
+  margin-top:8px;
+}
+
+#capView .cap-page-v260 .cap-hero-strip-v228 > div {
+  padding-top:7px;
+}
+
+#capView .cap-page-v260 .cap-panel-v228 {
+  padding:8px 9px;
+}
+
+#capView .cap-section-head-compact-v260 {
+  min-height:24px; margin-bottom:4px; align-items:center;
+}
+
+#capView .cap-section-head-compact-v260 .eyebrow {
+  margin:0;
+}
+
+#capView .cap-page-v260 .cap-outlook-grid-v228 {
+  gap:5px;
+}
+
+#capView .cap-page-v260 .cap-season-card-v228 {
+  padding:8px;
+}
+
+#capView .cap-page-v260 .cap-season-used-v228 {
+  margin-top:6px; font-size:.80rem;
+}
+
+#capView .cap-page-v260 .cap-season-track-v228 {
+  margin-top:6px;
+}
+
+#capView .cap-page-v260 .cap-season-metrics-v228,
+#capView .cap-page-v260 .cap-season-footer-v228 {
+  margin-top:5px;
+}
+
+#settingsView .settings-accordion-v260 {
+  gap:6px;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure > summary {
+  min-height:46px; padding:8px 10px;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure-title strong {
+  font-size:.79rem;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure-title span {
+  margin-top:1px; font-size:.60rem;
+}
+
+#settingsView .settings-accordion-v260 .settings-disclosure-body {
+  padding:0 10px 9px;
+}
+
+#settingsView .settings-accordion-v260 .settings-summary-grid {
+  gap:5px; margin-top:8px; margin-bottom:8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-summary-item {
+  padding:7px 8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-health-panel {
+  margin-top:8px; margin-bottom:8px; padding:9px;
+}
+
+#settingsView .settings-accordion-v260 .settings-current-season-control {
+  margin-top:8px; padding:8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-data-actions {
+  margin-top:8px;
+}
+
+#settingsView .settings-accordion-v260 .settings-danger-zone {
+  margin-top:1px;
+}
+
+@media (max-width:720px) {
+  #farmView .farm-page-v260 .farm-page-heading-v228 {
+    gap:7px;
+  }
+  #farmView .farm-page-v260 .farm-page-heading-v228 .inline-actions .btn {
+    min-height:33px;
+  }
+  #assetsView .assets-page-v260 .asset-hero-v230 {
+    gap:7px;
+  }
+  #assetsView .assets-page-v260 .asset-add-btn-v230 {
+    min-height:33px;
+  }
+  #assetsView .assets-page-v260 .asset-tab {
+    flex:0 0 auto; min-height:28px; padding:4px 7px; font-size:.57rem;
+  }
+  #assetsView .assets-page-v260 .asset-grid {
+    gap:5px;
+  }
+  #assetsView .assets-page-v260 .asset-card {
+    min-height:74px; padding:7px;
+  }
+  #capView .cap-page-v260 .cap-hero-v228 {
+    padding:9px 10px;
+  }
+  #capView .cap-page-v260 .cap-hero-primary-v228 {
+    font-size:1.66rem;
+  }
+  #capView .cap-page-v260 .cap-panel-v228 {
+    padding:8px;
+  }
+  #capView .cap-page-v260 .cap-outlook-grid-v228 {
+    gap:4px;
+  }
+  #capView .cap-page-v260 .cap-season-card-v228 {
+    padding:7px;
+  }
+  #settingsView .settings-accordion-v260 .settings-disclosure > summary {
+    min-height:43px; padding:7px 9px;
+  }
+  #settingsView .settings-accordion-v260 .settings-disclosure-body {
+    padding:0 9px 8px;
+  }
+}
+
+@media (max-width:390px) {
+  #assetsView .assets-page-v260 .asset-card {
+    min-height:70px;
+  }
+  #capView .cap-page-v260 .cap-hero-primary-v228 {
+    font-size:1.58rem;
+  }
+  #settingsView .settings-accordion-v260 {
+    gap:5px;
+  }
+}
+
+#capView .cap-page-v262 {
+  gap:6px;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 {
+  position:relative; padding-bottom:28px;
+}
+
+#capView .cap-edit-settings-v262 {
+  position:absolute; right:7px; bottom:6px; min-height:20px; padding:2px 6px; border:1px solid rgba(119,201,255,.24); border-radius:6px; background:rgba(50,173,255,.055); color:#91CDFB; font:inherit; font-size:.48rem; font-weight:850; cursor:pointer;
+}
+
+#capView .cap-edit-settings-v262:hover,
+#capView .cap-edit-settings-v262:focus-visible {
+  border-color:rgba(119,201,255,.45); color:#CDEAFF; outline:none;
+}
+
+#capView .cap-dead-zero-v262 {
+  display:grid; padding:8px 9px;
+}
+
+#capView .cap-dead-zero-v262 .cap-section-head-v228 {
+  align-items:center; margin:0;
+}
+
+#capView .cap-dead-zero-v262 .cap-dead-zero-value-v262 {
+  display:block; margin-top:2px; color:var(--healthy); font-size:.72rem; font-weight:900;
+}
+
+#capView .cap-dead-zero-v262 #capRecordTransactionBtn,
+#capView .cap-dead-active-v262 #capRecordTransactionBtn {
+  min-height:28px; padding:4px 7px; font-size:.55rem;
+}
+
+#capView .cap-dead-active-v262 {
+  padding:8px 9px;
+}
+
+#capView .cap-dead-active-v262 .cap-section-head-v228 {
+  margin-bottom:5px;
+}
+
+#capView .cap-dead-summary-v262 {
+  margin-top:2px !important; font-size:.54rem !important; line-height:1.25;
+}
+
+#capView .cap-dead-list-v228 {
+  gap:5px;
+}
+
+#capView .cap-dead-entry-v228 {
+  padding:7px 8px; border-radius:9px;
+}
+
+#capView .contract-intelligence-v262 {
+  padding:8px 9px;
+}
+
+#capView .contract-intelligence-v262 .contract-intelligence-head {
+  margin-bottom:5px;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary {
+  gap:0; overflow:hidden; border:1px solid var(--border); border-radius:10px;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary > div {
+  padding:7px 8px;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary strong {
+  margin-top:2px; font-size:.80rem;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary small {
+  margin-top:2px; font-size:.49rem;
+}
+
+#capView .contract-intel-main-details-v262 {
+  margin-top:6px; overflow:hidden; border:1px solid var(--border); border-radius:9px; background:rgba(9,18,27,.55);
+}
+
+#capView .contract-intel-main-details-v262 > summary {
+  min-height:34px; padding:6px 8px; list-style:none; cursor:pointer;
+}
+
+#capView .contract-intel-main-details-v262 > summary::-webkit-details-marker {
+  display:none;
+}
+
+#capView .contract-intel-main-details-v262 > summary > span {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+
+#capView .contract-intel-main-details-v262 > summary strong {
+  color:#D8E4ED; font-size:.61rem;
+}
+
+#capView .contract-intel-main-details-v262 > summary small {
+  color:var(--muted); font-size:.50rem; font-weight:650;
+}
+
+#capView .contract-intel-main-details-v262 > summary::after {
+  content:"+"; float:right; margin-top:-16px; color:var(--accent); font-size:.80rem;
+}
+
+#capView .contract-intel-main-details-v262[open] > summary::after {
+  content:"−";
+}
+
+#capView .contract-intel-main-body-v262 {
+  padding:0 7px 7px;
+}
+
+#capView .contract-intel-main-body-v262 .contract-intel-columns {
+  gap:6px;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-disclosure {
+  margin-top:6px;
+}
+
+#capView .cap-detail-disclosure-v228,
+#capView .cap-history-disclosure {
+  border-radius:9px;
+}
+
+#capView .cap-detail-disclosure-v228 > summary,
+#capView .cap-history-disclosure > summary {
+  min-height:40px; padding:7px 9px;
+}
+
+@media (max-width:720px) {
+  #capView .contract-intelligence-v262 .contract-intel-summary {
+    grid-template-columns:1fr 1fr;
+  }
+  #capView .contract-intelligence-v262 .contract-intel-summary > div {
+    padding:7px;
+  }
+  #capView .contract-intel-main-details-v262 > summary > span {
+    padding-right:14px;
+  }
+  #capView .contract-intel-main-details-v262 > summary small {
+    max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+}
+
+@media (max-width:430px) {
+  #capView .cap-page-v262 .cap-hero-limit-v228 {
+    padding-bottom:26px;
+  }
+  #capView .contract-intelligence-v262 .contract-intel-summary > div {
+    padding:6px 7px;
+  }
+}
+
+/* V2.67 controlled annual Season Rollover */
+.season-rollover-settings {
+  border-color:rgba(96,190,255,.22);
+  background:linear-gradient(180deg,rgba(96,190,255,.035),rgba(11,21,30,.96) 72%);
+}
+.season-rollover-annual-badge {
+  flex:0 0 auto;
+  margin-left:auto;
+  margin-right:5px;
+  padding:3px 7px;
+  border:1px solid rgba(96,190,255,.25);
+  border-radius:999px;
+  background:rgba(96,190,255,.07);
+  color:var(--accent);
+  font-size:.54rem;
+  font-weight:900;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.season-rollover-hero {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  padding:11px;
+  border:1px solid var(--border-soft);
+  border-radius:11px;
+  background:#0B151E;
+}
+.season-rollover-kicker,
+.season-rollover-review-head > div > span,
+.season-rollover-rollback > div > span {
+  display:block;
+  color:var(--accent);
+  font-size:.54rem;
+  font-weight:900;
+  letter-spacing:.075em;
+  text-transform:uppercase;
+}
+.season-rollover-hero strong {
+  display:block;
+  margin-top:3px;
+  font-size:.90rem;
+  font-weight:950;
+}
+.season-rollover-hero p {
+  margin:4px 0 0;
+  max-width:760px;
+  color:var(--muted);
+  font-size:.63rem;
+  line-height:1.45;
+}
+.season-rollover-notice {
+  display:grid;
+  gap:2px;
+  margin-bottom:9px;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+}
+.season-rollover-notice.is-success {
+  border-color:rgba(82,215,194,.28);
+  background:rgba(82,215,194,.05);
+}
+.season-rollover-notice strong {
+  font-size:.72rem;
+  font-weight:900;
+}
+.season-rollover-notice.is-success strong { color:var(--healthy); }
+.season-rollover-notice span {
+  color:var(--muted);
+  font-size:.60rem;
+  line-height:1.4;
+}
+.season-rollover-review {
+  margin-top:10px;
+  padding:11px;
+  border:1px solid rgba(96,190,255,.22);
+  border-radius:11px;
+  background:rgba(96,190,255,.025);
+}
+.season-rollover-review-head {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+}
+.season-rollover-review-head strong {
+  display:block;
+  margin-top:2px;
+  font-size:.80rem;
+  font-weight:950;
+}
+.season-rollover-readiness {
+  flex:0 0 auto;
+  padding:4px 8px;
+  border:1px solid rgba(82,215,194,.25);
+  border-radius:999px;
+  background:rgba(82,215,194,.055);
+  color:var(--healthy);
+  font-size:.55rem;
+  font-weight:900;
+}
+.season-rollover-review-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:9px;
+}
+.season-rollover-review-item {
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:#0B151E;
+}
+.season-rollover-review-item.attention {
+  border-color:rgba(242,198,109,.28);
+  background:rgba(242,198,109,.04);
+}
+.season-rollover-review-item > span {
+  display:block;
+  overflow:hidden;
+  color:var(--muted);
+  font-size:.52rem;
+  font-weight:850;
+  letter-spacing:.025em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.season-rollover-review-item > strong {
+  display:block;
+  margin-top:3px;
+  font-size:.78rem;
+  font-weight:950;
+}
+.season-rollover-review-item.attention > strong { color:var(--warning); }
+.season-rollover-review-item > small {
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.54rem;
+  line-height:1.35;
+}
+.season-rollover-cap-field {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(150px,220px);
+  gap:5px 10px;
+  align-items:center;
+  margin-top:9px;
+  padding:9px 10px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:#0B151E;
+  color:var(--text);
+  font-size:.65rem;
+  font-weight:850;
+}
+.season-rollover-cap-field input { min-width:0; }
+.season-rollover-cap-field small {
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:.56rem;
+  font-weight:600;
+  line-height:1.35;
+}
+.season-rollover-protection {
+  margin-top:9px;
+  padding:9px 10px;
+  border:1px solid rgba(82,215,194,.18);
+  border-radius:9px;
+  background:rgba(82,215,194,.025);
+}
+.season-rollover-protection > strong {
+  display:block;
+  color:var(--healthy);
+  font-size:.65rem;
+  font-weight:900;
+}
+.season-rollover-protection-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:4px 12px;
+  margin-top:6px;
+}
+.season-rollover-protection-grid span {
+  color:var(--text);
+  font-size:.58rem;
+  line-height:1.35;
+}
+.season-rollover-protection > p {
+  margin:7px 0 0;
+  color:var(--muted);
+  font-size:.56rem;
+  line-height:1.4;
+}
+.season-rollover-confirm-check {
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  margin-top:9px;
+  padding:8px 9px;
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  background:#0B151E;
+  color:var(--text);
+  font-size:.61rem;
+  font-weight:750;
+  line-height:1.4;
+}
+.season-rollover-confirm-check input {
+  flex:0 0 auto;
+  width:auto;
+  min-height:0;
+  margin-top:2px;
+}
+.season-rollover-confirm-actions {
+  display:flex;
+  gap:7px;
+  justify-content:flex-end;
+  margin-top:9px;
+}
+.season-rollover-rollback {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  margin-top:10px;
+  padding:9px 10px;
+  border:1px dashed rgba(255,255,255,.13);
+  border-radius:9px;
+  background:rgba(255,255,255,.012);
+}
+.season-rollover-rollback strong {
+  display:block;
+  margin-top:2px;
+  font-size:.68rem;
+}
+.season-rollover-rollback p {
+  margin:3px 0 0;
+  color:var(--muted);
+  font-size:.56rem;
+  line-height:1.38;
+}
+.season-rollover-manual-override {
+  opacity:.82;
+}
+.season-rollover-manual-override::before {
+  content:'Manual override';
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:.51rem;
+  font-weight:900;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+@media (max-width:720px) {
+  .season-rollover-hero,
+  .season-rollover-rollback {
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+  .season-rollover-hero .btn,
+  .season-rollover-rollback .btn {
+    width:100%;
+  }
+  .season-rollover-review-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width:430px) {
+  .season-rollover-annual-badge {
+    margin-right:2px;
+    padding:3px 6px;
+    font-size:.50rem;
+  }
+  .season-rollover-review {
+    padding:8px;
+  }
+  .season-rollover-review-grid {
+    gap:5px;
+  }
+  .season-rollover-review-item {
+    padding:7px;
+  }
+  .season-rollover-review-item > span { font-size:.48rem; }
+  .season-rollover-review-item > strong { font-size:.70rem; }
+  .season-rollover-review-item > small { font-size:.50rem; }
+  .season-rollover-cap-field {
+    grid-template-columns:1fr;
+  }
+  .season-rollover-protection-grid {
+    grid-template-columns:1fr;
+  }
+  .season-rollover-confirm-actions {
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .season-rollover-confirm-actions .btn { width:100%; }
+}
+
+
+/* ============================================================================
+   RosterCap V2.92 — Minors positional depth + Assets polish
+   Presentation only.
+   ============================================================================ */
+
+/* Minors ------------------------------------------------------------------ */
+
+#farmView .farm-page-v292 {
+  gap:7px;
+}
+
+#farmView .farm-page-v292 .farm-page-heading-v228 {
+  margin-bottom:1px;
+}
+
+#farmView .farm-depth-panel-v292 {
+  min-width:0;
+  padding:8px;
+}
+
+#farmView .farm-depth-panel-v292 .farm-section-head-v228 {
+  align-items:flex-end;
+  padding:0 1px 5px;
+}
+
+#farmView .farm-depth-scroll-v292 {
+  width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding-bottom:2px;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(119,201,255,.22) transparent;
+  -webkit-overflow-scrolling:touch;
+}
+
+#farmView .farm-depth-board-v292 {
+  display:grid;
+  grid-template-columns:repeat(var(--farm-depth-columns),minmax(116px,1fr));
+  align-items:start;
+  gap:5px;
+  width:100%;
+  min-width:max(
+    100%,
+    calc(var(--farm-depth-columns) * 116px + (var(--farm-depth-columns) - 1) * 5px)
+  );
+}
+
+#farmView .farm-depth-column-v292 {
+  display:grid;
+  align-content:start;
+  gap:5px;
+  min-width:0;
+  padding:5px;
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  background:#0D1822;
+}
+
+#farmView .farm-depth-column-head-v292 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:5px;
+  min-height:24px;
+}
+
+#farmView .farm-depth-column-head-v292 strong {
+  color:#EAF5FC;
+  font-size:.68rem;
+  line-height:1;
+}
+
+#farmView .farm-depth-column-head-v292 span {
+  display:grid;
+  place-items:center;
+  min-width:20px;
+  height:20px;
+  padding:0 4px;
+  border:1px solid rgba(119,201,255,.18);
+  border-radius:999px;
+  color:#A8D8F7;
+  background:rgba(50,173,255,.05);
+  font-size:.45rem;
+  font-weight:900;
+}
+
+#farmView .farm-depth-stack-v292 {
+  display:grid;
+  gap:4px;
+}
+
+#farmView .farm-depth-player-card-v292 {
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr !important;
+  gap:4px !important;
+  min-width:0;
+  min-height:0;
+  padding:5px !important;
+  border-radius:8px !important;
+  background:#101C27;
+}
+
+#farmView .farm-depth-rank-v292 {
+  display:inline-block;
+  width:auto;
+  max-width:100%;
+  justify-self:center;
+  padding:0 2px 3px;
+  border-bottom:1px solid rgba(143,207,255,.32);
+  color:#8FCFFF;
+  font-size:.42rem;
+  font-weight:900;
+  letter-spacing:.04em;
+  line-height:1;
+  text-align:center;
+  text-transform:uppercase;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-main {
+  display:grid;
+  justify-items:center;
+  gap:3px;
+  min-width:0;
+  padding:0;
+  text-align:center;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 {
+  min-width:0;
+  text-align:center;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 strong {
+  display:block;
+  overflow:hidden;
+  width:100%;
+  font-size:.62rem;
+  line-height:1.14;
+  text-align:center;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 small {
+  display:block;
+  overflow:hidden;
+  width:100%;
+  margin-top:2px;
+  font-size:.46rem;
+  line-height:1.18;
+  text-align:center;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-copy-v228 em {
+  display:block;
+  overflow:hidden;
+  width:100%;
+  margin-top:2px;
+  font-size:.43rem;
+  line-height:1.16;
+  text-align:center;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-cap {
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:4px;
+  min-width:0;
+  text-align:center;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-cap strong {
+  font-size:.56rem;
+  line-height:1.12;
+  text-align:center;
+}
+
+#farmView .farm-depth-player-card-v292 .farm-player-cap small {
+  display:none;
+}
+
+#farmView .farm-depth-player-card-v292 [data-call-up] {
+  width:100%;
+  min-width:0;
+  min-height:27px;
+  padding:3px 5px;
+  border-radius:7px;
+  font-size:.50rem;
+}
+
+#farmView .farm-depth-empty-v292 {
+  display:grid;
+  place-items:center;
+  min-height:58px;
+  padding:7px;
+  border:1px dashed var(--border);
+  border-radius:8px;
+  color:var(--muted);
+  background:rgba(255,255,255,.01);
+  font-size:.45rem;
+  text-align:center;
+}
+
+/* Assets ------------------------------------------------------------------ */
+
+#assetsView .assets-page-v292 {
+  gap:7px;
+}
+
+#assetsView .assets-page-v292 .asset-hero-v292 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:10px;
+  padding:2px 0 4px;
+}
+
+#assetsView .assets-page-v292 .asset-hero-copy-v230 h3 {
+  margin:0;
+  font-size:1.10rem;
+  line-height:1.08;
+}
+
+#assetsView .assets-page-v292 .asset-hero-copy-v230 p:last-child {
+  margin-top:3px;
+  max-width:620px;
+  font-size:.64rem;
+  line-height:1.35;
+}
+
+#assetsView .assets-page-v292 .asset-add-btn-v230 {
+  min-height:34px;
+  padding:5px 10px;
+  border-radius:9px;
+  box-shadow:none;
+  font-size:.61rem;
+}
+
+#assetsView .assets-page-v292 .asset-tabs {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:0 0 2px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+
+#assetsView .assets-page-v292 .asset-tabs::-webkit-scrollbar {
+  display:none;
+}
+
+#assetsView .assets-page-v292 .asset-tab-v292 {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  flex:0 0 auto;
+  min-width:max-content;
+  min-height:29px;
+  padding:4px 8px;
+  border:1px solid var(--border) !important;
+  border-radius:999px !important;
+  background:#0D1822 !important;
+  color:#C3D0DB !important;
+  box-shadow:none !important;
+  font-size:.56rem;
+  white-space:nowrap;
+}
+
+#assetsView .assets-page-v292 .asset-tab-v292.active {
+  border-color:rgba(50,173,255,.55) !important;
+  background:rgba(50,173,255,.10) !important;
+  color:#E8F6FF !important;
+}
+
+#assetsView .assets-page-v292 .asset-tab-count-v260 {
+  min-width:17px;
+  height:17px;
+  padding:0 4px;
+  background:rgba(255,255,255,.05);
+  color:#AFC0CD;
+  font-size:.46rem;
+}
+
+#assetsView .assets-page-v292 .asset-tab-v292.active .asset-tab-count-v260 {
+  background:rgba(50,173,255,.18);
+  color:#A9D9FF;
+}
+
+#assetsView .assets-page-v292 .asset-portfolio-v292 {
+  min-width:0;
+  padding:8px;
+  border-radius:11px;
+}
+
+#assetsView .asset-empty-state-v292 {
+  display:grid !important;
+  align-content:start;
+  gap:4px !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:14px 12px !important;
+  border:1px dashed var(--border) !important;
+  border-radius:10px !important;
+  background:rgba(255,255,255,.012) !important;
+  text-align:left !important;
+}
+
+#assetsView .asset-empty-state-v292 > * {
+  margin:0 !important;
+}
+
+#assetsView .asset-empty-state-v292 h2,
+#assetsView .asset-empty-state-v292 h3,
+#assetsView .asset-empty-state-v292 h4,
+#assetsView .asset-empty-state-v292 strong {
+  display:block;
+  color:var(--text);
+  font-size:.79rem !important;
+  line-height:1.15;
+}
+
+#assetsView .asset-empty-state-v292 p,
+#assetsView .asset-empty-state-v292 span:not(.asset-tab-count-v260) {
+  display:block;
+  max-width:560px;
+  color:var(--muted);
+  font-size:.60rem !important;
+  line-height:1.35;
+}
+
+#assetsView .assets-page-v292 .asset-grid-v292 {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:6px;
+}
+
+#assetsView .assets-page-v292 .asset-card-v292 {
+  min-width:0;
+  min-height:74px;
+  padding:7px;
+  border-radius:9px;
+  background:#0D1822;
+}
+
+#assetsView .assets-page-v292 .asset-card-v292 h5 {
+  font-size:.70rem;
+  line-height:1.15;
+}
+
+#assetsView .assets-page-v292 .asset-card-v292 .asset-card-meta {
+  font-size:.52rem;
+  line-height:1.25;
+}
+
+@media (max-width:720px) {
+  #farmView .farm-depth-board-v292 {
+    grid-template-columns:repeat(var(--farm-depth-columns),112px);
+    min-width:max-content;
+  }
+
+  #farmView .farm-depth-column-v292 {
+    width:112px;
+  }
+
+  #assetsView .assets-page-v292 .asset-hero-v292 {
+    grid-template-columns:1fr;
+    align-items:stretch;
+    gap:7px;
+  }
+
+  #assetsView .assets-page-v292 .asset-add-btn-v230 {
+    width:auto;
+    justify-self:start;
+  }
+
+  #assetsView .assets-page-v292 .asset-grid-v292 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media (max-width:430px) {
+  #farmView .farm-depth-board-v292 {
+    grid-template-columns:repeat(var(--farm-depth-columns),106px);
+  }
+
+  #farmView .farm-depth-column-v292 {
+    width:106px;
+    padding:4px;
+  }
+
+  #farmView .farm-depth-player-card-v292 {
+    padding:4px !important;
+  }
+
+  #assetsView .assets-page-v292 .asset-hero-copy-v230 h3 {
+    font-size:1.04rem;
+  }
+
+  #assetsView .asset-empty-state-v292 {
+    padding:11px 10px !important;
+  }
+}
+
+@media (max-width:350px) {
+  #assetsView .assets-page-v292 .asset-grid-v292 {
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V2.94 — Transactions page polish
+   Presentation only; transaction persistence/workflows are unchanged.
+   ============================================================================ */
+
+#transactionsView .transactions-page-v294 {
+  gap:6px;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:8px;
+  margin:0;
+  padding:0 0 3px;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 > div {
+  min-width:0;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .eyebrow {
+  margin:0 0 2px;
+  font-size:.53rem;
+  letter-spacing:.12em;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+  margin:0;
+  font-size:1.02rem;
+  line-height:1.04;
+  letter-spacing:-.025em;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+  margin:3px 0 0;
+  max-width:620px;
+  color:var(--muted);
+  font-size:.59rem;
+  line-height:1.32;
+}
+
+#transactionsView .transactions-page-v294 #recordTransactionBtn {
+  min-width:0;
+  min-height:31px;
+  padding:4px 9px;
+  border-radius:8px;
+  box-shadow:none;
+  font-size:.58rem;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+/* Filters only render when at least one transaction exists. */
+#transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  min-width:0;
+  margin:0;
+  padding:1px 0 2px;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filters-v259 {
+  gap:4px;
+  padding:0 0 1px;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 {
+  min-height:26px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#0D1822;
+  font-size:.52rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 strong {
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  font-size:.46rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-status-v259 {
+  font-size:.49rem;
+}
+
+/* Empty state ------------------------------------------------------------ */
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+  display:grid;
+  align-content:start;
+  gap:4px;
+  min-height:0;
+  margin:2px 0 0;
+  padding:11px 12px;
+  border:1px dashed var(--border);
+  border-radius:10px;
+  background:rgba(255,255,255,.012);
+  text-align:left;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 > * {
+  margin:0;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 h4 {
+  color:var(--text);
+  font-size:.76rem;
+  line-height:1.15;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 p {
+  max-width:590px;
+  color:var(--muted);
+  font-size:.57rem;
+  line-height:1.34;
+}
+
+/* Populated ledger ------------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-list-v228 {
+  display:grid;
+  gap:4px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 {
+  padding:6px 7px;
+  border-radius:9px;
+  background:#0D1822;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-head-v228 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:6px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 .transaction-type {
+  font-size:.44rem;
+  line-height:1;
+  letter-spacing:.07em;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+  margin:2px 0 0;
+  font-size:.68rem;
+  line-height:1.16;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 p {
+  margin:2px 0 0;
+  font-size:.48rem;
+  line-height:1.15;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 {
+  gap:3px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 time {
+  font-size:.46rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 {
+  gap:3px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+  min-height:21px;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:.47rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-body-v228 {
+  display:grid;
+  gap:2px;
+  margin-top:4px;
+  padding-top:4px;
+  border-top:1px solid var(--border-soft);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 {
+  grid-template-columns:34px minmax(0,1fr);
+  gap:4px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-direction-v228 {
+  font-size:.40rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 > span:last-child {
+  gap:3px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 em {
+  padding:1px 4px;
+  border-radius:5px;
+  font-size:.47rem;
+  line-height:1.22;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228.financial strong {
+  font-size:.50rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-notes-v228 {
+  margin:4px 0 0;
+  font-size:.48rem;
+  line-height:1.25;
+}
+
+#transactionsView .transactions-page-v294 .draft-history-card {
+  box-shadow:inset 2px 0 0 rgba(50,173,255,.28);
+}
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v294 {
+    gap:5px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:7px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+    font-size:.96rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    font-size:.55rem;
+    line-height:1.28;
+  }
+
+  #transactionsView .transactions-page-v294 #recordTransactionBtn {
+    min-height:30px;
+    padding:4px 8px;
+    font-size:.55rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+    display:block;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-filters-v259 {
+    width:100%;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-status-v259 {
+    display:none;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 {
+    padding:5px 6px;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    max-width:245px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+    padding:10px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-filter-v259 {
+    min-height:25px;
+    padding-left:6px;
+    padding-right:6px;
+    font-size:.50rem;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+    font-size:.65rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V2.97 — Assets workspace restoration + polish
+   Assets workspace styling belongs here. assets-landing.css is signed-out only.
+   ============================================================================ */
+
+#assetsView .assets-page-v297 {
+  display:grid;
+  gap:7px;
+  min-width:0;
+}
+
+/* Hero --------------------------------------------------------------------- */
+
+#assetsView .assets-page-v297 .asset-hero-v230 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"copy action";
+  align-items:end;
+  gap:10px;
+  min-width:0;
+  padding:2px 0 4px;
+}
+
+#assetsView .assets-page-v297 .asset-hero-copy-v230 {
+  grid-area:copy;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-hero-copy-v230 .eyebrow {
+  margin:0 0 2px;
+}
+
+#assetsView .assets-page-v297 .asset-hero-copy-v230 h3 {
+  margin:0;
+  font-size:1.10rem;
+  line-height:1.08;
+  letter-spacing:-.02em;
+}
+
+#assetsView .assets-page-v297 .asset-hero-copy-v230 p:last-child {
+  margin:3px 0 0;
+  max-width:620px;
+  color:var(--muted);
+  font-size:.64rem;
+  line-height:1.35;
+}
+
+#assetsView .assets-page-v297 .asset-add-btn-v230 {
+  grid-area:action;
+  min-width:0;
+  min-height:34px;
+  padding:5px 10px;
+  border-radius:9px;
+  box-shadow:none;
+  font-size:.61rem;
+  white-space:nowrap;
+}
+
+/* Category filters --------------------------------------------------------- */
+
+#assetsView .assets-page-v297 .asset-tabs-v230 {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  width:100%;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:0 0 2px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+
+#assetsView .assets-page-v297 .asset-tabs-v230::-webkit-scrollbar {
+  display:none;
+}
+
+#assetsView .assets-page-v297 .asset-tab {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  flex:0 0 auto;
+  min-width:max-content;
+  min-height:29px;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#0D1822;
+  color:#C3D0DB;
+  box-shadow:none;
+  font:inherit;
+  font-size:.56rem;
+  white-space:nowrap;
+}
+
+#assetsView .assets-page-v297 .asset-tab.active {
+  border-color:rgba(50,173,255,.55);
+  background:rgba(50,173,255,.10);
+  color:#E8F6FF;
+}
+
+/* If multiple statuses exist, keep the secondary filter visibly secondary. */
+
+#assetsView .assets-page-v297 .asset-status-rail-v297 {
+  margin-top:-1px;
+  padding-top:0;
+}
+
+#assetsView .assets-page-v297 .asset-status-rail-v297 button {
+  min-height:26px;
+  padding:3px 7px;
+  font-size:.51rem;
+}
+
+/* Section hierarchy -------------------------------------------------------- */
+
+#assetsView .assets-page-v297 .asset-sections-v230 {
+  display:grid;
+  gap:7px;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-portfolio-panel-v230 {
+  display:grid;
+  gap:7px;
+  min-width:0;
+  padding:9px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:rgba(13,24,34,.82);
+}
+
+#assetsView .assets-page-v297 .asset-section-head-v297 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-section-head-v297 h4 {
+  margin:0;
+  color:var(--text);
+  font-size:.78rem;
+  line-height:1.15;
+}
+
+#assetsView .assets-page-v297 .asset-section-head-v297 > span {
+  display:grid;
+  place-items:center;
+  min-width:21px;
+  height:21px;
+  padding:0 5px;
+  border:1px solid rgba(119,201,255,.15);
+  border-radius:999px;
+  background:rgba(50,173,255,.05);
+  color:#A8D8F7;
+  font-size:.48rem;
+  font-weight:900;
+}
+
+/* Draft-year grouping ------------------------------------------------------ */
+
+#assetsView .assets-page-v297 .asset-year-group-v297 {
+  display:grid;
+  gap:6px;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-year-group-v297 + .asset-year-group-v297 {
+  margin-top:2px;
+  padding-top:7px;
+  border-top:1px solid var(--border-soft);
+}
+
+#assetsView .assets-page-v297 .asset-year-label-v297 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  padding:0 1px;
+}
+
+#assetsView .assets-page-v297 .asset-year-label-v297 strong {
+  color:#E8F5FD;
+  font-size:.67rem;
+  font-weight:900;
+  line-height:1.1;
+}
+
+#assetsView .assets-page-v297 .asset-year-label-v297 span {
+  color:var(--muted);
+  font-size:.49rem;
+  line-height:1.1;
+}
+
+/* Asset cards -------------------------------------------------------------- */
+
+#assetsView .assets-page-v297 .asset-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:6px;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 {
+  display:grid;
+  align-content:start;
+  gap:7px;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:8px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:#0D1822;
+  color:var(--text);
+  box-shadow:none;
+  font:inherit;
+  text-align:left;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297:hover,
+#assetsView .assets-page-v297 .asset-card-v297:focus-visible {
+  border-color:rgba(50,173,255,.35);
+  background:#101D28;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297:focus-visible {
+  outline:2px solid rgba(50,173,255,.28);
+  outline-offset:2px;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-card-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-card-type {
+  min-width:0;
+  overflow:hidden;
+  color:#84CFFF;
+  font-size:.53rem;
+  font-weight:900;
+  line-height:1.1;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-status {
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:21px;
+  padding:3px 7px;
+  border:1px solid var(--border-soft);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  color:#AFBEC9;
+  font-size:.47rem;
+  font-weight:850;
+  line-height:1;
+  white-space:nowrap;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-status.owned {
+  border-color:rgba(84,204,145,.18);
+  background:rgba(84,204,145,.05);
+  color:#A8DEBF;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-status.conditional {
+  border-color:rgba(242,198,109,.20);
+  background:rgba(242,198,109,.05);
+  color:#E5CA93;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-status.traded-away,
+#assetsView .assets-page-v297 .asset-card-v297 .asset-status.expired {
+  color:#95A5B1;
+  opacity:.82;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-pick-main {
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-round-badge {
+  display:grid;
+  place-items:center;
+  width:38px;
+  min-width:38px;
+  height:38px;
+  margin:0;
+  border:1px solid rgba(50,173,255,.26);
+  border-radius:9px;
+  background:rgba(50,173,255,.065);
+  color:#8FD2FF;
+  font-size:.56rem;
+  font-weight:950;
+  line-height:1;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-pick-main > div {
+  min-width:0;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 h5 {
+  margin:0;
+  overflow:hidden;
+  color:#EEF6FC;
+  font-size:.63rem;
+  font-weight:900;
+  line-height:1.20;
+  text-overflow:ellipsis;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-card-meta {
+  margin-top:3px;
+  overflow:hidden;
+  color:#8FA4B4;
+  font-size:.49rem;
+  line-height:1.25;
+  text-overflow:ellipsis;
+}
+
+#assetsView .assets-page-v297 .asset-card-v297 .asset-lifecycle-v270 {
+  display:block;
+  margin-top:0;
+  padding-top:5px;
+  border-top:1px solid var(--border-soft);
+  color:#8DA3B4;
+  font-size:.48rem;
+  font-weight:700;
+  line-height:1.25;
+}
+
+/* Empty state -------------------------------------------------------------- */
+
+#assetsView .assets-page-v297 .asset-empty-v230 {
+  display:grid;
+  align-content:start;
+  gap:4px;
+  min-height:0;
+  padding:12px;
+  border:1px dashed var(--border);
+  border-radius:10px;
+  background:rgba(255,255,255,.012);
+}
+
+#assetsView .assets-page-v297 .asset-empty-v230 strong {
+  color:var(--text);
+  font-size:.76rem;
+  line-height:1.15;
+}
+
+#assetsView .assets-page-v297 .asset-empty-v230 span {
+  color:var(--muted);
+  font-size:.57rem;
+  line-height:1.34;
+}
+
+@media (max-width:720px) {
+  #assetsView .assets-page-v297 .asset-hero-v230 {
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "copy"
+      "action";
+    align-items:stretch;
+    gap:7px;
+  }
+
+  #assetsView .assets-page-v297 .asset-add-btn-v230 {
+    justify-self:start;
+  }
+
+  #assetsView .assets-page-v297 .asset-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  #assetsView .assets-page-v297 .asset-card-v297 {
+    gap:6px;
+    padding:7px;
+  }
+
+  #assetsView .assets-page-v297 .asset-card-v297 .asset-pick-main {
+    grid-template-columns:34px minmax(0,1fr);
+    gap:6px;
+  }
+
+  #assetsView .assets-page-v297 .asset-card-v297 .asset-round-badge {
+    width:34px;
+    min-width:34px;
+    height:34px;
+    font-size:.52rem;
+  }
+}
+
+@media (max-width:430px) {
+  #assetsView .assets-page-v297 {
+    gap:6px;
+  }
+
+  #assetsView .assets-page-v297 .asset-grid {
+    grid-template-columns:1fr;
+  }
+
+  #assetsView .assets-page-v297 .asset-portfolio-panel-v230 {
+    padding:8px;
+  }
+
+  #assetsView .assets-page-v297 .asset-card-v297 {
+    grid-template-columns:1fr;
+    padding:7px 8px;
+  }
+
+  #assetsView .assets-page-v297 .asset-card-v297 h5 {
+    white-space:normal;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V2.98.2 — Minors player age + contract expiry
+   ============================================================================ */
+
+#farmView .farm-page-v2982 .farm-player-age-v2982 {
+  display:block;
+  overflow:hidden;
+  margin-top:1px;
+  color:#8FA8B9;
+  font-size:.47rem;
+  font-style:normal;
+  font-weight:750;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-page-v2982 .farm-player-contract-v2982 {
+  display:block;
+  overflow:hidden;
+  margin-top:1px;
+  color:#86A1B3;
+  font-size:.47rem;
+  font-style:normal;
+  font-weight:750;
+  line-height:1.12;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982 {
+  font-size:.39rem;
+  line-height:1.10;
+}
+
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 {
+  display:grid;
+  gap:1px;
+}
+
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 small,
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+#farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982 {
+  margin-top:0;
+}
+
+@media (max-width:430px) {
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982 {
+    font-size:.38rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.01.9 — Centered Minors player-card information
+   Presentation only.
+   Depth labels remain top-left; player identity, contract metadata and salary
+   are centered and slightly enlarged for mobile readability.
+   ============================================================================ */
+
+
+/* ============================================================================
+   RosterCap V3.02.0 — Centered Minors labels + desktop alignment
+   ============================================================================ */
+
+@media (min-width:760px) {
+  #farmView .farm-depth-player-card-v292 {
+    justify-items:center;
+    text-align:center;
+  }
+
+  #farmView .farm-depth-rank-v292 {
+    justify-self:center;
+    text-align:center;
+  }
+
+  #farmView .farm-depth-player-card-v292 .farm-player-main,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 strong,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 small,
+  #farmView .farm-depth-player-card-v292 .farm-player-copy-v228 em,
+  #farmView .farm-depth-player-card-v292 .farm-player-cap {
+    width:100%;
+    text-align:center;
+  }
+
+  #farmView .farm-depth-player-card-v292 .farm-player-cap {
+    justify-content:center;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.02.1 — Minors desktop centering hardening
+   ---------------------------------------------------------------------------
+   V2.98.2 injects Age / Contract rows after the original Minors markup.
+   Explicitly center every visible information element on desktop so the
+   wider positional cards remain balanced.
+   ============================================================================ */
+
+@media (min-width:760px) {
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 {
+    justify-items:stretch !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-depth-rank-v292 {
+    justify-self:center !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-main {
+    width:100% !important;
+    justify-items:stretch !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 {
+    display:grid !important;
+    width:100% !important;
+    justify-items:center !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals {
+    display:grid !important;
+    width:100% !important;
+    justify-items:center !important;
+    justify-content:center !important;
+    gap:3px !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals > strong,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > small,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > em {
+    display:block !important;
+    width:100% !important;
+    justify-self:stretch !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap {
+    display:flex !important;
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap strong {
+    width:auto !important;
+    text-align:center !important;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.02.2 — Minors desktop single-stack centering
+   ---------------------------------------------------------------------------
+   The desktop Minors card inherited a multi-column player-main layout.
+   Previous text-align rules centered text inside that left column rather than
+   across the full card. Force the depth-card player-main into one vertical
+   flex stack on desktop.
+   ============================================================================ */
+
+@media (min-width:760px) {
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-main {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    width:100% !important;
+    min-width:0 !important;
+    gap:3px !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    gap:3px !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-name-signals > strong,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > small,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-age-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-contract-v2982,
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-copy-v228 > em {
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap {
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    margin:0 auto !important;
+    text-align:center !important;
+  }
+
+  #farmView .farm-page-v2982 .farm-depth-player-card-v292 .farm-player-cap > strong {
+    display:block !important;
+    width:auto !important;
+    margin:0 auto !important;
+    text-align:center !important;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.03.0 — Overview dashboard polish
+   Presentation only. No data/model/behavior changes.
+   ============================================================================ */
+
+#overviewView .overview-v227.overview-v255 {
+  gap:10px;
+}
+
+/* --------------------------------------------------------------------------
+   Primary cap-position hero
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-v255 .overview-hero-v227 {
+  position:relative;
+  overflow:hidden;
+  padding:18px 19px 16px;
+  border-color:rgba(119,201,255,.20);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 92% 4%,rgba(50,173,255,.10),transparent 34%),
+    linear-gradient(180deg,rgba(15,29,41,.96),rgba(10,20,29,.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.025),
+    0 8px 24px rgba(0,0,0,.10);
+}
+
+#overviewView .overview-v255 .overview-hero-v227::after {
+  content:"";
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(119,201,255,.16),transparent);
+  pointer-events:none;
+}
+
+#overviewView .overview-v255 .overview-hero-top {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:18px;
+}
+
+#overviewView .overview-v255 .overview-hero-top .eyebrow {
+  margin-bottom:7px;
+  color:#88B9D8;
+  font-size:.61rem;
+  letter-spacing:.075em;
+}
+
+#overviewView .overview-v255 .overview-primary-number {
+  font-size:clamp(2.25rem,5.2vw,3.45rem);
+  font-weight:950;
+  line-height:.96;
+  letter-spacing:-.035em;
+  font-variant-numeric:tabular-nums;
+}
+
+#overviewView .overview-v255 .overview-primary-label {
+  margin-top:7px;
+  color:#9EB3C2;
+  font-size:.68rem;
+  font-weight:850;
+  letter-spacing:.035em;
+  text-transform:uppercase;
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 {
+  min-width:138px;
+  padding:10px 12px;
+  border:1px solid rgba(119,201,255,.16);
+  border-radius:11px;
+  background:rgba(6,14,21,.42);
+  text-align:right;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 span {
+  color:#7891A3;
+  font-size:.53rem;
+  font-weight:850;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 strong {
+  display:block;
+  margin-top:4px;
+  color:#D9ECF8;
+  font-size:.94rem;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+
+#overviewView .overview-v255 .overview-progress-v227 {
+  margin-top:16px;
+}
+
+#overviewView .overview-v255 .overview-progress-v227 .cap-bar {
+  height:7px;
+  border:1px solid rgba(255,255,255,.035);
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.18);
+}
+
+#overviewView .overview-v255 .overview-progress-v227 .cap-bar-fill {
+  box-shadow:0 0 14px rgba(50,173,255,.15);
+}
+
+#overviewView .overview-v255 .overview-progress-meta-v227 {
+  margin-top:7px;
+  color:#7990A1;
+  font-size:.59rem;
+}
+
+#overviewView .overview-v255 .overview-progress-meta-v227 strong {
+  color:#BFD8E8;
+  font-weight:900;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:13px;
+  padding-top:0;
+  border-top:0;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 > div {
+  min-width:0;
+  padding:9px 10px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+  text-align:center;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 > div + div {
+  border-left:1px solid rgba(255,255,255,.055);
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 span {
+  display:block;
+  overflow:hidden;
+  color:#738A9B;
+  font-size:.51rem;
+  font-weight:850;
+  letter-spacing:.05em;
+  text-overflow:ellipsis;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+#overviewView .overview-v255 .overview-finance-strip-v227 strong {
+  display:block;
+  margin-top:4px;
+  overflow:hidden;
+  color:#CFE4F1;
+  font-size:.82rem;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Shared panel treatment
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-compact-panel-v255,
+#overviewView .overview-panel-v227,
+#overviewView .contract-watch-v246 {
+  border-color:rgba(119,201,255,.11);
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(13,25,35,.92),rgba(9,18,26,.92));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.018);
+}
+
+#overviewView .overview-compact-panel-v255 {
+  padding:11px 12px 12px;
+}
+
+#overviewView .overview-section-head-v227,
+#overviewView .overview-section-head-compact-v255 {
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+#overviewView .overview-section-head-v227 .eyebrow,
+#overviewView .overview-section-head-compact-v255 .eyebrow {
+  color:#87A7BB;
+  font-size:.58rem;
+  letter-spacing:.065em;
+}
+
+#overviewView .overview-section-head-v227 h3 {
+  margin-top:3px;
+  color:#D8EAF5;
+  font-size:.92rem;
+}
+
+#overviewView .overview-text-action {
+  min-height:26px;
+  padding:4px 8px;
+  border:1px solid rgba(119,201,255,.13);
+  border-radius:999px;
+  color:#83CFFF;
+  background:rgba(50,173,255,.035);
+  font-size:.56rem;
+  font-weight:850;
+  text-decoration:none;
+}
+
+#overviewView .overview-text-action:hover,
+#overviewView .overview-text-action:focus-visible {
+  border-color:rgba(119,201,255,.28);
+  color:#CDEEFF;
+  background:rgba(50,173,255,.075);
+}
+
+/* --------------------------------------------------------------------------
+   Team snapshot
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-snapshot-v227 .overview-snapshot-grid-v227 {
+  gap:7px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+  min-width:0;
+  padding:10px 10px 9px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+  text-align:center;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item.warning {
+  border-color:rgba(242,198,109,.25);
+  background:rgba(242,198,109,.035);
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item > span {
+  color:#758D9E;
+  font-size:.52rem;
+  font-weight:850;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+  margin-top:4px;
+  color:#D7EAF5;
+  font-size:1rem;
+  font-weight:950;
+  font-variant-numeric:tabular-nums;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-snapshot-item small {
+  margin-top:3px;
+  color:#708798;
+  font-size:.56rem;
+}
+
+/* --------------------------------------------------------------------------
+   Contract watch
+   -------------------------------------------------------------------------- */
+
+#overviewView .contract-watch-v246 {
+  padding:11px 12px 12px;
+}
+
+#overviewView .contract-watch-v246 .overview-section-head-v227 {
+  margin-bottom:8px;
+}
+
+#overviewView .contract-watch-metrics-v246 {
+  gap:7px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#overviewView .contract-watch-metrics-v246 > div {
+  min-width:0;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+  text-align:center;
+}
+
+#overviewView .contract-watch-metrics-v246 > div:last-child {
+  border-right:1px solid rgba(255,255,255,.06);
+}
+
+#overviewView .contract-watch-metrics-v246 > div.warning {
+  border-color:rgba(242,198,109,.25);
+  background:rgba(242,198,109,.04);
+}
+
+#overviewView .contract-watch-metrics-v246 > div > span {
+  font-size:.51rem;
+  letter-spacing:.05em;
+}
+
+#overviewView .contract-watch-metrics-v246 > div > strong {
+  margin-top:4px;
+  font-size:.94rem;
+}
+
+#overviewView .contract-watch-metrics-v246 > div > small {
+  margin-top:3px;
+  font-size:.54rem;
+}
+
+#overviewView .contract-watch-footer-v246 {
+  margin-top:7px;
+}
+
+#overviewView .contract-watch-priority {
+  min-height:42px;
+  gap:8px;
+  padding:8px 10px;
+  border-radius:10px;
+}
+
+#overviewView .contract-watch-priority::before {
+  width:20px;
+  height:20px;
+  border-radius:7px;
+}
+
+#overviewView .contract-watch-priority > strong {
+  font-size:.66rem;
+}
+
+#overviewView .contract-watch-priority > small {
+  font-size:.54rem;
+}
+
+/* --------------------------------------------------------------------------
+   Seven-season cap outlook
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-outlook-scroll {
+  margin-left:-2px;
+  margin-right:-2px;
+  padding:1px 2px 5px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:7px;
+  min-width:760px;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-card {
+  min-height:113px;
+  padding:9px 9px 8px;
+  border-color:rgba(255,255,255,.06);
+  border-radius:10px;
+  background:rgba(255,255,255,.018);
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-card.current {
+  border-color:rgba(82,215,194,.32);
+  background:
+    linear-gradient(180deg,rgba(82,215,194,.065),rgba(255,255,255,.015));
+  box-shadow:inset 0 2px 0 rgba(82,215,194,.30);
+}
+
+#overviewView .overview-outlook-season strong {
+  font-size:.66rem;
+}
+
+#overviewView .overview-outlook-season span {
+  padding:2px 5px;
+  border:1px solid rgba(82,215,194,.16);
+  background:rgba(82,215,194,.07);
+  color:#84E0D0;
+  font-size:.43rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-value {
+  margin-top:8px;
+  color:#D2E5F1;
+  font-size:.88rem;
+  font-weight:950;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-caption {
+  margin-top:2px;
+  color:#718899;
+  font-size:.48rem;
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-track {
+  height:5px;
+  margin-top:8px;
+  background:rgba(255,255,255,.05);
+}
+
+#overviewView .overview-compact-panel-v255 .overview-outlook-footer {
+  margin-top:6px;
+  color:#758A99;
+  font-size:.46rem;
+}
+
+/* --------------------------------------------------------------------------
+   Attention + recent activity
+   -------------------------------------------------------------------------- */
+
+#overviewView .overview-bottom-grid-v227 {
+  gap:10px;
+  align-items:stretch;
+}
+
+#overviewView .overview-bottom-grid-v227 > .overview-panel-v227 {
+  min-width:0;
+  height:100%;
+  padding:11px 12px 12px;
+}
+
+#overviewView .overview-attention-list,
+#overviewView .overview-activity-list {
+  gap:6px;
+}
+
+#overviewView .overview-attention-row,
+#overviewView .overview-activity-row {
+  min-height:48px;
+  padding:8px 9px;
+  border-color:rgba(255,255,255,.055);
+  border-radius:9px;
+  background:rgba(255,255,255,.015);
+}
+
+#overviewView .overview-attention-row {
+  grid-template-columns:27px minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+}
+
+#overviewView .overview-attention-action {
+  align-self:center;
+  white-space:nowrap;
+}
+
+#overviewView .overview-attention-icon {
+  width:27px;
+  height:27px;
+  border-radius:8px;
+  font-size:.68rem;
+}
+
+#overviewView .overview-attention-row strong,
+#overviewView .overview-activity-row strong {
+  color:#D1E2ED;
+  font-size:.69rem;
+}
+
+#overviewView .overview-attention-row small,
+#overviewView .overview-activity-row small {
+  margin-top:3px;
+  color:#748A9A;
+  font-size:.56rem;
+}
+
+#overviewView .overview-activity-row {
+  grid-template-columns:9px minmax(0,1fr);
+  gap:9px;
+}
+
+#overviewView .overview-activity-dot {
+  width:7px;
+  height:7px;
+  box-shadow:0 0 0 4px rgba(50,173,255,.045);
+}
+
+/* --------------------------------------------------------------------------
+   Desktop: take advantage of extra width instead of simply stretching cards.
+   -------------------------------------------------------------------------- */
+
+@media (min-width:980px) {
+  #overviewView .overview-v227.overview-v255 {
+    gap:11px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:20px 22px 18px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 {
+    gap:8px;
+  }
+
+  #overviewView .overview-compact-panel-v255,
+  #overviewView .contract-watch-v246,
+  #overviewView .overview-bottom-grid-v227 > .overview-panel-v227 {
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+    min-width:0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile: retain density, but make small text and metric separation clearer.
+   -------------------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #overviewView .overview-attention-row {
+    grid-template-columns:27px minmax(0,1fr);
+  }
+
+  #overviewView .overview-attention-action {
+    grid-column:2;
+    justify-self:start;
+    margin-top:2px;
+  }
+
+  #overviewView .overview-v227.overview-v255 {
+    gap:7px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:12px;
+    border-radius:13px;
+  }
+
+  #overviewView .overview-v255 .overview-hero-top {
+    gap:10px;
+  }
+
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.95rem;
+  }
+
+  #overviewView .overview-v255 .overview-primary-label {
+    margin-top:5px;
+    font-size:.60rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    min-width:108px;
+    padding:7px 8px;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 span {
+    font-size:.48rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 strong {
+    margin-top:3px;
+    font-size:.76rem;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 {
+    margin-top:11px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 .cap-bar {
+    height:6px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-meta-v227 {
+    margin-top:6px;
+    font-size:.55rem;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 {
+    gap:5px;
+    margin-top:9px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 > div {
+    padding:7px 5px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 span {
+    font-size:.46rem;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 strong {
+    margin-top:3px;
+    font-size:.70rem;
+  }
+
+  #overviewView .overview-compact-panel-v255,
+  #overviewView .contract-watch-v246 {
+    padding:9px;
+    border-radius:12px;
+  }
+
+  #overviewView .overview-section-head-v227,
+  #overviewView .overview-section-head-compact-v255 {
+    margin-bottom:6px;
+  }
+
+  #overviewView .overview-text-action {
+    min-height:24px;
+    padding:3px 7px;
+    font-size:.54rem;
+  }
+
+  #overviewView .overview-snapshot-v227 .overview-snapshot-grid-v227,
+  #overviewView .contract-watch-metrics-v246 {
+    gap:5px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item,
+  #overviewView .contract-watch-metrics-v246 > div {
+    padding:8px 6px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item strong {
+    font-size:.82rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item small,
+  #overviewView .contract-watch-metrics-v246 > div > small {
+    font-size:.52rem;
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div {
+    border-right:1px solid rgba(255,255,255,.06);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div:nth-child(2n) {
+    border-right:1px solid rgba(255,255,255,.06);
+  }
+
+  #overviewView .contract-watch-metrics-v246 > div:nth-last-child(-n+2) {
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-grid {
+    grid-template-columns:repeat(7,108px);
+    min-width:max-content;
+    gap:5px;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-outlook-card {
+    min-height:106px;
+    padding:8px;
+  }
+
+  #overviewView .overview-bottom-grid-v227 {
+    grid-template-columns:1fr;
+    gap:7px;
+  }
+
+  #overviewView .overview-bottom-grid-v227 > .overview-panel-v227 {
+    padding:9px;
+  }
+
+  #overviewView .overview-attention-row,
+  #overviewView .overview-activity-row {
+    min-height:44px;
+    padding:7px 8px;
+  }
+
+  #overviewView .overview-attention-row strong,
+  #overviewView .overview-activity-row strong {
+    font-size:.66rem;
+  }
+
+  #overviewView .overview-attention-row small,
+  #overviewView .overview-activity-row small {
+    font-size:.54rem;
+    white-space:normal;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.82rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    min-width:100px;
+  }
+
+  #overviewView .overview-v255 .overview-finance-strip-v227 strong {
+    font-size:.66rem;
+  }
+
+  #overviewView .overview-compact-panel-v255 .overview-snapshot-item {
+    padding:8px 5px;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.03.1 — Overview de-duplication + compact cap hero
+   ============================================================================ */
+
+#overviewView .overview-v255 .overview-hero-v227 {
+  padding:14px 16px 13px;
+}
+
+#overviewView .overview-v255 .overview-hero-v227::after {
+  left:16px;
+  right:16px;
+}
+
+#overviewView .overview-v255 .overview-primary-number {
+  font-size:clamp(1.95rem,4.5vw,3rem);
+}
+
+#overviewView .overview-v255 .overview-primary-label {
+  margin-top:5px;
+  font-size:.63rem;
+}
+
+#overviewView .overview-v255 .overview-cap-limit-v227 {
+  min-width:126px;
+  padding:8px 10px;
+}
+
+#overviewView .overview-v255 .overview-progress-v227 {
+  margin-top:12px;
+}
+
+#overviewView .overview-v255 .overview-progress-meta-v227 {
+  margin-top:6px;
+}
+
+/* V3.03.1 removes the redundant Cap Used / Roster Cap / Dead Cap strip from
+   the Overview markup. Keep this defensive rule for stale cached markup. */
+#overviewView .overview-v255 .overview-finance-strip-v227 {
+  display:none !important;
+}
+
+#overviewView .overview-snapshot-grid-v3031 {
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+
+#overviewView .overview-outlook-footer.single {
+  justify-content:flex-end;
+}
+
+@media (min-width:980px) {
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:16px 19px 14px;
+  }
+}
+
+@media (max-width:720px) {
+  #overviewView .overview-v255 .overview-hero-v227 {
+    padding:10px 11px 11px;
+  }
+
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.72rem;
+  }
+
+  #overviewView .overview-v255 .overview-primary-label {
+    font-size:.57rem;
+  }
+
+  #overviewView .overview-v255 .overview-cap-limit-v227 {
+    min-width:101px;
+    padding:6px 8px;
+  }
+
+  #overviewView .overview-v255 .overview-progress-v227 {
+    margin-top:9px;
+  }
+
+  #overviewView .overview-snapshot-grid-v3031 {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+@media (max-width:390px) {
+  #overviewView .overview-v255 .overview-primary-number {
+    font-size:1.64rem;
+  }
+
+  #overviewView .overview-snapshot-grid-v3031 .overview-snapshot-item {
+    padding-left:4px;
+    padding-right:4px;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.04.0 — Roster top polish
+   Presentation only. Player roster board and roster logic are untouched.
+   ============================================================================ */
+
+#rosterView .roster-page {
+  gap:8px;
+}
+
+#rosterView .roster-page-heading-v252 {
+  align-items:flex-start;
+  gap:12px;
+}
+
+#rosterView .roster-page-heading-copy-v252 .eyebrow {
+  margin-bottom:3px;
+}
+
+#rosterView .roster-page-heading-copy-v252 h3 {
+  font-size:1.12rem;
+  line-height:1.08;
+}
+
+#rosterView .roster-page-heading-copy-v252 .page-copy {
+  margin-top:5px;
+  max-width:580px;
+  color:#8298A8;
+  font-size:.67rem;
+  line-height:1.42;
+}
+
+/* Compact stacked actions. */
+#rosterView .roster-header-actions-v252 {
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:flex-start;
+  gap:6px;
+  width:154px;
+  flex:0 0 154px;
+}
+
+#rosterView .roster-header-actions-v252 #addPlayerBtn {
+  order:1;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu {
+  order:2;
+  width:100%;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary,
+#rosterView .roster-header-actions-v252 > .btn {
+  width:100%;
+  min-height:36px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.65rem;
+  font-weight:850;
+}
+
+#rosterView .roster-header-actions-v252 #addPlayerBtn {
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary {
+  border-color:rgba(119,201,255,.15);
+  background:rgba(255,255,255,.018);
+}
+
+#rosterView .roster-header-actions-v252 .tools-popover {
+  right:0;
+  left:auto;
+  min-width:190px;
+}
+
+/* Independent summary tiles. */
+#rosterView .roster-summary-grid-v252 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#rosterView .roster-summary-grid-v252 > div {
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid rgba(119,201,255,.105);
+  border-radius:10px;
+  background:linear-gradient(180deg,rgba(14,27,38,.90),rgba(10,20,29,.90));
+  text-align:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.015);
+}
+
+#rosterView .roster-summary-grid-v252 > div:last-child,
+#rosterView .roster-summary-grid-v252 > div:nth-child(2n),
+#rosterView .roster-summary-grid-v252 > div:nth-last-child(-n+2) {
+  border-right:1px solid rgba(119,201,255,.105);
+  border-bottom:1px solid rgba(119,201,255,.105);
+}
+
+#rosterView .roster-summary-grid-v252 > div.warning {
+  border-color:rgba(242,198,109,.20);
+  background:linear-gradient(180deg,rgba(242,198,109,.045),rgba(10,20,29,.90));
+}
+
+#rosterView .roster-summary-grid-v252 > div.good {
+  border-color:rgba(82,215,194,.16);
+  background:linear-gradient(180deg,rgba(82,215,194,.035),rgba(10,20,29,.90));
+}
+
+#rosterView .roster-summary-grid-v252 span {
+  color:#8095A5;
+  font-size:.50rem;
+  letter-spacing:.055em;
+  text-align:center;
+}
+
+#rosterView .roster-summary-grid-v252 strong {
+  margin-top:3px;
+  color:#D7EAF5;
+  font-size:.82rem;
+  line-height:1.12;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+
+#rosterView .roster-summary-grid-v252 small {
+  margin-top:3px;
+  color:#718899;
+  font-size:.51rem;
+  line-height:1.22;
+  text-align:center;
+}
+
+@media (max-width:720px) {
+  #rosterView .roster-page-heading-v252 {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px 10px;
+    align-items:start;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 {
+    grid-column:1 / -1;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 h3 {
+    font-size:1.08rem;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 .page-copy {
+    max-width:none;
+    font-size:.65rem;
+    line-height:1.40;
+  }
+
+  #rosterView .roster-header-actions-v252 {
+    grid-column:2;
+    justify-self:end;
+    width:148px;
+    flex-basis:auto;
+    gap:5px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu,
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    width:100%;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    min-height:35px;
+    padding:6px 9px;
+    font-size:.64rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 {
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+  }
+
+  #rosterView .roster-summary-grid-v252 > div {
+    padding:7px 6px;
+  }
+
+  #rosterView .roster-summary-grid-v252 span {
+    font-size:.49rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 strong {
+    font-size:.77rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 small {
+    font-size:.50rem;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .roster-header-actions-v252 {
+    width:142px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    min-height:34px;
+    font-size:.62rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 {
+    border-radius:0;
+  }
+
+  #rosterView .roster-summary-grid-v252 > div {
+    padding:7px 5px;
+  }
+
+  #rosterView .roster-summary-grid-v252 span {
+    font-size:.47rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 strong {
+    font-size:.74rem;
+  }
+
+  #rosterView .roster-summary-grid-v252 small {
+    font-size:.48rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.04.1 — Roster header actions side-by-side
+   ============================================================================ */
+
+#rosterView .roster-page-heading-v252 {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+}
+
+#rosterView .roster-page-heading-copy-v252 {
+  width:100%;
+}
+
+#rosterView .roster-header-actions-v252 {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  width:100%;
+  max-width:none;
+  flex:initial;
+}
+
+#rosterView .roster-header-actions-v252 #addPlayerBtn,
+#rosterView .roster-header-actions-v252 .tools-menu {
+  order:initial;
+  width:100%;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary,
+#rosterView .roster-header-actions-v252 > .btn {
+  width:100%;
+  min-height:37px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.65rem;
+}
+
+#rosterView .roster-header-actions-v252 .tools-menu > summary {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#rosterView .roster-header-actions-v252 .tools-popover {
+  left:0;
+  right:auto;
+  min-width:190px;
+}
+
+@media (min-width:760px) {
+  #rosterView .roster-page-heading-v252 {
+    grid-template-columns:minmax(0,1fr) minmax(280px,340px);
+    align-items:end;
+    gap:14px;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 {
+    grid-column:1;
+  }
+
+  #rosterView .roster-header-actions-v252 {
+    grid-column:2;
+    align-self:end;
+  }
+}
+
+@media (max-width:720px) {
+  #rosterView .roster-page-heading-v252 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  #rosterView .roster-page-heading-copy-v252 {
+    grid-column:1;
+  }
+
+  #rosterView .roster-header-actions-v252 {
+    grid-column:1;
+    justify-self:stretch;
+    width:100%;
+    gap:6px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu,
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    width:100%;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .roster-header-actions-v252 {
+    grid-template-columns:1fr 1fr;
+    width:100%;
+    gap:5px;
+  }
+
+  #rosterView .roster-header-actions-v252 .tools-menu > summary,
+  #rosterView .roster-header-actions-v252 > .btn {
+    min-height:35px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.61rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.04.3 — Minors Call Up button polish
+   Presentation only. Minors layout/data/behavior are unchanged.
+   ============================================================================ */
+
+#farmView .farm-depth-player-card-v292 [data-call-up] {
+  min-height:31px;
+  padding:5px 9px;
+  border-color:rgba(119,201,255,.26);
+  border-radius:9px;
+  background:linear-gradient(
+    180deg,
+    rgba(55,176,245,.88),
+    rgba(37,153,222,.88)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    0 2px 6px rgba(0,0,0,.08);
+  color:#07131C;
+  font-size:.55rem;
+  font-weight:850;
+  line-height:1.1;
+}
+
+#farmView .farm-depth-player-card-v292 [data-call-up]:hover,
+#farmView .farm-depth-player-card-v292 [data-call-up]:focus-visible {
+  border-color:rgba(119,201,255,.38);
+  background:linear-gradient(
+    180deg,
+    rgba(67,187,251,.94),
+    rgba(42,161,230,.94)
+  );
+}
+
+#farmView .farm-depth-player-card-v292 [data-call-up]:active {
+  transform:translateY(1px);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.10);
+}
+
+@media (max-width:720px) {
+  #farmView .farm-depth-player-card-v292 [data-call-up] {
+    min-height:30px;
+    padding:5px 8px;
+    font-size:.54rem;
+  }
+}
+
+@media (max-width:390px) {
+  #farmView .farm-depth-player-card-v292 [data-call-up] {
+    min-height:29px;
+    padding:4px 7px;
+    font-size:.53rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.05.0 — Assets page polish
+   Presentation only. Asset persistence/lifecycle behavior is unchanged.
+   ============================================================================ */
+
+#assetsView .assets-page-v230,
+#assetsView .assets-page-v270 {
+  gap:8px;
+}
+
+/* Header */
+#assetsView .asset-hero-v230 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:10px 14px;
+}
+
+#assetsView .asset-hero-copy-v230 {
+  min-width:0;
+}
+
+#assetsView .asset-hero-copy-v230 .eyebrow {
+  margin-bottom:3px;
+}
+
+#assetsView .asset-hero-copy-v230 h3 {
+  margin:0;
+  font-size:1.08rem;
+  line-height:1.08;
+}
+
+#assetsView .asset-hero-copy-v230 p:last-child {
+  margin-top:5px;
+  color:#8298A8;
+  font-size:.65rem;
+  line-height:1.38;
+}
+
+#assetsView .asset-add-btn-v230 {
+  min-width:116px;
+  min-height:35px;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:.63rem;
+  font-weight:850;
+  align-self:end;
+}
+
+/* Category filters */
+#assetsView .asset-tabs-v230,
+#assetsView .assets-page-v260 .asset-tabs-v230 {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:5px;
+  width:100%;
+  overflow:visible;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#assetsView .asset-tabs-v230 .asset-tab,
+#assetsView .assets-page-v260 .asset-tab {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-width:0;
+  min-height:33px;
+  padding:5px 7px;
+  border:1px solid rgba(119,201,255,.12);
+  border-radius:9px;
+  background:rgba(255,255,255,.016);
+  color:#8FA3B2;
+  font-size:.59rem;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+#assetsView .asset-tabs-v230 .asset-tab.active,
+#assetsView .assets-page-v260 .asset-tab.active {
+  border-color:rgba(50,173,255,.38);
+  background:rgba(50,173,255,.08);
+  color:#DDF2FF;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+#assetsView .asset-tab-count-v260 {
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  font-size:.47rem;
+}
+
+/* Lifecycle/status rail */
+#assetsView .assets-page-v270 .asset-status-rail-v270 {
+  gap:5px;
+  padding:0;
+}
+
+#assetsView .assets-page-v270 .asset-status-rail-v270 button {
+  min-height:27px;
+  padding:3px 7px;
+  font-size:.54rem;
+}
+
+/* Portfolio panel */
+#assetsView .asset-portfolio-panel-v230,
+#assetsView .asset-portfolio-panel-v228,
+#assetsView .assets-page-v260 .asset-portfolio-panel-v230,
+#assetsView .assets-page-v260 .asset-portfolio-panel-v228 {
+  gap:7px;
+  padding:9px;
+  border-color:rgba(119,201,255,.11);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(13,25,35,.92),rgba(9,18,26,.92));
+}
+
+#assetsView .asset-section-head-v230 {
+  min-height:28px;
+  padding:0 1px 6px;
+}
+
+#assetsView .asset-section-head-v230 h4 {
+  font-size:.77rem;
+}
+
+#assetsView .asset-section-head-v230 > span {
+  min-width:20px;
+  height:20px;
+  font-size:.54rem;
+}
+
+#assetsView .asset-year-group-v230 {
+  gap:5px;
+}
+
+#assetsView .asset-year-label-v230 {
+  padding:1px 2px 4px;
+}
+
+#assetsView .asset-year-label-v230 strong {
+  font-size:.66rem;
+}
+
+#assetsView .asset-year-label-v230 span {
+  font-size:.54rem;
+}
+
+/* Draft-pick cards */
+#assetsView .asset-year-group-v230 .asset-grid {
+  gap:6px;
+}
+
+/* Year is already visible in the year group and the generated label. */
+#assetsView .asset-year-group-v230 .asset-card-top .asset-card-type {
+  display:none;
+}
+
+#assetsView .asset-year-group-v230 .asset-card-top {
+  min-height:21px;
+  justify-content:flex-end;
+  margin:0;
+}
+
+#assetsView .asset-year-group-v230 .asset-card,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card {
+  min-height:0;
+  gap:5px;
+  padding:8px 9px;
+  border-color:rgba(119,201,255,.14);
+  border-radius:10px;
+  background:rgba(10,21,30,.94);
+}
+
+#assetsView .asset-year-group-v230 .asset-card:hover,
+#assetsView .asset-year-group-v230 .asset-card:focus-visible {
+  border-color:rgba(119,201,255,.30);
+  background:rgba(13,27,38,.98);
+}
+
+#assetsView .asset-year-group-v230 .asset-status {
+  min-height:22px;
+  padding:3px 7px;
+  font-size:.51rem;
+}
+
+#assetsView .asset-year-group-v230 .asset-pick-main {
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr);
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+
+#assetsView .asset-year-group-v230 .asset-round-badge,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-round-badge {
+  min-width:38px;
+  width:38px;
+  height:38px;
+  border-radius:9px;
+  font-size:.61rem;
+}
+
+#assetsView .asset-year-group-v230 .asset-card h5,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card h5 {
+  margin:0;
+  overflow:hidden;
+  color:#DCECF6;
+  font-size:.69rem;
+  line-height:1.18;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetsView .asset-year-group-v230 .asset-card-meta,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card-meta {
+  margin-top:3px;
+  overflow:hidden;
+  color:#7F95A5;
+  font-size:.54rem;
+  line-height:1.24;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#assetsView .asset-year-group-v230 .asset-lifecycle-v270 {
+  margin-top:2px;
+  font-size:.51rem;
+  line-height:1.25;
+}
+
+/* Desktop */
+@media (min-width:760px) {
+  #assetsView .asset-hero-v230 {
+    grid-template-columns:minmax(0,1fr) 128px;
+  }
+
+  #assetsView .asset-add-btn-v230 {
+    width:128px;
+  }
+
+  #assetsView .asset-year-group-v230 .asset-grid {
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width:720px) {
+  #assetsView .asset-hero-v230 {
+    grid-template-columns:minmax(0,1fr) 116px;
+    gap:8px;
+    align-items:end;
+  }
+
+  #assetsView .asset-hero-copy-v230 h3 {
+    font-size:1.04rem;
+  }
+
+  #assetsView .asset-hero-copy-v230 p:last-child {
+    font-size:.62rem;
+  }
+
+  #assetsView .asset-add-btn-v230 {
+    width:116px;
+    min-width:116px;
+    min-height:34px;
+    padding:5px 8px;
+    font-size:.61rem;
+  }
+
+  #assetsView .asset-tabs-v230,
+  #assetsView .assets-page-v260 .asset-tabs-v230 {
+    gap:4px;
+  }
+
+  #assetsView .asset-tabs-v230 .asset-tab,
+  #assetsView .assets-page-v260 .asset-tab {
+    min-height:32px;
+    padding:4px 5px;
+    font-size:.57rem;
+  }
+
+  #assetsView .asset-portfolio-panel-v230,
+  #assetsView .asset-portfolio-panel-v228,
+  #assetsView .assets-page-v260 .asset-portfolio-panel-v230,
+  #assetsView .assets-page-v260 .asset-portfolio-panel-v228 {
+    padding:8px;
+  }
+
+  #assetsView .asset-year-group-v230 .asset-grid {
+    grid-template-columns:1fr;
+  }
+
+  #assetsView .asset-year-group-v230 .asset-card,
+  #assetsView .assets-page-v260 .asset-year-group-v230 .asset-card {
+    padding:7px 8px;
+  }
+
+  #assetsView .asset-year-group-v230 .asset-pick-main {
+    grid-template-columns:36px minmax(0,1fr);
+    gap:8px;
+  }
+
+  #assetsView .asset-year-group-v230 .asset-round-badge,
+  #assetsView .assets-page-v260 .asset-year-group-v230 .asset-round-badge {
+    min-width:36px;
+    width:36px;
+    height:36px;
+  }
+}
+
+@media (max-width:390px) {
+  #assetsView .asset-hero-v230 {
+    grid-template-columns:minmax(0,1fr) 108px;
+  }
+
+  #assetsView .asset-add-btn-v230 {
+    width:108px;
+    min-width:108px;
+    font-size:.59rem;
+  }
+
+  #assetsView .asset-tabs-v230 .asset-tab,
+  #assetsView .assets-page-v260 .asset-tab {
+    gap:3px;
+    padding-left:4px;
+    padding-right:4px;
+    font-size:.55rem;
+  }
+
+  #assetsView .asset-year-group-v230 .asset-card h5,
+  #assetsView .assets-page-v260 .asset-year-group-v230 .asset-card h5 {
+    font-size:.67rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.05.1 — Remove redundant draft-round badges
+   ============================================================================ */
+
+#assetsView .asset-year-group-v230 .asset-round-badge,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-round-badge {
+  display:none !important;
+}
+
+#assetsView .asset-year-group-v230 .asset-pick-main,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-pick-main {
+  display:block;
+  width:100%;
+  min-width:0;
+}
+
+#assetsView .asset-year-group-v230 .asset-pick-main > div,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-pick-main > div {
+  width:100%;
+  min-width:0;
+}
+
+#assetsView .asset-year-group-v230 .asset-card h5,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card h5,
+#assetsView .asset-year-group-v230 .asset-card-meta,
+#assetsView .assets-page-v260 .asset-year-group-v230 .asset-card-meta {
+  width:100%;
+}
+
+
+/* ============================================================================
+   RosterCap V3.07.0 — Cap page polish
+   Presentation only. Cap calculations and behavior are unchanged.
+   ============================================================================ */
+
+#capView .cap-page-v262 {
+  gap:8px;
+}
+
+/* Current cap position ----------------------------------------------------- */
+
+#capView .cap-page-v262 .cap-hero-v228 {
+  padding:10px 11px 9px;
+  border-radius:13px;
+}
+
+#capView .cap-page-v262 .cap-hero-primary-v228 {
+  font-size:1.68rem;
+  line-height:.98;
+}
+
+#capView .cap-page-v262 .cap-hero-primary-label-v228 {
+  margin-top:4px;
+  font-size:.64rem;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 {
+  min-width:112px;
+  padding:7px 8px 26px;
+  border-radius:10px;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 > span {
+  font-size:.49rem;
+}
+
+#capView .cap-page-v262 .cap-hero-limit-v228 > strong {
+  margin-top:3px;
+  font-size:.78rem;
+}
+
+#capView .cap-page-v262 .cap-edit-settings-v262 {
+  right:6px;
+  bottom:5px;
+  min-height:19px;
+  padding:2px 6px;
+  font-size:.46rem;
+}
+
+#capView .cap-page-v262 .cap-hero-progress-v228 {
+  margin-top:8px;
+}
+
+#capView .cap-page-v262 .cap-hero-progress-v228 .cap-bar {
+  height:6px;
+}
+
+#capView .cap-page-v262 .cap-hero-progress-v228 > div:last-child {
+  margin-top:6px;
+  font-size:.57rem;
+}
+
+/* The progress line already communicates current Cap Used, and Dead Cap has
+   its own canonical section below. Remove the repeated three-metric strip. */
+#capView .cap-page-v262 .cap-hero-strip-v228 {
+  display:none !important;
+}
+
+/* Cap outlook ------------------------------------------------------------- */
+
+#capView .cap-page-v262 .cap-panel-v228 {
+  padding:8px;
+  border-radius:12px;
+}
+
+#capView .cap-page-v262 .cap-outlook-scroll-v228 {
+  padding-bottom:2px;
+}
+
+#capView .cap-page-v262 .cap-outlook-grid-v228 {
+  gap:5px;
+}
+
+#capView .cap-page-v262 .cap-season-card-v228 {
+  min-height:0;
+  padding:7px 8px;
+  border-radius:10px;
+}
+
+#capView .cap-page-v262 .cap-season-top-v228 strong {
+  font-size:.68rem;
+}
+
+#capView .cap-page-v262 .cap-season-top-v228 > span {
+  padding:2px 5px;
+  font-size:.43rem;
+}
+
+#capView .cap-page-v262 .cap-season-used-v228 {
+  margin-top:6px;
+  font-size:.80rem;
+}
+
+#capView .cap-page-v262 .cap-season-label-v228 {
+  margin-top:2px;
+  font-size:.48rem;
+}
+
+#capView .cap-page-v262 .cap-season-track-v228 {
+  height:5px;
+  margin-top:6px;
+}
+
+/* Roster + Dead are breakdown values available in Cap Detail below.
+   Removing these small boxes prevents truncation and makes outlook a true
+   high-level seven-season view. */
+#capView .cap-page-v262 .cap-season-metrics-v228 {
+  display:none !important;
+}
+
+#capView .cap-page-v262 .cap-season-footer-v228 {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:2px;
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid rgba(255,255,255,.045);
+  font-size:.46rem;
+  line-height:1.2;
+}
+
+#capView .cap-page-v262 .cap-season-footer-v228 > span {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#capView .cap-page-v262 .cap-season-footer-v228 > span:last-child {
+  color:#8EA3B2;
+}
+
+/* Contract intelligence --------------------------------------------------- */
+
+#capView .contract-intelligence-v262 {
+  padding:8px;
+  border-radius:12px;
+}
+
+#capView .contract-intelligence-v262 .contract-intelligence-head {
+  margin-bottom:5px;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary {
+  gap:5px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary > div {
+  min-width:0;
+  padding:7px 6px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:rgba(255,255,255,.014);
+  text-align:center;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary > div.warning {
+  border-color:rgba(242,198,109,.24);
+  background:rgba(242,198,109,.035);
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary span {
+  font-size:.49rem;
+  text-align:center;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary strong {
+  margin-top:3px;
+  font-size:.78rem;
+  text-align:center;
+}
+
+#capView .contract-intelligence-v262 .contract-intel-summary small {
+  margin-top:3px;
+  font-size:.49rem;
+  line-height:1.25;
+  text-align:center;
+}
+
+#capView .contract-intel-main-details-v262,
+#capView .contract-intelligence-v262 .contract-intel-disclosure {
+  border-color:rgba(119,201,255,.09);
+  background:rgba(8,17,25,.58);
+}
+
+#capView .contract-intel-main-details-v262 > summary,
+#capView .contract-intelligence-v262 .contract-intel-disclosure > summary {
+  min-height:34px;
+  padding:6px 8px;
+}
+
+#capView .contract-intel-main-details-v262 > summary strong,
+#capView .contract-intelligence-v262 .contract-intel-disclosure > summary strong {
+  font-size:.61rem;
+}
+
+#capView .contract-intel-main-details-v262 > summary small,
+#capView .contract-intelligence-v262 .contract-intel-disclosure > summary small {
+  font-size:.49rem;
+}
+
+/* Dead Cap + bottom disclosures ------------------------------------------ */
+
+#capView .cap-dead-zero-v262,
+#capView .cap-dead-active-v262 {
+  border-radius:11px;
+}
+
+#capView .cap-detail-disclosure-v228,
+#capView .cap-history-disclosure {
+  border-radius:9px;
+  background:rgba(10,20,29,.78);
+}
+
+#capView .cap-detail-disclosure-v228 > summary,
+#capView .cap-history-disclosure > summary {
+  min-height:38px;
+  padding:7px 9px;
+}
+
+/* Desktop ---------------------------------------------------------------- */
+
+@media (min-width:980px) {
+  #capView .cap-page-v262 .cap-outlook-grid-v228 {
+    grid-template-columns:repeat(7,minmax(0,1fr));
+    min-width:0;
+  }
+
+  #capView .cap-page-v262 .cap-season-card-v228 {
+    min-width:0;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+
+/* Mobile ----------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #capView .cap-page-v262 {
+    gap:7px;
+  }
+
+  #capView .cap-page-v262 .cap-hero-v228 {
+    padding:9px 10px 8px;
+  }
+
+  #capView .cap-page-v262 .cap-hero-primary-v228 {
+    font-size:1.56rem;
+  }
+
+  #capView .cap-page-v262 .cap-hero-limit-v228 {
+    min-width:105px;
+    padding:6px 7px 25px;
+  }
+
+  #capView .cap-page-v262 .cap-hero-limit-v228 > strong {
+    font-size:.74rem;
+  }
+
+  #capView .cap-page-v262 .cap-outlook-grid-v228 {
+    gap:5px;
+  }
+
+  #capView .cap-page-v262 .cap-season-card-v228 {
+    padding:7px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary {
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary > div {
+    padding:7px 5px;
+  }
+
+  /* This supporting sentence is the element visibly truncating in the
+     screenshot; the title is enough on phone and the detail is inside. */
+  #capView .contract-intel-main-details-v262 > summary small {
+    display:none;
+  }
+
+  #capView .contract-intel-main-details-v262 > summary > span {
+    padding-right:10px;
+  }
+}
+
+@media (max-width:390px) {
+  #capView .cap-page-v262 .cap-hero-primary-v228 {
+    font-size:1.48rem;
+  }
+
+  #capView .cap-page-v262 .cap-hero-limit-v228 {
+    min-width:101px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary > div {
+    padding:6px 5px;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary span {
+    font-size:.47rem;
+  }
+
+  #capView .contract-intelligence-v262 .contract-intel-summary small {
+    font-size:.47rem;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.08.0 — Transactions page polish
+   Presentation only. Transaction persistence/workflows are unchanged.
+   ============================================================================ */
+
+#transactionsView .transactions-page-v294 {
+  gap:7px;
+}
+
+/* Ledger heading ---------------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:9px 12px;
+  padding-bottom:1px;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .eyebrow {
+  margin-bottom:2px;
+  color:#88B9D8;
+  font-size:.51rem;
+  letter-spacing:.105em;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+  font-size:1rem;
+  line-height:1.06;
+}
+
+#transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+  margin-top:3px;
+  max-width:540px;
+  color:#8196A6;
+  font-size:.56rem;
+  line-height:1.32;
+}
+
+#transactionsView .transactions-page-v294 #recordTransactionBtn {
+  min-width:108px;
+  min-height:32px;
+  padding:5px 9px;
+  border-radius:9px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+  font-size:.56rem;
+  font-weight:900;
+}
+
+/* Empty ledger ------------------------------------------------------------ */
+
+#transactionsView .transactions-page-v294.empty-transaction-history-v294 {
+  gap:6px;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+  position:relative;
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr);
+  grid-template-areas:
+    "mark title"
+    "mark copy";
+  align-items:center;
+  gap:2px 9px;
+  min-height:0;
+  margin-top:1px;
+  padding:9px 10px;
+  border:1px dashed rgba(119,201,255,.16);
+  border-radius:9px;
+  background:rgba(119,201,255,.018);
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294::before {
+  content:"";
+  grid-area:mark;
+  width:22px;
+  height:22px;
+  border:1px solid rgba(119,201,255,.15);
+  border-radius:7px;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(119,201,255,.75) 0 2px,transparent 3px),
+    rgba(119,201,255,.035);
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 h4 {
+  grid-area:title;
+  margin:0;
+  color:#D5E6F1;
+  font-size:.68rem;
+  line-height:1.15;
+}
+
+#transactionsView .transactions-page-v294 .tx-empty-state-v294 p {
+  grid-area:copy;
+  margin:0;
+  max-width:none;
+  color:#7890A0;
+  font-size:.52rem;
+  line-height:1.30;
+}
+
+/* Type filters once the ledger has data ---------------------------------- */
+
+#transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+  gap:5px;
+  margin-top:0;
+  padding:0;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filters-v259 {
+  display:flex;
+  gap:4px;
+  overflow-x:auto;
+  width:100%;
+  padding:0 0 2px;
+  scrollbar-width:thin;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 {
+  flex:0 0 auto;
+  min-height:28px;
+  padding:3px 7px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:999px;
+  background:rgba(255,255,255,.014);
+  color:#8DA1B0;
+  font-size:.51rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259.active {
+  border-color:rgba(50,173,255,.34);
+  background:rgba(50,173,255,.075);
+  color:#DDF2FF;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259 strong {
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  background:rgba(255,255,255,.05);
+  font-size:.45rem;
+}
+
+#transactionsView .transactions-page-v294 .tx-history-filter-v259.active strong {
+  background:rgba(50,173,255,.14);
+}
+
+#transactionsView .transactions-page-v294 .tx-history-status-v259 {
+  color:#718899;
+  font-size:.48rem;
+}
+
+/* Populated ledger cards -------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-list-v228 {
+  gap:5px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 {
+  padding:7px 8px;
+  border:1px solid rgba(119,201,255,.09);
+  border-radius:9px;
+  background:linear-gradient(180deg,rgba(13,24,34,.94),rgba(10,19,28,.94));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.012);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294:hover,
+#transactionsView .transactions-page-v294 .transaction-card-v294:focus-within {
+  border-color:rgba(119,201,255,.18);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 .transaction-type {
+  display:inline-flex;
+  align-items:center;
+  min-height:17px;
+  padding:2px 5px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:999px;
+  background:rgba(119,201,255,.025);
+  color:#8FCFFF;
+  font-size:.42rem;
+  letter-spacing:.06em;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+  margin-top:3px;
+  color:#D8E9F4;
+  font-size:.67rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 p,
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 time {
+  color:#748B9B;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+  min-height:22px;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:.46rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-body-v228 {
+  margin-top:5px;
+  padding-top:5px;
+  border-top-color:rgba(119,201,255,.07);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 em {
+  background:rgba(255,255,255,.025);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-notes-v228 {
+  color:#7B91A1;
+}
+
+/* Mobile ----------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+    gap:7px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 h3 {
+    font-size:.96rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    max-width:470px;
+    font-size:.54rem;
+    line-height:1.28;
+  }
+
+  #transactionsView .transactions-page-v294 #recordTransactionBtn {
+    min-width:101px;
+    min-height:31px;
+    padding:4px 8px;
+    font-size:.54rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+    grid-template-columns:22px minmax(0,1fr);
+    gap:2px 8px;
+    padding:8px 9px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294::before {
+    width:20px;
+    height:20px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 h4 {
+    font-size:.66rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 p {
+    font-size:.50rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-history-toolbar-v294 {
+    display:block;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 {
+    padding:6px 7px;
+  }
+}
+
+@media (max-width:390px) {
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 {
+    gap:6px;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-page-heading-v294 .page-copy {
+    max-width:235px;
+  }
+
+  #transactionsView .transactions-page-v294 #recordTransactionBtn {
+    min-width:96px;
+    padding-left:7px;
+    padding-right:7px;
+    font-size:.52rem;
+  }
+
+  #transactionsView .transactions-page-v294 .tx-empty-state-v294 {
+    padding:8px;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.08.1 — Populated transaction-card polish
+   Presentation only. Uses the existing data-history-type contract.
+   ============================================================================ */
+
+/* Card spacing / hierarchy ------------------------------------------------ */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 {
+  padding:8px 9px;
+  border-color:rgba(119,201,255,.11);
+  border-radius:10px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-head-v228 {
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;
+  gap:8px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 .transaction-type {
+  min-height:16px;
+  padding:2px 6px;
+  border-color:rgba(119,201,255,.14);
+  background:rgba(119,201,255,.035);
+  font-size:.41rem;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+  margin-top:4px;
+  color:#DCECF6;
+  font-size:.69rem;
+  line-height:1.16;
+}
+
+/* On Trade cards the generated "With Vancouver" subtitle repeats
+   "Trade with Vancouver". Keep the title as the single counterparty label. */
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-title-v228 p {
+  display:none;
+}
+
+/* Date + edit/delete area ------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 {
+  display:grid;
+  justify-items:end;
+  gap:4px;
+  min-width:max-content;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 time {
+  color:#778E9E;
+  font-size:.46rem;
+  line-height:1;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 {
+  display:flex;
+  justify-content:flex-end;
+  gap:4px;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+  min-height:23px;
+  padding:3px 6px;
+  border-radius:7px;
+  font-size:.46rem;
+}
+
+/* IN / OUT ledger --------------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-body-v228 {
+  display:grid;
+  gap:0;
+  margin-top:6px;
+  padding-top:5px;
+  border-top:1px solid rgba(119,201,255,.08);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 {
+  display:grid;
+  grid-template-columns:38px minmax(0,1fr);
+  align-items:start;
+  gap:7px;
+  min-height:25px;
+  padding:4px 0;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 + .tx-ledger-flow-v228 {
+  border-top:1px solid rgba(255,255,255,.035);
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-direction-v228 {
+  padding-top:2px;
+  font-size:.41rem;
+  font-weight:950;
+  letter-spacing:.095em;
+  line-height:1.2;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228.in .tx-ledger-direction-v228 {
+  color:#68DBB6;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228.out .tx-ledger-direction-v228 {
+  color:#F07C83;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 > span:last-child {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:3px 8px;
+  min-width:0;
+}
+
+/* Trade contents read as ledger text, not chip/pill controls. */
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228 em {
+  display:inline;
+  max-width:100%;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#BFCFDC;
+  font-size:.52rem;
+  font-style:normal;
+  font-weight:650;
+  line-height:1.3;
+  white-space:normal;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228.in em {
+  color:#C8E6DD;
+}
+
+#transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228.out em {
+  color:#D8DDE3;
+}
+
+/* Notes remain secondary -------------------------------------------------- */
+
+#transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-notes-v228 {
+  margin-top:5px;
+  padding-top:5px;
+  border-top:1px solid rgba(255,255,255,.035);
+  color:#718899;
+  font-size:.49rem;
+  line-height:1.3;
+}
+
+/* Mobile ----------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-page-v294 .transaction-card-v294 {
+    padding:7px 8px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-head-v228 {
+    gap:6px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-title-v228 h4 {
+    font-size:.67rem;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-flow-v228 {
+    grid-template-columns:34px minmax(0,1fr);
+    gap:6px;
+    min-height:24px;
+    padding:4px 0;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294[data-history-type="Trade"] .tx-ledger-flow-v228 em {
+    font-size:.50rem;
+  }
+}
+
+@media (max-width:390px) {
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-meta-v259 {
+    gap:3px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 {
+    gap:3px;
+  }
+
+  #transactionsView .transactions-page-v294 .transaction-card-v294 .tx-ledger-actions-inline-v259 .btn {
+    padding-left:5px;
+    padding-right:5px;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.11.1 — Bundled Transactions Decision Support
+   ============================================================================ */
+
+/* ==========================================================================\n   RosterCap V3.10.1 — Visible Player Decisions\n   ========================================================================== */
+
+.player-decision-launcher-v310 {
+  margin-top:16px;
+  padding:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  border:1px solid rgba(77,181,255,.26);
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(54,173,255,.10),transparent 46%),
+    rgba(8,23,34,.72);
+}
+
+.player-decision-launcher-v310.hidden {
+  display:none !important;
+}
+
+.player-decision-launcher-copy-v310 {
+  min-width:0;
+  display:grid;
+  gap:3px;
+}
+
+.player-decision-launcher-copy-v310 .eyebrow {
+  margin:0;
+  font-size:.62rem;
+}
+
+.player-decision-launcher-copy-v310 strong {
+  color:var(--text);
+  font-size:.94rem;
+}
+
+.player-decision-launcher-copy-v310 span {
+  color:var(--muted);
+  font-size:.72rem;
+  line-height:1.4;
+}
+
+.player-decision-launcher-btn-v310 {
+  flex:0 0 auto;
+  min-width:136px;
+}
+
+.decision-centre-dialog-v310 {
+  --decision-teal:#63dbc8;
+  --decision-blue:#79caff;
+}
+
+.decision-centre-card-v310 {
+  width:min(920px,calc(100vw - 22px));
+  max-width:920px;
+  max-height:min(90dvh,900px);
+  overflow:hidden;
+}
+
+.decision-centre-header-v310 {
+  flex:0 0 auto;
+}
+
+.decision-centre-body-v310 {
+  display:grid;
+  gap:14px;
+  min-width:0;
+  overflow-x:hidden;
+}
+
+.decision-player-hero-v310,
+.decision-options-v310 {
+  border:1px solid rgba(112,164,199,.24);
+  border-radius:18px;
+  background:rgba(8,21,31,.54);
+}
+
+.decision-player-hero-v310 {
+  padding:18px;
+}
+
+.decision-player-heading-v310 {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.decision-player-heading-v310 .eyebrow,
+.decision-options-heading-v310 .eyebrow,
+.decision-action-copy-v310 .eyebrow {
+  margin:0 0 3px;
+}
+
+.decision-player-heading-v310 h3,
+.decision-options-heading-v310 h3 {
+  margin:0;
+  color:var(--text);
+}
+
+.decision-player-heading-v310 h3 {
+  font-size:1.35rem;
+}
+
+.decision-player-heading-v310 p:not(.eyebrow) {
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.76rem;
+}
+
+.decision-location-badge-v310 {
+  flex:0 0 auto;
+  padding:7px 10px;
+  border:1px solid rgba(100,217,197,.26);
+  border-radius:999px;
+  background:rgba(31,122,107,.12);
+  color:#a7ead8;
+  font-size:.67rem;
+  font-weight:800;
+  letter-spacing:.035em;
+}
+
+.decision-summary-grid-v310 {
+  margin-top:15px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  border:1px solid rgba(112,164,199,.22);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(9,20,29,.58);
+}
+
+.decision-summary-grid-v310 > div {
+  min-width:0;
+  padding:12px 13px;
+  display:grid;
+  gap:3px;
+  text-align:center;
+  border-right:1px solid rgba(112,164,199,.18);
+}
+
+.decision-summary-grid-v310 > div:last-child {
+  border-right:0;
+}
+
+.decision-summary-grid-v310 span,
+.decision-static-status-v310 span,
+.decision-impact-total-v310 span {
+  color:var(--muted);
+  font-size:.61rem;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.decision-summary-grid-v310 strong {
+  min-width:0;
+  color:var(--text);
+  font-size:.92rem;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.decision-summary-grid-v310 small {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+.decision-strip-head-v310 {
+  margin:14px 2px 7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-strip-head-v310 span {
+  color:#9fc5dc;
+  font-size:.67rem;
+  font-weight:900;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.decision-strip-head-v310 small {
+  color:var(--muted);
+  font-size:.62rem;
+}
+
+.decision-contract-strip-v310 {
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(104px,1fr);
+  gap:8px;
+  overflow-x:auto;
+  overscroll-behavior-inline:contain;
+  scrollbar-width:thin;
+  padding:1px 1px 5px;
+}
+
+.decision-contract-season-v310 {
+  min-width:0;
+  padding:10px 9px;
+  display:grid;
+  gap:3px;
+  text-align:center;
+  border:1px solid rgba(112,164,199,.18);
+  border-radius:12px;
+  background:rgba(9,20,29,.56);
+}
+
+.decision-contract-season-v310.entered {
+  border-color:rgba(92,199,227,.30);
+  background:rgba(21,57,75,.30);
+}
+
+.decision-contract-season-v310 span {
+  color:#9fc5dc;
+  font-size:.63rem;
+  font-weight:800;
+}
+
+.decision-contract-season-v310 strong {
+  color:var(--text);
+  font-size:.78rem;
+}
+
+.decision-contract-season-v310 small {
+  color:var(--muted);
+  font-size:.57rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.decision-options-v310 {
+  padding:18px;
+}
+
+.decision-options-heading-v310 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:12px;
+}
+
+.decision-options-heading-v310 h3 {
+  font-size:1.02rem;
+}
+
+.decision-options-heading-v310 > span {
+  max-width:300px;
+  color:var(--muted);
+  font-size:.65rem;
+  line-height:1.4;
+  text-align:right;
+}
+
+.decision-actions-grid-v310 {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.decision-action-card-v310 {
+  min-width:0;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+  border:1px solid rgba(112,164,199,.22);
+  border-radius:14px;
+  background:rgba(7,18,27,.66);
+}
+
+.decision-action-card-v310.primary {
+  border-color:rgba(84,185,255,.34);
+  background:linear-gradient(145deg,rgba(22,74,102,.28),rgba(7,18,27,.72));
+}
+
+.decision-action-card-v310.danger {
+  border-color:rgba(223,109,115,.28);
+}
+
+.decision-action-copy-v310 {
+  display:grid;
+  gap:3px;
+}
+
+.decision-action-copy-v310 h4 {
+  margin:0;
+  color:var(--text);
+  font-size:.94rem;
+}
+
+.decision-action-copy-v310 p:not(.eyebrow) {
+  margin:0;
+  color:var(--muted);
+  font-size:.70rem;
+  line-height:1.45;
+}
+
+.decision-static-status-v310,
+.decision-impact-v310 {
+  padding:10px 11px;
+  border:1px solid rgba(112,164,199,.18);
+  border-radius:11px;
+  background:rgba(14,29,40,.58);
+}
+
+.decision-static-status-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-static-status-v310 strong {
+  color:#cfe2ee;
+  font-size:.72rem;
+  text-align:right;
+}
+
+.decision-impact-v310 {
+  display:grid;
+  gap:7px;
+}
+
+.decision-impact-v310.neutral {
+  gap:3px;
+}
+
+.decision-impact-v310.neutral strong {
+  color:#cfe2ee;
+  font-size:.75rem;
+}
+
+.decision-impact-v310.neutral span {
+  color:var(--muted);
+  font-size:.64rem;
+  line-height:1.35;
+}
+
+.decision-impact-total-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-impact-total-v310 strong {
+  color:var(--decision-teal);
+  font-size:.92rem;
+}
+
+.decision-impact-v310 > p {
+  margin:0;
+  color:var(--muted);
+  font-size:.62rem;
+  line-height:1.35;
+}
+
+.decision-relief-v310 {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding-top:6px;
+  border-top:1px solid rgba(112,164,199,.14);
+}
+
+.decision-relief-v310 span {
+  color:#9fc5dc;
+  font-size:.59rem;
+  font-weight:800;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+}
+
+.decision-relief-v310 strong {
+  color:var(--decision-teal);
+  font-size:.72rem;
+}
+
+.decision-relief-v310.cost strong {
+  color:#ef9ba0;
+}
+
+.decision-impact-seasons-v310 {
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.decision-impact-season-v310 {
+  padding:5px 7px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  border:1px solid rgba(112,164,199,.17);
+  border-radius:8px;
+  background:rgba(5,15,23,.45);
+}
+
+.decision-impact-season-v310 small {
+  color:var(--muted);
+  font-size:.56rem;
+}
+
+.decision-impact-season-v310 strong {
+  color:#d7e8f2;
+  font-size:.62rem;
+}
+
+.decision-impact-empty-v310 {
+  color:var(--muted);
+  font-size:.63rem;
+}
+
+.decision-action-btn-v310 {
+  margin-top:auto;
+  width:100%;
+  min-height:40px;
+}
+
+.decision-centre-footer-v310 {
+  gap:12px;
+}
+
+.decision-centre-footer-note-v310 {
+  flex:1 1 auto;
+  color:var(--muted);
+  font-size:.65rem;
+  line-height:1.35;
+}
+
+@media (max-width:720px) {
+  .player-decision-launcher-v310 {
+    align-items:stretch;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .player-decision-launcher-btn-v310 {
+    width:100%;
+  }
+
+  .decision-centre-card-v310 {
+    width:min(100vw - 12px,920px);
+    max-height:calc(100dvh - 12px);
+    border-radius:18px;
+  }
+
+  .decision-centre-body-v310 {
+    gap:10px;
+  }
+
+  .decision-player-hero-v310,
+  .decision-options-v310 {
+    padding:13px;
+    border-radius:15px;
+  }
+
+  .decision-player-heading-v310 h3 {
+    font-size:1.18rem;
+  }
+
+  .decision-summary-grid-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .decision-summary-grid-v310 > div:nth-child(2) {
+    border-right:0;
+  }
+
+  .decision-summary-grid-v310 > div:nth-child(-n+2) {
+    border-bottom:1px solid rgba(112,164,199,.18);
+  }
+
+  .decision-actions-grid-v310 {
+    grid-template-columns:1fr;
+  }
+
+  .decision-options-heading-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .decision-options-heading-v310 > span {
+    max-width:none;
+    text-align:left;
+  }
+
+  .decision-centre-footer-v310 {
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .decision-centre-footer-v310 .btn {
+    width:100%;
+  }
+}
+
+@media (max-width:390px) {
+  .decision-player-heading-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .decision-summary-grid-v310 > div {
+    padding:10px 8px;
+  }
+
+  .decision-summary-grid-v310 strong {
+    font-size:.82rem;
+  }
+
+  .decision-contract-strip-v310 {
+    grid-auto-columns:96px;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.10.1 — Visible Player Decisions
+   ============================================================================ */
+
+/* Existing-player launcher: move it near the top and keep it compact. */
+.player-decision-launcher-v310 {
+  margin:8px 0 12px;
+  padding:9px 10px;
+  border-radius:11px;
+}
+
+.player-decision-launcher-copy-v310 {
+  gap:2px;
+}
+
+.player-decision-launcher-copy-v310 strong {
+  font-size:.75rem;
+}
+
+.player-decision-launcher-copy-v310 span {
+  font-size:.57rem;
+  line-height:1.32;
+}
+
+.player-decision-launcher-btn-v310 {
+  min-width:112px;
+  min-height:32px;
+  padding:5px 8px;
+  font-size:.56rem;
+}
+
+/* Obvious Roster-page entry point below Import / Tools + Add Player. */
+#rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 {
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  width:100%;
+  min-height:32px;
+  padding:5px 8px;
+  border-color:rgba(99,219,200,.18);
+  background:rgba(99,219,200,.035);
+  color:#CDEFE8;
+  font-size:.58rem;
+}
+
+#rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 span {
+  font-weight:900;
+}
+
+#rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 small {
+  color:#789B98;
+  font-size:.47rem;
+  font-weight:700;
+}
+
+/* Roster-wide player chooser. */
+.decision-player-picker-card-v3101 {
+  width:min(620px,calc(100vw - 22px));
+  max-width:620px;
+  max-height:min(86dvh,760px);
+  overflow:hidden;
+}
+
+.decision-player-picker-body-v3101 {
+  display:grid;
+  gap:9px;
+  overflow:hidden;
+}
+
+.decision-player-picker-intro-v3101 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.decision-player-picker-intro-v3101 > div {
+  display:grid;
+  gap:2px;
+}
+
+.decision-player-picker-intro-v3101 strong {
+  color:var(--text);
+  font-size:.75rem;
+}
+
+.decision-player-picker-intro-v3101 span,
+.decision-player-picker-intro-v3101 > small {
+  color:var(--muted);
+  font-size:.55rem;
+  line-height:1.3;
+}
+
+.decision-player-picker-search-v3101 {
+  display:grid;
+  gap:4px;
+}
+
+.decision-player-picker-search-v3101 > span {
+  color:#8EA8B8;
+  font-size:.50rem;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.decision-player-picker-search-v3101 input {
+  min-height:34px;
+  padding:6px 9px;
+  border-radius:9px;
+  font-size:.60rem;
+}
+
+.decision-player-picker-list-v3101 {
+  display:grid;
+  gap:5px;
+  max-height:58dvh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:2px;
+  scrollbar-width:thin;
+}
+
+.decision-player-choice-v3101 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  width:100%;
+  min-height:48px;
+  padding:7px 8px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  color:inherit;
+  background:rgba(255,255,255,.012);
+  text-align:left;
+  cursor:pointer;
+}
+
+.decision-player-choice-v3101:hover,
+.decision-player-choice-v3101:focus-visible {
+  border-color:rgba(99,219,200,.28);
+  background:rgba(99,219,200,.035);
+}
+
+.decision-player-choice-main-v3101,
+.decision-player-choice-contract-v3101 {
+  display:grid;
+  gap:2px;
+  min-width:0;
+}
+
+.decision-player-choice-main-v3101 strong {
+  overflow:hidden;
+  color:#DCECF6;
+  font-size:.64rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.decision-player-choice-main-v3101 small,
+.decision-player-choice-contract-v3101 small {
+  color:#758B9B;
+  font-size:.50rem;
+}
+
+.decision-player-choice-contract-v3101 {
+  justify-items:end;
+}
+
+.decision-player-choice-contract-v3101 strong {
+  color:#BFD8E6;
+  font-size:.59rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.decision-player-picker-empty-v3101 {
+  padding:12px;
+  border:1px dashed rgba(119,201,255,.13);
+  border-radius:9px;
+  color:#7D93A3;
+}
+
+.decision-player-picker-empty-v3101 strong,
+.decision-player-picker-empty-v3101 span {
+  display:block;
+}
+
+.decision-player-picker-empty-v3101 strong {
+  color:#BDD3E0;
+  font-size:.63rem;
+}
+
+.decision-player-picker-empty-v3101 span {
+  margin-top:3px;
+  font-size:.53rem;
+}
+
+@media (max-width:720px) {
+  #rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 {
+    min-height:31px;
+    font-size:.56rem;
+  }
+
+  .decision-player-picker-card-v3101 {
+    width:min(620px,calc(100vw - 14px));
+  }
+
+  .decision-player-picker-list-v3101 {
+    max-height:56dvh;
+  }
+
+  .decision-player-choice-v3101 {
+    min-height:46px;
+    padding:7px;
+  }
+
+  .player-decision-launcher-v310 {
+    gap:8px;
+    padding:8px 9px;
+  }
+
+  .player-decision-launcher-copy-v310 span {
+    display:none;
+  }
+
+  .player-decision-launcher-btn-v310 {
+    min-width:104px;
+  }
+}
+
+@media (max-width:390px) {
+  #rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 {
+    gap:5px;
+    font-size:.54rem;
+  }
+
+  #rosterView .roster-header-actions-v252 .roster-player-decisions-btn-v3101 small {
+    font-size:.45rem;
+  }
+
+  .decision-player-choice-v3101 {
+    grid-template-columns:minmax(0,1fr) 84px;
+  }
+}
+
+/* ==========================================================================
+   RosterCap V3.11.0 — Transactions Action Centre
+   ========================================================================== */
+
+#transactionsView .transactions-action-centre-page-v311 {
+  gap:8px;
+}
+
+/* Overall Transactions heading ------------------------------------------ */
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-page-heading-v294 {
+  grid-template-columns:minmax(0,1fr);
+}
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-page-heading-v294 .page-copy {
+  max-width:640px;
+}
+
+/* Plan a Move ------------------------------------------------------------ */
+
+#transactionsView .transaction-action-centre-v311 {
+  display:grid;
+  gap:8px;
+  padding:10px;
+  border:1px solid rgba(119,201,255,.11);
+  border-radius:11px;
+  background:
+    radial-gradient(circle at 4% 0%,rgba(99,219,200,.045),transparent 36%),
+    rgba(255,255,255,.012);
+}
+
+#transactionsView .transaction-action-centre-head-v311 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+}
+
+#transactionsView .transaction-action-centre-head-v311 > div {
+  display:grid;
+  gap:2px;
+}
+
+#transactionsView .transaction-action-centre-head-v311 .eyebrow,
+#transactionsView .transaction-history-section-head-v311 .eyebrow {
+  margin:0;
+  color:#88B9D8;
+  font-size:.48rem;
+  letter-spacing:.11em;
+}
+
+#transactionsView .transaction-action-centre-head-v311 h4,
+#transactionsView .transaction-history-section-head-v311 h4 {
+  margin:0;
+  color:#D8EAF4;
+  font-size:.72rem;
+  line-height:1.12;
+}
+
+#transactionsView .transaction-action-centre-head-v311 p:not(.eyebrow) {
+  margin:1px 0 0;
+  color:#7F94A4;
+  font-size:.52rem;
+  line-height:1.32;
+}
+
+#transactionsView .transaction-action-centre-note-v311 {
+  flex:0 0 auto;
+  max-width:240px;
+  color:#708798;
+  font-size:.48rem;
+  line-height:1.28;
+  text-align:right;
+}
+
+#transactionsView .transaction-action-grid-v311 {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+
+#transactionsView .transaction-action-card-v311 {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-content:center;
+  justify-items:start;
+  gap:2px;
+  min-width:0;
+  min-height:62px;
+  padding:8px 9px;
+  border:1px solid rgba(119,201,255,.10);
+  border-radius:9px;
+  background:#0D1822;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+#transactionsView .transaction-action-card-v311:hover,
+#transactionsView .transaction-action-card-v311:focus-visible {
+  border-color:rgba(119,201,255,.25);
+  background:#101E2A;
+  transform:translateY(-1px);
+}
+
+#transactionsView .transaction-action-card-v311.player {
+  box-shadow:inset 2px 0 0 rgba(99,219,200,.32);
+}
+
+#transactionsView .transaction-action-card-v311.trade {
+  box-shadow:inset 2px 0 0 rgba(75,169,255,.34);
+}
+
+#transactionsView .transaction-action-card-v311.record {
+  box-shadow:inset 2px 0 0 rgba(171,184,197,.20);
+}
+
+#transactionsView .transaction-action-kicker-v311 {
+  color:#738A9A;
+  font-size:.42rem;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+#transactionsView .transaction-action-card-v311 strong {
+  overflow:hidden;
+  max-width:100%;
+  color:#DDECF5;
+  font-size:.63rem;
+  line-height:1.16;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+#transactionsView .transaction-action-card-v311 small {
+  color:#718899;
+  font-size:.47rem;
+  line-height:1.22;
+}
+
+/* History --------------------------------------------------------------- */
+
+#transactionsView .transaction-history-section-head-v311 {
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:2px;
+  padding:1px 1px 0;
+}
+
+#transactionsView .transaction-history-section-head-v311 > div {
+  display:grid;
+  gap:2px;
+}
+
+#transactionsView .transaction-history-section-head-v311 > span {
+  color:#708798;
+  font-size:.49rem;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Existing history now belongs visually to the History section. */
+#transactionsView .transactions-action-centre-page-v311
+.tx-history-toolbar-v294 {
+  margin-top:-1px;
+}
+
+#transactionsView .transactions-action-centre-page-v311
+.tx-empty-state-v294 {
+  margin-top:0;
+}
+
+/* The original heading-level Record button is intentionally superseded. */
+#transactionsView .transactions-action-centre-page-v311
+#recordTransactionBtn[hidden] {
+  display:none !important;
+}
+
+/* Player picker remains modal, not Roster-page chrome. */
+#rosterView #rosterPlayerDecisionsBtnV3101 {
+  display:none !important;
+}
+
+/* Mobile ---------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  #transactionsView .transactions-action-centre-page-v311 {
+    gap:7px;
+  }
+
+  #transactionsView .transaction-action-centre-v311 {
+    gap:7px;
+    padding:9px;
+  }
+
+  #transactionsView .transaction-action-centre-head-v311 {
+    display:grid;
+    gap:3px;
+  }
+
+  #transactionsView .transaction-action-centre-note-v311 {
+    max-width:none;
+    font-size:.46rem;
+    text-align:left;
+  }
+
+  #transactionsView .transaction-action-grid-v311 {
+    gap:5px;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:58px;
+    padding:7px 8px;
+  }
+
+  #transactionsView .transaction-action-card-v311 strong {
+    font-size:.60rem;
+  }
+
+  #transactionsView .transaction-action-card-v311 small {
+    font-size:.45rem;
+  }
+}
+
+@media (max-width:430px) {
+  #transactionsView .transaction-action-centre-v311 {
+    padding:8px;
+  }
+
+  #transactionsView .transaction-action-centre-head-v311 p:not(.eyebrow) {
+    font-size:.50rem;
+  }
+
+  #transactionsView .transaction-action-centre-note-v311 {
+    display:none;
+  }
+
+  #transactionsView .transaction-action-grid-v311 {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:57px;
+    padding:7px 6px;
+  }
+
+  #transactionsView .transaction-action-card-v311 strong {
+    font-size:.56rem;
+  }
+
+  #transactionsView .transaction-action-card-v311 small {
+    font-size:.42rem;
+  }
+
+  #transactionsView .transaction-action-kicker-v311 {
+    font-size:.39rem;
+  }
+}
+
+@media (max-width:360px) {
+  #transactionsView .transaction-action-card-v311 small {
+    display:none;
+  }
+
+  #transactionsView .transaction-action-card-v311 {
+    min-height:50px;
+  }
+}
+
+
+/* Transactions owns the persistent action entry point. */
+#rosterView #rosterPlayerDecisionsBtnV3101 {
+  display:none !important;
+}
+
+
+/* ============================================================================
+   RosterCap V3.11.2 — Decision modal viewport / iOS Safari hardening
+
+   The decision cards were viewport-sized, but the dialog element could still
+   contribute padding around them. On narrow Safari viewports that made the
+   effective width larger than the visible screen.
+
+   Own the outer dialog geometry here, then let the card fill the safe area.
+   ============================================================================ */
+
+.decision-player-picker-dialog-v3101,
+.decision-centre-dialog-v310 {
+  box-sizing:border-box !important;
+  width:100vw !important;
+  max-width:100vw !important;
+  height:100dvh !important;
+  max-height:100dvh !important;
+  margin:0 !important;
+  padding:
+    max(8px,env(safe-area-inset-top))
+    max(7px,env(safe-area-inset-right))
+    max(8px,env(safe-area-inset-bottom))
+    max(7px,env(safe-area-inset-left)) !important;
+  border:0 !important;
+  background:transparent !important;
+  overflow:hidden !important;
+}
+
+/* Fallback for engines where dvh is unavailable. */
+@supports not (height:100dvh) {
+  .decision-player-picker-dialog-v3101,
+  .decision-centre-dialog-v310 {
+    height:100vh !important;
+    max-height:100vh !important;
+  }
+}
+
+/* The card must fit inside the dialog's safe-area box, not size against 100vw
+   independently of that outer padding. */
+.decision-player-picker-dialog-v3101 .decision-player-picker-card-v3101,
+.decision-centre-dialog-v310 .decision-centre-card-v310 {
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  margin:0 auto !important;
+  overflow:hidden !important;
+}
+
+/* Preserve sensible desktop widths while still respecting the viewport. */
+@media (min-width:721px) {
+  .decision-player-picker-dialog-v3101 .decision-player-picker-card-v3101 {
+    width:min(620px,100%) !important;
+    max-width:620px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-centre-card-v310 {
+    width:min(920px,100%) !important;
+    max-width:920px !important;
+  }
+}
+
+/* Modal cards are vertical shells. Header remains visible; body owns scrolling. */
+.decision-player-picker-dialog-v3101 .decision-player-picker-card-v3101,
+.decision-centre-dialog-v310 .decision-centre-card-v310 {
+  display:flex !important;
+  flex-direction:column !important;
+}
+
+.decision-player-picker-dialog-v3101 .decision-player-picker-header-v3101,
+.decision-centre-dialog-v310 .decision-centre-header-v310 {
+  flex:0 0 auto !important;
+  min-width:0;
+}
+
+.decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101,
+.decision-centre-dialog-v310 .decision-centre-body-v310 {
+  flex:1 1 auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+}
+
+/* Player picker: the list, not the entire card, scrolls. */
+.decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+  overflow:hidden !important;
+}
+
+.decision-player-picker-dialog-v3101 .decision-player-picker-list-v3101 {
+  flex:1 1 auto;
+  min-height:0;
+  max-height:none !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Actual decision screen: allow its body to scroll within the fitted shell. */
+.decision-centre-dialog-v310 .decision-centre-body-v310 {
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Narrow-screen containment. Prevent text/meta from forcing horizontal width. */
+@media (max-width:720px) {
+  .decision-player-picker-dialog-v3101,
+  .decision-centre-dialog-v310 {
+    padding:
+      max(6px,env(safe-area-inset-top))
+      max(6px,env(safe-area-inset-right))
+      max(6px,env(safe-area-inset-bottom))
+      max(6px,env(safe-area-inset-left)) !important;
+  }
+
+  .decision-player-picker-intro-v3101 {
+    align-items:flex-start;
+    min-width:0;
+  }
+
+  .decision-player-picker-intro-v3101 > div {
+    min-width:0;
+  }
+
+  .decision-player-picker-intro-v3101 > small {
+    flex:0 0 auto;
+    max-width:74px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .decision-player-picker-search-v3101,
+  .decision-player-picker-search-v3101 input {
+    box-sizing:border-box;
+    width:100%;
+    min-width:0;
+    max-width:100%;
+  }
+
+  .decision-player-choice-v3101 {
+    box-sizing:border-box;
+    min-width:0;
+    max-width:100%;
+  }
+
+  .decision-player-choice-main-v3101,
+  .decision-player-choice-contract-v3101 {
+    min-width:0;
+  }
+}
+
+/* iPhone-width layout: keep price/end column controlled so the player side
+   gets the remaining width instead of pushing the card wider. */
+@media (max-width:430px) {
+  .decision-player-choice-v3101 {
+    grid-template-columns:minmax(0,1fr) minmax(76px,92px) !important;
+    gap:7px;
+  }
+
+  .decision-player-choice-contract-v3101 {
+    max-width:92px;
+  }
+
+  .decision-player-choice-contract-v3101 strong,
+  .decision-player-choice-contract-v3101 small {
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+}
+
+
+/* ============================================================================
+   RosterCap V3.11.3 — Decision Centre inner-content fit
+
+   V3.11.2 constrained the outer dialog/card correctly. The remaining iPhone
+   overflow came from the modal body/content layer: generic modal sizing can
+   make a 100%-wide content box plus horizontal padding exceed the card width.
+
+   This version makes every Decision Centre content layer border-box and
+   explicitly width-contained.
+   ============================================================================ */
+
+/* Critical fix: padding belongs INSIDE the available card width. */
+.decision-centre-dialog-v310 .decision-centre-body-v310,
+.decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+  box-sizing:border-box !important;
+  inline-size:100% !important;
+  width:100% !important;
+  max-inline-size:100% !important;
+  max-width:100% !important;
+  min-inline-size:0 !important;
+  min-width:0 !important;
+}
+
+/* Every large content panel must size from the body's content box, never from
+   its own min-content width. */
+.decision-centre-dialog-v310 .decision-player-hero-v310,
+.decision-centre-dialog-v310 .decision-options-v310,
+.decision-centre-dialog-v310 .decision-summary-grid-v310,
+.decision-centre-dialog-v310 .decision-actions-grid-v310,
+.decision-centre-dialog-v310 .decision-action-card-v310,
+.decision-centre-dialog-v310 .decision-contract-strip-v310,
+.decision-centre-dialog-v310 .decision-strip-head-v310,
+.decision-centre-dialog-v310 .decision-player-heading-v310,
+.decision-centre-dialog-v310 .decision-options-heading-v310 {
+  box-sizing:border-box !important;
+  inline-size:100%;
+  width:100%;
+  max-inline-size:100%;
+  max-width:100%;
+  min-inline-size:0;
+  min-width:0;
+}
+
+/* Flex/grid children must be allowed to shrink. */
+.decision-centre-dialog-v310 .decision-player-heading-v310 > *,
+.decision-centre-dialog-v310 .decision-options-heading-v310 > *,
+.decision-centre-dialog-v310 .decision-action-copy-v310,
+.decision-centre-dialog-v310 .decision-static-status-v310,
+.decision-centre-dialog-v310 .decision-impact-v310,
+.decision-centre-dialog-v310 .decision-impact-total-v310,
+.decision-centre-dialog-v310 .decision-relief-v310 {
+  min-width:0;
+  max-width:100%;
+}
+
+/* Normal prose should wrap instead of widening its card. */
+.decision-centre-dialog-v310 .decision-action-copy-v310 h4,
+.decision-centre-dialog-v310 .decision-action-copy-v310 p,
+.decision-centre-dialog-v310 .decision-options-heading-v310 h3,
+.decision-centre-dialog-v310 .decision-options-heading-v310 > span,
+.decision-centre-dialog-v310 .decision-player-heading-v310 h3,
+.decision-centre-dialog-v310 .decision-player-heading-v310 p,
+.decision-centre-dialog-v310 .decision-static-status-v310 strong,
+.decision-centre-dialog-v310 .decision-impact-v310 p {
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+/* Keep the summary cells from using their contents as a minimum width. */
+.decision-centre-dialog-v310 .decision-summary-grid-v310 > div {
+  box-sizing:border-box;
+  min-width:0 !important;
+  max-width:100%;
+}
+
+.decision-centre-dialog-v310 .decision-summary-grid-v310 strong,
+.decision-centre-dialog-v310 .decision-summary-grid-v310 small,
+.decision-centre-dialog-v310 .decision-summary-grid-v310 span {
+  min-width:0;
+  max-width:100%;
+}
+
+/* -------------------------------------------------------------------------
+   Mobile Decision Centre
+   ------------------------------------------------------------------------- */
+
+@media (max-width:720px) {
+  /* Explicit body padding, border-box constrained. This avoids inheriting a
+     modal-body width/padding combination that can overflow on Safari. */
+  .decision-centre-dialog-v310 .decision-centre-body-v310 {
+    padding:10px !important;
+  }
+
+  .decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+    padding:10px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-player-hero-v310,
+  .decision-centre-dialog-v310 .decision-options-v310 {
+    padding:11px !important;
+    border-radius:14px;
+  }
+
+  /* Two-column summary remains compact but cannot exceed the panel. */
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  /* Do not present a clipped fourth season as the default state.
+     On phones the entered horizon wraps into a contained two-column grid. */
+  .decision-centre-dialog-v310 .decision-contract-strip-v310 {
+    display:grid !important;
+    grid-auto-flow:row !important;
+    grid-auto-columns:auto !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:7px !important;
+    padding:1px !important;
+    overflow:visible !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-season-v310 {
+    box-sizing:border-box;
+    width:100%;
+    min-width:0 !important;
+    max-width:100%;
+    padding:9px 7px;
+  }
+
+  .decision-centre-dialog-v310 .decision-strip-head-v310 small {
+    display:none;
+  }
+
+  /* Action cards are strictly single-column on mobile. */
+  .decision-centre-dialog-v310 .decision-actions-grid-v310 {
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:8px;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-card-v310 {
+    padding:11px !important;
+    gap:9px;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-copy-v310 p:not(.eyebrow) {
+    font-size:.67rem;
+    line-height:1.38;
+  }
+
+  .decision-centre-dialog-v310 .decision-static-status-v310,
+  .decision-centre-dialog-v310 .decision-impact-total-v310,
+  .decision-centre-dialog-v310 .decision-relief-v310 {
+    box-sizing:border-box;
+    width:100%;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   iPhone width
+   ------------------------------------------------------------------------- */
+
+@media (max-width:430px) {
+  .decision-centre-dialog-v310 .decision-centre-body-v310,
+  .decision-player-picker-dialog-v3101 .decision-player-picker-body-v3101 {
+    padding:8px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-player-hero-v310,
+  .decision-centre-dialog-v310 .decision-options-v310 {
+    padding:10px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 > div {
+    padding:9px 6px !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 span {
+    font-size:.55rem;
+    letter-spacing:.07em;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 strong {
+    font-size:.78rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-summary-grid-v310 small {
+    font-size:.55rem;
+    line-height:1.22;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-strip-v310 {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-season-v310 span {
+    font-size:.58rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-contract-season-v310 strong {
+    font-size:.72rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-options-heading-v310 h3 {
+    font-size:.95rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-copy-v310 h4 {
+    font-size:.87rem;
+  }
+
+  .decision-centre-dialog-v310 .decision-action-copy-v310 p:not(.eyebrow) {
+    font-size:.64rem;
+  }
+
+  /* Long status rows can stack rather than forcing horizontal width. */
+  .decision-centre-dialog-v310 .decision-static-status-v310 {
+    align-items:flex-start;
+    flex-direction:column;
+    gap:3px;
+  }
+
+  .decision-centre-dialog-v310 .decision-static-status-v310 strong {
+    width:100%;
+    text-align:left;
+  }
+}
+
+/* Very narrow phones: horizon becomes one clean column rather than clipping. */
+@media (max-width:350px) {
+  .decision-centre-dialog-v310 .decision-contract-strip-v310 {
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+}
