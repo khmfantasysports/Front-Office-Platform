@@ -151,7 +151,7 @@ function syncAssetTypeFields() {
   el('assetDraftFields').classList.toggle('hidden', !isDraft);
   el('assetFormNote').textContent = isDraft
     ? 'Draft-pick identity is based on year, round and original team. The original team should never change when the pick is traded.'
-    : 'Use the name and notes fields to describe this asset. Structured trade execution will connect these records to Transactions in the next integration pass.';
+    : 'Use the name and notes fields to describe this asset. Tracked assets can be included in structured trades and transaction history.';
   el('assetLabel').placeholder = isDraft ? 'Optional — generated from pick identity' : 'Asset name';
 }
 
