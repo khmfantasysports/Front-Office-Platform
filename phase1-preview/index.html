@@ -43,6 +43,12 @@
 <link href="./css/transactions.css?v=20260820-v265-css-consolidation" rel="stylesheet"/>
 <link href="./css/transaction-contracts.css?v=20260822-v2961-contract-percentage" rel="stylesheet"/>
 <link href="./css/legal.css?v=20260824-v3018-centered-footer" rel="stylesheet"/>
+<style>
+.phase1-preview-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:10px 12px;border:1px solid rgba(87,177,255,.28);border-radius:12px;background:rgba(65,153,230,.09);color:#cfe8fb;font-size:.72rem}
+.phase1-preview-strip strong{color:#78c3ff;letter-spacing:.08em;text-transform:uppercase;font-size:.64rem}
+.phase1-preview-account{color:#9eb0bf;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:720px){.phase1-preview-strip{align-items:flex-start;flex-direction:column;gap:4px}.phase1-preview-account{max-width:100%}}
+</style>
 </head>
 <body data-rostercap-version="3.17.2">
 <div class="app-shell" id="app">
@@ -139,6 +145,10 @@
 </div>
 </section>
 <section class="office-picker-shell hidden" id="officePicker">
+<div class="phase1-preview-strip" role="status">
+  <strong>Phase 1 Preview</strong>
+  <span class="phase1-preview-account" id="phase1PreviewAccount">Checking signed-in account…</span>
+</div>
 <div class="office-picker-hero">
 <div>
 <p class="eyebrow">Front Office Hub</p>
@@ -611,5 +621,27 @@ window.__rostercapOnGoogleGISLoad = function () {
 <script src="./js/features/office-picker.js?v=20260822-v295-logo-cache"></script>
 <script src="./js/features/season-rollover.js?v=20260820-v267-season-rollover"></script>
 <script src="./js/app.js?v=20260826-v3114-penalty-semantics"></script>
+<script>
+(function(){
+  const syncPreviewIdentity = () => {
+    const target = document.getElementById('phase1PreviewAccount');
+    const source = document.getElementById('userEmail');
+    if (!target) return;
+    const value = (source?.textContent || '').trim();
+    target.textContent = value && value !== 'Signed in'
+      ? 'Signed in as ' + value
+      : 'Signed in account unavailable';
+  };
+  window.addEventListener('load', () => {
+    syncPreviewIdentity();
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      syncPreviewIdentity();
+      attempts += 1;
+      if (attempts >= 20) window.clearInterval(timer);
+    }, 500);
+  });
+})();
+</script>
 </body>
 </html>
