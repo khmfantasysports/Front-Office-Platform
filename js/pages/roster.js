@@ -121,6 +121,7 @@ function renderRoster() {
           <p class="page-copy">Manage depth, roster status and seven-season contract commitments.</p>
         </div>
         <div class="roster-header-actions-v252">
+          <button id="rosterFantraxSyncBtn" class="btn btn-secondary" type="button">Sync Fantrax</button>
           <details class="tools-menu"><summary>Import / Tools ▾</summary><div class="tools-popover"><button id="importRosterBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="rosterExportBtn" class="btn btn-ghost" type="button">Export CSV</button></div></details>
           <button id="addPlayerBtn" class="btn btn-primary" type="button">+ Add Player</button>
         </div>
@@ -149,6 +150,15 @@ function renderRoster() {
     </div>`;
 
   const rerenderMode = (mode) => { if (mode !== 'depth') { depthEditMode = false; depthDraftOrder = []; } rosterMode = mode; renderRoster(); };
+  el('rosterFantraxSyncBtn')?.addEventListener('click', () => {
+    switchView('settings');
+    const disclosure = document.querySelector('#settingsView details[data-settings-section="fantrax-connection"]');
+    if (disclosure) {
+      disclosure.open = true;
+      requestAnimationFrame(() => disclosure.scrollIntoView({ behavior:'smooth', block:'start' }));
+    }
+  });
+
   el('rosterDepthModeBtn').addEventListener('click', () => rerenderMode('depth'));
   el('rosterGridModeBtn').addEventListener('click', () => rerenderMode('grid'));
   el('addPlayerBtn').addEventListener('click', () => openPlayerDialog());

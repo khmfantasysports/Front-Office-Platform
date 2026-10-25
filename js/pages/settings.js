@@ -245,8 +245,8 @@ function fantraxSyncOptionsMarkupV3171() {
         </select>
         <small>Example: 2 can mean 2 seasons remaining (current season included) or Year 2 of the contract. Current-contract-year mode never guesses an end date.</small>
       </label>
-      <label><span><input type="checkbox" disabled /> League settings</span><small>Shown here as a planned module; field-by-field Fantrax mapping is not enabled until the exact returned settings contract is verified.</small></label>
-      <label><span><input type="checkbox" disabled /> Draft picks</span><small>Planned module using getDraftPicks after its exact response contract is verified.</small></label>
+      <label><span><input type="checkbox" disabled /> League settings</span><small>Not available yet. RosterCap leaves your saved league settings unchanged during Fantrax sync.</small></label>
+      <label><span><input type="checkbox" disabled /> Draft picks</span><small>Not available yet. Draft picks remain managed in Draft &amp; Assets.</small></label>
     </div>
   </div>`;
 }
@@ -714,17 +714,17 @@ function fantraxPreviewResultMarkupV3162() {
   ${fantraxConnectionSelectorMarkupV3162()}
   <div id="fantraxRosterResultV3162">${fantraxRosterResultMarkupV3162()}</div>
   <details class="advanced-contract">
-    <summary>Technical league response</summary>
-    <p class="settings-card-copy">Raw redacted getLeagues response. The User Secret ID is not included.</p>
+    <summary>Connection details</summary>
+    <p class="settings-card-copy">Technical details returned by Fantrax. Your Secret ID is never shown.</p>
     <pre style="max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0">${escapeHtml(leagueJson)}</pre>
   </details>`;
 }
 
 function fantraxConnectionMarkupV3162() {
   return `<details class="settings-disclosure" data-settings-section="fantrax-connection">
-    <summary><span class="settings-disclosure-title"><strong>Fantrax Connection</strong><span>Manual modular sync</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Not connected')}</summary>
+    <summary><span class="settings-disclosure-title"><strong>Fantrax Sync</strong><span>Connect, review &amp; sync</span></span>${settingsFeedbackMarkup('fantrax-connection', 'Ready to connect')}</summary>
     <div class="settings-disclosure-body">
-      <p class="settings-card-copy">Fantrax remains user-triggered only. Load Leagues reads your owned Fantrax leagues only when you press the button. Choose the roster, salary and contract modules you want, then review every player before anything is saved.</p>
+      <p class="settings-card-copy">Connect Fantrax to bring in roster, salary and contract information. You choose what to sync, review the changes first, and nothing is saved until you apply the review.</p>
       <div id="fantraxCredentialStatusV3172">${fantraxCredentialStatusMarkupV3172()}</div>
       <div class="settings-fields">
         <label>Fantrax User Secret ID
@@ -736,7 +736,7 @@ function fantraxConnectionMarkupV3162() {
         <span>Leave the Secret ID blank when a saved credential is available. Saving is optional; uncheck Remember to use a newly entered ID only for this request.</span>
         <div class="settings-data-actions">
           <button id="fantraxForgetSecretBtnV3172" class="btn btn-ghost btn-small ${fantraxCredentialStateV3172.saved ? '' : 'hidden'}" type="button">Forget Saved ID</button>
-          <button id="fantraxTestConnectionBtnV3162" class="btn btn-primary btn-small" type="button">Load Leagues</button>
+          <button id="fantraxTestConnectionBtnV3162" class="btn btn-primary btn-small" type="button">Connect Fantrax</button>
         </div>
       </div>
       <div id="fantraxConnectionResultV3162">${fantraxPreviewResultMarkupV3162()}</div>
@@ -779,13 +779,13 @@ async function testFantraxConnectionV3162() {
   );
 
   if (!secret && !useSavedCredential) {
-    alert('Enter your Fantrax User Secret ID first, or save one securely for this account.');
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Enter your Fantrax Secret ID');
     input?.focus();
     return;
   }
 
   if (!session?.user) {
-    alert('Sign in to RosterCap before loading Fantrax leagues.');
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Sign in to connect Fantrax');
     return;
   }
 
@@ -857,7 +857,7 @@ async function testFantraxConnectionV3162() {
     const currentButton = el('fantraxTestConnectionBtnV3162');
     if (currentButton) {
       currentButton.disabled = false;
-      currentButton.textContent = 'Load Leagues';
+      currentButton.textContent = 'Connect Fantrax';
     }
   }
 }
@@ -877,17 +877,17 @@ async function previewFantraxRosterV3162(syncAll = false) {
   const requestedOptions = fantraxReadSyncOptionsV3171();
 
   if (!requestedOptions.roster && !requestedOptions.salaries && !requestedOptions.contracts) {
-    alert('Choose at least one Fantrax sync module.');
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Choose at least one sync option');
     return;
   }
 
   if (!selected) {
-    alert('Choose a Fantrax league/team first.');
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Choose a Fantrax league and team');
     return;
   }
 
   if (!session?.user) {
-    alert('Sign in to RosterCap before previewing Fantrax sync data.');
+    setSettingsSectionFeedback('fantrax-connection', 'error', 'Sign in to sync Fantrax');
     return;
   }
 
@@ -1082,7 +1082,7 @@ function renderSettings() {
       <summary><span class="settings-disclosure-title"><strong>Data & Export</strong><span>Health, refresh, CSV import and backups</span></span>${settingsFeedbackMarkup('data-export', 'Ready')}</summary>
       <div class="settings-disclosure-body">
         ${settingsDataHealthMarkup(snapshot)}
-        <p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. Existing Fantrax / CSV import remains available while the API roster, salary and player-identity contracts are validated separately above.</p>
+        <p class="settings-card-copy">Refresh reloads the latest saved Front Office data from the cloud. You can sync from Fantrax, import a CSV, or export a roster backup at any time.</p>
         <div class="settings-data-actions"><button id="settingsRefreshBtn" class="btn btn-secondary" type="button">Refresh Front Office</button><button id="settingsImportBtn" class="btn btn-secondary" type="button">Import Fantrax / CSV</button><button id="settingsExportBtn" class="btn btn-secondary" type="button">Export CSV</button></div>
       </div>
     </details>
